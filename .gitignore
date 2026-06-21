@@ -10,10 +10,13 @@ __pycache__/
 venv/
 .env
 
-# Kết quả & model weights (đừng commit)
-results/
-crsd_results/
-models/
+# Kết quả & model weights (đừng commit) — NEO GỐC (dấu /) để KHÔNG nuốt nhầm
+# package con như crsd/models/ hay crsd/.../results/.
+/results/
+/crsd_results/
+/models/
+# Output CSV (3.4MB) của FAIRGAME — vendored, không cần public
+FAIRGAME/resources/results/
 *.safetensors
 *.gguf
 *.zip

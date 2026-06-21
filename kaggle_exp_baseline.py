@@ -177,14 +177,22 @@ else:
     _spec = "vllm" + (f"=={VLLM_VERSION}" if VLLM_VERSION else "")
     _cmd = [sys.executable, "-m", "pip", "install", "--no-index",
             f"--find-links={VLLM_WHEELS_DIR}", _spec]
-    print("Cài vLLM offline:", " ".join(_cmd))
-    subprocess.run(_cmd, check=True)
+    print(f"Cài vLLM offline từ {VLLM_WHEELS_DIR} ... (ẩn log pip, chỉ hiện khi lỗi)")
+    _r = subprocess.run(_cmd, capture_output=True, text=True)
+    if _r.returncode != 0:
+        print(_r.stdout[-3000:])
+        print(_r.stderr[-3000:])
+        raise RuntimeError("pip install vllm offline thất bại — xem log phía trên.")
     importlib.invalidate_caches()
     _probe = ("import torch; torch.zeros(1).cuda(); print('GPU_OK', torch.__version__)")
-    if subprocess.run([sys.executable, "-c", _probe]).returncode != 0:
+    _rp = subprocess.run([sys.executable, "-c", _probe], capture_output=True, text=True)
+    if _rp.returncode != 0:
+        print(_rp.stdout)
+        print(_rp.stderr)
         raise RuntimeError(
             "torch vừa cài KHÔNG init được GPU — gần như chắc do wheels build SAI CUDA so với "
             "driver Kaggle. Build lại wheels khớp torch của Kaggle, hoặc tạm đổi engine='transformers'.")
+    print(_rp.stdout.strip())
     print("vLLM đã cài từ wheels và torch init GPU OK.")
 
 # =====================================================================
