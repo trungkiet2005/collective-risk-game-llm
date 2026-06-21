@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crsd"
+version = "0.1.0"
+description = "Collective-Risk Social Dilemma cho LLM agents (mô phỏng Milinski et al. 2008)"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+packages = ["crsd"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["crsd/tests"]
+addopts = "-q"

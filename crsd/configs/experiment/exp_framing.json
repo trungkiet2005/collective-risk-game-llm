@@ -1,0 +1,21 @@
+{
+  "name": "exp_framing",
+  "description": "So sánh khung dẫn nhập: baseline (chỉ mô tả payoff) vs framed (thêm câu neo trung lập 'điều duy nhất quan trọng là payoff của chính bạn', không kê toa chiến lược). Kiểm tra thiên lệch hợp tác do RLHF có làm mất độ nhạy theo rủi ro không. 3 mức rủi ro Milinski, agent trung tính, EN+VN. CHẠY framed trên CẢ HAI chế độ trí nhớ (full_history + scratchpad) -> factorial 2×2 framing×memory. ĐÃ KHỬ TRÙNG: chỉ chạy nhánh framed; đối chứng không-framing lấy từ exp_baseline (full_history) và exp_memory_ablation (scratchpad), join theo risk×language×rep×model×memory_mode (cùng seed/CRN). 6 game × 2 lang × 10 = 120 game/model.",
+  "games": [
+    "crsd_milinski_high_risk_framed",
+    "crsd_milinski_medium_risk_framed",
+    "crsd_milinski_low_risk_framed",
+    "crsd_milinski_high_risk_scratchpad_framed",
+    "crsd_milinski_medium_risk_scratchpad_framed",
+    "crsd_milinski_low_risk_scratchpad_framed"
+  ],
+  "agents": "personas_default",
+  "languages": ["en", "vn"],
+  "models": ["LocalQwen"],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}

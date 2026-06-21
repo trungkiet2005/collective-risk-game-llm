@@ -1,0 +1,5 @@
+{
+  "abstractName": "LocalQwen",
+  "modelPath": "Qwen/Qwen2.5-7B-Instruct",
+  "note": "Đặt modelPath thành thư mục local để chạy hoàn toàn offline, vd 'D:/models/Qwen2.5-7B-Instruct'."
+}

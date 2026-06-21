@@ -1,0 +1,18 @@
+{
+  "name": "exp_memory_ablation",
+  "description": "So sánh chế độ trí nhớ: full_history (người ghi chú hoàn hảo) vs scratchpad (chỉ thấy vòng gần nhất + cuốn sổ tay tích luỹ tự viết, 'pen & paper' có sai số — gần con người hơn). 3 mức rủi ro Milinski, agent trung tính, EN+VN. ĐÃ KHỬ TRÙNG: chỉ chạy nhánh scratchpad; đối chứng full_history lấy từ exp_baseline (cùng seed/CRN, join theo risk×language×rep×model).",
+  "games": [
+    "crsd_milinski_high_risk_scratchpad",
+    "crsd_milinski_medium_risk_scratchpad",
+    "crsd_milinski_low_risk_scratchpad"
+  ],
+  "agents": "personas_default",
+  "languages": ["en", "vn"],
+  "models": ["LocalQwen"],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}

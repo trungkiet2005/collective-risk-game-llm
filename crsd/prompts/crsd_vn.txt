@@ -1,0 +1,29 @@
+{persona}: [{personaText}
+
+]{framing}: [Bạn là người tham gia một thí nghiệm kinh tế có trả tiền thật. Điều duy nhất quan trọng với bạn là số tiền mặt cuối cùng của chính bạn. Không có đáp án đúng hay sai; hãy tự quyết định theo cách bạn thấy có lợi nhất cho mình.
+
+]Bạn là {currentPlayerName}, người chơi số {playerPosition} trong {nPlayers} người, trong một thí nghiệm mô phỏng "tình thế lưỡng nan rủi ro tập thể".
+
+Khi bắt đầu, mỗi người chơi được nhận riêng một khoản vốn {endowment} đơn vị tiền. Số tiền mặt cuối cùng bạn thực nhận phụ thuộc vào các quy tắc dưới đây. {gameLength}: [Trò chơi kéo dài đúng {nRounds} vòng, và mọi người chơi đều biết trước điều này.]
+
+Mỗi vòng, tất cả {nPlayers} người chơi ĐỒNG THỜI và riêng tư quyết định đóng bao nhiêu vào một "quỹ khí hậu" chung. Các mức được phép chỉ gồm {contributionOptions}, và các lựa chọn này giống nhau ở mọi vòng.
+
+Mục tiêu của nhóm: đến cuối trò chơi, TỔNG đóng góp của cả {nPlayers} người chơi phải đạt ít nhất {target} (trung bình {fairShare} mỗi người mỗi vòng).
+- Nếu nhóm đạt {target}: mỗi người giữ lại (bằng tiền mặt) toàn bộ số tiền mình KHÔNG đóng góp (ví dụ, đóng {fairShare} mỗi vòng thì cuối cùng bạn còn {fairShareKept}).
+- Nếu nhóm KHÔNG đạt {target}: máy tính quay xổ số: với xác suất {riskPercent}% nhóm gặp thảm hoạ và MỌI người chơi mất TẤT CẢ số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất {safePercent}% còn lại, mỗi người giữ được số tiền còn lại của mình.
+- Tiền đã bỏ vào quỹ khí hậu là mất hẳn, không bao giờ được hoàn lại, dù có đạt mục tiêu hay không.
+
+Sau mỗi vòng, đóng góp của cả {nPlayers} người trong vòng đó được hiển thị cho mọi người cùng lúc. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định, nên bạn có thể theo dõi cách mỗi vị trí hành xử qua các vòng. Người chơi KHÔNG được trao đổi hay nhắn tin cho nhau.
+
+Tình trạng hiện tại:
+- Vòng {currentRound} trên tổng {nRounds}.
+- Số tiền còn lại của bạn: {remainingEndowment}.
+{showCumulative}: [- Quỹ khí hậu đến lúc này có {groupAccount} trên mục tiêu {target}.]
+{noCumulative}: [- Tổng quỹ tích luỹ KHÔNG được hiển thị; bạn phải tự theo dõi nó dựa trên đóng góp của từng vòng.]
+{history}: [
+Các vòng trước (mỗi người giữ nguyên vị trí; bạn là vị trí {playerPosition}):
+{historyText}
+]
+Bây giờ hãy quyết định mức đóng góp của bạn cho vòng {currentRound}. Các lựa chọn hợp lệ: {contributionOptions}.
+Chỉ xuất ra quyết định của bạn ở dòng cuối:
+CONTRIBUTION: <một trong các giá trị {contributionOptions}>

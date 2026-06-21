@@ -1,0 +1,5 @@
+{
+  "abstractName": "LocalLlama",
+  "modelPath": "meta-llama/Llama-3.1-8B-Instruct",
+  "note": "Đặt modelPath thành thư mục local để chạy hoàn toàn offline."
+}

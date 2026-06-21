@@ -1,0 +1,22 @@
+# Chuẩn hoá xuống dòng: lưu text dạng LF trong repo và checkout cũng LF
+# (tránh cảnh báo "LF will be replaced by CRLF" trên Windows).
+* text=auto eol=lf
+
+# Một số đuôi text khai báo tường minh cho chắc.
+*.py    text eol=lf
+*.json  text eol=lf
+*.txt   text eol=lf
+*.md    text eol=lf
+*.cfg   text eol=lf
+*.toml  text eol=lf
+
+# Nhị phân: KHÔNG đụng vào xuống dòng.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.zip   binary
+*.gz    binary
+*.npy   binary
+*.npz   binary
+*.parquet binary

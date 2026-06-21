@@ -1,0 +1,18 @@
+{
+  "name": "exp_baseline",
+  "description": "BASELINE / replicate Milinski 2008 thuần: agent trung tính, full_history, KHÔNG framing, KHÔNG scratchpad, KHÔNG persona. Chỉ thao tác risk × ngôn ngữ (EN/VN). Là ô đối chứng mà các experiment khác đều chứa lại; cũng là chỗ đo HIỆU ỨNG NGÔN NGỮ sạch nhất (so cột language). 10 lần lặp/điều kiện = 10 nhóm/điều kiện như bản gốc.",
+  "games": [
+    "crsd_milinski_high_risk",
+    "crsd_milinski_medium_risk",
+    "crsd_milinski_low_risk"
+  ],
+  "agents": "personas_default",
+  "languages": ["en", "vn"],
+  "models": ["LocalQwen"],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}

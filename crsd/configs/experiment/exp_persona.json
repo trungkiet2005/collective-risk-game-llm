@@ -1,0 +1,28 @@
+{
+  "name": "exp_persona",
+  "description": "Hiệu ứng persona kiểu FairGame: mỗi nhóm 6 agent gán tính cách theo ghế (đồng nhất hoặc hỗn hợp). So các nhóm trên 3 mức rủi ro Milinski, EN+VN. Cùng seed/rep -> so theo cặp (CRN). ĐÃ KHỬ TRÙNG: bỏ 'personas_default' (đối chứng neutral lấy từ exp_baseline, join theo risk×language×rep×model). Gồm 7 điều kiện = GRADIENT đủ bộ theo số agent ích kỷ trong nhóm (0→6): cooperative (0 ích kỷ), 1:5, 2:4, 3:3, 4:2, 5:1, selfish (6 ích kỷ) — đo dị thể/bóc lột trong nhóm & dose-response của tỉ lệ ích kỷ lên reach-rate. 3 risk × 7 cond × 2 lang × 10 = 420 game/model. shufflePersonas=true: hoán vị NGẪU NHIÊN vị trí ghế (tất định theo cond×rep, độc lập risk/ngôn ngữ -> giữ CRN) để selfish không cố định ở ghế đầu; disposition từng ghế ghi vào turns.jsonl + cột persona_seats trong games.csv.",
+  "games": [
+    "crsd_milinski_high_risk",
+    "crsd_milinski_medium_risk",
+    "crsd_milinski_low_risk"
+  ],
+  "agents": "personas_default",
+  "agentsConditions": [
+    "personas_cooperative",
+    "personas_mixed_1sel_5coop",
+    "personas_mixed_2sel_4coop",
+    "personas_mixed_3sel_3coop",
+    "personas_mixed_4sel_2coop",
+    "personas_mixed_5sel_1coop",
+    "personas_selfish"
+  ],
+  "shufflePersonas": true,
+  "languages": ["en", "vn"],
+  "models": ["LocalQwen"],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}

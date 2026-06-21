@@ -1,0 +1,7 @@
+# Tuỳ chọn — chỉ cần khi chạy model API ở phase 2 (tính tiền).
+# Các connector này import lazy nên không bắt buộc khi chạy offline.
+
+anthropic>=0.39
+openai>=1.40
+mistralai>=1.0
+python-dotenv>=1.0

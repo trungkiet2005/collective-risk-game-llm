@@ -1,0 +1,5 @@
+{
+  "abstractName": "LocalGemma",
+  "modelPath": "google/gemma-2-9b-it",
+  "note": "Đặt modelPath thành thư mục local để chạy hoàn toàn offline."
+}

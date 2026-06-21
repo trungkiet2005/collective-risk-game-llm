@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Môi trường
+.venv/
+venv/
+.env
+
+# Kết quả & model weights (đừng commit)
+results/
+crsd_results/
+models/
+*.safetensors
+*.gguf
+*.zip
+
+# PDF bài báo gốc — bản quyền, KHÔNG public (giữ local; tham chiếu qua docs/papers/*.md + DOI)
+papers/
+
+# OS
+.DS_Store
+Thumbs.db

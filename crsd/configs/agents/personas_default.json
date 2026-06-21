@@ -1,0 +1,10 @@
+{
+  "name": "personas_default",
+  "nPlayers": 6,
+  "names": ["Player_1", "Player_2", "Player_3", "Player_4", "Player_5", "Player_6"],
+  "personas": {
+    "en": ["", "", "", "", "", ""],
+    "vn": ["", "", "", "", "", ""]
+  },
+  "description": "Agent trung tính cho replicate Milinski 2008 (không gán tính cách). Persona rỗng -> block persona trong prompt bị bỏ."
+}

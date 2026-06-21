@@ -1,0 +1,15 @@
+# CRSD — chạy offline open-source models trên GPU (RTX 6000 PRO 96GB) hoặc Kaggle.
+# torch/transformers/vllm thường có sẵn trên môi trường GPU; chỉ cài khi thiếu.
+
+pandas>=2.0,<3
+numpy>=1.24
+
+# Offline inference (cài theo CUDA của máy — gỡ dấu # khi cần):
+# vllm>=0.6            # backend ưu tiên (throughput cao, có logprobs cho XAI)
+# transformers>=4.44   # backend fallback
+# torch                # cài theo hướng dẫn CUDA tương ứng
+# sentencepiece        # tokenizer cho Llama/Gemma
+# accelerate           # tiện cho transformers backend
+
+# Dev:
+# pytest>=8
