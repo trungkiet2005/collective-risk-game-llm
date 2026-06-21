@@ -129,7 +129,31 @@ print("Internet OFF: dùng thư viện có sẵn trên image Kaggle (trừ cell 
 import importlib.util
 import subprocess
 
-VLLM_WHEELS_DIR = Path("/kaggle/input/vllm-offline-wheels")  # sửa cho đúng tên dataset
+# TỰ DÒ thư mục chứa wheel vLLM (vllm*.whl) dưới /kaggle/input/ — path dataset khác
+# nhau tuỳ cách add; dò trượt thì set VLLM_WHEELS_DIR thủ công tới thư mục chứa .whl.
+def find_wheels_dir(root="/kaggle/input", max_depth=6):
+    root = Path(root)
+    if not root.is_dir():
+        return None
+    stack = [(root, 0)]
+    while stack:
+        d, depth = stack.pop()
+        try:
+            if any(d.glob("vllm*.whl")):
+                return d
+        except OSError:
+            pass
+        if depth < max_depth:
+            try:
+                for c in sorted(d.iterdir()):
+                    if c.is_dir() and not c.name.startswith("."):
+                        stack.append((c, depth + 1))
+            except OSError:
+                pass
+    return None
+
+
+VLLM_WHEELS_DIR = find_wheels_dir("/kaggle/input") or Path("/kaggle/input/vllm-offline-wheels")
 VLLM_VERSION = ""   # "" = bản trong wheels; hoặc ghim "0.6.x"
 
 _want_vllm = (DEFAULT_ENGINE == "vllm") or any(
