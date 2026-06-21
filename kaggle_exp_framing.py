@@ -168,12 +168,37 @@ else:
 # =====================================================================
 import shutil
 
-# Repo đã add làm input (read-only). Sửa cho đúng path (xem "!ls /kaggle/input/").
-KAGGLE_CODE_INPUT = Path("/kaggle/input/colective-risk-game")
+# Repo đã add làm input (read-only). TỰ DÒ thư mục chứa crsd/ + FAIRGAME/ dưới
+# /kaggle/input/ (đường dẫn khác nhau tuỳ cách add: dataset, GitHub repo, notebook
+# output...). Auto-detect trượt thì sửa KAGGLE_CODE_INPUT thủ công cho đúng path.
+def find_repo_input(root="/kaggle/input", max_depth=6):
+    root = Path(root)
+    if not root.is_dir():
+        return None
+    stack = [(root, 0)]
+    while stack:
+        d, depth = stack.pop()
+        try:
+            if (d / "crsd").is_dir() and (d / "FAIRGAME").is_dir():
+                return d
+        except OSError:
+            pass
+        if depth < max_depth:
+            try:
+                for c in sorted(d.iterdir()):
+                    if c.is_dir() and not c.name.startswith("."):
+                        stack.append((c, depth + 1))
+            except OSError:
+                pass
+    return None
+
+
+KAGGLE_CODE_INPUT = find_repo_input("/kaggle/input") or Path("/kaggle/input/colective-risk-game")
+print(f"Repo input: {KAGGLE_CODE_INPUT}  (exists={Path(KAGGLE_CODE_INPUT).exists()})")
 
 if WORK_COPY.exists():
     shutil.rmtree(WORK_COPY)
-shutil.copytree(KAGGLE_CODE_INPUT, WORK_COPY)
+shutil.copytree(KAGGLE_CODE_INPUT, WORK_COPY, ignore=shutil.ignore_patterns(".git"))
 
 REPO_ROOT = resolve_repo_root(WORK_COPY)
 os.chdir(REPO_ROOT)
