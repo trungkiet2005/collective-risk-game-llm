@@ -30,7 +30,7 @@ def _init_vllm_engine(model_path: str, max_model_len: int = 4096,
     """
     from vllm import LLM, SamplingParams
 
-    global _GLOBAL_LLM, _GLOBAL_SAMPLING_PARAMS, _GLOBAL_ENGINE_TYPE
+    global _GLOBAL_LLM, _GLOBAL_TOKENIZER, _GLOBAL_SAMPLING_PARAMS, _GLOBAL_ENGINE_TYPE
     global _GLOBAL_VLLM_SAMPLING_KWARGS
 
     _GLOBAL_VLLM_SAMPLING_KWARGS = dict(
@@ -47,8 +47,19 @@ def _init_vllm_engine(model_path: str, max_model_len: int = 4096,
         tensor_parallel_size=tensor_parallel_size,
         enforce_eager=enforce_eager,  # True = no CUDA graphs (safe, slower)
     )
+    # Lấy tokenizer để áp chat template TRƯỚC khi generate. BẮT BUỘC: gemma2 (và mọi
+    # model instruct nhạy template) phát EOS ngay nếu nhận prompt thô không có marker
+    # <start_of_turn>/<|im_start|> -> trả về RỖNG. Tái dùng tokenizer của chính vLLM
+    # (đã nạp sẵn) để khỏi tải lại; fallback sang AutoTokenizer nếu API đổi.
+    try:
+        _GLOBAL_TOKENIZER = _GLOBAL_LLM.get_tokenizer()
+    except Exception:  # noqa: BLE001
+        from transformers import AutoTokenizer
+        _GLOBAL_TOKENIZER = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     _GLOBAL_ENGINE_TYPE = "vllm"
-    print(f"[LocalVLLM] Loaded model from {model_path} with vLLM engine")
+    has_tmpl = bool(getattr(_GLOBAL_TOKENIZER, "chat_template", None))
+    print(f"[LocalVLLM] Loaded model from {model_path} with vLLM engine "
+          f"(chat_template={'yes' if has_tmpl else 'NONE'})")
 
 
 def _init_transformers_engine(model_path: str, temperature: float = 1.0,
@@ -217,7 +228,7 @@ def free_local_llm() -> None:
 
 def _generate_vllm(prompt: str) -> str:
     """Generate text using vLLM engine."""
-    outputs = _GLOBAL_LLM.generate([prompt], _GLOBAL_SAMPLING_PARAMS)
+    outputs = _GLOBAL_LLM.generate([_format_prompt_for_model(prompt)], _GLOBAL_SAMPLING_PARAMS)
     return outputs[0].outputs[0].text.strip()
 
 
@@ -227,7 +238,7 @@ def _generate_vllm_with_details(prompt: str) -> dict:
     Returns:
         dict with keys: text, logprobs, top_alternatives, cumulative_logprob
     """
-    outputs = _GLOBAL_LLM.generate([prompt], _GLOBAL_SAMPLING_PARAMS)
+    outputs = _GLOBAL_LLM.generate([_format_prompt_for_model(prompt)], _GLOBAL_SAMPLING_PARAMS)
     output = outputs[0].outputs[0]
 
     result = {
@@ -259,13 +270,23 @@ def _generate_vllm_with_details(prompt: str) -> dict:
 
 
 def _format_prompt_for_model(prompt: str) -> str:
-    """Apply chat template if model has one, else return prompt as-is."""
-    if hasattr(_GLOBAL_TOKENIZER, "chat_template") and _GLOBAL_TOKENIZER.chat_template:
+    """Apply chat template if model has one, else return prompt as-is.
+
+    ``enable_thinking=False`` chỉ có ý nghĩa với vài model (Qwen3); các tokenizer
+    khác (gemma2, llama3.1, qwen2.5) bỏ qua nó vô hại, nhưng nếu một template nào đó
+    báo lỗi với kwarg lạ thì thử lại không kèm kwarg để vẫn áp được template.
+    """
+    if _GLOBAL_TOKENIZER is not None and getattr(_GLOBAL_TOKENIZER, "chat_template", None):
         messages = [{"role": "user", "content": prompt}]
-        return _GLOBAL_TOKENIZER.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True,
-            enable_thinking=False,
-        )
+        try:
+            return _GLOBAL_TOKENIZER.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            return _GLOBAL_TOKENIZER.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+            )
     return prompt
 
 
@@ -366,7 +387,8 @@ def _generate_vllm_batch(prompts: list, seeds=None) -> list:
         sampling = [_sampling_params_with_seed(s) for s in seeds]
     else:
         sampling = _GLOBAL_SAMPLING_PARAMS
-    outputs = _GLOBAL_LLM.generate(prompts, sampling)
+    templated = [_format_prompt_for_model(p) for p in prompts]
+    outputs = _GLOBAL_LLM.generate(templated, sampling)
     return [o.outputs[0].text.strip() for o in outputs]
 
 

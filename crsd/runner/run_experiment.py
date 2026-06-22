@@ -210,7 +210,12 @@ def main(argv):
             sampling_seeds_applied=sampling_seeds_applied,
         )
 
-        results = run_games_batched(games, send_batch, verbose=True)
+        # Retry chỉ có ý nghĩa khi backend áp seed per-request (offline). Mock luôn
+        # parse được; API connector chưa nhận seed -> gọi lại sẽ ra y hệt nên tắt.
+        max_parse_retries = int((offline_settings or {}).get("maxParseRetries", 3)) if (use_offline and not mock_strategy) else 0
+        results = run_games_batched(
+            games, send_batch, verbose=True, max_parse_retries=max_parse_retries
+        )
         all_results.extend(results)
         for g in games:
             all_turns.extend(g.turns)

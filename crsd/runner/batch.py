@@ -7,13 +7,44 @@ from __future__ import annotations
 
 from typing import Callable, List, Union
 
+from ..engine.round import parse_contribution
+
+# Đổi seed khi gọi lại: vLLM với CÙNG seed sinh ra output Y HỆT, nên muốn lấy mẫu
+# khác (mong parse được) thì phải đổi seed. Vẫn tất định theo (seed gốc, lần thử)
+# nên chạy lại toàn bộ vẫn tái lập được.
+_RETRY_SEED_MOD = 2_147_483_647  # 2**31 - 1, giữ seed trong int32 dương
+_RETRY_SEED_STEP = 1_000_003     # số nguyên tố, tách xa seed các slot khác
+
+
+def _resp_text(resp: Union[str, dict]) -> str:
+    """Lấy phần text từ phản hồi (chuỗi hoặc dict có khoá 'text')."""
+    if isinstance(resp, dict):
+        return resp.get("text", "") or ""
+    return resp or ""
+
+
+def _failed_slots(responses, options_per_prompt) -> List[int]:
+    """Chỉ số các slot mà output KHÔNG parse được CONTRIBUTION (cần gọi lại)."""
+    out = []
+    for i, r in enumerate(responses):
+        _, failed = parse_contribution(_resp_text(r), options_per_prompt[i])
+        if failed:
+            out.append(i)
+    return out
+
 
 def run_games_batched(
     games,
     send_batch: Callable[..., List[Union[str, dict]]],
     verbose: bool = False,
+    max_parse_retries: int = 3,
 ):
-    """Chạy tất cả ``games`` đến hết. Trả về list GameResult (đúng thứ tự games)."""
+    """Chạy tất cả ``games`` đến hết. Trả về list GameResult (đúng thứ tự games).
+
+    ``max_parse_retries``: nếu output của một slot không parse được CONTRIBUTION
+    (rỗng / sai định dạng / số ngoài tập), gọi lại RIÊNG slot đó với seed mới, tối đa
+    ngần này lần, để kéo tỉ lệ parse_failed về ~0. Đặt 0 để tắt (vd mock/API).
+    """
     while True:
         active = [g for g in games if not g.is_done()]
         if not active:
@@ -21,12 +52,14 @@ def run_games_batched(
 
         prompts: List[str] = []
         seeds: List[int] = []
+        options_per_prompt = []  # tập lựa chọn đóng góp của từng prompt (để parse)
         meta = []  # (game, count)
         for g in active:
             ps = g.build_round_prompts()
             meta.append((g, len(ps)))
             prompts.extend(ps)
             seeds.extend(g.build_round_sampling_seeds())
+            options_per_prompt.extend([g.config.contribution_options] * len(ps))
 
         if verbose:
             print(f"[batch] {len(active)} games active, {len(prompts)} prompts")
@@ -36,6 +69,32 @@ def run_games_batched(
             raise RuntimeError(
                 f"send_batch trả về {len(responses)} phản hồi cho {len(prompts)} prompt"
             )
+
+        # Gọi lại các slot parse-fail với seed mới cho tới khi sạch hoặc cạn lượt thử.
+        for attempt in range(1, max_parse_retries + 1):
+            fail_idx = _failed_slots(responses, options_per_prompt)
+            if not fail_idx:
+                break
+            if verbose:
+                print(f"[batch]   retry {attempt}/{max_parse_retries}: "
+                      f"{len(fail_idx)} prompt parse-fail")
+            retry_prompts = [prompts[i] for i in fail_idx]
+            retry_seeds = [(seeds[i] + attempt * _RETRY_SEED_STEP) % _RETRY_SEED_MOD
+                           for i in fail_idx]
+            retry_resp = send_batch(retry_prompts, retry_seeds)
+            if len(retry_resp) != len(retry_prompts):
+                raise RuntimeError(
+                    f"send_batch (retry) trả về {len(retry_resp)} cho "
+                    f"{len(retry_prompts)} prompt"
+                )
+            for j, i in enumerate(fail_idx):
+                responses[i] = retry_resp[j]
+
+        if verbose:
+            remain = len(_failed_slots(responses, options_per_prompt))
+            if remain:
+                print(f"[batch]   còn {remain} prompt parse-fail sau {max_parse_retries} "
+                      f"lượt (fallback về lựa chọn nhỏ nhất)")
 
         i = 0
         for g, n in meta:
