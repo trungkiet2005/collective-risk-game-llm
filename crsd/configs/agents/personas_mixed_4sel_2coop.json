@@ -4,20 +4,20 @@
   "names": ["Player_1", "Player_2", "Player_3", "Player_4", "Player_5", "Player_6"],
   "personas": {
     "en": [
-      "You are a selfish player: you care ONLY about maximizing your own final cash. You are reluctant to put money into the shared account and would rather let others cover the group's target.",
-      "You are a selfish player: you care ONLY about maximizing your own final cash. You are reluctant to put money into the shared account and would rather let others cover the group's target.",
-      "You are a selfish player: you care ONLY about maximizing your own final cash. You are reluctant to put money into the shared account and would rather let others cover the group's target.",
-      "You are a selfish player: you care ONLY about maximizing your own final cash. You are reluctant to put money into the shared account and would rather let others cover the group's target.",
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track.",
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track."
+      "You are a selfish player: you care only about maximizing your own final cash.",
+      "You are a selfish player: you care only about maximizing your own final cash.",
+      "You are a selfish player: you care only about maximizing your own final cash.",
+      "You are a selfish player: you care only about maximizing your own final cash.",
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster.",
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster."
     ],
     "vn": [
-      "Bạn là người chơi ích kỷ: bạn CHỈ quan tâm tối đa hoá số tiền cuối cùng của riêng mình. Bạn ngại bỏ tiền vào quỹ chung và muốn để người khác lo việc đạt mục tiêu nhóm.",
-      "Bạn là người chơi ích kỷ: bạn CHỈ quan tâm tối đa hoá số tiền cuối cùng của riêng mình. Bạn ngại bỏ tiền vào quỹ chung và muốn để người khác lo việc đạt mục tiêu nhóm.",
-      "Bạn là người chơi ích kỷ: bạn CHỈ quan tâm tối đa hoá số tiền cuối cùng của riêng mình. Bạn ngại bỏ tiền vào quỹ chung và muốn để người khác lo việc đạt mục tiêu nhóm.",
-      "Bạn là người chơi ích kỷ: bạn CHỈ quan tâm tối đa hoá số tiền cuối cùng của riêng mình. Bạn ngại bỏ tiền vào quỹ chung và muốn để người khác lo việc đạt mục tiêu nhóm.",
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng.",
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng."
+      "Bạn là người chơi ích kỷ: bạn chỉ quan tâm tối đa hoá số tiền cuối cùng của riêng mình.",
+      "Bạn là người chơi ích kỷ: bạn chỉ quan tâm tối đa hoá số tiền cuối cùng của riêng mình.",
+      "Bạn là người chơi ích kỷ: bạn chỉ quan tâm tối đa hoá số tiền cuối cùng của riêng mình.",
+      "Bạn là người chơi ích kỷ: bạn chỉ quan tâm tối đa hoá số tiền cuối cùng của riêng mình.",
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ.",
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ."
     ]
   },
   "description": "Nhóm HỖN HỢP 4 ích kỷ (Player_1..4) + 2 hợp tác (Player_5..6). Đa số ích kỷ, thiểu số hợp tác: test 2 người tốt có kéo nổi nhóm phần lớn ăn theo không. Persona gán theo ghế (slot); chỉ neo tính cách, KHÔNG kê mức đóng cụ thể."

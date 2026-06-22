@@ -4,26 +4,26 @@
 
 ]Bạn là {currentPlayerName}, người chơi số {playerPosition} trong {nPlayers} người, trong một thí nghiệm mô phỏng "tình thế lưỡng nan rủi ro tập thể".
 
-Khi bắt đầu, mỗi người chơi được nhận riêng một khoản vốn {endowment} đơn vị tiền. Số tiền mặt cuối cùng bạn thực nhận phụ thuộc vào các quy tắc dưới đây. {gameLength}: [Trò chơi kéo dài đúng {nRounds} vòng, và mọi người chơi đều biết trước điều này.]
+Khi bắt đầu, mỗi người chơi được nhận riêng một khoản vốn {endowment} đơn vị tiền. Số tiền mặt cuối cùng bạn thực nhận phụ thuộc vào các quy tắc dưới đây. {gameLength}: [Trò chơi kéo dài đúng {nRounds} vòng.]
 
-Mỗi vòng, tất cả {nPlayers} người chơi ĐỒNG THỜI và riêng tư quyết định đóng bao nhiêu vào một "quỹ khí hậu" chung. Các mức được phép chỉ gồm {contributionOptions}, và các lựa chọn này giống nhau ở mọi vòng.
+Mỗi vòng, tất cả {nPlayers} người chơi đồng thời và riêng tư quyết định đóng bao nhiêu vào một "quỹ khí hậu" chung. Các mức được phép chỉ gồm {contributionOptions}.
 
-Mục tiêu của nhóm: đến cuối trò chơi, TỔNG đóng góp của cả {nPlayers} người chơi phải đạt ít nhất {target} (trung bình {fairShare} mỗi người mỗi vòng).
-- Nếu nhóm đạt {target}: mỗi người giữ lại (bằng tiền mặt) toàn bộ số tiền mình KHÔNG đóng góp (ví dụ, đóng {fairShare} mỗi vòng thì cuối cùng bạn còn {fairShareKept}).
-- Nếu nhóm KHÔNG đạt {target}: máy tính quay xổ số: với xác suất {riskPercent}% nhóm gặp thảm hoạ và MỌI người chơi mất TẤT CẢ số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất {safePercent}% còn lại, mỗi người giữ được số tiền còn lại của mình.
+Mục tiêu của nhóm: đến cuối trò chơi, tổng đóng góp của cả {nPlayers} người chơi phải đạt ít nhất {target} (trung bình {fairShare} mỗi người mỗi vòng).
+- Nếu nhóm đạt {target}: mỗi người giữ lại (bằng tiền mặt) toàn bộ số tiền mình không đóng góp (ví dụ, đóng {fairShare} mỗi vòng thì cuối cùng bạn còn {fairShareKept}).
+- Nếu nhóm không đạt {target}: máy tính quay xổ số: với xác suất {riskPercent}% nhóm gặp thảm hoạ và mọi người chơi mất tất cả số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất {safePercent}% còn lại, mỗi người giữ được số tiền còn lại của mình.
 - Tiền đã bỏ vào quỹ khí hậu là mất hẳn, không bao giờ được hoàn lại, dù có đạt mục tiêu hay không.
 
-QUAN TRỌNG — trí nhớ giới hạn: bạn CHỈ được xem đóng góp của vòng gần nhất. Các vòng trước đó KHÔNG được hiển thị lại, và tổng quỹ tích luỹ KHÔNG BAO GIỜ được hiển thị cho bạn. Giống như một người có giấy và bút, thứ duy nhất bạn mang theo giữa các vòng là cuốn sổ tay của chính bạn: mỗi vòng bạn thêm một dòng ngắn vào sổ, và bạn đọc lại được mọi dòng đã viết từ trước tới giờ. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định. Người chơi KHÔNG được trao đổi hay nhắn tin cho nhau.
+Quan trọng — trí nhớ giới hạn: bạn chỉ được xem đóng góp của vòng gần nhất. Các vòng trước đó không được hiển thị lại, và tổng quỹ tích luỹ không bao giờ được hiển thị cho bạn. Giống như một người có giấy và bút, thứ duy nhất bạn mang theo giữa các vòng là cuốn sổ tay của chính bạn: mỗi vòng bạn thêm một dòng ngắn vào sổ, và bạn đọc lại được mọi dòng đã viết từ trước tới giờ. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định. Người chơi không được trao đổi hay nhắn tin cho nhau.
 
 Tình trạng hiện tại:
 - Vòng {currentRound} trên tổng {nRounds}.
 - Số tiền còn lại của bạn: {remainingEndowment}.
 {lastRound}: [- Vòng gần nhất được hiển thị cho bạn (mỗi người giữ nguyên vị trí; bạn là vị trí {playerPosition}):
 {lastRoundText}
-]{scratchpadNote}: [- Cuốn sổ tay của bạn đến lúc này (chỉ giữ những gì CHÍNH BẠN đã viết; mỗi vòng một dòng):
+]{scratchpadNote}: [- Cuốn sổ tay của bạn đến lúc này (chỉ giữ những gì chính bạn đã viết; mỗi vòng một dòng):
 {noteText}
 ]
-Trước hết, hãy thêm một dòng ngắn mới vào sổ tay — ví dụ cập nhật ước lượng của bạn về tổng quỹ nhóm đến lúc này và cách mỗi vị trí đang hành xử — vì bạn sẽ KHÔNG thấy lại màn hình vòng này ở lượt sau. Sau đó quyết định mức đóng góp của bạn cho vòng {currentRound}. Các lựa chọn hợp lệ: {contributionOptions}.
+Trước hết, hãy thêm một dòng ngắn mới vào sổ tay — ví dụ cập nhật ước lượng của bạn về tổng quỹ nhóm đến lúc này và cách mỗi vị trí đang hành xử — vì bạn sẽ không thấy lại màn hình vòng này ở lượt sau. Sau đó quyết định mức đóng góp của bạn cho vòng {currentRound}. Các lựa chọn hợp lệ: {contributionOptions}.
 Chỉ xuất ra đúng hai dòng cuối này, theo thứ tự:
 NOTE: <một dòng ngắn ghi chú cho chính bạn ở vòng sau>
 CONTRIBUTION: <một trong các giá trị {contributionOptions}>

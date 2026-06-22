@@ -4,20 +4,20 @@
   "names": ["Player_1", "Player_2", "Player_3", "Player_4", "Player_5", "Player_6"],
   "personas": {
     "en": [
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track.",
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track.",
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track.",
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track.",
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track.",
-      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster. You are willing to contribute your fair share, and more if needed to keep the group on track."
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster.",
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster.",
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster.",
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster.",
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster.",
+      "You are a cooperative player: you want the whole group to reach the target and avoid the disaster."
     ],
     "vn": [
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng.",
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng.",
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng.",
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng.",
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng.",
-      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ. Bạn sẵn lòng đóng góp phần công bằng của mình, và nhiều hơn nếu cần để giữ nhóm đi đúng hướng."
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ.",
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ.",
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ.",
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ.",
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ.",
+      "Bạn là người chơi hợp tác: bạn muốn cả nhóm đạt mục tiêu và tránh thảm hoạ."
     ]
   },
   "description": "Nhóm ĐỒNG NHẤT hợp tác (cả 6 agent): điều kiện persona kiểu FairGame. Chỉ neo tính cách, KHÔNG kê toa mức đóng cụ thể."
