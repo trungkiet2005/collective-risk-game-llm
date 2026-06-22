@@ -60,11 +60,11 @@ def build_history_text(history: List[List[float]], player_index: int, cfg, langu
                 for i, c in enumerate(round_contribs)
             )
             if language == "vn":
-                line = f"Vòng {r}: {labeled} (tổng vòng {_fmt(total)}"
-                line += f"; tích luỹ {_fmt(cumulative)})." if show_cum else ")."
+                line = f"Vòng {r}: {labeled}"
+                line += f" (tích luỹ {_fmt(cumulative)})." if show_cum else "."
             else:
-                line = f"Round {r}: {labeled} (round total {_fmt(total)}"
-                line += f"; cumulative {_fmt(cumulative)})." if show_cum else ")."
+                line = f"Round {r}: {labeled}"
+                line += f" (cumulative {_fmt(cumulative)})." if show_cum else "."
         else:
             if language == "vn":
                 line = f"Vòng {r}: bạn đóng {_fmt(own)}; tổng nhóm vòng này {_fmt(total)}"
@@ -98,9 +98,9 @@ def build_window_text(history, player_index, cfg, language, window):
                 for i, c in enumerate(round_contribs)
             )
             if language == "vn":
-                lines.append(f"Vòng {round_no}: {labeled} (tổng vòng {_fmt(total)}).")
+                lines.append(f"Vòng {round_no}: {labeled}.")
             else:
-                lines.append(f"Round {round_no}: {labeled} (round total {_fmt(total)}).")
+                lines.append(f"Round {round_no}: {labeled}.")
         else:
             own = round_contribs[player_index]
             if language == "vn":
@@ -180,7 +180,6 @@ def build_prompt(
         # full_history: nạp lại toàn bộ lịch sử; scratchpad: KHÔNG dùng block này.
         "history": (not is_scratchpad) and has_history,
         "showCumulative": (not is_scratchpad) and show_cum,
-        "noCumulative": (not is_scratchpad) and (not show_cum),
         # scratchpad: chỉ hiển thị vòng gần nhất + cuốn sổ tay ghi chú riêng.
         "lastRound": is_scratchpad and has_history,
         "scratchpadNote": is_scratchpad and bool(notepad_text),
