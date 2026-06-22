@@ -1,0 +1,13 @@
+After each round, all {nPlayers} contributions for that round are revealed to everyone. Names are hidden, but each player always appears in the same fixed position. Players cannot talk to or message each other.
+
+Current state:
+- Round {currentRound} of {nRounds}.
+- Your remaining money: {remainingEndowment}.
+{showCumulative}: [- The climate account so far holds {groupAccount} of the {target} target.]
+{history}: [
+Previous rounds (each player keeps the same position; you are position {playerPosition}):
+{historyText}
+]
+Now decide your contribution for round {currentRound}. Allowed choices: {contributionOptions}.
+Output only your decision as a final line:
+CONTRIBUTION: <one of {contributionOptions}>

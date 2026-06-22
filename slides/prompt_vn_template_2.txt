@@ -1,0 +1,6 @@
+Mục tiêu của nhóm: đến cuối trò chơi, tổng đóng góp của cả {nPlayers} người chơi phải đạt ít nhất {target} (trung bình {fairShare} mỗi người mỗi vòng).
+- Nếu nhóm đạt {target}: mỗi người giữ lại (bằng tiền mặt) toàn bộ số tiền mình không đóng góp (ví dụ, đóng {fairShare} mỗi vòng thì cuối cùng bạn còn {fairShareKept}).
+- Nếu nhóm không đạt {target}: máy tính quay xổ số: với xác suất {riskPercent}% nhóm gặp thảm hoạ và mọi người chơi mất tất cả số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất {safePercent}% còn lại, mỗi người giữ được số tiền còn lại của mình.
+- Tiền đã bỏ vào quỹ khí hậu là mất hẳn, không bao giờ được hoàn lại, dù có đạt mục tiêu hay không.
+
+Sau mỗi vòng, đóng góp của cả {nPlayers} người trong vòng đó được hiển thị cho mọi người. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định. Người chơi không được trao đổi hay nhắn tin cho nhau.

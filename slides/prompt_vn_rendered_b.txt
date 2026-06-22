@@ -1,0 +1,12 @@
+Tình trạng hiện tại:
+- Vòng 4 trên tổng 10.
+- Số tiền còn lại của bạn: 28.
+
+Các vòng trước (mỗi người giữ nguyên vị trí; bạn là vị trí 1):
+Vòng 1: P1(bạn)=4, P2=4, P3=2, P4=2, P5=0, P6=4.
+Vòng 2: P1(bạn)=4, P2=4, P3=2, P4=2, P5=0, P6=4.
+Vòng 3: P1(bạn)=4, P2=4, P3=2, P4=2, P5=0, P6=4.
+
+Bây giờ hãy quyết định mức đóng góp của bạn cho vòng 4. Các lựa chọn hợp lệ: 0, 2, 4.
+Chỉ xuất ra quyết định của bạn ở dòng cuối:
+CONTRIBUTION: <một trong các giá trị 0, 2, 4>

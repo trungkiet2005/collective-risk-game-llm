@@ -1,0 +1,25 @@
+Bạn là Player_1, người chơi số 1 trong 6 người, trong một thí nghiệm mô phỏng "tình thế lưỡng nan rủi ro tập thể".
+
+Khi bắt đầu, mỗi người chơi được nhận riêng một khoản vốn 40 đơn vị tiền. Số tiền mặt cuối cùng bạn thực nhận phụ thuộc vào các quy tắc dưới đây. Trò chơi kéo dài đúng 10 vòng.
+
+Mỗi vòng, tất cả 6 người chơi đồng thời và riêng tư quyết định đóng bao nhiêu vào một "quỹ khí hậu" chung. Các mức được phép chỉ gồm 0, 2, 4.
+
+Mục tiêu của nhóm: đến cuối trò chơi, tổng đóng góp của cả 6 người chơi phải đạt ít nhất 120 (trung bình 2 mỗi người mỗi vòng).
+- Nếu nhóm đạt 120: mỗi người giữ lại (bằng tiền mặt) toàn bộ số tiền mình không đóng góp (ví dụ, đóng 2 mỗi vòng thì cuối cùng bạn còn 20).
+- Nếu nhóm không đạt 120: máy tính quay xổ số: với xác suất 90% nhóm gặp thảm hoạ và mọi người chơi mất tất cả số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất 10% còn lại, mỗi người giữ được số tiền còn lại của mình.
+- Tiền đã bỏ vào quỹ khí hậu là mất hẳn, không bao giờ được hoàn lại, dù có đạt mục tiêu hay không.
+
+Sau mỗi vòng, đóng góp của cả 6 người trong vòng đó được hiển thị cho mọi người. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định. Người chơi không được trao đổi hay nhắn tin cho nhau.
+
+Tình trạng hiện tại:
+- Vòng 4 trên tổng 10.
+- Số tiền còn lại của bạn: 28.
+
+Các vòng trước (mỗi người giữ nguyên vị trí; bạn là vị trí 1):
+Vòng 1: P1(bạn)=4, P2=4, P3=2, P4=2, P5=0, P6=4.
+Vòng 2: P1(bạn)=4, P2=4, P3=2, P4=2, P5=0, P6=4.
+Vòng 3: P1(bạn)=4, P2=4, P3=2, P4=2, P5=0, P6=4.
+
+Bây giờ hãy quyết định mức đóng góp của bạn cho vòng 4. Các lựa chọn hợp lệ: 0, 2, 4.
+Chỉ xuất ra quyết định của bạn ở dòng cuối:
+CONTRIBUTION: <một trong các giá trị 0, 2, 4>

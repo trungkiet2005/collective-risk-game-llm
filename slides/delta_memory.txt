@@ -1,0 +1,10 @@
+KHÁC baseline — thay "xem trọn lịch sử" bằng:
+
+Quan trọng — trí nhớ giới hạn: bạn chỉ được xem đóng góp của vòng gần nhất. Các vòng trước đó không được hiển thị lại, và tổng quỹ tích luỹ không bao giờ được hiển thị cho bạn. Giống như một người có giấy và bút, thứ duy nhất bạn mang theo giữa các vòng là cuốn sổ tay của chính bạn: mỗi vòng bạn thêm một dòng ngắn vào sổ, và bạn đọc lại được mọi dòng đã viết từ trước tới giờ. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định. Người chơi không được trao đổi hay nhắn tin cho nhau.
+
+[lastRound]: chỉ hiện đóng góp VÒNG GẦN NHẤT (vị trí cố định)
+[scratchpadNote]: cuốn sổ tay = những gì CHÍNH BẠN đã ghi
+
+Đầu ra (thêm dòng NOTE):
+  NOTE: <một dòng ghi chú cho chính bạn ở vòng sau>
+  CONTRIBUTION: <0 / 2 / 4>

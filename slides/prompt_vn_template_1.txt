@@ -1,0 +1,9 @@
+{persona}: [{personaText}
+
+]{framing}: [Bạn là người tham gia một thí nghiệm kinh tế có trả tiền thật. Điều duy nhất quan trọng với bạn là số tiền mặt cuối cùng của chính bạn. Không có đáp án đúng hay sai; hãy tự quyết định theo cách bạn thấy có lợi nhất cho mình.
+
+]Bạn là {currentPlayerName}, người chơi số {playerPosition} trong {nPlayers} người, trong một thí nghiệm mô phỏng "tình thế lưỡng nan rủi ro tập thể".
+
+Khi bắt đầu, mỗi người chơi được nhận riêng một khoản vốn {endowment} đơn vị tiền. Số tiền mặt cuối cùng bạn thực nhận phụ thuộc vào các quy tắc dưới đây. {gameLength}: [Trò chơi kéo dài đúng {nRounds} vòng.]
+
+Mỗi vòng, tất cả {nPlayers} người chơi đồng thời và riêng tư quyết định đóng bao nhiêu vào một "quỹ khí hậu" chung. Các mức được phép chỉ gồm {contributionOptions}.

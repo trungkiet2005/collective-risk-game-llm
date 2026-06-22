@@ -24,6 +24,18 @@ FAIRGAME/resources/results/
 # PDF bài báo gốc — bản quyền, KHÔNG public (giữ local; tham chiếu qua docs/papers/*.md + DOI)
 papers/
 
+# LaTeX build artifacts (slides/) — giữ .tex/.pdf/figs, bỏ file trung gian
+slides/*.aux
+slides/*.fdb_latexmk
+slides/*.fls
+slides/*.log
+slides/*.nav
+slides/*.out
+slides/*.snm
+slides/*.toc
+slides/*.vrb
+slides/*.xdv
+
 # OS
 .DS_Store
 Thumbs.db
