@@ -36,9 +36,12 @@
   fontsize=#1,baselinestretch=0.92,frame=single,framesep=4pt,%
   rulecolor=\color{deepteal!35},formatcom=\color{ink}]{#2}}
 \newcommand{\take}[1]{\vfill{\footnotesize\color{deepteal}#1}}
+% nhãn nguồn đáp án: đọc thẳng vs phải tự tính
+\newcommand{\rd}{{\footnotesize\color{tealc}\textbf{[đọc]}}}
+\newcommand{\sm}{{\footnotesize\color{coral}\textbf{[tính]}}}
 
-\title{Tác nhân LLM trong trò chơi rủi ro tập thể — Tuần 2}
-\subtitle{Hai mở rộng: \emph{phóng to model} (scaling) \& \emph{kiểm tra đọc-hiểu} (comprehension)}
+\title{Tác nhân LLM trong trò chơi rủi ro tập thể --- Tuần 2}
+\subtitle{Hai mở rộng: \emph{model lớn} (scaling) và \emph{khả năng đọc-hiểu luật chơi} (comprehension)}
 \date{\today}
 \author{Báo cáo nghiên cứu}
 
@@ -48,184 +51,240 @@
 % ======================================================================
 \section{Tuần này làm gì}
 
-\begin{frame}{Nhắc lại kết luận tuần trước (3 model nhỏ, baseline)}
-  \begin{block}{LLM chơi collective-risk game KHÁC con người}
+\begin{frame}{Nhắc lại: tuần trước ba model nhỏ chơi khác hẳn con người}
+  \begin{block}{Ba điểm bất thường ở điều kiện baseline}
     \begin{itemize}
-      \item \textbf{Phớt lờ rủi ro}: đạt mục tiêu $\sim$100\% ở cả 3 mức rủi ro (người: 50/10/0\%).
-      \item \textbf{Hợp tác TĂNG dần} qua vòng, không phản bội cuối game (ngược người).
-      \item \textbf{Vượt mục tiêu}: Qwen-7B $\sim$233, Llama-8B $\sim$185, Gemma-9B $\sim$129.
+      \item \textbf{Không phản ứng với rủi ro.} Dù xác suất thảm hoạ là 90\%, 50\% hay 10\%, cả ba model vẫn đạt mục tiêu gần 100\%; trong khi tỉ lệ của người giảm dần 50 $\to$ 10 $\to$ 0\%.
+      \item \textbf{Càng cuối game càng hợp tác}, và không hề ``phản bội'' ở vòng chót --- ngược hẳn với người.
+      \item \textbf{Luôn đóng vượt mục tiêu}: Qwen-7B $\sim$233, Llama-8B $\sim$185, Gemma-9B $\sim$129 (trên tổng 240).
     \end{itemize}
   \end{block}
-  \begin{exampleblock}{Hai câu hỏi còn treo $\Rightarrow$ hai thí nghiệm tuần này}
+  \begin{exampleblock}{Hai câu hỏi còn bỏ ngỏ $\Rightarrow$ hai thí nghiệm tuần này}
     \begin{enumerate}
-      \item Các bất thường này có phải vì model \emph{nhỏ}? $\to$ \alert{Large model (scaling)}.
-      \item Phớt-lờ-rủi-ro là \emph{không hiểu luật} hay \emph{cố tình}? $\to$ \alert{Comprehension}.
+      \item Những bất thường này có phải chỉ vì model còn \emph{nhỏ}? $\to$ thử với \alert{model lớn hơn}.
+      \item Phớt lờ rủi ro là vì model \emph{không hiểu luật}, hay hiểu mà vẫn chọn vậy? $\to$ \alert{kiểm tra đọc-hiểu}.
     \end{enumerate}
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Thiết lập hai thí nghiệm mới}
+\begin{frame}{Hai thí nghiệm mới --- nhìn tổng quan}
   \begin{center}\small
   \begin{tabular}{lll}
     \toprule
-    & \textbf{5 · Large model (scaling)} & \textbf{6 · Comprehension} \\
+    & \textbf{Mở rộng 1 --- Model lớn} & \textbf{Mở rộng 2 --- Đọc-hiểu} \\
     \midrule
-    Mục tiêu   & bất thường có do cỡ model? & model có HIỂU luật không? \\
-    Model      & Qwen 7B$\to$32B, Gemma 9B$\to$27B & 3 model nhỏ (như baseline) \\
-    Điều kiện  & baseline trung tính (y hệt tuần 1) & probe IN-SITU trong ván baseline \\
-    Đo gì      & reach, đóng góp, vân tay, vòng & accuracy 20 câu hỏi/3 trục \\
-    Quy mô     & 60 ván/model (3 risk×2 lang×10) & \,$\sim$54.5k probe/model \\
+    Để trả lời  & bất thường có do cỡ model? & model có thật sự hiểu luật? \\
+    Model       & Qwen 7B$\to$32B, Gemma 9B$\to$27B & ba model nhỏ (như baseline) \\
+    Thiết lập   & baseline trung tính, y như tuần 1 & hỏi xen kẽ ngay trong ván baseline \\
+    Đo cái gì   & tỉ lệ đạt, đóng góp, lựa chọn, nhịp & độ chính xác trên 20 câu hỏi \\
+    Quy mô      & 60 ván/model & $\sim$54.500 câu hỏi/model \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vfill
-  \begin{block}{Comprehension — phỏng theo ``Nicer Than Humans'' (Fontana et al.\ 2024)}
-    {\footnotesize Mỗi vòng bắn THÊM câu hỏi Rules / Time / State, gửi RIÊNG (không đụng quyết định), chấm so ground-truth của engine. Hai nhánh A/B: \texttt{showCumulative} pool ẩn (như baseline) vs pool hiện (tái lập Figure A7).}
-  \end{block}
+  {\footnotesize Phần đọc-hiểu phỏng theo bài \emph{``Nicer Than Humans''} (Fontana et al.\ 2024): trong lúc model chơi, ta hỏi thêm về chính ván đó rồi chấm so với đáp án đúng của engine.}
 \end{frame}
 
 % ======================================================================
-\section{5 · Large model (scaling)}
+\section{Mở rộng 1 --- Model lớn (scaling)}
 
-\begin{frame}{Scaling — câu hỏi \& cách đọc}
+\begin{frame}{Cách làm và điều ta muốn biết}
   \begin{block}{Thao tác}
-    {\footnotesize Giữ NGUYÊN prompt baseline trung tính của tuần 1, chỉ \textbf{thay model}: Qwen2.5-7B$\to$32B, Gemma-2-9B$\to$27B. Llama-3.1-8B giữ làm mốc tham chiếu. Cùng 3 mức rủi ro $\times$ \{EN, VN\} $\times$ 10 lần lặp.}
+    {\footnotesize Giữ nguyên mọi thứ của tuần trước --- prompt baseline trung tính, ba mức rủi ro, hai ngôn ngữ, mười lần lặp --- chỉ \textbf{đổi sang model lớn hơn}: Qwen2.5 từ 7B lên 32B, Gemma-2 từ 9B lên 27B. Llama-3.1-8B giữ nguyên làm mốc so sánh (chưa có bản Llama lớn nên để trống cặp này).}
   \end{block}
-  \begin{exampleblock}{Hai giả thuyết cạnh tranh}
+  \begin{exampleblock}{Hai khả năng đối nghịch}
     \begin{itemize}
-      \item \emph{H1 — ``do model nhỏ''}: model lớn sẽ nhạy rủi ro hơn, giống người hơn.
-      \item \emph{H2 — ``đặc tính bền''}: bất thường vẫn còn; chỉ phần \emph{kinh tế} thay đổi.
+      \item \emph{Nếu do model nhỏ}: model lớn sẽ biết ``sợ'' rủi ro hơn và chơi giống người hơn.
+      \item \emph{Nếu là đặc tính chung}: model lớn vẫn phớt lờ rủi ro, chỉ thay đổi ở khâu \emph{tiêu tiền}.
     \end{itemize}
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Scaling — Qwen thôi hào phóng, hội tụ về ``vừa đủ 120''}
+\begin{frame}{Model càng lớn, Qwen càng bớt hào phóng}
   \centering\includegraphics[height=0.66\textheight]{figs/L1_scaling_contrib.png}
-  \take{Phóng to Qwen 7B$\to$32B kéo đóng góp \alert{233$\to$128} ($-105$); Gemma 9B$\to$27B gần như đứng yên (129$\to$126). Model lớn hội tụ về cùng một chiến lược ``ép sát mục tiêu'' — Gemma vốn đã ở đó.}
+  \take{Khi phóng từ 7B lên 32B, đóng góp của Qwen tụt mạnh từ 233 xuống 128 (giảm hơn 100 đơn vị). Gemma thì gần như đứng yên (129 $\to$ 126) vì vốn đã chơi tiết kiệm sẵn. \alert{Hai model lớn gặp nhau ở cùng một lối chơi}: đóng vừa đủ chạm mốc 120, không dư thừa.}
 \end{frame}
 
-\begin{frame}{Scaling — KHÔNG phục hồi nhạy-rủi-ro (H2 thắng)}
+\begin{frame}{Nhưng model lớn vẫn không biết sợ rủi ro}
   \centering\includegraphics[height=0.66\textheight]{figs/L2_scaling_reach.png}
-  \take{Cả Qwen-32B lẫn Gemma-27B vẫn đạt mục tiêu $\sim$100\% ở mọi mức rủi ro (đường người dốc 50$\to$10$\to$0\%). Phớt-lờ-rủi-ro \alert{bền theo cỡ model} — không phải lỗi của model nhỏ.}
+  \take{Cả Qwen-32B lẫn Gemma-27B vẫn đạt mục tiêu khoảng 100\% ở mọi mức rủi ro, trong khi đường của người dốc xuống rõ rệt (50 $\to$ 10 $\to$ 0\%). Việc phớt lờ rủi ro \alert{không hề mất đi khi model lớn lên} --- nó là đặc tính bền, không phải hạn chế của model nhỏ.}
 \end{frame}
 
-\begin{frame}{Scaling — ``vân tay'' lựa chọn LẬT về mức 2}
+\begin{frame}{Lớn lên, Qwen đổi ``gu'' từ mức 4 sang mức 2}
   \centering\includegraphics[height=0.64\textheight]{figs/L3_choice_flip.png}
-  \take{Qwen-7B kịch trần (94\% chọn 4) nhưng Qwen-32B đổi sang \alert{88\% chọn 2} — đúng mức ``fair-share'' mà Gemma đã khoá. Model càng lớn càng kinh tế: bỏ thói quá-đóng-góp, chỉ đóng vừa đủ phần công bằng.}
+  \take{Qwen-7B gần như luôn đóng mức cao nhất (94\% chọn 4), nhưng Qwen-32B lại chủ yếu chọn mức 2 (88\%) --- đúng mức ``chia đều công bằng'' mà Gemma vẫn dùng. \alert{Model lớn bỏ thói quen đóng dư}, chuyển sang chỉ đóng vừa đủ phần của mình.}
 \end{frame}
 
-\begin{frame}{Scaling — vẫn tăng dần, ``ép vạch'' sát deadline}
+\begin{frame}{Vẫn đóng tăng dần, dồn mạnh về cuối game}
   \centering\includegraphics[height=0.64\textheight]{figs/L4_scaling_dynamics.png}
-  \take{Model lớn giữ phẳng ở 2.0 gần hết game rồi \emph{ramp} ở vòng 9--10 (Gemma-27B: 2.0$\to$2.87). Vẫn là quỹ đạo \alert{tăng dần} ngược người — chỉ ``ép sát ngưỡng'' muộn và gọn hơn, tiết kiệm hơn model nhỏ.}
+  \take{Hai model lớn giữ mức 2.0 gần như suốt game rồi mới tăng vọt ở vòng 9--10 (Gemma-27B nhảy 2.0 $\to$ 2.87). Quỹ đạo vẫn \alert{tăng dần --- ngược với người}; chỉ khác là chúng dồn đóng góp sát hạn chót, gọn và tiết kiệm hơn model nhỏ.}
 \end{frame}
 
-\begin{frame}{Scaling — trục ngôn ngữ co lại (Llama vẫn lệch nhất)}
+\begin{frame}{Khác biệt giữa hai ngôn ngữ thu hẹp lại}
   \centering\includegraphics[height=0.62\textheight]{figs/L5_scaling_lang.png}
-  \take{Khoảng cách EN--VN của Qwen co từ $-10$ (7B) còn $-3$ (32B); Gemma-27B đảo dấu nhẹ ($-13$). Llama-8B vẫn lệch mạnh nhất ($-44$). Phóng to làm hành vi \emph{ổn định hơn} giữa hai ngôn ngữ, nhưng không xoá trục này.}
+  \take{Chênh lệch Anh--Việt của Qwen co từ $-10$ (bản 7B) còn $-3$ (bản 32B); Gemma-27B đảo chiều nhẹ ($-13$). Llama-8B vẫn lệch nhiều nhất ($-44$). Phóng to giúp hành vi \alert{ổn định hơn giữa hai ngôn ngữ}, nhưng không xoá hẳn khác biệt này.}
 \end{frame}
 
-\begin{frame}{Scaling — chốt phần 5}
+\begin{frame}{Tóm lại về model lớn}
   \begin{center}\small
   \begin{tabular}{lll}
     \toprule
-    Khía cạnh & Nhỏ (7--9B) & Lớn (27--32B) \\
+    Khía cạnh & Model nhỏ (7--9B) & Model lớn (27--32B) \\
     \midrule
-    Nhạy rủi ro          & Không (100\% phẳng) & \alert{Không} (100\% phẳng) \\
-    Hợp tác qua vòng     & Tăng dần & \alert{Tăng dần} (ramp muộn) \\
-    Mức đóng góp Qwen    & 233 (kịch trần 4) & \alert{128} (về mức 2) \\
-    Mức đóng góp Gemma   & 129 & 126 (gần như không đổi) \\
-    Tiền mặt giữ (Qwen)  & 7/240 & \alert{112/240} \\
+    Phản ứng với rủi ro    & Không (phẳng 100\%) & \alert{Vẫn không} (phẳng 100\%) \\
+    Nhịp hợp tác qua vòng  & Tăng dần & \alert{Vẫn tăng dần} (dồn về cuối) \\
+    Đóng góp của Qwen      & 233 (luôn chọn 4) & \alert{128} (chuyển sang chọn 2) \\
+    Đóng góp của Gemma     & 129 & 126 (gần như không đổi) \\
+    Tiền mặt Qwen giữ lại  & 7/240 & \alert{112/240} \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \take{Phóng to model = \emph{kinh tế hơn}, KHÔNG phải \emph{nhạy rủi ro hơn}. Bất thường cốt lõi (phớt-lờ-rủi-ro, tăng dần) là đặc tính bền, không phải hạn chế dung lượng.}
+  \take{Phóng to model khiến nó \emph{tiêu tiền khôn hơn}, chứ KHÔNG khiến nó \emph{biết sợ rủi ro hơn}. Các bất thường cốt lõi (phớt lờ rủi ro, hợp tác tăng dần) là đặc tính bền của lớp model này, không phải do thiếu dung lượng.}
 \end{frame}
 
 % ======================================================================
-\section{6 · Comprehension (đọc-hiểu)}
+\section{Mở rộng 2 --- Kiểm tra đọc-hiểu}
 
-\begin{frame}[fragile]{Comprehension — thiết kế probe}
-  \begin{block}{20 câu hỏi · 3 trục (chấm so ground-truth engine)}
-    {\footnotesize \textbf{RULES} (luật tĩnh: mức đóng, vốn, mục tiêu, số vòng, \% rủi ro, payoff) ·
-    \textbf{TIME} (tra lịch sử: đang vòng mấy, ai đóng bao nhiêu ở vòng $i$) ·
-    \textbf{STATE} (thống kê tích luỹ: quỹ hiện có, còn thiếu bao nhiêu — phần lớn phải \emph{tự cộng dồn}).}
+\begin{frame}{Đo đọc-hiểu bằng cách nào?}
+  \begin{block}{Cách hỏi --- xen kẽ ngay trong lúc chơi (in-situ)}
+    {\footnotesize Trong khi model chơi ván baseline bình thường, mỗi vòng tôi gửi \textbf{thêm} một loạt câu hỏi về chính ván đó. Các câu này gửi qua một lượt \emph{riêng}, không nằm trong prompt quyết định, nên \textbf{không làm đổi nước đi} --- đã kiểm chứng: bật hay tắt probe thì quyết định vẫn giống hệt nhau.}
   \end{block}
+  \begin{block}{Cách chấm --- so với đáp án đúng của engine}
+    {\footnotesize Mỗi câu có đáp án đúng tính sẵn từ trạng thái game (ground truth), nên chấm đúng/sai hoàn toàn tự động. Khoảng \textbf{54.500 câu mỗi model}.}
+  \end{block}
+  \begin{exampleblock}{Ba nhóm câu hỏi}
+    {\footnotesize \textbf{Rules} --- luật tĩnh (đọc thẳng từ đề) \quad$\bullet$\quad \textbf{Time} --- tra lịch sử từng vòng \quad$\bullet$\quad \textbf{State} --- thống kê tích luỹ (phần lớn phải \emph{tự cộng dồn}).}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Bộ câu hỏi thật --- 20 câu mỗi lượt}
+  {\footnotesize Nhãn: \rd{} = đáp án \emph{in sẵn} trong prompt, chỉ cần đọc \quad $\vert$ \quad \sm{} = phải \emph{tự tính} từ lịch sử.}
+  \smallskip
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      {\scriptsize\color{deepteal}\textbf{RULES} (8 câu --- toàn bộ \rd)}\par
+      {\scriptsize
+      \begin{itemize}\setlength\itemsep{1pt}
+        \item Mỗi vòng được đóng những mức nào? \;(0/2/4)
+        \item Vốn ban đầu mỗi người? \;(40)
+        \item Mục tiêu chung cả game? \;(120)
+        \item Game dài bao nhiêu vòng? \;(10)
+        \item Trượt mục tiêu thì xác suất mất hết là mấy \%? \;(90/50/10)
+        \item Trượt mà gặp thảm hoạ, bạn còn bao nhiêu? \;(0)
+        \item Mức đóng tối đa / tối thiểu một vòng? \;(4 / 0)
+      \end{itemize}}
+      \smallskip
+      {\scriptsize\color{deepteal}\textbf{TIME} (4 câu --- tra lịch sử)}\par
+      {\scriptsize
+      \begin{itemize}\setlength\itemsep{1pt}
+        \item Đang ở vòng thứ mấy? \rd
+        \item Vòng $i$, người ghế P$x$ / chính bạn đóng bao nhiêu? \rd
+        \item Vòng $i$, cả 6 người đóng tổng bao nhiêu? \sm
+      \end{itemize}}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      {\scriptsize\color{deepteal}\textbf{STATE} (8 câu --- thống kê tích luỹ)}\par
+      {\scriptsize
+      \begin{itemize}\setlength\itemsep{1pt}
+        \item Tổng quỹ chung đến giờ là bao nhiêu? \sm
+        \item Còn thiếu bao nhiêu nữa để đạt 120? \sm
+        \item Ghế P$x$ đã đóng tổng cộng bao nhiêu? \sm
+        \item Chính bạn đã đóng tổng cộng bao nhiêu? \sm
+        \item Bạn còn lại bao nhiêu vốn chưa đóng? \rd
+        \item Ghế P$x$ đã đóng đúng mức 4 mấy lần? \sm
+        \item Còn mấy vòng nữa (tính cả vòng này)? \sm
+        \item Nhóm đã đạt mục tiêu chưa? (có/không) \sm
+      \end{itemize}}
+      \smallskip
+      \begin{block}{Ý đồ thiết kế}
+        {\scriptsize Rules/Time chủ yếu là \emph{đọc}; State chủ yếu là \emph{cộng dồn}. Tách hai loại để biết model yếu ở khâu \emph{hiểu luật} hay khâu \emph{tính toán trạng thái}.}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Một probe hoàn chỉnh --- đúng những gì model nhận được}
+  \promptbox{\fontsize{6.4}{7.4}\selectfont}{assets/probe_prompt_full.txt}
+  \take{Câu hỏi ở đây là ``tổng quỹ đến giờ là bao nhiêu''. Prompt CÓ in sẵn \emph{your remaining money: 34} (đọc là ra), nhưng \alert{KHÔNG in tổng quỹ} --- model phải tự cộng 12+12+12 = 36 qua ba vòng. Đáp án đúng đòi hỏi cộng dồn.}
+\end{frame}
+
+\begin{frame}[fragile]{Ví dụ trả lời thật --- biết luật, nhưng không cộng được}
   \promptbox{\fontsize{7.4}{8.6}\selectfont}{assets/probe_examples.txt}
-  \take{Cùng một câu STATE: pool ẨN model đáp 24 (chỉ một vòng) thay vì 96; pool HIỆN đáp đúng ngay.}
+  \take{Cùng một câu State: khi pool bị ẩn, model trả 24 (chỉ lấy một vòng) thay vì 96; khi prompt in sẵn tổng, model trả đúng ngay. Còn câu về \% rủi ro thì model trả đúng 90 --- nó \emph{biết} luật.}
 \end{frame}
 
-\begin{frame}{Comprehension — hiểu LUẬT \& đọc LỊCH SỬ tốt, sụp ở CỘNG DỒN}
-  \centering\includegraphics[height=0.64\textheight]{figs/K1_comp_category.png}
-  \take{Rules 94--100\%, Time 82--99\% — model \emph{hiểu luật} và \emph{tra được lịch sử}. Nhưng State (cộng dồn) chỉ 32--72\%: Gemma 72\% $>$ Qwen 37\% $>$ Llama 32\%. Lỗ hổng nằm ở \alert{số học tích luỹ}, không phải ở luật chơi.}
+\begin{frame}{Hiểu luật và đọc lịch sử thì tốt, nhưng sụp ở cộng dồn}
+  \centering\includegraphics[height=0.62\textheight]{figs/K1_comp_category.png}
+  \take{Rules 94--100\%, Time 82--99\% --- model \emph{hiểu luật} và \emph{tra được lịch sử}. Nhưng nhóm State (cộng dồn) chỉ 32--72\% (Gemma 72 $>$ Qwen 37 $>$ Llama 32). \alert{Lỗ hổng nằm ở số học tích luỹ}, không phải ở việc nắm luật chơi.}
 \end{frame}
 
-\begin{frame}{Comprehension — ĐỌC được $\neq$ CỘNG được (kết quả sắc nhất)}
-  \centering\includegraphics[height=0.62\textheight]{figs/K2_comp_read_vs_add.png}
-  \take{Số IN SẴN trong prompt (own\_remaining): 66--100\%. Cùng loại ``tổng quỹ'' nhưng PHẢI cộng dồn: pool ẨN chỉ \alert{10--21\%}; khi prompt IN sẵn tổng thì vọt lên \alert{92--100\%}. Model \emph{đọc được nhưng không cộng được} — đúng Figure A7 của ``Nicer Than Humans''.}
+\begin{frame}{Kết quả sắc nhất: đọc được $\neq$ cộng được}
+  \centering\includegraphics[height=0.60\textheight]{figs/K2_comp_read_vs_add.png}
+  \take{Con số \emph{in sẵn} trong prompt (vốn còn lại) được trả đúng 66--100\%. Cũng là ``tổng quỹ'', nhưng nếu phải tự cộng: khi pool bị ẩn chỉ đúng \alert{10--21\%}; khi prompt in sẵn tổng thì vọt lên \alert{92--100\%}. Model \emph{đọc được nhưng không cộng được} --- đúng như Hình A7 của ``Nicer Than Humans''.}
 \end{frame}
 
-\begin{frame}{Comprehension — CỔNG: họ BIẾT rủi ro, chỉ là phớt lờ}
-  \centering\includegraphics[height=0.60\textheight]{figs/K3_comp_risk_gate.png}
-  \take{Câu ``rủi ro bao nhiêu \%'' được trả đúng $\sim$100\% (Qwen 98, Gemma 100, Llama 91). Vậy phớt-lờ-rủi-ro \alert{KHÔNG phải do hiểu sai luật} — model biết rõ 90/50/10\% nhưng vẫn chọn như nhau. Đây là \emph{cổng} hợp thức hoá claim hành vi của tuần trước.}
+\begin{frame}{Phép thử then chốt: model BIẾT rủi ro, chỉ là phớt lờ}
+  \centering\includegraphics[height=0.58\textheight]{figs/K3_comp_risk_gate.png}
+  \take{Câu ``rủi ro bao nhiêu \%'' được trả đúng gần 100\% (Qwen 98, Gemma 100, Llama 91). Vậy phớt lờ rủi ro \alert{không phải do hiểu sai luật} --- model biết rõ mức 90/50/10\% nhưng vẫn chọn như nhau. Đây chính là bằng chứng củng cố kết luận hành vi của tuần trước.}
 \end{frame}
 
-\begin{frame}{Comprehension — tiếng Việt đánh đúng vào cộng dồn}
-  \centering\includegraphics[height=0.60\textheight]{figs/K4_comp_lang.png}
-  \take{Rules/Time gần như không đổi giữa EN/VN ($-2$/$-5$pp); nhưng State rớt \alert{$-19$pp} ở tiếng Việt (Gemma nặng nhất: $-32$pp). Trục ngôn ngữ tấn công đúng khâu yếu nhất — \emph{số học trạng thái} — chứ không phải khả năng đọc luật.}
+\begin{frame}{Tiếng Việt làm yếu đúng khâu cộng dồn}
+  \centering\includegraphics[height=0.58\textheight]{figs/K4_comp_lang.png}
+  \take{Rules và Time gần như không đổi giữa Anh--Việt ($-2$ và $-5$ điểm \%); nhưng State rớt tới \alert{$-19$ điểm \%} ở tiếng Việt (Gemma nặng nhất, $-32$). Ngôn ngữ tấn công đúng vào khâu yếu nhất --- \emph{tính toán trạng thái} --- chứ không phải khả năng đọc luật.}
 \end{frame}
 
-\begin{frame}{Comprehension — bảng chi tiết 20 câu (phụ lục)}
-  \centering\includegraphics[height=0.66\textheight]{figs/K5_comp_figure1.png}
-  \take{Trần ở Rules; Time tốt trừ \texttt{time\_round\_total\_i} (phải cộng 6 ghế trong 1 vòng). State lủng đều: \texttt{state\_X\_total}, \texttt{state\_own\_total}, \texttt{state\_rounds\_left} đều thấp. Riêng \texttt{state\_pool} nhảy rõ giữa hai panel (ẩn$\to$hiện).}
+\begin{frame}{Bảng chi tiết 20 câu (phụ lục)}
+  \centering\includegraphics[height=0.64\textheight]{figs/K5_comp_figure1.png}
+  \take{Gần như kịch trần ở Rules; Time tốt, trừ câu ``tổng cả 6 người trong một vòng'' (phải cộng). Các câu State đòi cộng dồn đều thấp. Riêng \texttt{state\_pool} nhảy rõ giữa hai bảng (pool ẩn $\to$ pool hiện).}
 \end{frame}
 
 % ======================================================================
-\section{Tổng hợp tuần 2}
+\section{Tổng kết tuần 2}
 
 \begin{frame}{Hai mảnh ghép vào bức tranh chung}
-  \begin{block}{Cơ chế hợp tác của LLM = \emph{prior}, không phải \emph{tính toán}}
+  \begin{block}{Hợp tác của LLM là \emph{thói quen có sẵn}, không phải \emph{tính toán}}
     \begin{itemize}
-      \item \textbf{Comprehension}: model HIỂU luật \& BIẾT rủi ro (Rules $\sim$100\%, risk-gate $\sim$100\%) nhưng KHÔNG cộng được trạng thái (State 10--21\% khi phải tự tính).
-      \item \textbf{Hệ quả}: hợp tác vẫn đạt mục tiêu \emph{dù} ghi sổ sai $\Rightarrow$ là thiên kiến hợp tác có sẵn, không phải suy luận chiến lược theo trạng thái.
-      \item \textbf{Scaling}: phóng to chỉ cắt phần \emph{lãng phí} (Qwen 233$\to$128) — làm model \emph{kinh tế hơn}, nhưng giữ nguyên phớt-lờ-rủi-ro \& tăng-dần.
+      \item Phần đọc-hiểu cho thấy: model \textbf{hiểu luật} và \textbf{biết rủi ro} (Rules $\sim$100\%, câu rủi ro $\sim$100\%), nhưng \textbf{không cộng được trạng thái} (chỉ 10--21\% khi phải tự tính).
+      \item Hệ quả: model vẫn đạt mục tiêu \emph{dù} theo dõi sai số quỹ $\Rightarrow$ hợp tác là thiên hướng có sẵn, không phải suy luận theo trạng thái.
+      \item Phần scaling cho thấy: phóng to chỉ cắt phần \emph{đóng dư} (Qwen 233 $\to$ 128) --- model \emph{tiêu khôn hơn}, nhưng vẫn phớt lờ rủi ro và vẫn tăng dần.
     \end{itemize}
   \end{block}
-  \take{Phớt-lờ-rủi-ro KHÔNG phải lỗi hiểu (comprehension bác bỏ) cũng KHÔNG phải lỗi dung lượng (scaling bác bỏ) $\Rightarrow$ là một \alert{thiên kiến hành vi} của lớp model này.}
+  \take{Phớt lờ rủi ro không phải do \emph{hiểu sai} (đọc-hiểu đã bác bỏ), cũng không phải do \emph{model nhỏ} (scaling đã bác bỏ) $\Rightarrow$ nó là một \alert{thiên hướng hành vi} của lớp model này.}
 \end{frame}
 
 \begin{frame}{So với tuần trước: cập nhật bảng tổng}
   \centering\small
   \begin{tabular}{lll}
     \toprule
-    Câu hỏi & Trả lời tuần trước & Bằng chứng tuần này \\
+    Câu hỏi & Tuần trước & Bằng chứng tuần này \\
     \midrule
-    Do model nhỏ?            & (giả thuyết) & \alert{Không} — 27/32B vẫn phẳng 100\% \\
-    Có hiểu luật không?      & (chưa đo)    & \alert{Có} — Rules 94--100\% \\
-    Có biết mức rủi ro?      & (chưa đo)    & \alert{Có} — risk-gate $\sim$100\% \\
-    Vì sao ghi sổ sai?       & ``hợp tác là prior'' & \alert{Không cộng dồn được} (State 10--21\%) \\
-    Trục ngôn ngữ ở đâu?     & đóng góp (Llama) & + \alert{số học trạng thái} (State $-19$pp VN) \\
+    Có phải do model nhỏ?      & (chỉ là giả thuyết) & \alert{Không} --- 27/32B vẫn phẳng 100\% \\
+    Model có hiểu luật không?  & (chưa đo)           & \alert{Có} --- Rules đúng 94--100\% \\
+    Model có biết mức rủi ro?  & (chưa đo)           & \alert{Có} --- câu rủi ro đúng $\sim$100\% \\
+    Vì sao theo dõi quỹ sai?   & ``hợp tác là thói quen'' & \alert{Không cộng dồn được} (State 10--21\%) \\
+    Trục ngôn ngữ nằm ở đâu?   & ở đóng góp (Llama)  & + \alert{số học trạng thái} (State $-19$đ\% ở VN) \\
     \bottomrule
   \end{tabular}
-  \take{Hai thí nghiệm \emph{khẳng định} và \emph{giải thích} các bất thường của tuần 1, thay vì lật chúng.}
+  \take{Hai thí nghiệm tuần này \emph{khẳng định} và \emph{giải thích} các bất thường của tuần 1, chứ không lật ngược chúng.}
 \end{frame}
 
 \begin{frame}{Điểm thảo luận với thầy}
-  \textbf{Về scaling}
+  \textbf{Về phần scaling}
   \begin{itemize}
-    \item Chưa có Llama lớn (70B) — có cần để hoàn tất cặp họ thứ ba?
-    \item Qwen-32B tụt nhẹ reach (97\%) vì chơi sát vạch 120 — có nên báo cáo đóng góp làm biến chính (như đã chốt tuần trước)?
+    \item Chưa có bản Llama lớn (70B) --- có cần chạy để hoàn tất cặp họ thứ ba không ạ?
+    \item Qwen-32B tụt nhẹ tỉ lệ đạt (97\%) vì chơi sát vạch 120 --- có nên lấy \emph{mức đóng góp} làm biến chính như đã chốt tuần trước?
   \end{itemize}
-  \textbf{Về comprehension}
+  \textbf{Về phần đọc-hiểu}
   \begin{itemize}
-    \item ``Không cộng dồn được'' là giới hạn số học hay do prompt quá dài? $\to$ đề xuất ablation \emph{độ dài lịch sử} (probe theo vòng).
-    \item Có nên đưa \emph{một câu state-pool} vào prompt quyết định để xem hợp tác có đổi khi model ``được nhắc'' tổng quỹ?
+    \item ``Không cộng dồn được'' là giới hạn số học, hay do prompt quá dài? $\to$ đề xuất thử cắt ngắn lịch sử rồi đo lại theo từng vòng.
+    \item Có nên thử đưa \emph{tổng quỹ in sẵn} vào prompt quyết định, xem hợp tác có đổi khi model được ``nhắc'' đúng trạng thái không?
   \end{itemize}
 \end{frame}
 
 \begin{frame}[standout]
-  Phóng to model làm nó \textbf{kinh tế hơn}, không \textbf{nhạy rủi ro hơn}. \\[2mm]
-  LLM \textbf{hiểu luật} và \textbf{biết rủi ro} — nhưng \textbf{không cộng được trạng thái}: \\
-  hợp tác là \textbf{thiên kiến có sẵn}, không phải tính toán.
+  Phóng to model làm nó \textbf{tiêu tiền khôn hơn}, chứ không \textbf{biết sợ rủi ro hơn}. \\[2mm]
+  LLM \textbf{hiểu luật} và \textbf{biết rủi ro}, nhưng \textbf{không cộng được trạng thái}: \\
+  hợp tác là \textbf{thói quen có sẵn}, không phải tính toán.
 \end{frame}
 
 \end{document}
