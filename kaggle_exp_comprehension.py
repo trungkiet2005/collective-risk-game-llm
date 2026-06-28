@@ -53,7 +53,8 @@ MAX_MODEL_LEN = 4096
 #   B) STOCHASTIC FULL (ĐANG CHỌN, ~6-8h/3 model, khớp regime run-2, CI chặt nhất):
 #      TEMPERATURE=0.7 + REPS_OVERRIDE=None (10 rep) -> 120 quỹ đạo/model, ~62k gen/model.
 TEMPERATURE = 0.7         # chế độ B: stochastic, 6 agent ra quyết định khác nhau (giống run-2)
-MAX_TOKENS = 256          # câu trả lời đọc-hiểu ngắn (1 dòng ANSWER) — 256 dư
+MAX_TOKENS = 512          # ÁP CHO CẢ decision lẫn probe. 512 = an toàn khỏi cắt cụt dòng
+                          # CONTRIBUTION:/ANSWER: (model phát EOS sớm nên không tốn thêm giờ).
 GPU_UTIL = 0.90
 TP_SIZE = 1
 BATCH_SIZE = 256          # probe thêm nhiều prompt/vòng -> batch giúp throughput
@@ -351,9 +352,12 @@ def smoke_test(model_cfg, exp, agents_cfg, agents_name):
         pa, pf = parse_answer(presp[0], pmetas[0]["answer_kind"])
         print(f"[{model_cfg['short_name']}] probe '{pmetas[0]['question_id']}' reply (last 200):\n", presp[0][-200:])
         print(f"Parsed ANSWER = {pa} (parse_failed={pf}) | ground_truth = {pmetas[0]['ground_truth']}")
-    print(f"ETA THÔ: 1 gen ~{dt:.1f}s; quyết định ~{dt * GEN_PER_MODEL / 3600:.1f} h/model "
-          f"(probe thêm ~{int(_plan[0][1] * 450)} gen). CẬN TRÊN — batching {BATCH_SIZE} nhanh hơn nhiều. "
-          f"Quá lâu thì hạ REPS_OVERRIDE/LANGUAGES_OVERRIDE ở Cell 1.")
+    _n_probe = int(_plan[0][1] * 454)                 # ~454 probe/game (probePlayers=[0])
+    _total_gen = GEN_PER_MODEL + _n_probe             # decision + probe = tải THẬT/model
+    print(f"ETA THÔ: 1 gen ~{dt:.1f}s -> ~{dt * _total_gen / 3600:.1f} h/model "
+          f"({GEN_PER_MODEL} decision + ~{_n_probe} probe = {_total_gen} gen). "
+          f"CẬN TRÊN — batching {BATCH_SIZE} nhanh hơn NHIỀU (baseline thực tế ~30p/3 model). "
+          f"Quá lâu thì hạ REPS_OVERRIDE (vd 5) / LANGUAGES_OVERRIDE ở Cell 1.")
 
 
 def run_comprehension_for_model(model_cfg, exp_name):
