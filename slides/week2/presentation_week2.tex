@@ -52,17 +52,18 @@
 \section{Tuần này làm gì}
 
 \begin{frame}{Nhắc lại: tuần trước ba model nhỏ chơi khác hẳn con người}
+  \small
   \begin{block}{Ba điểm bất thường ở điều kiện baseline}
-    \begin{itemize}
-      \item \textbf{Không phản ứng với rủi ro.} Dù xác suất thảm hoạ là 90\%, 50\% hay 10\%, cả ba model vẫn đạt mục tiêu gần 100\%; trong khi tỉ lệ của người giảm dần 50 $\to$ 10 $\to$ 0\%.
-      \item \textbf{Càng cuối game càng hợp tác}, và không hề ``phản bội'' ở vòng chót --- ngược hẳn với người.
-      \item \textbf{Luôn đóng vượt mục tiêu}: Qwen-7B $\sim$233, Llama-8B $\sim$185, Gemma-9B $\sim$129 (trên tổng 240).
+    \begin{itemize}\setlength\itemsep{2pt}
+      \item \textbf{Không phản ứng với rủi ro}: dù thảm hoạ ở mức 90\%, 50\% hay 10\%, cả ba model vẫn đạt gần 100\% (tỉ lệ của người giảm dần 50 $\to$ 10 $\to$ 0\%).
+      \item \textbf{Càng cuối game càng hợp tác}, không ``phản bội'' ở vòng chót --- ngược hẳn với người.
+      \item \textbf{Luôn đóng vượt mục tiêu}: Qwen-7B $\sim$233, Llama-8B $\sim$185, Gemma-9B $\sim$129 (trên 240).
     \end{itemize}
   \end{block}
   \begin{exampleblock}{Hai câu hỏi còn bỏ ngỏ $\Rightarrow$ hai thí nghiệm tuần này}
-    \begin{enumerate}
-      \item Những bất thường này có phải chỉ vì model còn \emph{nhỏ}? $\to$ thử với \alert{model lớn hơn}.
-      \item Phớt lờ rủi ro là vì model \emph{không hiểu luật}, hay hiểu mà vẫn chọn vậy? $\to$ \alert{kiểm tra đọc-hiểu}.
+    \begin{enumerate}\setlength\itemsep{2pt}
+      \item Các bất thường này có phải chỉ vì model còn \emph{nhỏ}? $\to$ thử \alert{model lớn hơn}.
+      \item Model \emph{không hiểu luật}, hay hiểu mà vẫn phớt lờ rủi ro? $\to$ \alert{kiểm tra đọc-hiểu}.
     \end{enumerate}
   \end{exampleblock}
 \end{frame}
@@ -204,8 +205,8 @@
 \end{frame}
 
 \begin{frame}[fragile]{Một probe hoàn chỉnh --- đúng những gì model nhận được}
-  \promptbox{\fontsize{6.4}{7.4}\selectfont}{assets/probe_prompt_full.txt}
-  \take{Câu hỏi ở đây là ``tổng quỹ đến giờ là bao nhiêu''. Prompt CÓ in sẵn \emph{your remaining money: 34} (đọc là ra), nhưng \alert{KHÔNG in tổng quỹ} --- model phải tự cộng 12+12+12 = 36 qua ba vòng. Đáp án đúng đòi hỏi cộng dồn.}
+  \promptbox{\fontsize{6}{6.6}\selectfont}{assets/probe_prompt_full.txt}
+  \take{Câu hỏi: ``tổng quỹ đến giờ là bao nhiêu''. Prompt in sẵn \emph{your remaining money: 34} (đọc là ra) nhưng \alert{KHÔNG in tổng quỹ} --- model phải tự cộng 12+12+12 = 36.}
 \end{frame}
 
 \begin{frame}[fragile]{Ví dụ trả lời thật --- biết luật, nhưng không cộng được}
