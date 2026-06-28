@@ -1,0 +1,16 @@
+{
+  "name": "crsd_milinski_low_risk_showcum",
+  "engine": "collective_risk",
+  "nPlayers": 6,
+  "endowment": 40,
+  "contributionOptions": [0, 2, 4],
+  "target": 120,
+  "nRounds": 10,
+  "nRoundsIsKnown": true,
+  "riskProbability": 0.10,
+  "showIndividualContributions": true,
+  "showCumulative": true,
+  "agentsCommunicate": false,
+  "promptTemplate": "crsd",
+  "agents": "personas_default"
+}

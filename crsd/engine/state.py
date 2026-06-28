@@ -131,3 +131,38 @@ class GameResult:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+@dataclass
+class ComprehensionRecord:
+    """Một lượt KIỂM TRA ĐỌC-HIỂU (probe): hỏi 1 câu về trạng thái game, chấm so
+    với ground truth của engine. Tự mô tả (denormalize) để comprehension.jsonl
+    phân tích được mà không cần parse game_id.
+
+    ``parsed_answer``/``ground_truth`` đã được chuyển về dạng JSON-friendly (set ->
+    list đã sắp xếp) trước khi tạo record.
+    """
+
+    game_id: str
+    round: int
+    player: str
+    player_index: int
+    question_id: str
+    category: str                 # rules | time | state
+    params: dict                  # tham số câu hỏi (vd {"i":3,"x":2}; {} cho Rules)
+    question_text: str
+    raw_response: str
+    parsed_answer: Any
+    ground_truth: Any
+    correct: bool
+    parse_failed: bool
+    answer_kind: str              # int | int_set | yesno
+    answerable_from_prompt: bool  # đáp án IN SẴN (đọc) hay phải TỰ TÍNH (số học)
+    language: str
+    risk_probability: float
+    model: str
+    show_cumulative: bool         # nhánh A/B (False=ẩn pool, True=hiện) — Fig A7
+    sampling_seed: Optional[int] = None
+
+    def to_dict(self) -> dict:
+        return asdict(self)

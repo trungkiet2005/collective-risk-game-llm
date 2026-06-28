@@ -15,13 +15,20 @@ import re
 from typing import Callable, List, Union
 
 from . import scoring
+from .comprehension import iter_questions, make_record
+from .prompt import build_prompt
 from .round import CrsdRound, parse_contribution, parse_note
-from .state import GameResult, TurnRecord
+from .state import ComprehensionRecord, GameResult, TurnRecord
 
 # Khoảng cách giữa các seed của hai rep liên tiếp; đủ lớn để (round*100 + agent)
 # không bao giờ tràn sang rep kế tiếp (round<100, agent<100 -> <10000 << stride).
 _SAMPLING_SEED_STRIDE = 100_000
 _SAMPLING_SEED_MOD = 2_147_483_647  # 2**31 - 1, giữ seed trong phạm vi int32 dương
+
+# Seed của probe đọc-hiểu nằm trong KHÔNG GIAN RIÊNG, lệch khỏi seed quyết định
+# (offset lớn + stride theo thứ tự câu hỏi) -> tất định & tái lập, không trùng dụng ý.
+_PROBE_SEED_OFFSET = 700_000_000
+_PROBE_SEED_STRIDE = 10_000
 
 
 def _unpack(resp: Union[str, dict]):
@@ -76,6 +83,7 @@ class CrsdGame:
         self.rng = random.Random(seed)
         self.history: List[List[float]] = []   # [round][player] -> contribution
         self.turns: List[TurnRecord] = []
+        self.comprehension_records: List[ComprehensionRecord] = []  # probe đọc-hiểu (in-situ)
         self.current_round = 1
 
     # --- stepwise API (dùng cho cả run tuần tự lẫn batch lockstep) ---
@@ -103,6 +111,61 @@ class CrsdGame:
 
     def build_round_sampling_seeds(self) -> List[int]:
         return [self.sampling_seed(i, self.current_round) for i in range(len(self.agents))]
+
+    # --- probe đọc-hiểu (in-situ): hỏi trên ĐÚNG trạng thái agent đang quyết định ---
+
+    def comprehension_seed(self, player_index: int, round_number: int, q_ord: int) -> int:
+        """Seed cho 1 probe — suy từ ``sampling_seed`` rồi đẩy sang không gian riêng."""
+        base = self.sampling_seed(player_index, round_number)
+        return (base + _PROBE_SEED_OFFSET + q_ord * _PROBE_SEED_STRIDE) % _SAMPLING_SEED_MOD
+
+    def build_comprehension_prompts(self, comp_template, player_index: int, caps=None):
+        """Dựng prompt + seed + meta cho mọi câu hỏi đọc-hiểu ở vòng hiện tại, từ góc
+        nhìn ghế ``player_index``. Dùng CÙNG luật/state/lịch sử như prompt quyết định
+        (chỉ khác đuôi = câu hỏi). KHÔNG đổi state game. Trả về ``(prompts, seeds, metas)``.
+        """
+        cfg = self.config
+        agent = self.agents[player_index]
+        items = iter_questions(cfg, self.history, self.current_round, player_index, caps)
+        prompts: List[str] = []
+        seeds: List[int] = []
+        metas: List[dict] = []
+        for q_ord, (spec, params) in enumerate(items):
+            qtext = spec.render(cfg, self.history, self.current_round, player_index, params, cfg.language)
+            prompts.append(
+                build_prompt(
+                    comp_template, cfg, agent.name, player_index, agent.persona_text,
+                    self.current_round, self.history, cfg.language,
+                    agent_notes=agent.notes, question_text=qtext,
+                )
+            )
+            seed = self.comprehension_seed(player_index, self.current_round, q_ord)
+            seeds.append(seed)
+            metas.append({
+                "game_id": self.game_id,
+                "round": self.current_round,
+                "player": agent.name,
+                "player_index": player_index,
+                "question_id": spec.id,
+                "category": spec.category,
+                "params": dict(params),
+                "question_text": qtext,
+                "ground_truth": spec.ground_truth(cfg, self.history, self.current_round, player_index, params),
+                "answer_kind": spec.answer_kind,
+                "answerable_from_prompt": bool(spec.answerable(cfg)),
+                "language": cfg.language,
+                "risk_probability": cfg.risk_probability,
+                "model": cfg.model,
+                "show_cumulative": bool(getattr(cfg, "show_cumulative", False)),
+                "sampling_seed": seed if self.sampling_seeds_applied else None,
+            })
+        return prompts, seeds, metas
+
+    def record_comprehension(self, metas, responses) -> None:
+        """Chấm & lưu các probe (responses khớp thứ tự ``metas``)."""
+        for m, resp in zip(metas, responses):
+            text = resp.get("text", "") if isinstance(resp, dict) else (resp or "")
+            self.comprehension_records.append(make_record(m, text))
 
     def apply_round_responses(self, responses: List[Union[str, dict]]) -> None:
         cfg = self.config

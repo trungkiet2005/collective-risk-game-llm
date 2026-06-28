@@ -1,0 +1,29 @@
+{
+  "name": "exp_comprehension",
+  "description": "ĐỌC-HIỂU (prompt comprehension, phỏng theo Nicer Than Humans): probe IN-SITU trong các ván BASELINE thật (agent trung tính, full_history, không framing/persona). Mỗi vòng hỏi thêm các câu Rules/Time/State + chấm so ground truth của engine -> đo model có HIỂU LUẬT collective-risk game không. Chạy 2 nhánh A/B showCumulative: 3 game pool-ẩn (baseline) + 3 game *_showcum pool-hiện (tái lập Figure A7). Probe gửi RIÊNG nên KHÔNG đụng quyết định.",
+  "games": [
+    "crsd_milinski_high_risk",
+    "crsd_milinski_medium_risk",
+    "crsd_milinski_low_risk",
+    "crsd_milinski_high_risk_showcum",
+    "crsd_milinski_medium_risk_showcum",
+    "crsd_milinski_low_risk_showcum"
+  ],
+  "agents": "personas_default",
+  "languages": ["en", "vn"],
+  "models": ["LocalQwen"],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false,
+
+  "comprehension": {
+    "template": "crsd_comprehension",
+    "probePlayers": [0],
+    "maxSeats": 4,
+    "maxPastRounds": null,
+    "rulesCheckpoints": [1, 5, 10]
+  }
+}

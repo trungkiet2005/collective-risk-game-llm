@@ -145,6 +145,7 @@ def build_prompt(
     history: List[List[float]],
     language: str,
     agent_notes=None,
+    question_text: str = "",
 ) -> str:
     """Trả về prompt hoàn chỉnh cho một agent ở một vòng.
 
@@ -152,6 +153,11 @@ def build_prompt(
     các ghi chú mà chính agent đã viết ở các vòng trước (``notes[i]`` = vòng i+1).
     Được nạp lại thành "cuốn sổ tay" (tích luỹ theo ``cfg.note_window``) thay cho
     transcript đầy đủ.
+
+    ``question_text`` chỉ dùng cho template ĐỌC-HIỂU (``crsd_comprehension_*``): khi
+    có, block ``{question}`` bật và thay đuôi "quyết định" bằng một câu hỏi +
+    neo ``ANSWER:``. Template quyết định thường KHÔNG có placeholder này nên truyền
+    vào cũng vô hại (tương thích ngược).
     """
     cumulative = sum(sum(r) for r in history)
     own_total = sum(r[player_index] for r in history)
@@ -183,6 +189,8 @@ def build_prompt(
         # scratchpad: chỉ hiển thị vòng gần nhất + cuốn sổ tay ghi chú riêng.
         "lastRound": is_scratchpad and has_history,
         "scratchpadNote": is_scratchpad and bool(notepad_text),
+        # đọc-hiểu: thay đuôi "quyết định" bằng một câu hỏi + neo ANSWER.
+        "question": bool(question_text),
     }
     text = _resolve_blocks(template, enabled)
 
@@ -205,6 +213,7 @@ def build_prompt(
         "historyText": build_history_text(history, player_index, cfg, language),
         "lastRoundText": build_window_text(history, player_index, cfg, language, memory_window),
         "noteText": notepad_text,
+        "questionText": question_text or "",
     }
     for k, v in replacements.items():
         text = text.replace("{" + k + "}", str(v))

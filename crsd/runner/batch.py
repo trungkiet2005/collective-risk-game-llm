@@ -38,12 +38,19 @@ def run_games_batched(
     send_batch: Callable[..., List[Union[str, dict]]],
     verbose: bool = False,
     max_parse_retries: int = 3,
+    probe_builder: Callable = None,
 ):
     """Chạy tất cả ``games`` đến hết. Trả về list GameResult (đúng thứ tự games).
 
     ``max_parse_retries``: nếu output của một slot không parse được CONTRIBUTION
     (rỗng / sai định dạng / số ngoài tập), gọi lại RIÊNG slot đó với seed mới, tối đa
     ngần này lần, để kéo tỉ lệ parse_failed về ~0. Đặt 0 để tắt (vd mock/API).
+
+    ``probe_builder``: nếu khác None, là hàm ``probe_builder(game) -> (prompts, seeds,
+    metas)`` sinh các prompt ĐỌC-HIỂU cho game ở vòng hiện tại. Chúng được gửi ở MỘT
+    lời gọi ``send_batch`` RIÊNG (sau khi quyết định đã gửi & retry xong, TRƯỚC khi áp
+    kết quả) -> KHÔNG ảnh hưởng quyết định (model stateless giữa các lần gọi). Mặc định
+    None -> đường chạy hành vi y nguyên (giữ tái lập run cũ).
     """
     while True:
         active = [g for g in games if not g.is_done()]
@@ -95,6 +102,31 @@ def run_games_batched(
             if remain:
                 print(f"[batch]   còn {remain} prompt parse-fail sau {max_parse_retries} "
                       f"lượt (fallback về lựa chọn nhỏ nhất)")
+
+        # Probe đọc-hiểu (in-situ): hỏi trên ĐÚNG trạng thái vừa quyết định, gửi RIÊNG.
+        # Quyết định đã gửi xong ở trên nên byte-identical với run không probe.
+        if probe_builder is not None:
+            probe_prompts: List[str] = []
+            probe_seeds: List[int] = []
+            probe_meta = []  # (game, metas, count)
+            for g, _ in meta:
+                pps, pseeds, pmetas = probe_builder(g)
+                if pps:
+                    probe_prompts.extend(pps)
+                    probe_seeds.extend(pseeds)
+                    probe_meta.append((g, pmetas, len(pps)))
+            if probe_prompts:
+                if verbose:
+                    print(f"[batch]   probe đọc-hiểu: {len(probe_prompts)} prompt")
+                probe_resp = send_batch(probe_prompts, probe_seeds)
+                if len(probe_resp) != len(probe_prompts):
+                    raise RuntimeError(
+                        f"send_batch (probe) trả về {len(probe_resp)} cho {len(probe_prompts)} prompt"
+                    )
+                j = 0
+                for g, pmetas, k in probe_meta:
+                    g.record_comprehension(pmetas, probe_resp[j : j + k])
+                    j += k
 
         i = 0
         for g, n in meta:
