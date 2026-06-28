@@ -1,0 +1,10 @@
+[RULES . risk]  Q: If the group does NOT reach the target, what is the
+percent chance (0-100) that everyone loses all of their remaining money?
+   model -> ANSWER: 90      ground-truth 90   [DUNG]  -> BIET ro muc rui ro
+
+[STATE . pool AN, vong 5]  Q: Across all rounds played so far, what is the
+total amount currently in the climate account (all players combined)?
+   model -> ANSWER: 24      ground-truth 96   [SAI]   -> chi lay 1 vong, khong cong don
+
+[STATE . pool HIEN, vong 5]  cung cau hoi, prompt CO in san tong quy:
+   model -> ANSWER: 96      ground-truth 96   [DUNG]  -> doc duoc la dung ngay

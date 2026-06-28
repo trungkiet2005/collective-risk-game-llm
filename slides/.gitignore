@@ -1,0 +1,12 @@
+# LaTeX build artifacts (regenerable bằng latexmk -xelatex)
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.xdv
+*.synctex.gz

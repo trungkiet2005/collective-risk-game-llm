@@ -104,7 +104,7 @@
 \section{1 · Baseline}
 
 \begin{frame}[fragile]{Baseline — prompt ví dụ (vòng 3, đã có lịch sử)}
-  \promptbox{\fontsize{7}{8}\selectfont}{prompt_baseline_r3.txt}
+  \promptbox{\fontsize{7}{8}\selectfont}{assets/prompt_baseline_r3.txt}
 \end{frame}
 
 \begin{frame}{Baseline — phớt lờ rủi ro (so với người)}
@@ -155,7 +155,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Memory — prompt (phần khác baseline)}
-  \promptbox{\scriptsize}{delta_memory.txt}
+  \promptbox{\scriptsize}{assets/delta_memory.txt}
 \end{frame}
 
 \begin{frame}{Memory — chỉ Gemma bị ảnh hưởng}
@@ -175,7 +175,7 @@
   \begin{block}{Thao tác — thiết kế 2$\times$2 (framing $\times$ memory)}
     {\footnotesize Chèn \textbf{khung tâm lý ích kỷ} lên đầu prompt; luật chơi giữ NGUYÊN. Khung này chạy trên \textbf{CẢ HAI} chế độ trí nhớ: full-history (như baseline) \emph{và} scratchpad (như memory) — so với neutral tương ứng.}
   \end{block}
-  \promptbox{\scriptsize}{delta_framing.txt}
+  \promptbox{\scriptsize}{assets/delta_framing.txt}
 \end{frame}
 
 \begin{frame}{Framing — \emph{giảm bao nhiêu} đóng góp (mạnh hơn ở tiếng Việt)}
@@ -195,7 +195,7 @@
   \begin{block}{Thao tác}
     {\footnotesize Gán cho mỗi tác nhân một \textbf{dòng tính cách}. Nhóm trộn 0$\to$6 tác nhân ích kỷ (gradient), vị trí xáo trộn. Phần còn lại như baseline.}
   \end{block}
-  \promptbox{\scriptsize}{delta_persona.txt}
+  \promptbox{\scriptsize}{assets/delta_persona.txt}
 \end{frame}
 
 \begin{frame}{Persona — thao tác hiệu quả nhất}
