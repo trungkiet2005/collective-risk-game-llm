@@ -1,0 +1,10 @@
+{
+  "abstractName": "LocalQwen",
+  "modelPath": "Qwen/Qwen2.5-72B-Instruct-GPTQ-Int4",
+  "engine": {
+    "quantization": null,
+    "dtype": "auto",
+    "gpuMemoryUtilization": 0.92
+  },
+  "note": "GPTQ int4 (~41GB trọng số) — phương án B nếu AWQ trục trặc. quantization=null: vLLM tự nhận GPTQ từ checkpoint (kernel gptq_marlin). Đặt modelPath thành thư mục local để chạy offline."
+}

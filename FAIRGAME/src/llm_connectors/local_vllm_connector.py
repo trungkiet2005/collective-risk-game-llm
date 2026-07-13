@@ -22,11 +22,29 @@ def _init_vllm_engine(model_path: str, max_model_len: int = 4096,
                       temperature: float = 1.0, max_tokens: int = 1024,
                       gpu_memory_utilization: float = 0.90,
                       tensor_parallel_size: int = 1,
-                      enforce_eager: bool = True):
+                      enforce_eager: bool = True,
+                      quantization: str = None,
+                      dtype: str = None,
+                      kv_cache_dtype: str = None,
+                      max_num_seqs: int = None,
+                      cpu_offload_gb: float = 0,
+                      trust_remote_code: bool = True):
     """Initialize vLLM engine (preferred for high throughput).
 
     ``enforce_eager=True`` (default) disables CUDA graphs — safest across GPUs but
     slower; set False to recover throughput on big models when the GPU is known-good.
+
+    Quantization (để chạy 70B+ trên 1 GPU 96GB):
+      - Checkpoint ĐÃ quantize sẵn (AWQ/GPTQ/bnb-4bit): để ``quantization=None`` —
+        vLLM tự đọc ``quantization_config`` trong config.json của checkpoint và chọn
+        kernel tốt nhất (awq_marlin/gptq_marlin...). Chỉ đặt tường minh ("awq",
+        "gptq"...) khi cần ép kernel khác vì kernel auto lỗi trên GPU lạ.
+      - Checkpoint bf16 thường: ``quantization="fp8"`` (quantize on-the-fly, cần GPU
+        Ada/Hopper/Blackwell) hoặc ``"bitsandbytes"`` (cần wheel bitsandbytes).
+      - ``dtype``: AWQ/GPTQ thường muốn "auto" (→ float16); ép "bfloat16" chỉ với
+        checkpoint bf16 thường.
+      - ``kv_cache_dtype="fp8"``: nén KV-cache khi VRAM sát nút (đổi chút chính xác).
+      - ``max_num_seqs``/``cpu_offload_gb``: van xả cuối nếu vẫn thiếu VRAM.
     """
     from vllm import LLM, SamplingParams
 
@@ -39,14 +57,37 @@ def _init_vllm_engine(model_path: str, max_model_len: int = 4096,
         logprobs=5,  # Capture top-5 token logprobs for XAI analysis
     )
     _GLOBAL_SAMPLING_PARAMS = SamplingParams(**_GLOBAL_VLLM_SAMPLING_KWARGS)
-    _GLOBAL_LLM = LLM(
+    # Knob tuỳ chọn CHỈ truyền khi đặt tường minh — config cũ (không quantize) giữ
+    # nguyên kwargs như trước, tương thích cả vLLM cũ chưa có tham số mới.
+    engine_kwargs = dict(
         model=model_path,
-        trust_remote_code=True,
+        trust_remote_code=bool(trust_remote_code),
         max_model_len=max_model_len,
         gpu_memory_utilization=gpu_memory_utilization,
         tensor_parallel_size=tensor_parallel_size,
         enforce_eager=enforce_eager,  # True = no CUDA graphs (safe, slower)
     )
+    if quantization:
+        engine_kwargs["quantization"] = str(quantization)
+    if dtype and str(dtype).lower() != "auto":
+        engine_kwargs["dtype"] = str(dtype)
+    if kv_cache_dtype and str(kv_cache_dtype).lower() != "auto":
+        engine_kwargs["kv_cache_dtype"] = str(kv_cache_dtype)
+    if max_num_seqs:
+        engine_kwargs["max_num_seqs"] = int(max_num_seqs)
+    if cpu_offload_gb:
+        engine_kwargs["cpu_offload_gb"] = float(cpu_offload_gb)
+    try:
+        _GLOBAL_LLM = LLM(**engine_kwargs)
+    except (TypeError, ValueError) as e:
+        # vLLM đời cũ (<0.8) đòi load_format="bitsandbytes" đi kèm
+        # quantization="bitsandbytes"; bản mới tự suy ra và có thể từ chối kwarg.
+        if quantization == "bitsandbytes" and "load_format" not in engine_kwargs:
+            print(f"[LocalVLLM] init lại với load_format=bitsandbytes ({type(e).__name__}: {e})")
+            engine_kwargs["load_format"] = "bitsandbytes"
+            _GLOBAL_LLM = LLM(**engine_kwargs)
+        else:
+            raise
     # Lấy tokenizer để áp chat template TRƯỚC khi generate. BẮT BUỘC: gemma2 (và mọi
     # model instruct nhạy template) phát EOS ngay nếu nhận prompt thô không có marker
     # <start_of_turn>/<|im_start|> -> trả về RỖNG. Tái dùng tokenizer của chính vLLM
@@ -55,21 +96,31 @@ def _init_vllm_engine(model_path: str, max_model_len: int = 4096,
         _GLOBAL_TOKENIZER = _GLOBAL_LLM.get_tokenizer()
     except Exception:  # noqa: BLE001
         from transformers import AutoTokenizer
-        _GLOBAL_TOKENIZER = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        _GLOBAL_TOKENIZER = AutoTokenizer.from_pretrained(
+            model_path, trust_remote_code=bool(trust_remote_code))
     _GLOBAL_ENGINE_TYPE = "vllm"
     has_tmpl = bool(getattr(_GLOBAL_TOKENIZER, "chat_template", None))
+    quant_note = engine_kwargs.get("quantization", "auto-detect")
     print(f"[LocalVLLM] Loaded model from {model_path} with vLLM engine "
-          f"(chat_template={'yes' if has_tmpl else 'NONE'})")
+          f"(chat_template={'yes' if has_tmpl else 'NONE'}, quantization={quant_note})")
 
 
 def _init_transformers_engine(model_path: str, temperature: float = 1.0,
-                               max_tokens: int = 1024):
+                               max_tokens: int = 1024, quantization: str = None,
+                               trust_remote_code: bool = True):
     """Fallback: Initialize HuggingFace Transformers pipeline.
 
     Optimizations applied:
       - Flash-Attention 2 (fallback to SDPA if package missing)
       - eval() + cudnn benchmark for fixed-shape kernels
       - Left-padding tokenizer (cần khi muốn batch sau này)
+
+    ``quantization`` (để chạy 70B+ trên 1 GPU): "bnb-4bit" (NF4, ~0.55 byte/param)
+    hoặc "bnb-8bit" — quantize on-the-fly checkpoint bf16 thường, cần wheel
+    ``bitsandbytes``. Checkpoint ĐÃ quantize sẵn (AWQ/GPTQ/bnb-4bit serialized)
+    thì để None: transformers tự đọc quantization_config (cần lib tương ứng:
+    autoawq/gptqmodel/bitsandbytes). Các giá trị kiểu vLLM ("awq", "fp8"...) không
+    hợp lệ ở backend này -> báo lỗi sớm cho rõ.
     """
     import torch
     from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -79,18 +130,41 @@ def _init_transformers_engine(model_path: str, temperature: float = 1.0,
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.benchmark = True
 
+    quant_cfg = None
+    if quantization:
+        q = str(quantization).lower()
+        if q in ("bnb-4bit", "bnb", "bitsandbytes"):
+            from transformers import BitsAndBytesConfig
+            quant_cfg = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+            )
+        elif q == "bnb-8bit":
+            from transformers import BitsAndBytesConfig
+            quant_cfg = BitsAndBytesConfig(load_in_8bit=True)
+        else:
+            raise ValueError(
+                f"Backend transformers chỉ hỗ trợ quantization 'bnb-4bit'/'bnb-8bit', "
+                f"nhận {quantization!r}. AWQ/GPTQ/fp8 hãy dùng backend 'vllm' "
+                f"(checkpoint quantize sẵn thì để quantization=None)."
+            )
+
     _GLOBAL_TOKENIZER = AutoTokenizer.from_pretrained(
-        model_path, trust_remote_code=True, padding_side="left"
+        model_path, trust_remote_code=bool(trust_remote_code), padding_side="left"
     )
     if _GLOBAL_TOKENIZER.pad_token_id is None:
         _GLOBAL_TOKENIZER.pad_token_id = _GLOBAL_TOKENIZER.eos_token_id
 
     common_kwargs = dict(
-        trust_remote_code=True,
+        trust_remote_code=bool(trust_remote_code),
         torch_dtype=torch.bfloat16,
         device_map="auto",
         low_cpu_mem_usage=True,
     )
+    if quant_cfg is not None:
+        common_kwargs["quantization_config"] = quant_cfg
     try:
         _GLOBAL_LLM = AutoModelForCausalLM.from_pretrained(
             model_path, attn_implementation="flash_attention_2", **common_kwargs
@@ -109,7 +183,8 @@ def _init_transformers_engine(model_path: str, temperature: float = 1.0,
         "max_new_tokens": max_tokens,
     }
     _GLOBAL_ENGINE_TYPE = "transformers"
-    print(f"[LocalVLLM] Loaded model from {model_path} with Transformers engine")
+    print(f"[LocalVLLM] Loaded model from {model_path} with Transformers engine "
+          f"(quantization={quantization or 'none/auto'})")
 
 
 def init_local_llm(model_path: str, engine: str = "vllm", force: bool = False, **kwargs):

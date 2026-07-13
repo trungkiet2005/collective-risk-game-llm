@@ -11,5 +11,9 @@ numpy>=1.24
 # sentencepiece        # tokenizer cho Llama/Gemma
 # accelerate           # tiện cho transformers backend
 
+# Quantization (model 70B+ trên 1 GPU 96GB — xem kaggle_build_quant_wheels.py):
+# bitsandbytes>=0.45   # quantization='bitsandbytes' (vLLM) / 'bnb-4bit' (transformers)
+#                      # AWQ/GPTQ quantize sẵn: vLLM có kernel built-in, KHÔNG cần lib thêm
+
 # Dev:
 # pytest>=8

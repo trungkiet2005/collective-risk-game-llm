@@ -7,11 +7,17 @@
     "maxTokens": 512,
     "seedBase": 0
   },
+  "_comment_quantization": "quantization: null = tự nhận từ checkpoint (AWQ/GPTQ quantize sẵn cứ để null); 'fp8' = quantize on-the-fly checkpoint bf16; 'bitsandbytes' = on-the-fly bf16 HOẶC checkpoint bnb-4bit quantize sẵn (cần wheel bitsandbytes). kvCacheDtype 'fp8' nén KV-cache khi VRAM sát nút. maxNumSeqs/cpuOffloadGb: van xả cuối. Preset models_*.json có thể mang block 'engine' override đè lên các giá trị ở đây (xem models_qwen2.5-72b-awq.json).",
+  "_comment_dtype": "dtype 'auto' = theo checkpoint (bf16 model -> bfloat16, AWQ/GPTQ -> float16). CHỈ ép 'bfloat16'/'float16' khi cố ý — ép bfloat16 lên checkpoint AWQ fp16 có thể bị vLLM từ chối hoặc lệch numerics.",
   "engine": {
     "maxModelLen": 4096,
     "gpuMemoryUtilization": 0.90,
     "tensorParallelSize": 1,
-    "dtype": "bfloat16",
+    "dtype": "auto",
+    "quantization": null,
+    "kvCacheDtype": null,
+    "maxNumSeqs": null,
+    "cpuOffloadGb": 0,
     "trustRemoteCode": true
   },
   "batchSize": 0

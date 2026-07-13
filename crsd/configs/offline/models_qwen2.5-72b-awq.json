@@ -1,0 +1,10 @@
+{
+  "abstractName": "LocalQwen",
+  "modelPath": "Qwen/Qwen2.5-72B-Instruct-AWQ",
+  "engine": {
+    "quantization": null,
+    "dtype": "auto",
+    "gpuMemoryUtilization": 0.92
+  },
+  "note": "AWQ int4 (~41GB trọng số) — vừa 1 GPU 96GB, còn ~45GB cho KV-cache. quantization=null: vLLM TỰ nhận AWQ từ config checkpoint và chọn kernel tốt nhất (awq_marlin); nếu kernel lỗi trên GPU lạ thì ép 'awq'. dtype='auto' -> float16 (chuẩn cho AWQ). Đặt modelPath thành thư mục local để chạy offline, vd '/kaggle/input/qwen25-72b-instruct-awq/model_weights'."
+}

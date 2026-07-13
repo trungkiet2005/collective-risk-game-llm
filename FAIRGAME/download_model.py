@@ -17,14 +17,23 @@ Sau khi chạy xong, vào Output tab → "New Dataset" để biến output thàn
 # =====================================================================
 
 # === Chọn model muốn download ===
-# Với 96GB VRAM, có thể chạy tới 72B parameters
+# 96GB VRAM: bf16 chỉ vừa tới ~32B (Qwen2.5-32B ≈ 64GB). Model 70B+ bf16 ≈ 140GB
+# KHÔNG vừa -> dùng checkpoint QUANTIZE SẴN 4-bit (AWQ/GPTQ, ~40GB) bên dưới.
 # Uncomment model bạn muốn:
 
 MODEL_ID = "meta-llama/Llama-3.1-8B"          # ~15GB, nhanh, test trước
-# MODEL_ID = "Qwen/Qwen2.5-72B-Instruct"        # ~140GB, best reasoning
+# --- bf16 thường (vừa 96GB tới ~32B) ---
 # MODEL_ID = "google/gemma-2-27b-it"             # ~54GB, balanced
-# MODEL_ID = "meta-llama/Llama-3.1-70B-Instruct" # ~140GB, strong multilingual
+# MODEL_ID = "Qwen/Qwen2.5-32B-Instruct"         # ~64GB, lớn nhất còn vừa bf16
 # MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.3"# ~15GB, fast
+# --- QUANTIZE SẴN 4-bit (70B+ trên 1 GPU 96GB; chạy bằng kaggle_exp_baseline_72b.py) ---
+# MODEL_ID = "Qwen/Qwen2.5-72B-Instruct-AWQ"                       # ~41GB, AWQ int4 (vLLM tự nhận)
+# MODEL_ID = "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4" # ~40GB, AWQ int4
+# MODEL_ID = "Qwen/Qwen2.5-72B-Instruct-GPTQ-Int4"                 # ~41GB, GPTQ int4 (phương án B)
+# MODEL_ID = "unsloth/Qwen2.5-72B-Instruct-bnb-4bit"               # ~40GB, bnb NF4 (cần wheel bitsandbytes)
+# --- bf16 70B+ (~140GB): CHỈ tải nếu muốn tự quantize fp8, KHÔNG chạy trực tiếp được trên 96GB ---
+# MODEL_ID = "Qwen/Qwen2.5-72B-Instruct"         # ~140GB
+# MODEL_ID = "meta-llama/Llama-3.1-70B-Instruct" # ~140GB
 
 # HuggingFace token (cần cho Llama, Gemma - lấy từ https://huggingface.co/settings/tokens)
 # Cách 1: Paste trực tiếp
@@ -49,8 +58,9 @@ from pathlib import Path
 subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
                        "huggingface_hub"])
 
-# Try to get HF_TOKEN from Kaggle Secrets
-if HF_TOKEN is None:
+# Try to get HF_TOKEN from Kaggle Secrets ("" hoặc None đều = chưa có token —
+# check `is None` cũ khiến nhánh Secrets KHÔNG BAO GIỜ chạy vì mặc định là "")
+if not HF_TOKEN:
     try:
         from kaggle_secrets import UserSecretsClient
         secrets = UserSecretsClient()
@@ -59,6 +69,7 @@ if HF_TOKEN is None:
             print("✅ HF_TOKEN loaded from Kaggle Secrets")
     except Exception:
         print("ℹ️ No Kaggle Secrets found, proceeding without HF_TOKEN")
+HF_TOKEN = HF_TOKEN or None  # "" -> None để snapshot_download dùng token cached/env nếu có
 
 # =====================================================================
 # CELL 3: Download Model

@@ -58,16 +58,22 @@ Ma trận chạy = `games × languages × models × repetitions`.
 | `modelPreset` | str | tên file preset model (mục 5) |
 | `sampling.temperature` | float | nhiệt độ sinh |
 | `sampling.maxTokens` | int | token tối đa mỗi phản hồi |
-| `sampling.seed` | int | seed sampling (tuỳ backend) |
+| `sampling.seedBase` | int | offset TOÀN CỤC cho seed sinh văn bản (mặc định 0); seed per-lượt vẫn suy từ `exp.seed + rep + round + agent` (xem `CrsdGame.sampling_seed`) |
 | `engine.maxModelLen` | int | context tối đa (vLLM) |
 | `engine.gpuMemoryUtilization` | float | tỉ lệ VRAM dùng (vLLM) |
 | `engine.tensorParallelSize` | int | số GPU (1 = đơn GPU) |
-| `engine.dtype` | str | vd `"bfloat16"` |
-| `engine.trustRemoteCode` | bool | cho model cần code tuỳ biến |
+| `engine.dtype` | str | `"auto"` (mặc định — theo checkpoint; AWQ/GPTQ → float16) / `"bfloat16"` / `"float16"`. CHỈ ép khi cố ý: ép bfloat16 lên checkpoint AWQ fp16 có thể bị vLLM từ chối |
+| `engine.quantization` | str\|null | `null` = **tự nhận từ checkpoint** (AWQ/GPTQ quantize sẵn cứ để null); `"fp8"` = quantize on-the-fly checkpoint bf16; `"bitsandbytes"` = on-the-fly bf16 HOẶC checkpoint bnb-4bit quantize sẵn; ép `"awq"`/`"gptq"` chỉ khi kernel auto lỗi. Backend transformers: `"bnb-4bit"`/`"bnb-8bit"` |
+| `engine.kvCacheDtype` | str\|null | `"fp8"` nén KV-cache khi VRAM sát nút; null/`"auto"` = mặc định |
+| `engine.maxNumSeqs` | int\|null | giới hạn sequence chạy đồng thời (ghìm VRAM) |
+| `engine.cpuOffloadGb` | number | >0 = đẩy bớt trọng số sang RAM (chậm — van xả cuối) |
+| `engine.trustRemoteCode` | bool | cho model cần code tuỳ biến (mặc định `true`; áp cho cả vLLM lẫn transformers/tokenizer) |
 | `batchSize` | int | 0 = batch cả list một lần |
 
-> Lưu ý: với `backend="transformers"`, factory chỉ truyền `temperature/maxTokens`
-> (các knob vLLM bị bỏ qua) để khớp chữ ký `init_local_llm`.
+> Lưu ý: với `backend="transformers"`, factory chỉ truyền
+> `temperature/maxTokens/quantization/trustRemoteCode` (các knob vLLM bị bỏ qua).
+> Knob quantize chỉ được truyền xuống engine khi đặt tường minh (khác
+> null/"auto"/0) — config cũ chạy y hệt trước.
 
 ## 5. Model preset — `crsd/configs/offline/models_*.json`
 
@@ -75,4 +81,9 @@ Ma trận chạy = `games × languages × models × repetitions`.
 |---|---|---|
 | `abstractName` | str | tên trong `MODEL_PROVIDER_MAP` (vd `LocalQwen`) |
 | `modelPath` | str | tên HF hoặc **đường dẫn local** để chạy offline |
+| `engine` | dict (tuỳ chọn) | override đè lên `engine` của offline_settings — vd model 72B AWQ mang `quantization`/`gpuMemoryUtilization` riêng (xem `models_qwen2.5-72b-awq.json`) |
 | `note` | str | ghi chú |
+
+Preset 70B+ có sẵn: `models_qwen2.5-72b-awq` · `models_llama3.1-70b-awq` ·
+`models_qwen2.5-72b-gptq-int4` · `models_qwen2.5-72b-bnb4bit` (bf16 72B ≈ 140GB
+không vừa 96GB VRAM — bắt buộc 4-bit; AWQ int4 ≈ 41GB, còn ~45GB cho KV-cache).

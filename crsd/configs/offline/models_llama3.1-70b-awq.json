@@ -1,0 +1,10 @@
+{
+  "abstractName": "LocalLlama",
+  "modelPath": "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+  "engine": {
+    "quantization": null,
+    "dtype": "auto",
+    "gpuMemoryUtilization": 0.92
+  },
+  "note": "AWQ int4 (~40GB trọng số) — vừa 1 GPU 96GB. quantization=null: vLLM tự nhận AWQ từ checkpoint. Repo cộng đồng hugging-quants (bản chính chủ meta-llama chỉ có bf16 ~140GB, KHÔNG vừa 96GB). Đặt modelPath thành thư mục local để chạy offline."
+}

@@ -1,0 +1,10 @@
+{
+  "abstractName": "LocalQwen",
+  "modelPath": "unsloth/Qwen2.5-72B-Instruct-bnb-4bit",
+  "engine": {
+    "quantization": "bitsandbytes",
+    "dtype": "auto",
+    "gpuMemoryUtilization": 0.92
+  },
+  "note": "bitsandbytes NF4 quantize sẵn (~40GB) — phương án C, cần wheel 'bitsandbytes' (đã gồm trong kaggle_build_quant_wheels.py); chậm hơn AWQ/GPTQ marlin. Với backend='transformers' dùng quantization='bnb-4bit'. Đặt modelPath thành thư mục local để chạy offline."
+}

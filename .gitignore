@@ -21,6 +21,10 @@ FAIRGAME/resources/results/
 *.gguf
 *.zip
 
+# Large trained model artifacts (>100MB) — quá lớn cho GitHub, giữ local
+strategy_recognizer/saved_models/rf_coarse.pkl
+strategy_recognizer/saved_models/rf_fine.pkl
+
 # PDF bài báo gốc — bản quyền, KHÔNG public (giữ local; tham chiếu qua docs/papers/*.md + DOI)
 papers/
 

@@ -69,6 +69,25 @@ python -m crsd.runner.run_experiment crsd/configs/experiment/exp_baseline.json
 4. Chạy lệnh ở bước 4 trên. Mọi prompt trong một vòng (của tất cả ván) được **batch** một lần
    generate để tối đa throughput (xem `crsd/runner/batch.py`).
 
+### Chạy model 70B+ bằng quantize 4-bit (96GB VRAM, Kaggle Internet OFF)
+
+bf16 72B ≈ 140GB **không vừa** 96GB → dùng checkpoint **quantize sẵn** (AWQ/GPTQ int4 ≈ 40GB,
+còn ~45GB cho KV-cache). vLLM tự nhận quantization từ checkpoint — để `quantization=null`.
+
+1. **Wheels** (notebook Internet ON): chạy [kaggle_build_quant_wheels.py](kaggle_build_quant_wheels.py)
+   → Output → *New Dataset* (vd `crsd-quant-wheels`). Tải vllm + bitsandbytes + toàn bộ deps.
+2. **Model** (notebook Internet ON): chạy [FAIRGAME/download_model.py](FAIRGAME/download_model.py)
+   với `MODEL_ID = "Qwen/Qwen2.5-72B-Instruct-AWQ"` (hoặc
+   `hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4`) → Output → *New Dataset*.
+3. **Chạy** (notebook GPU 96GB, Internet OFF): dùng [kaggle_exp_baseline_72b.py](kaggle_exp_baseline_72b.py),
+   + Add Input: repo + 2 dataset trên. Cell 2.5 tự dò wheels và cài offline.
+4. Chạy local thì trỏ experiment tới preset có sẵn: `models_qwen2.5-72b-awq` ·
+   `models_llama3.1-70b-awq` · `models_qwen2.5-72b-gptq-int4` · `models_qwen2.5-72b-bnb4bit`
+   (đặt `offlineSettings.modelPreset` hoặc thêm block `engine` override — xem
+   [docs/design/config-schema.md](docs/design/config-schema.md) mục 4–5).
+   OOM? Theo thứ tự: `maxModelLen` 4096→2048 → `kvCacheDtype: "fp8"` → `maxNumSeqs: 32`
+   → `cpuOffloadGb: 8`.
+
 ## Tài liệu
 
 - Thiết kế: [docs/design/architecture.md](docs/design/architecture.md) ·
