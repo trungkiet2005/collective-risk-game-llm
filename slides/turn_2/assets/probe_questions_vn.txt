@@ -1,0 +1,89 @@
+BỘ CÂU HỎI ĐỌC-HIỂU (comprehension) — 20 LOẠI CÂU, TIẾNG VIỆT ĐẦY ĐỦ
+Nguồn chân lý: crsd/engine/comprehension.py, REGISTRY (hàm render(..., "vn")).
+Ví dụ minh hoạ = ván crsd_milinski_high_risk, góc nhìn P1, ở VÒNG 4 (đã chơi 3 vòng):
+  Round 1: P1=0, P2=2, P3=4, P4=2, P5=0, P6=4
+  Round 2: P1=2, P2=2, P3=0, P4=4, P5=2, P6=2
+  Round 3: P1=4, P2=0, P3=4, P4=0, P5=4, P6=0
+Luật: 6 người, vốn 40, mức đóng {0,2,4}, mục tiêu 120, 10 vòng, rủi ro 90%.
+
+Cột "Loại": ĐỌC = đáp án IN SẴN trong prompt (chỉ cần đọc lại).
+            TỰ TÍNH = phải CỘNG DỒN / suy ra (bài test số học kiểu Figure A7).
+{i} = vòng quá khứ, {x} = vị trí ghế Px, {p} = một mức đóng (0/2/4).
+
+
+===== RULES — 8 câu (luật tĩnh, đáp án in sẵn → ĐỌC) =====
+
+ 1. [rules_actions]          Mỗi vòng bạn được phép chọn những mức đóng góp nào?
+                             → 0, 2, 4
+ 2. [rules_endowment]        Mỗi người chơi nhận bao nhiêu đơn vị tiền làm vốn ban đầu?
+                             → 40
+ 3. [rules_target]           Tổng đóng góp của tất cả người chơi phải đạt ít nhất bao nhiêu
+                             vào cuối trò chơi để tránh rủi ro?
+                             → 120
+ 4. [rules_n_rounds]         Trò chơi kéo dài tổng cộng bao nhiêu vòng?
+                             → 10
+ 5. [rules_risk_pct]         Nếu nhóm KHÔNG đạt mục tiêu, xác suất (theo phần trăm, 0-100)
+                             mọi người mất hết số tiền còn lại là bao nhiêu?
+                             → 90
+ 6. [rules_payoff_disaster]  Nếu nhóm không đạt mục tiêu và thảm hoạ XẢY RA, số tiền mặt
+                             cuối cùng của bạn là bao nhiêu?
+                             → 0
+ 7. [rules_max_contrib]      Mức LỚN NHẤT mà một người chơi có thể bỏ vào quỹ khí hậu
+                             trong một vòng là bao nhiêu?
+                             → 4
+ 8. [rules_min_contrib]      Mức NHỎ NHẤT mà một người chơi có thể bỏ vào quỹ khí hậu
+                             trong một vòng là bao nhiêu?
+                             → 0
+
+
+===== TIME — 4 câu (tra cứu lịch sử theo vòng) =====
+
+ 9. [time_round | ĐỌC]       Trò chơi hiện đang ở vòng nào (vòng bạn sắp chơi)?
+                             → 4
+10. [time_action_i | ĐỌC]    Ở vòng {i}, người chơi ở vị trí P{x} đã bỏ bao nhiêu vào
+                             quỹ khí hậu?
+                             ví dụ: Ở vòng 2, người chơi ở vị trí P5 → 2
+11. [time_own_action_i|ĐỌC]  Ở vòng {i}, BẠN (vị trí P1) đã bỏ bao nhiêu vào quỹ khí hậu?
+                             ví dụ: Ở vòng 3, BẠN → 4
+12. [time_round_total_i|TÍNH]Ở vòng {i}, tổng số tiền mà cả 6 người chơi bỏ vào quỹ khí hậu
+                             là bao nhiêu?
+                             ví dụ: Ở vòng 1 → 12
+
+
+===== STATE — 8 câu (thống kê tích luỹ, phần lớn phải CỘNG DỒN) =====
+
+13. [state_pool | TỰ TÍNH]   Tính tất cả các vòng đã chơi đến giờ, hiện quỹ khí hậu có
+                             tổng cộng bao nhiêu (gộp mọi người chơi)?
+                             → 36   ← câu "gãy" điển hình của Figure A7
+14. [state_remaining_to_target | TỰ TÍNH]
+                             Nhóm còn phải bỏ thêm bao nhiêu nữa vào quỹ khí hậu để đạt
+                             mục tiêu?
+                             → 84
+15. [state_X_total | TỰ TÍNH] Tính tất cả các vòng đến giờ, người chơi ở vị trí P{x} đã bỏ
+                             tổng cộng bao nhiêu vào quỹ khí hậu?
+                             ví dụ: P3 → 8
+16. [state_own_total | TỰ TÍNH]
+                             Tính tất cả các vòng đến giờ, BẠN (vị trí P1) đã bỏ tổng cộng
+                             bao nhiêu vào quỹ khí hậu?
+                             → 6
+17. [state_own_remaining | ĐỌC]   ← ĐỐI CHỨNG: số này IN SẴN trong prompt
+                             Ngay lúc này, bạn còn lại bao nhiêu trong khoản vốn của mình
+                             (phần chưa đóng góp)?
+                             → 34
+18. [state_count_p | TỰ TÍNH] Tính tất cả các vòng đến giờ, người chơi ở vị trí P{x} đã đóng
+                             đúng {p} bao nhiêu lần?
+                             ví dụ: P3 đóng đúng 4 → 2 lần
+19. [state_rounds_left|TÍNH] Tính CẢ vòng hiện tại, còn lại bao nhiêu vòng để chơi?
+                             → 7
+20. [state_target_reached|TÍNH]
+                             Nhóm đã đạt mục tiêu chưa? Trả lời có hoặc không.
+                             → không
+
+
+GHI CHÚ CHO SLIDE
+- 20 khuôn câu ở trên là "20 câu mỗi lượt". Các câu có {i}/{x}/{p} được nhân bản qua các
+  vòng quá khứ và các ghế đại diện (max_seats=4: bạn + free-rider + altruist + 1 ghế giữa),
+  nên số BẢN thực tế lớn dần theo vòng (vd vòng 4 → 45 bản).
+- Nhóm Rules chỉ hỏi ở checkpoint (vòng 1, 5, 10) vì đáp án bất biến.
+- Cặp đối chứng chính (Figure A7): state_own_remaining (ĐỌC, làm được) đối lập
+  state_pool / state_X_total (TỰ TÍNH, chỗ model gãy vì đọc ≠ cộng).
