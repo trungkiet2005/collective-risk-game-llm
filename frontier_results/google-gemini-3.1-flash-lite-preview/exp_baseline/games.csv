@@ -1,0 +1,2 @@
+game_id,model,language,risk_probability,persona_set,persona_seats,memory_mode,framing,group_total,target,target_reached,catastrophe,mean_payoff,rep,seed
+crsd_milinski_high_risk__google-gemini-3.1-flash-lite-preview__en__rep0,google-gemini-3.1-flash-lite-preview,en,0.9,personas_default,NNNNNN,full_history,0,120.0,120.0,1,0,20.0,0,12345

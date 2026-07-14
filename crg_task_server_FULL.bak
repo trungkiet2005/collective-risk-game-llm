@@ -44,7 +44,14 @@ try:
     load_dotenv()
 except Exception:
     pass
-MODEL = os.environ.get("CRG_MODEL", "google/gemini-3.1-flash-lite-preview")
+# Server-side model selection: `kaggle b t run -m <slug>` sets LLM_DEFAULT in the
+# server env BEFORE this module imports. Precedence: explicit CRG_MODEL (local
+# override) > server/.env-provided LLM_DEFAULT > flash-lite fallback. This is the
+# ONLY behavioural difference from crg_task.py, which hard-pins flash-lite here and
+# would therefore silently override the -m flag on the server.
+MODEL = (os.environ.get("CRG_MODEL")
+         or os.environ.get("LLM_DEFAULT")
+         or "google/gemini-3.1-flash-lite-preview")
 os.environ["LLM_DEFAULT"] = MODEL
 
 import kaggle_benchmarks as kbench
@@ -68,10 +75,6 @@ SAMPLING_SEED_STRIDE = 100_000
 SAMPLING_SEED_MOD = 2_147_483_647    # 2**31 - 1
 RETRY_SEED_STEP = 1_000_003
 MAX_PARSE_RETRIES = 3
-# Per-request wall timeout (s). The proxy can leave a request hanging indefinitely
-# (a stalled connection never raises), which silently freezes the whole run — bound it
-# so a hung call aborts, gets retried, and (on token expiry) triggers reauth.
-REQUEST_TIMEOUT = 120
 
 # Swept conditions (env-overridable so a smoke test doesn't need code edits).
 RISKS = [float(x) for x in os.environ.get("CRG_RISKS", "0.9,0.5,0.1").split(",")]
@@ -86,8 +89,7 @@ GAME_NAME = {0.90: "crsd_milinski_high_risk",
 # Proxy models (esp. non-Gemini on staging) intermittently return 429/503. Retry
 # those; if a call STILL fails after retries, raise so the run aborts loudly.
 _TRANSIENT = ("429", "503", "500", "502", "504", "overloaded",
-              "unavailable", "not reachable", "rate limit", "heavy load",
-              "timeout", "timed out", "connection", "read operation")
+              "unavailable", "not reachable", "rate limit", "heavy load")
 
 
 # %% =====================  PROMPT (exact copy of crsd_en.txt / crsd_vn.txt)  ==========
@@ -291,21 +293,16 @@ def _call_llm(llm, prompt, seed, max_attempts=6):
         attempt += 1
         try:
             with kbench.chats.new("turn", orphan=True) as chat:
-                text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed,
-                                   extra_api_params={"timeout": REQUEST_TIMEOUT})
+                text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed)
             return text, chat.usage
         except Exception as e:
             msg = str(e).lower()
-            is_auth = any(t in msg for t in _AUTH_ERR)
-            is_timeout = "timeout" in msg or "timed out" in msg
-            # A hang -> timeout may actually be a token-expiry stall; try one reauth
-            # early (cheap) so the run self-heals instead of burning the retry budget.
-            if is_auth or (is_timeout and auth_retries == 0):
+            if any(t in msg for t in _AUTH_ERR):     # token expired -> refresh, don't burn budget
                 auth_retries += 1
                 if auth_retries > 6:
                     raise
                 _reauth()
-                attempt -= 1                          # don't count reauth against transient budget
+                attempt -= 1
                 continue
             if attempt >= max_attempts or not any(t in msg for t in _TRANSIENT):
                 raise
@@ -394,7 +391,7 @@ def play_game(llm, risk, language, rep, model_tag, turns_sink):
 
 # %% =====================  SWEEP (== exp_baseline: 3 risk × 2 lang × 10 rep)  =========
 @kbench.task(
-    name="collective-risk-baseline",
+    name="collective-risk-baseline-srv",
     description="Milinski 2008 collective-risk dilemma, frontier arm — faithful port of "
                 "crsd exp_baseline (6 agents, 10 rounds, risk×lang×rep). Measures "
                 "reach-rate + cost/game; output joins the open-source games.csv.",
@@ -414,16 +411,6 @@ def collective_risk_baseline(llm) -> dict:
     done = 0
     t0 = time.time()
 
-    def _flush():
-        """Rewrite both crsd-schema files after each game -> live progress + crash recovery."""
-        with open(out_dir / "turns.jsonl", "w", encoding="utf-8") as f:
-            for t in turns:
-                f.write(json.dumps(t, ensure_ascii=False) + "\n")
-        if games:
-            with open(out_dir / "games.csv", "w", newline="", encoding="utf-8") as f:
-                w = csv.DictWriter(f, fieldnames=list(games[0].keys()))
-                w.writeheader(); w.writerows(games)
-
     for risk in RISKS:
         for language in LANGS:
             for rep in range(REPS):
@@ -431,12 +418,16 @@ def collective_risk_baseline(llm) -> dict:
                 games.append(row)
                 tok_in += ti; tok_out += to; cost += cn; parse_failed += pf
                 done += 1
-                _flush()                                     # persist after every game
-                el = time.time() - t0
-                eta = el / done * (total - done)
                 print(f"[{done}/{total}] {row['game_id']}  reach={row['target_reached']} "
-                      f"GT={row['group_total']} disaster={row['catastrophe']} parse_fail={pf} "
-                      f"| {el/60:.1f}min in, ETA {eta/60:.1f}min", flush=True)
+                      f"GT={row['group_total']} disaster={row['catastrophe']} parse_fail={pf}")
+
+    # Write logs that mirror the crsd schema (turns.jsonl + games.csv) for joint analysis.
+    with open(out_dir / "turns.jsonl", "w", encoding="utf-8") as f:
+        for t in turns:
+            f.write(json.dumps(t, ensure_ascii=False) + "\n")
+    with open(out_dir / "games.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(games[0].keys()))
+        w.writeheader(); w.writerows(games)
 
     n_turns = len(turns)
     reached = sum(g["target_reached"] for g in games)
@@ -451,7 +442,7 @@ def collective_risk_baseline(llm) -> dict:
         "n_decisions": n_turns,
         "parse_fail_rate": round(parse_failed / n_turns, 4) if n_turns else None,
         "overall_reach_rate": round(reached / len(games), 3),
-        "reach_by_risk": {r: reach_rate(lambda g, r=r: g["risk_probability"] == r) for r in RISKS},
+        "reach_by_risk": {str(r): reach_rate(lambda g, r=r: g["risk_probability"] == r) for r in RISKS},
         "reach_by_lang": {l: reach_rate(lambda g, l=l: g["language"] == l) for l in LANGS},
         "mean_group_total": round(sum(g["group_total"] for g in games) / len(games), 2),
         "usage_input_tokens": tok_in,
@@ -475,5 +466,6 @@ def collective_risk_baseline(llm) -> dict:
 
 
 # %%
-if __name__ == "__main__":
-    collective_risk_baseline.run(kbench.llm)
+# Unguarded so the Kaggle server (which executes this as a module, __name__ != "__main__")
+# actually fires the run; local `python crg_task_server.py` still runs it too.
+collective_risk_baseline.run(kbench.llm)
