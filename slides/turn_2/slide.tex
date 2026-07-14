@@ -12,6 +12,7 @@
 \setmonofont{Consolas}
 \usepackage{fvextra}
 \usepackage{booktabs}
+\usepackage{makecell}          % \makecell nhiều dòng trong ô
 \usepackage{colortbl}          % \rowcolor
 \usepackage{xcolor}
 \graphicspath{{figs/}}
@@ -68,10 +69,10 @@
     & \textbf{1 --- Model lớn} & \textbf{2 --- Đọc-hiểu} \\
     \midrule
     Trả lời   & do cỡ model? & có thật sự hiểu luật? \\
-    Model     & Qwen 7B$\to$32B, Gemma 9B$\to$27B & ba model nhỏ \\
+    Model     & \makecell[l]{Qwen 7B$\to$32B$\to$72B\\Gemma 9B$\to$27B, Llama 8B$\to$70B} & 3 nhỏ + 2 lớn (32B/27B) \\
     Setup     & baseline như Turn 1 & hỏi xen kẽ trong ván \\
     Đo        & tỉ lệ đạt, đóng góp, nhịp & đúng/sai 20 loại câu \\
-    Quy mô    & 60 ván/model & $\sim$54.500 câu/model \\
+    Quy mô    & 60 ván/model (7 model) & $\sim$54.500 câu/model \\
     \bottomrule
   \end{tabular}
   \take{Phần đọc-hiểu phỏng theo \emph{``Nicer Than Humans''} (Fontana et al.\ 2024).}
@@ -82,7 +83,7 @@
 
 \begin{frame}{Cách làm}
   \begin{block}{Thao tác}
-    Giữ nguyên baseline Turn 1 --- chỉ \textbf{đổi model lớn}: Qwen 7B$\to$32B, Gemma 9B$\to$27B. Llama-8B làm mốc.
+    Giữ nguyên baseline Turn 1 --- chỉ \textbf{đổi model lớn}: Qwen 7B$\to$32B$\to$\textbf{72B}, Gemma 9B$\to$27B, và \textbf{Llama 8B$\to$70B} (đủ ba họ, mỗi họ một model lớn).
   \end{block}
   \begin{exampleblock}{Hai khả năng đối nghịch}
     \begin{itemize}\setlength\itemsep{4pt}
@@ -92,46 +93,52 @@
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Model càng lớn, Qwen càng bớt hào phóng}
+\begin{frame}{Model càng lớn, cả ba họ càng hội tụ về “vừa đủ”}
   \centering\includegraphics[height=0.68\textheight]{L1_scaling_contrib.png}
-  \take{Qwen \weak{233}$\to$\good{128} khi lên 32B; Gemma đứng yên. Hai model lớn hội tụ: đóng vừa đủ mốc 120.}
+  \take{Qwen \weak{233}$\to$\good{128}$\to$132 (bão hoà); Llama \weak{185}$\to$\good{121}; Gemma đứng yên. Ba họ chụm về mốc 120.}
 \end{frame}
 
 \begin{frame}{Nhưng model lớn vẫn không biết sợ rủi ro}
   \centering\includegraphics[height=0.68\textheight]{L2_scaling_reach.png}
-  \take{Qwen-32B \& Gemma-27B vẫn \good{$\sim$100\%} ở mọi mức rủi ro. Phớt lờ rủi ro không mất khi model lớn lên.}
+  \take{Qwen-32B/72B \& Gemma-27B vẫn \good{$\sim$100\%} ở mọi mức rủi ro. Llama-70B \weak{phẳng ở 50\%} --- thất bại, \emph{không phải} nhạy rủi ro.}
 \end{frame}
 
-\begin{frame}{Lớn lên, Qwen đổi ``gu'' từ mức 4 sang mức 2}
+\begin{frame}{Model lớn đầu tiên THẤT BẠI --- nhưng do ngôn ngữ}
+  \centering\includegraphics[height=0.62\textheight]{L6_llama70_lang_collapse.png}
+  \take{Llama-70B: EN đạt \good{100\%}; VN đóng \weak{112$<$120} $\to$ trượt \weak{100\%}, thảm hoạ \weak{73\%}. Trục ngôn ngữ đủ mạnh để gây hậu quả thật.}
+\end{frame}
+
+\begin{frame}{Lớn lên, cả họ Qwen \& Llama bỏ thói quen đóng dư}
   \centering\includegraphics[height=0.66\textheight]{L3_choice_flip.png}
-  \take{Qwen-7B: \weak{94\% chọn 4}. Qwen-32B: \good{88\% chọn 2} (như Gemma). Bỏ thói quen đóng dư.}
+  \take{Chỉ Qwen-7B (\weak{94\% chọn 4}) \& Llama-8B (63\%) kịch trần. Mọi model lớn về \good{mức ``2''} như Gemma.}
 \end{frame}
 
-\begin{frame}{Vẫn đóng tăng dần, dồn về cuối game}
+\begin{frame}{Vẫn đóng tăng dần --- riêng Llama-70B bỏ cuộc vòng chót}
   \centering\includegraphics[height=0.66\textheight]{L4_scaling_dynamics.png}
-  \take{Giữ mức 2 gần suốt game rồi vọt ở vòng 9--10. Vẫn \alert{tăng dần --- ngược người}, chỉ dồn sát hạn chót.}
+  \take{Model lớn giữ mức 2 rồi vọt ở vòng 9--10 (vẫn \alert{tăng dần, ngược người}). Riêng Llama-70B \weak{sụp 2.5$\to$1.1} vòng cuối $\to$ trượt vạch.}
 \end{frame}
 
-\begin{frame}{Khác biệt hai ngôn ngữ thu hẹp lại}
+\begin{frame}{Trục ngôn ngữ không mất khi phóng to}
   \centering\includegraphics[height=0.64\textheight]{L5_scaling_lang.png}
-  \take{Chênh Anh--Việt của Qwen: $-10$$\to$\good{$-3$}. Llama vẫn lệch nhất (\weak{$-44$}). Lớn hơn = ổn định hơn.}
+  \take{Chênh Anh--Việt còn ở mọi cỡ ($-3$ đến $-22$). Điều mới: ở Llama-70B mức VN \weak{tụt dưới mốc 120} $\to$ hụt vạch, thảm hoạ.}
 \end{frame}
 
 \begin{frame}{Tóm lại về model lớn}
   \centering
-  \setlength{\tabcolsep}{11pt}\renewcommand{\arraystretch}{1.35}
+  \setlength{\tabcolsep}{10pt}\renewcommand{\arraystretch}{1.3}
   \begin{tabular}{lll}
     \toprule
-    Khía cạnh & Nhỏ (7--9B) & Lớn (27--32B) \\
+    Khía cạnh & Nhỏ (7--9B) & Lớn (27--72B) \\
     \midrule
     Phản ứng rủi ro   & Không & \alert{Vẫn không} \\
     Nhịp hợp tác      & Tăng dần & \alert{Vẫn tăng dần} \\
-    \rowcolor{hirow} Đóng góp Qwen   & \weak{233} & \good{128} \\
-    Đóng góp Gemma    & 129 & 126 \\
-    \rowcolor{hirow} Tiền Qwen giữ lại & 7/240 & \good{112/240} \\
+    \rowcolor{hirow} Đóng góp Qwen (7$\to$32$\to$72B) & \weak{233} & \good{128 $\to$ 132} \\
+    Đóng góp Llama (8$\to$70B) & 185 & \good{121} \\
+    Đóng góp Gemma (9$\to$27B) & 129 & 126 \\
+    \rowcolor{hirow} Tỉ lệ đạt mục tiêu & 100\% & \makecell[l]{$\sim$100\% \emph{trừ} Llama-70B\\(\weak{50\%}, VN thất bại)} \\
     \bottomrule
   \end{tabular}
-  \take{Model lớn \emph{tiêu tiền khôn hơn}, chứ KHÔNG \emph{biết sợ rủi ro hơn}.}
+  \take{Model lớn \emph{tiêu tiền khôn hơn}, KHÔNG \emph{biết sợ rủi ro hơn}. Llama-70B lộ điểm gãy \alert{ngôn ngữ}.}
 \end{frame}
 
 % ======================================================================
@@ -142,7 +149,7 @@
     Mỗi vòng hỏi thêm về chính ván đó, qua lượt \emph{riêng} $\Rightarrow$ \textbf{không đổi nước đi} (đã kiểm chứng).
   \end{block}
   \begin{block}{Chấm --- so đáp án engine}
-    Ground-truth tính sẵn, đúng/sai tự động. \textbf{$\sim$54.500 câu/model}.
+    Ground-truth tính sẵn, đúng/sai tự động. \textbf{$\sim$54.500 câu/model}; nay đo cả \textbf{2 model lớn} (Qwen-32B, Gemma-27B) để xem scaling có ``chữa'' được không.
   \end{block}
   \begin{exampleblock}{Ba nhóm câu}
     \textbf{Rules} đọc luật \quad$\bullet$\quad \textbf{Time} tra lịch sử \quad$\bullet$\quad \textbf{State} cộng dồn
@@ -211,29 +218,29 @@
   \take{Pool ẩn: model trả \weak{24} (một vòng) thay vì 96. In sẵn tổng: \good{đúng} ngay. Biết \% rủi ro (90).}
 \end{frame}
 
-\begin{frame}{Hiểu luật + đọc lịch sử tốt, nhưng sụp ở cộng dồn}
+\begin{frame}{Model lớn cộng dồn tốt hơn hẳn --- nhưng chưa kín}
   \centering\includegraphics[height=0.64\textheight]{K1_comp_category.png}
-  \take{Rules \good{94--100\%}, Time \good{82--99\%}; nhưng State \weak{32--72\%}. Lỗ hổng ở số học tích luỹ, không phải nắm luật.}
+  \take{Rules/Time đã kịch trần ở mọi cỡ. Scaling nâng riêng State: Qwen \weak{37}$\to$\good{79}, Gemma \weak{72}$\to$\good{86}. Lỗ hổng là \emph{số học}, không phải luật.}
 \end{frame}
 
 \begin{frame}{Kết quả sắc nhất: đọc được $\neq$ cộng được}
   \centering\includegraphics[height=0.62\textheight]{K2_comp_read_vs_add.png}
-  \take{Số in sẵn: \good{66--100\%}. Cùng ``tổng quỹ'' mà phải tự cộng: \weak{10--21\%} (pool ẩn) $\to$ \good{92--100\%} (in sẵn).}
+  \take{Pool ẩn (phải tự cộng) hồi theo scale: Qwen \weak{14}$\to$44, Gemma \weak{21}$\to$\good{62}; nhưng in sẵn tổng là \good{$\sim$100\%}. Khoảng cách co lại, chưa mất.}
 \end{frame}
 
 \begin{frame}{Phép thử then chốt: model BIẾT rủi ro, chỉ phớt lờ}
   \centering\includegraphics[height=0.60\textheight]{K3_comp_risk_gate.png}
-  \take{Câu ``\% rủi ro'' đúng \good{$\sim$100\%} (98/100/91). Phớt lờ rủi ro KHÔNG do hiểu sai --- biết mà vẫn chọn như nhau.}
+  \take{Câu ``\% rủi ro'' đúng \good{$\sim$100\%} --- model lớn \good{hoàn hảo mọi mức}. Phớt lờ rủi ro KHÔNG do hiểu sai; biết mà vẫn chọn như nhau.}
 \end{frame}
 
 \begin{frame}{Tiếng Việt làm yếu đúng khâu cộng dồn}
   \centering\includegraphics[height=0.60\textheight]{K4_comp_lang.png}
-  \take{Rules/Time gần như không đổi ($-2$, $-5$đ\%); State rớt \weak{$-19$đ\%} ở tiếng Việt. Ngôn ngữ đánh đúng khâu yếu nhất.}
+  \take{Rules/Time gần như không đổi ($-1$, $-4$đ\%); State rớt \weak{$-15$đ\%} ở tiếng Việt (gộp cả model lớn). Ngôn ngữ đánh đúng khâu yếu nhất.}
 \end{frame}
 
 \begin{frame}{Bảng chi tiết 20 loại câu (phụ lục)}
   \centering\includegraphics[height=0.66\textheight]{K5_comp_figure1.png}
-  \take{Rules kịch trần; Time tốt trừ ``tổng 6 người/vòng''. State cộng dồn đều thấp.}
+  \take{Năm model, nhỏ$\to$lớn: Rules kịch trần; Time tốt trừ ``tổng 6 người/vòng''; State cộng dồn cải thiện theo cỡ nhưng vẫn thấp nhất.}
 \end{frame}
 
 % ======================================================================
@@ -241,10 +248,11 @@
 
 \begin{frame}{Hai mảnh ghép vào bức tranh chung}
   \begin{block}{Hợp tác của LLM là \emph{thói quen}, không phải \emph{tính toán}}
-    \begin{itemize}\setlength\itemsep{4pt}
-      \item Hiểu luật + biết rủi ro (\good{$\sim$100\%}), nhưng không cộng được trạng thái (\weak{10--21\%})
+    \begin{itemize}\setlength\itemsep{3pt}
+      \item Hiểu luật + biết rủi ro (\good{$\sim$100\%}); cộng-dồn trạng thái yếu và \emph{chỉ hồi một phần} khi phóng to (pool ẩn 21$\to$\good{62\%})
       \item $\Rightarrow$ hợp tác là thiên hướng có sẵn, không phải suy luận theo trạng thái
-      \item Scaling chỉ cắt phần đóng dư (233$\to$128): tiêu khôn hơn, vẫn phớt lờ rủi ro
+      \item Scaling chỉ cắt phần đóng dư (233$\to$128): tiêu khôn hơn, vẫn phớt lờ rủi ro tới 72B
+      \item Llama-70B: model lớn đầu tiên \weak{thất bại thật} --- nhưng do \alert{ngôn ngữ} (VN hụt vạch), không do rủi ro
     \end{itemize}
   \end{block}
   \take{Phớt lờ rủi ro: không do \emph{hiểu sai}, không do \emph{model nhỏ} $\Rightarrow$ \alert{thiên hướng hành vi} của lớp model này.}

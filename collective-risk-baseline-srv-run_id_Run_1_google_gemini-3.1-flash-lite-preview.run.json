@@ -9,11 +9,11 @@
     "slug": "google/gemini-3.1-flash-lite-preview"
   },
   "state": "BENCHMARK_TASK_RUN_STATE_COMPLETED",
-  "startTime": "2026-07-14T09:18:51.970108Z",
-  "endTime": "2026-07-14T09:20:09.578212Z",
+  "startTime": "2026-07-14T09:57:10.790674Z",
+  "endTime": "2026-07-14T09:58:21.287322Z",
   "conversations": [
     {
-      "id": "collective-risk-baseline-srv-2a79ade8",
+      "id": "collective-risk-baseline-srv-2ed3e875",
       "metrics": {},
       "modelVersionSlug": "model_version_slug for conversation is DEPRECATED"
     }
@@ -22,19 +22,19 @@
     {
       "type": "AGGREGATED",
       "dictResult": {
-        "elapsed_sec": 77.0,
-        "out_dir": "C:\\Users\\huynh\\AppData\\Local\\Temp\\claude\\d--AI-PhD-GameTheory-Colective-Risk-Game\\76e584ce-c486-446f-a63d-2b031a2dabec\\scratchpad\\srv_validate2",
+        "elapsed_sec": 69.9,
+        "out_dir": "C:\\Users\\huynh\\AppData\\Local\\Temp\\claude\\d--AI-PhD-GameTheory-Colective-Risk-Game\\76e584ce-c486-446f-a63d-2b031a2dabec\\scratchpad\\srv_validate3",
         "n_games": 1.0,
-        "usage_output_tokens": 8784.0,
-        "games_per_10usd": 460.0,
+        "usage_output_tokens": 5911.0,
+        "games_per_10usd": 575.0,
         "model": "google-gemini-3.1-flash-lite-preview",
         "reach_by_lang": {
           "en": 1.0
         },
         "overall_reach_rate": 1.0,
-        "mean_group_total": 124.0,
+        "mean_group_total": 120.0,
         "parse_fail_rate": 0.0,
-        "usage_total_cost_usd": 0.021696,
+        "usage_total_cost_usd": 0.017386,
         "usage_input_tokens": 34080.0,
         "reach_by_risk": {
           "0.9": 1.0
@@ -47,11 +47,11 @@
     {
       "expectation": "All agent decisions parsed a legal CONTRIBUTION (0/2/4)",
       "status": "BENCHMARK_TASK_RUN_ASSERTION_STATUS_PASSED",
-      "lineNumber": 463,
+      "lineNumber": 474,
       "definition": "kbench.assertions.assert_equal(0, parse_failed,",
       "conversationRequestIds": [
         {
-          "conversationId": "collective-risk-baseline-srv-2a79ade8"
+          "conversationId": "collective-risk-baseline-srv-2ed3e875"
         }
       ]
     }

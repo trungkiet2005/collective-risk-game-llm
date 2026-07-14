@@ -35,6 +35,7 @@ import random
 import re
 import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FutureTimeout
 from pathlib import Path
 
 # Load MODEL_PROXY_* from .env for local runs (harmless on the Kaggle server, which
@@ -68,10 +69,11 @@ SAMPLING_SEED_STRIDE = 100_000
 SAMPLING_SEED_MOD = 2_147_483_647    # 2**31 - 1
 RETRY_SEED_STEP = 1_000_003
 MAX_PARSE_RETRIES = 3
-# Per-request wall timeout (s). The proxy can leave a request hanging indefinitely
-# (a stalled connection never raises), which silently freezes the whole run — bound it
-# so a hung call aborts, gets retried, and (on token expiry) triggers reauth.
-REQUEST_TIMEOUT = 120
+# Hard per-request wall timeout (s), enforced by a THREAD watchdog (below). The proxy
+# intermittently leaves a request hanging forever and the OpenAI/httpx `timeout` does
+# NOT reliably fire on it (observed: a call stalled >11 min). Normal calls are ~1-2s,
+# so 60s is huge headroom but bounds a stall so the run self-heals instead of freezing.
+REQUEST_TIMEOUT = 60
 
 # Swept conditions (env-overridable so a smoke test doesn't need code edits).
 RISKS = [float(x) for x in os.environ.get("CRG_RISKS", "0.9,0.5,0.1").split(",")]
@@ -268,10 +270,23 @@ _AUTH_ERR = ("expired token", "authentication", "unauthorized", "401",
              "invalid api key", "invalid_api_key", "403")
 
 
-def _reauth():
-    """Refresh the proxy token and rebuild the client so a long run survives expiry."""
+# Watchdog runs each proxy call in a worker thread so a stalled request can be
+# ABANDONED (Python can't kill the thread, but we stop waiting and retry on a fresh
+# client). Generous worker count absorbs the occasional leaked hung thread.
+_EXECUTOR = ThreadPoolExecutor(max_workers=32, thread_name_prefix="llm")
+
+
+def _rebuild_client():
+    """Rebuild the client with a fresh connection pool (no re-auth) — drops a stuck socket."""
     global _LLM
-    print("[auth] token rejected -> `kaggle b auth -y` + rebuild client ...", flush=True)
+    from kaggle_benchmarks.kaggle.models import load_default_model
+    _LLM = load_default_model()
+
+
+def _reauth():
+    """Refresh the proxy token AND rebuild the client so a long run survives expiry."""
+    global _LLM
+    print("[auth] refreshing token (`kaggle b auth -y`) + rebuild client ...", flush=True)
     subprocess.run(["kaggle", "b", "auth", "-y"], capture_output=True, text=True)
     try:
         from dotenv import load_dotenv
@@ -282,30 +297,43 @@ def _reauth():
     _LLM = load_default_model()                      # uses LLM_DEFAULT (still set) + new key
 
 
-def _call_llm(llm, prompt, seed, max_attempts=6):
-    """One free-text generation via the (rebuildable) global client `_LLM`. Returns
-    (text, usage). Auto-reauths on token expiry; exp-backoff on transient 429/503."""
+def _one_shot(prompt, seed):
+    with kbench.chats.new("turn", orphan=True) as chat:
+        text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed,
+                           extra_api_params={"timeout": REQUEST_TIMEOUT})
+    return text, chat.usage
+
+
+def _call_llm(llm, prompt, seed, max_attempts=8):
+    """One free-text generation via the (rebuildable) global client `_LLM`, under a hard
+    thread watchdog. Returns (text, usage). Recovers from: proxy stalls (watchdog ->
+    rebuild client), token expiry (401 -> reauth), transient 429/503 (exp backoff)."""
     attempt = 0
+    hangs = 0
     auth_retries = 0
     while True:
         attempt += 1
         try:
-            with kbench.chats.new("turn", orphan=True) as chat:
-                text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed,
-                                   extra_api_params={"timeout": REQUEST_TIMEOUT})
-            return text, chat.usage
+            fut = _EXECUTOR.submit(_one_shot, prompt, seed)
+            return fut.result(timeout=REQUEST_TIMEOUT)
+        except _FutureTimeout:
+            hangs += 1
+            if hangs > 8:
+                raise TimeoutError(
+                    f"LLM call stalled {hangs}x (>{REQUEST_TIMEOUT}s each) — proxy hanging")
+            print(f"[watchdog] call stalled >{REQUEST_TIMEOUT}s (hang #{hangs}) -> "
+                  f"{'reauth' if hangs >= 2 else 'rebuild client'} + retry", flush=True)
+            _reauth() if hangs >= 2 else _rebuild_client()   # 2nd stall: maybe token expiry
+            attempt -= 1                                       # a stall isn't a bad answer
+            continue
         except Exception as e:
             msg = str(e).lower()
-            is_auth = any(t in msg for t in _AUTH_ERR)
-            is_timeout = "timeout" in msg or "timed out" in msg
-            # A hang -> timeout may actually be a token-expiry stall; try one reauth
-            # early (cheap) so the run self-heals instead of burning the retry budget.
-            if is_auth or (is_timeout and auth_retries == 0):
+            if any(t in msg for t in _AUTH_ERR):              # token expired -> refresh
                 auth_retries += 1
                 if auth_retries > 6:
                     raise
                 _reauth()
-                attempt -= 1                          # don't count reauth against transient budget
+                attempt -= 1
                 continue
             if attempt >= max_attempts or not any(t in msg for t in _TRANSIENT):
                 raise
@@ -477,3 +505,6 @@ def collective_risk_baseline(llm) -> dict:
 # %%
 if __name__ == "__main__":
     collective_risk_baseline.run(kbench.llm)
+    # Results are already on disk (written per-game). Force-exit so any worker thread
+    # still stuck on a hung proxy socket can't block interpreter shutdown.
+    os._exit(0)

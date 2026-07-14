@@ -81,6 +81,17 @@ RISKS = [float(x) for x in os.environ.get("CRG_RISKS", "0.9,0.5,0.1").split(",")
 LANGS = [s.strip() for s in os.environ.get("CRG_LANGS", "en,vn").split(",")]
 REPS = int(os.environ.get("CRG_REPS", "10"))
 
+# --- Kaggle push-validation guard ------------------------------------------
+# `kaggle b t push` executes the task ONCE on the server default model
+# (observed: gemini-3-flash-preview) over the FULL sweep before the task is
+# usable. 60 games on that slow reasoning model would cost ~$11 and time out
+# the kernel, so collapse to a 1-game smoke for THAT model only. The real run
+# (`kaggle b t run -m <model>` -> sets LLM_DEFAULT=<model>) gets the full sweep;
+# gpt/claude/deepseek/other Geminis are unaffected. Local CRG_* overrides win.
+_no_overrides = not any(os.environ.get(k) for k in ("CRG_RISKS", "CRG_LANGS", "CRG_REPS"))
+if "gemini-3-flash-preview" in MODEL and _no_overrides:
+    RISKS, LANGS, REPS = [0.9], ["en"], 1
+
 # risk -> crsd game name, so game_id matches the open-source arm's join key.
 GAME_NAME = {0.90: "crsd_milinski_high_risk",
              0.50: "crsd_milinski_medium_risk",
