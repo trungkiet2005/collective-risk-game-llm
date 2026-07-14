@@ -35,7 +35,7 @@
   rulecolor=\color{black!35},formatcom=\color{black!85}]{#2}}
 
 \title{Tác nhân LLM trong trò chơi rủi ro tập thể --- Turn 2}
-\subtitle{Model lớn (scaling) \enspace\&\enspace Đọc-hiểu (comprehension) \enspace\&\enspace Model frontier đóng}
+\subtitle{Model lớn + frontier đóng (scaling) \enspace\&\enspace Đọc-hiểu (comprehension)}
 \date{\today}
 \author{Báo cáo nghiên cứu}
 
@@ -53,12 +53,13 @@
       \item Đóng vượt mục tiêu: Qwen 233, Llama 185, Gemma 129 \;(/240)
     \end{itemize}
   \end{block}
-  \begin{exampleblock}{Ba câu hỏi $\Rightarrow$ ba mở rộng Turn này}
-    \begin{itemize}\setlength\itemsep{4pt}
+  \begin{exampleblock}{Ba câu hỏi $\Rightarrow$ hai mở rộng Turn này}
+    \begin{itemize}\setlength\itemsep{3pt}
       \item Do model \emph{nhỏ}? \quad$\to$\quad \alert{thử model lớn}
+      \item Chỉ ở model \emph{mở / tự host}? \quad$\to$\quad \alert{thêm frontier đóng}
       \item Không hiểu luật, hay hiểu mà cố phớt lờ? \quad$\to$\quad \alert{kiểm tra đọc-hiểu}
-      \item Chỉ ở model \emph{mở / tự host}? \quad$\to$\quad \alert{thử model frontier đóng}
     \end{itemize}
+    {\footnotesize Câu 1 \& 2 gộp thành \textbf{một phần ``scaling''} (model lớn \emph{và} frontier đóng); câu 3 là phần \textbf{đọc-hiểu}.}
   \end{exampleblock}
 \end{frame}
 
@@ -67,24 +68,24 @@
   \setlength{\tabcolsep}{10pt}\renewcommand{\arraystretch}{1.3}
   \begin{tabular}{lll}
     \toprule
-    & \textbf{1 --- Model lớn} & \textbf{2 --- Đọc-hiểu} \\
+    & \textbf{1 --- Model lớn + frontier đóng} & \textbf{2 --- Đọc-hiểu} \\
     \midrule
-    Trả lời   & do cỡ model? & có thật sự hiểu luật? \\
-    Model     & \makecell[l]{Qwen 7B$\to$32B$\to$72B\\Gemma 9B$\to$27B, Llama 8B$\to$70B} & \makecell[l]{3 nhỏ + 4 lớn\\(32/72B, 27B, 70B)} \\
+    Trả lời   & do cỡ model? do mở/đóng? & có thật sự hiểu luật? \\
+    Model     & \makecell[l]{Qwen 7B$\to$32B$\to$72B, Gemma 9B$\to$27B,\\Llama 8B$\to$70B \;\textbf{+ Gemini (đóng)}} & \makecell[l]{3 nhỏ + 4 lớn\\(32/72B, 27B, 70B)} \\
     Setup     & baseline như Turn 1 & hỏi xen kẽ trong ván \\
     Đo        & tỉ lệ đạt, đóng góp, nhịp & đúng/sai 20 loại câu \\
-    Quy mô    & 60 ván/model (7 model) & $\sim$54.500 câu/model \\
+    Quy mô    & 60 ván/model (7 mở + 1 đóng) & $\sim$54.500 câu/model \\
     \bottomrule
   \end{tabular}
   \take{Phần đọc-hiểu phỏng theo \emph{``Nicer Than Humans''} (Fontana et al.\ 2024).}
 \end{frame}
 
 % ======================================================================
-\section{Mở rộng 1 --- Model lớn (scaling)}
+\section{Mở rộng 1 --- Model lớn (scaling) \& frontier đóng}
 
 \begin{frame}{Cách làm}
   \begin{block}{Thao tác}
-    Giữ nguyên baseline Turn 1 --- chỉ \textbf{đổi model lớn}: Qwen 7B$\to$32B$\to$\textbf{72B}, Gemma 9B$\to$27B, và \textbf{Llama 8B$\to$70B} (đủ ba họ, mỗi họ một model lớn).
+    Giữ nguyên baseline Turn 1 --- chỉ \textbf{đổi model lớn}: Qwen 7B$\to$32B$\to$\textbf{72B}, Gemma 9B$\to$27B, và \textbf{Llama 8B$\to$70B} (đủ ba họ, mỗi họ một model lớn). Rồi thêm một model \textbf{frontier đóng} (Gemini) vào cùng phép so.
   \end{block}
   \begin{exampleblock}{Hai khả năng đối nghịch}
     \begin{itemize}\setlength\itemsep{4pt}
@@ -94,14 +95,14 @@
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Model càng lớn, cả ba họ càng hội tụ về “vừa đủ”}
-  \centering\includegraphics[height=0.68\textheight]{L1_scaling_contrib.png}
-  \take{Qwen \weak{233}$\to$\good{128}$\to$132 (bão hoà); Llama \weak{185}$\to$\good{121}; Gemma đứng yên. Ba họ chụm về mốc 120.}
+\begin{frame}{Model càng lớn → hội tụ “vừa đủ”; Gemini đóng cũng vào vùng đó}
+  \centering\includegraphics[height=0.66\textheight]{LF_scaling_frontier.png}
+  \take{Qwen \weak{233}$\to$\good{128}$\to$132, Llama \weak{185}$\to$\good{121}, Gemma đứng yên --- ba họ chụm về mốc 120. Gemini \textbf{đóng} đáp \good{121}, ngồi chung ``câu lạc bộ model lớn''.}
 \end{frame}
 
 \begin{frame}{Nhưng model lớn vẫn không biết sợ rủi ro}
   \centering\includegraphics[height=0.68\textheight]{L2_scaling_reach.png}
-  \take{Qwen-32B/72B \& Gemma-27B vẫn \good{$\sim$100\%} ở mọi mức rủi ro. Llama-70B \weak{phẳng ở 50\%} --- thất bại, \emph{không phải} nhạy rủi ro.}
+  \take{Qwen-32B/72B, Gemma-27B \& \textbf{Gemini (đóng)} vẫn \good{$\sim$100\%} ở mọi mức rủi ro. Llama-70B \weak{phẳng ở 50\%} --- thất bại, \emph{không phải} nhạy rủi ro.}
 \end{frame}
 
 \begin{frame}{Model lớn đầu tiên THẤT BẠI --- nhưng do ngôn ngữ}
@@ -111,25 +112,51 @@
 
 \begin{frame}{Lớn lên, cả họ Qwen \& Llama bỏ thói quen đóng dư}
   \centering\includegraphics[height=0.66\textheight]{L3_choice_flip.png}
-  \take{Chỉ Qwen-7B (\weak{94\% chọn 4}) \& Llama-8B (63\%) kịch trần. Mọi model lớn về \good{mức ``2''} như Gemma.}
+  \take{Chỉ Qwen-7B (\weak{94\% chọn 4}) \& Llama-8B (63\%) kịch trần. Mọi model lớn --- \emph{và Gemini} (\good{99\% chọn ``2''}) --- đều về mức ``2'' như Gemma.}
 \end{frame}
 
 \begin{frame}{Vẫn đóng tăng dần --- riêng Llama-70B bỏ cuộc vòng chót}
   \centering\includegraphics[height=0.66\textheight]{L4_scaling_dynamics.png}
-  \take{Model lớn giữ mức 2 rồi vọt ở vòng 9--10 (vẫn \alert{tăng dần, ngược người}). Riêng Llama-70B \weak{sụp 2.5$\to$1.1} vòng cuối $\to$ trượt vạch.}
+  \take{Model lớn giữ mức 2 rồi vọt ở vòng 9--10 (vẫn \alert{tăng dần, ngược người}); \textbf{Gemini} phẳng \good{``2''} tới cuối, \emph{không ramp}. Riêng Llama-70B \weak{sụp 2.5$\to$1.1} vòng cuối $\to$ trượt vạch.}
 \end{frame}
 
 \begin{frame}{Trục ngôn ngữ không mất khi phóng to}
   \centering\includegraphics[height=0.64\textheight]{L5_scaling_lang.png}
-  \take{Chênh Anh--Việt còn ở mọi cỡ ($-3$ đến $-22$). Điều mới: ở Llama-70B mức VN \weak{tụt dưới mốc 120} $\to$ hụt vạch, thảm hoạ.}
+  \take{Chênh Anh--Việt còn ở mọi cỡ; \textbf{Gemini} lệch \good{ít nhất ($-1$)}. Ở Llama-70B mức VN \weak{tụt dưới mốc 120} $\to$ hụt vạch, thảm hoạ.}
 \end{frame}
 
-\begin{frame}{Tóm lại về model lớn}
+% ---- Nhánh frontier ĐÓNG, gộp thẳng vào phần scaling ----------------------
+\begin{frame}{Cùng bức tranh đó có ở model ĐÓNG (frontier) không?}
+  \begin{block}{Đến giờ toàn model MỞ, tự host}
+    Qwen / Gemma / Llama đều \textbf{mở}, chạy offline. Biết đâu phớt lờ rủi ro + đóng ``vừa đủ'' chỉ là nét riêng của \emph{lớp model mở}?
+  \end{block}
+  \begin{exampleblock}{Thêm một model ĐÓNG, frontier, khác nhà cung cấp vào phép so}
+    \begin{itemize}\setlength\itemsep{4pt}
+      \item Model: \textbf{Gemini-3.1-flash-lite} (Google, đóng) --- qua Kaggle Model Proxy, \emph{không cần GPU}.
+      \item Chạy \textbf{y hệt baseline}: 60 ván (3 rủi ro $\times$ EN/VN $\times$ 10 lặp), cùng prompt/seed --- đã kiểm chứng \good{trùng từng byte} với arm mở.
+    \end{itemize}
+  \end{exampleblock}
+  \take{Model đầu của arm frontier 4 model (gpt-nano / DeepSeek / Claude chạy tiếp).}
+\end{frame}
+
+\begin{frame}{Frontier đóng: cùng một bức tranh (rủi ro \& đóng góp)}
+  \centering\includegraphics[width=0.97\textwidth]{F1_frontier.png}
+  \take{Gemini đạt \good{100\% mọi mức rủi ro} (như mọi model mở); đóng \good{121 --- vừa đủ} như model lớn; EN$=$VN (121 vs 120). Bất thường \emph{không} do model mở hay tự host.}
+\end{frame}
+
+\begin{frame}{Tách ngôn ngữ: trục EN--VN chỉ lay model MỞ, không lay Gemini}
+  \centering
+  \includegraphics[height=0.40\textheight]{F2_contrib_vn.png}\\[2pt]
+  \includegraphics[height=0.40\textheight]{F2_contrib_en.png}
+  \take{Gemini gần như bất biến (EN 122 / VN 120). Model mở lệch theo ngôn ngữ: \weak{Llama-70B tụt DƯỚI vạch ở VN} (130$\to$\weak{112}), Gemma-9B lại \emph{nhích lên} (120$\to$138); Qwen-7B vẫn hào phóng nhất cả hai (238/228).}
+\end{frame}
+
+\begin{frame}{Tóm lại: model lớn MỞ \& frontier ĐÓNG --- cùng hành vi}
   \centering
   \setlength{\tabcolsep}{10pt}\renewcommand{\arraystretch}{1.3}
   \begin{tabular}{lll}
     \toprule
-    Khía cạnh & Nhỏ (7--9B) & Lớn (27--72B) \\
+    Khía cạnh & Nhỏ mở (7--9B) & Lớn mở (27--72B) \\
     \midrule
     Phản ứng rủi ro   & Không & \alert{Vẫn không} \\
     Nhịp hợp tác      & Tăng dần & \alert{Vẫn tăng dần} \\
@@ -137,9 +164,11 @@
     Đóng góp Llama (8$\to$70B) & 185 & \good{121} \\
     Đóng góp Gemma (9$\to$27B) & 129 & 126 \\
     \rowcolor{hirow} Tỉ lệ đạt mục tiêu & 100\% & \makecell[l]{$\sim$100\% \emph{trừ} Llama-70B\\(\weak{50\%}, VN thất bại)} \\
+    \midrule
+    \multicolumn{3}{l}{\textbf{Frontier ĐÓNG (Gemini):} \good{đóng 121} · rủi ro \good{phẳng 100\%} · EN=VN --- \emph{như model lớn mở}} \\
     \bottomrule
   \end{tabular}
-  \take{Model lớn \emph{tiêu tiền khôn hơn}, KHÔNG \emph{biết sợ rủi ro hơn}. Llama-70B lộ điểm gãy \alert{ngôn ngữ}.}
+  \take{Nhỏ hay lớn, MỞ hay ĐÓNG: lớn lên chỉ \emph{tiêu tiền khôn hơn}, KHÔNG \emph{biết sợ rủi ro hơn}. Llama-70B lộ điểm gãy \alert{ngôn ngữ}.}
 \end{frame}
 
 % ======================================================================
@@ -229,6 +258,11 @@
   \take{Pool ẩn (phải tự cộng) hồi \emph{mạnh} theo scale: Qwen \weak{14}$\to$44$\to$\good{88}, Llama \weak{10}$\to$\good{82}; in sẵn tổng luôn \good{$\sim$100\%}. Tới 70--72B khoảng cách gần khép.}
 \end{frame}
 
+\begin{frame}{Cộng sai kiểu gì? Nhỏ báo THIẾU (chỉ $\sim$40\% pool); lớn lên lỗi teo về 0}
+  \centering\includegraphics[height=0.60\textheight]{K6_comp_over_under.png}
+  \take{Model nhỏ (7--9B) \& Gemma-27B: \weak{79--100\% câu sai là báo THIẾU}, trung bình lệch $-42$ đến $-68$đ\% $\Rightarrow$ chỉ báo \weak{$\sim$40\% pool thật} (đếm 1 vòng, quên cộng dồn). Tới 70--72B lỗi \good{gần đối xứng \& nhỏ} (TB $\pm$1--3\%): từ \emph{lỗi tích luỹ hệ thống} thành \emph{nhiễu số học}.}
+\end{frame}
+
 \begin{frame}{Phép thử then chốt: model BIẾT rủi ro, chỉ phớt lờ}
   \centering\includegraphics[height=0.60\textheight]{K3_comp_risk_gate.png}
   \take{Câu ``\% rủi ro'' đúng \good{$\sim$100\%} --- \emph{mọi} model lớn (tới 70--72B) \good{hoàn hảo}. Phớt lờ rủi ro KHÔNG do hiểu sai; biết mà vẫn chọn như nhau.}
@@ -242,27 +276,6 @@
 \begin{frame}{Bảng chi tiết 20 loại câu (phụ lục)}
   \centering\includegraphics[height=0.66\textheight]{K5_comp_figure1.png}
   \take{Bảy model, nhỏ$\to$lớn: Rules kịch trần; Time tốt trừ ``tổng 6 người/vòng''; State cộng dồn cải thiện rõ theo cỡ --- tới 70--72B gần bắt kịp.}
-\end{frame}
-
-% ======================================================================
-\section{Mở rộng 3 --- Model frontier (đóng)}
-
-\begin{frame}{Bất thường có phải chỉ của model MỞ?}
-  \begin{block}{Turn 1--2 toàn model mở, tự host}
-    Qwen / Gemma / Llama đều là model \textbf{mở}, chạy offline. Biết đâu phớt lờ rủi ro + đóng dư chỉ là nét riêng của \emph{lớp model mở}?
-  \end{block}
-  \begin{exampleblock}{Thử một model ĐÓNG, frontier, khác nhà cung cấp}
-    \begin{itemize}\setlength\itemsep{4pt}
-      \item Model: \textbf{Gemini-3.1-flash-lite} (Google, đóng) --- qua Kaggle Model Proxy, \emph{không cần GPU}.
-      \item Chạy \textbf{y hệt baseline}: 60 ván (3 rủi ro $\times$ EN/VN $\times$ 10 lặp), cùng prompt/seed --- đã kiểm chứng \good{trùng từng byte} với arm mở.
-    \end{itemize}
-  \end{exampleblock}
-  \take{Model đầu của arm frontier 4 model (gpt-nano / DeepSeek / Claude chạy tiếp).}
-\end{frame}
-
-\begin{frame}{Frontier đóng: vẫn đúng một bức tranh}
-  \centering\includegraphics[width=0.97\textwidth]{F1_frontier.png}
-  \take{Gemini đạt \good{100\% mọi mức rủi ro} (như mọi model mở); đóng \good{121 --- vừa đủ} như model lớn; EN$=$VN (121 vs 120). Bất thường \emph{không} do model mở hay tự host.}
 \end{frame}
 
 % ======================================================================
