@@ -479,13 +479,15 @@ def collective_risk_baseline(llm) -> dict:
         "n_decisions": n_turns,
         "parse_fail_rate": round(parse_failed / n_turns, 4) if n_turns else None,
         "overall_reach_rate": round(reached / len(games), 3),
-        "reach_by_risk": {r: reach_rate(lambda g, r=r: g["risk_probability"] == r) for r in RISKS},
+        # str keys: kbench serializes the return dict to run.json and chokes on float keys.
+        "reach_by_risk": {str(r): reach_rate(lambda g, r=r: g["risk_probability"] == r) for r in RISKS},
         "reach_by_lang": {l: reach_rate(lambda g, l=l: g["language"] == l) for l in LANGS},
         "mean_group_total": round(sum(g["group_total"] for g in games) / len(games), 2),
         "usage_input_tokens": tok_in,
         "usage_output_tokens": tok_out,
         "usage_total_cost_usd": round(cost / 1e9, 6),
-        "games_per_10usd": int(10 / (cost / 1e9)) if cost else None,
+        # games per $10 = 10 / cost-per-game (not 10 / whole-run cost).
+        "games_per_10usd": int(10 * len(games) / (cost / 1e9)) if cost else None,
         "elapsed_sec": round(time.time() - t0, 1),
         "out_dir": str(out_dir),
     }

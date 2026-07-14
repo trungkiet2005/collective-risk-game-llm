@@ -35,7 +35,7 @@
   rulecolor=\color{black!35},formatcom=\color{black!85}]{#2}}
 
 \title{Tác nhân LLM trong trò chơi rủi ro tập thể --- Turn 2}
-\subtitle{Model lớn (scaling) \enspace\&\enspace Đọc-hiểu luật chơi (comprehension)}
+\subtitle{Model lớn (scaling) \enspace\&\enspace Đọc-hiểu (comprehension) \enspace\&\enspace Model frontier đóng}
 \date{\today}
 \author{Báo cáo nghiên cứu}
 
@@ -53,10 +53,11 @@
       \item Đóng vượt mục tiêu: Qwen 233, Llama 185, Gemma 129 \;(/240)
     \end{itemize}
   \end{block}
-  \begin{exampleblock}{Hai câu hỏi $\Rightarrow$ hai thí nghiệm Turn này}
+  \begin{exampleblock}{Ba câu hỏi $\Rightarrow$ ba mở rộng Turn này}
     \begin{itemize}\setlength\itemsep{4pt}
       \item Do model \emph{nhỏ}? \quad$\to$\quad \alert{thử model lớn}
       \item Không hiểu luật, hay hiểu mà cố phớt lờ? \quad$\to$\quad \alert{kiểm tra đọc-hiểu}
+      \item Chỉ ở model \emph{mở / tự host}? \quad$\to$\quad \alert{thử model frontier đóng}
     \end{itemize}
   \end{exampleblock}
 \end{frame}
@@ -69,7 +70,7 @@
     & \textbf{1 --- Model lớn} & \textbf{2 --- Đọc-hiểu} \\
     \midrule
     Trả lời   & do cỡ model? & có thật sự hiểu luật? \\
-    Model     & \makecell[l]{Qwen 7B$\to$32B$\to$72B\\Gemma 9B$\to$27B, Llama 8B$\to$70B} & 3 nhỏ + 2 lớn (32B/27B) \\
+    Model     & \makecell[l]{Qwen 7B$\to$32B$\to$72B\\Gemma 9B$\to$27B, Llama 8B$\to$70B} & \makecell[l]{3 nhỏ + 4 lớn\\(32/72B, 27B, 70B)} \\
     Setup     & baseline như Turn 1 & hỏi xen kẽ trong ván \\
     Đo        & tỉ lệ đạt, đóng góp, nhịp & đúng/sai 20 loại câu \\
     Quy mô    & 60 ván/model (7 model) & $\sim$54.500 câu/model \\
@@ -149,7 +150,7 @@
     Mỗi vòng hỏi thêm về chính ván đó, qua lượt \emph{riêng} $\Rightarrow$ \textbf{không đổi nước đi} (đã kiểm chứng).
   \end{block}
   \begin{block}{Chấm --- so đáp án engine}
-    Ground-truth tính sẵn, đúng/sai tự động. \textbf{$\sim$54.500 câu/model}; nay đo cả \textbf{2 model lớn} (Qwen-32B, Gemma-27B) để xem scaling có ``chữa'' được không.
+    Ground-truth tính sẵn, đúng/sai tự động. \textbf{$\sim$54.500 câu/model}; nay đo tới \textbf{70--72B} (Qwen-32B/72B, Gemma-27B, Llama-70B\footnote{\scriptsize bản đo comprehension là Llama-3.3-70B; baseline hành vi là Llama-3.1-70B}) để xem scaling có ``chữa'' được không.
   \end{block}
   \begin{exampleblock}{Ba nhóm câu}
     \textbf{Rules} đọc luật \quad$\bullet$\quad \textbf{Time} tra lịch sử \quad$\bullet$\quad \textbf{State} cộng dồn
@@ -218,44 +219,66 @@
   \take{Pool ẩn: model trả \weak{24} (một vòng) thay vì 96. In sẵn tổng: \good{đúng} ngay. Biết \% rủi ro (90).}
 \end{frame}
 
-\begin{frame}{Model lớn cộng dồn tốt hơn hẳn --- nhưng chưa kín}
+\begin{frame}{Model càng lớn, cộng dồn càng khá --- 70--72B đạt 82--87\%}
   \centering\includegraphics[height=0.64\textheight]{K1_comp_category.png}
-  \take{Rules/Time đã kịch trần ở mọi cỡ. Scaling nâng riêng State: Qwen \weak{37}$\to$\good{79}, Gemma \weak{72}$\to$\good{86}. Lỗ hổng là \emph{số học}, không phải luật.}
+  \take{Rules/Time kịch trần ở mọi cỡ. Scaling nâng riêng State: Qwen \weak{37}$\to$79$\to$\good{82}, Gemma \weak{72}$\to$\good{86}, Llama \weak{32}$\to$\good{87}. Lỗ hổng là \emph{số học} --- co lại theo cỡ.}
 \end{frame}
 
-\begin{frame}{Kết quả sắc nhất: đọc được $\neq$ cộng được}
+\begin{frame}{Kết quả sắc nhất: đọc được $\neq$ cộng được (ở model nhỏ)}
   \centering\includegraphics[height=0.62\textheight]{K2_comp_read_vs_add.png}
-  \take{Pool ẩn (phải tự cộng) hồi theo scale: Qwen \weak{14}$\to$44, Gemma \weak{21}$\to$\good{62}; nhưng in sẵn tổng là \good{$\sim$100\%}. Khoảng cách co lại, chưa mất.}
+  \take{Pool ẩn (phải tự cộng) hồi \emph{mạnh} theo scale: Qwen \weak{14}$\to$44$\to$\good{88}, Llama \weak{10}$\to$\good{82}; in sẵn tổng luôn \good{$\sim$100\%}. Tới 70--72B khoảng cách gần khép.}
 \end{frame}
 
 \begin{frame}{Phép thử then chốt: model BIẾT rủi ro, chỉ phớt lờ}
   \centering\includegraphics[height=0.60\textheight]{K3_comp_risk_gate.png}
-  \take{Câu ``\% rủi ro'' đúng \good{$\sim$100\%} --- model lớn \good{hoàn hảo mọi mức}. Phớt lờ rủi ro KHÔNG do hiểu sai; biết mà vẫn chọn như nhau.}
+  \take{Câu ``\% rủi ro'' đúng \good{$\sim$100\%} --- \emph{mọi} model lớn (tới 70--72B) \good{hoàn hảo}. Phớt lờ rủi ro KHÔNG do hiểu sai; biết mà vẫn chọn như nhau.}
 \end{frame}
 
 \begin{frame}{Tiếng Việt làm yếu đúng khâu cộng dồn}
   \centering\includegraphics[height=0.60\textheight]{K4_comp_lang.png}
-  \take{Rules/Time gần như không đổi ($-1$, $-4$đ\%); State rớt \weak{$-15$đ\%} ở tiếng Việt (gộp cả model lớn). Ngôn ngữ đánh đúng khâu yếu nhất.}
+  \take{Rules/Time gần như không đổi ($-1$, $-2$đ\%); State rớt \weak{$-12$đ\%} ở tiếng Việt (gộp cả 7 model). Ngôn ngữ đánh đúng khâu yếu nhất.}
 \end{frame}
 
 \begin{frame}{Bảng chi tiết 20 loại câu (phụ lục)}
   \centering\includegraphics[height=0.66\textheight]{K5_comp_figure1.png}
-  \take{Năm model, nhỏ$\to$lớn: Rules kịch trần; Time tốt trừ ``tổng 6 người/vòng''; State cộng dồn cải thiện theo cỡ nhưng vẫn thấp nhất.}
+  \take{Bảy model, nhỏ$\to$lớn: Rules kịch trần; Time tốt trừ ``tổng 6 người/vòng''; State cộng dồn cải thiện rõ theo cỡ --- tới 70--72B gần bắt kịp.}
+\end{frame}
+
+% ======================================================================
+\section{Mở rộng 3 --- Model frontier (đóng)}
+
+\begin{frame}{Bất thường có phải chỉ của model MỞ?}
+  \begin{block}{Turn 1--2 toàn model mở, tự host}
+    Qwen / Gemma / Llama đều là model \textbf{mở}, chạy offline. Biết đâu phớt lờ rủi ro + đóng dư chỉ là nét riêng của \emph{lớp model mở}?
+  \end{block}
+  \begin{exampleblock}{Thử một model ĐÓNG, frontier, khác nhà cung cấp}
+    \begin{itemize}\setlength\itemsep{4pt}
+      \item Model: \textbf{Gemini-3.1-flash-lite} (Google, đóng) --- qua Kaggle Model Proxy, \emph{không cần GPU}.
+      \item Chạy \textbf{y hệt baseline}: 60 ván (3 rủi ro $\times$ EN/VN $\times$ 10 lặp), cùng prompt/seed --- đã kiểm chứng \good{trùng từng byte} với arm mở.
+    \end{itemize}
+  \end{exampleblock}
+  \take{Model đầu của arm frontier 4 model (gpt-nano / DeepSeek / Claude chạy tiếp).}
+\end{frame}
+
+\begin{frame}{Frontier đóng: vẫn đúng một bức tranh}
+  \centering\includegraphics[width=0.97\textwidth]{F1_frontier.png}
+  \take{Gemini đạt \good{100\% mọi mức rủi ro} (như mọi model mở); đóng \good{121 --- vừa đủ} như model lớn; EN$=$VN (121 vs 120). Bất thường \emph{không} do model mở hay tự host.}
 \end{frame}
 
 % ======================================================================
 \section{Tổng kết Turn 2}
 
-\begin{frame}{Hai mảnh ghép vào bức tranh chung}
+\begin{frame}{Ba mảnh ghép vào bức tranh chung}
   \begin{block}{Hợp tác của LLM là \emph{thói quen}, không phải \emph{tính toán}}
     \begin{itemize}\setlength\itemsep{3pt}
-      \item Hiểu luật + biết rủi ro (\good{$\sim$100\%}); cộng-dồn trạng thái yếu và \emph{chỉ hồi một phần} khi phóng to (pool ẩn 21$\to$\good{62\%})
-      \item $\Rightarrow$ hợp tác là thiên hướng có sẵn, không phải suy luận theo trạng thái
+      \item Hiểu luật + biết rủi ro (\good{$\sim$100\%}); cộng-dồn trạng thái yếu ở model nhỏ nhưng \emph{hồi gần hết} khi phóng to (pool ẩn 14$\to$\good{88\%} ở Qwen-72B)
+      \item $\Rightarrow$ tới 70--72B model \emph{cộng được} trạng thái \& biết rủi ro mà \good{vẫn} phớt lờ --- hợp tác là thiên hướng, không phải suy luận theo trạng thái
       \item Scaling chỉ cắt phần đóng dư (233$\to$128): tiêu khôn hơn, vẫn phớt lờ rủi ro tới 72B
+      \item Model frontier \textbf{đóng} (Gemini) cũng \good{phớt lờ rủi ro} + đóng vừa đủ $\Rightarrow$ bất thường không riêng lớp model mở/tự host
       \item Llama-70B: model lớn đầu tiên \weak{thất bại thật} --- nhưng do \alert{ngôn ngữ} (VN hụt vạch), không do rủi ro
     \end{itemize}
   \end{block}
-  \take{Phớt lờ rủi ro: không do \emph{hiểu sai}, không do \emph{model nhỏ} $\Rightarrow$ \alert{thiên hướng hành vi} của lớp model này.}
+  \take{Phớt lờ rủi ro: không do \emph{hiểu sai}, không do \emph{model nhỏ}, không do \emph{mở/đóng} $\Rightarrow$ \alert{thiên hướng hành vi} của lớp model này.}
 \end{frame}
 
 \begin{frame}{So với Turn trước}
@@ -265,34 +288,36 @@
     \toprule
     Câu hỏi & Turn trước & Turn này \\
     \midrule
-    Do model nhỏ?        & giả thuyết & \weak{Không} --- 27/32B vẫn phẳng \\
+    Do model nhỏ?        & giả thuyết & \weak{Không} --- tới 72B vẫn phẳng \\
+    Chỉ ở model mở?      & chưa xét   & \weak{Không} --- Gemini \emph{đóng} y hệt \\
     Hiểu luật?           & chưa đo    & \good{Có} --- Rules 94--100\% \\
     Biết mức rủi ro?     & chưa đo    & \good{Có} --- câu rủi ro $\sim$100\% \\
-    Vì sao theo dõi quỹ sai? & ``thói quen'' & \weak{Không cộng dồn được} (10--21\%) \\
-    Trục ngôn ngữ?       & đóng góp (Llama) & + \alert{số học} (State $-19$đ\% VN) \\
+    Vì sao theo dõi quỹ sai? & ``thói quen'' & \makecell[l]{\weak{Cộng dồn yếu} ở nhỏ,\\\good{hồi gần hết} ở 70--72B} \\
+    Trục ngôn ngữ?       & đóng góp (Llama) & + \alert{gây thất bại thật} (Llama-70B VN) \\
     \bottomrule
   \end{tabular}
   \take{Turn này \emph{khẳng định} \& \emph{giải thích} các bất thường Turn 1, không lật ngược.}
 \end{frame}
 
 \begin{frame}{Điểm thảo luận với thầy}
-  \textbf{Scaling}
+  \textbf{Scaling} (đã có đủ ba họ + 70/72B)
   \begin{itemize}\setlength\itemsep{2pt}
-    \item Cần chạy Llama lớn (70B) để đủ cặp họ thứ ba không ạ?
+    \item Llama-70B \good{đã chạy}: lộ điểm gãy \alert{ngôn ngữ} (VN 112$<$120, thảm hoạ 73\%) --- đào sâu vì sao chỉ Llama?
     \item Qwen-32B tụt nhẹ tỉ lệ đạt (97\%) vì chơi sát vạch --- lấy \emph{đóng góp} làm biến chính?
   \end{itemize}
   \smallskip
-  \textbf{Đọc-hiểu}
+  \textbf{Đọc-hiểu} (đã đo tới 70--72B)
   \begin{itemize}\setlength\itemsep{2pt}
-    \item ``Không cộng dồn'' là giới hạn số học hay do prompt quá dài? $\to$ thử cắt ngắn lịch sử.
+    \item Scaling hồi cộng-dồn \good{gần hết} (pool ẩn 14$\to$88\% ở Qwen-72B) --- nhưng hành vi phớt lờ rủi ro \emph{không} đổi $\Rightarrow$ tách bạch được ``hiểu'' vs ``hành vi''.
     \item Đưa \emph{tổng quỹ in sẵn} vào prompt quyết định --- hợp tác có đổi khi được ``nhắc''?
   \end{itemize}
 \end{frame}
 
 \begin{frame}[standout]
   Model lớn: \textbf{tiêu tiền khôn hơn}, không \textbf{biết sợ rủi ro hơn}. \\[3mm]
-  LLM \textbf{hiểu luật} \& \textbf{biết rủi ro}, nhưng \textbf{không cộng được trạng thái} --- \\
-  hợp tác là \textbf{thói quen}, không phải tính toán.
+  Tới 70--72B, LLM \textbf{hiểu luật}, \textbf{biết rủi ro} \& \textbf{cộng được trạng thái} --- \\
+  mà \textbf{vẫn} phớt lờ rủi ro: hợp tác là \textbf{thói quen}, không phải tính toán. \\[3mm]
+  {\normalsize Nhỏ hay lớn, mở hay \textbf{đóng} --- cùng một hành vi.}
 \end{frame}
 
 \end{document}

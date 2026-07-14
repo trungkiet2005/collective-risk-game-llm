@@ -9,11 +9,11 @@
     "slug": "google/gemini-3.1-flash-lite-preview"
   },
   "state": "BENCHMARK_TASK_RUN_STATE_COMPLETED",
-  "startTime": "2026-07-14T09:57:10.790674Z",
-  "endTime": "2026-07-14T09:58:21.287322Z",
+  "startTime": "2026-07-14T11:13:49.205414Z",
+  "endTime": "2026-07-14T11:15:00.286077Z",
   "conversations": [
     {
-      "id": "collective-risk-baseline-srv-2ed3e875",
+      "id": "collective-risk-baseline-srv-395bb672",
       "metrics": {},
       "modelVersionSlug": "model_version_slug for conversation is DEPRECATED"
     }
@@ -22,11 +22,11 @@
     {
       "type": "AGGREGATED",
       "dictResult": {
-        "elapsed_sec": 69.9,
-        "out_dir": "C:\\Users\\huynh\\AppData\\Local\\Temp\\claude\\d--AI-PhD-GameTheory-Colective-Risk-Game\\76e584ce-c486-446f-a63d-2b031a2dabec\\scratchpad\\srv_validate3",
+        "elapsed_sec": 70.5,
+        "out_dir": "C:\\Users\\huynh\\AppData\\Local\\Temp\\claude\\d--AI-PhD-GameTheory-Colective-Risk-Game\\76e584ce-c486-446f-a63d-2b031a2dabec\\scratchpad\\srv_seq",
         "n_games": 1.0,
-        "usage_output_tokens": 5911.0,
-        "games_per_10usd": 575.0,
+        "usage_output_tokens": 5880.0,
+        "games_per_10usd": 576.0,
         "model": "google-gemini-3.1-flash-lite-preview",
         "reach_by_lang": {
           "en": 1.0
@@ -34,7 +34,7 @@
         "overall_reach_rate": 1.0,
         "mean_group_total": 120.0,
         "parse_fail_rate": 0.0,
-        "usage_total_cost_usd": 0.017386,
+        "usage_total_cost_usd": 0.01734,
         "usage_input_tokens": 34080.0,
         "reach_by_risk": {
           "0.9": 1.0
@@ -47,11 +47,11 @@
     {
       "expectation": "All agent decisions parsed a legal CONTRIBUTION (0/2/4)",
       "status": "BENCHMARK_TASK_RUN_ASSERTION_STATUS_PASSED",
-      "lineNumber": 474,
+      "lineNumber": 508,
       "definition": "kbench.assertions.assert_equal(0, parse_failed,",
       "conversationRequestIds": [
         {
-          "conversationId": "collective-risk-baseline-srv-2ed3e875"
+          "conversationId": "collective-risk-baseline-srv-395bb672"
         }
       ]
     }

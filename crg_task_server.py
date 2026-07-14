@@ -36,6 +36,8 @@ import re
 import subprocess
 import time
 from pathlib import Path
+import contextvars
+from concurrent.futures import ThreadPoolExecutor
 
 # Load MODEL_PROXY_* from .env for local runs (harmless on the Kaggle server, which
 # injects these as real env vars). Pick the model via CRG_MODEL, else flash-lite.
@@ -91,6 +93,11 @@ REPS = int(os.environ.get("CRG_REPS", "10"))
 _no_overrides = not any(os.environ.get(k) for k in ("CRG_RISKS", "CRG_LANGS", "CRG_REPS"))
 if "gemini-3-flash-preview" in MODEL and _no_overrides:
     RISKS, LANGS, REPS = [0.9], ["en"], 1
+
+# Per-round decision concurrency. DEFAULT 1 = fully sequential (reliable on
+# capacity-limited proxies like gpt-nano, which 429s under bursts). Set
+# CRG_CONCURRENCY>1 (e.g. 6) for the parallel path on higher-capacity models.
+_CONCURRENCY = int(os.environ.get("CRG_CONCURRENCY", "1"))
 
 # risk -> crsd game name, so game_id matches the open-source arm's join key.
 GAME_NAME = {0.90: "crsd_milinski_high_risk",
@@ -302,10 +309,16 @@ def _call_llm(llm, prompt, seed, max_attempts=6):
     auth_retries = 0
     while True:
         attempt += 1
+        text = None
         try:
             with kbench.chats.new("turn", orphan=True) as chat:
                 text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed)
-            return text, chat.usage
+            if text is not None:
+                return text, chat.usage
+            # Parallel path: contexts.enter can SWALLOW a proxy error inside a
+            # worker thread (the run ContextVar does not propagate), leaving
+            # text=None. Raise a synthetic transient so the backoff below retries.
+            raise RuntimeError("503 no-text: proxy error swallowed under concurrency")
         except Exception as e:
             msg = str(e).lower()
             if any(t in msg for t in _AUTH_ERR):     # token expired -> refresh, don't burn budget
@@ -351,12 +364,33 @@ def play_game(llm, risk, language, rep, model_tag, turns_sink):
     parse_failed = 0
 
     for r in range(1, N_ROUNDS + 1):
-        # All N prompts built from COMPLETED-round history -> genuinely simultaneous.
-        round_contribs = []
-        for pid in range(N_PLAYERS):
-            prompt = assemble_prompt(language, pid, r, history, risk)
-            base_seed = sampling_seed(rep, pid, r)
+        # All N prompts built from COMPLETED-round history -> genuinely simultaneous,
+        # so the N per-round decisions are INDEPENDENT and run concurrently. Results
+        # are gathered in fixed player order (ThreadPoolExecutor.map preserves input
+        # order) and all bookkeeping/logging below stays single-threaded, so the output
+        # is byte-identical to the sequential version (seeds fixed per (rep, pid, round);
+        # history is only read inside the threads and appended after the batch).
+        def _decide_one(pid, _r=r):
+            prompt = assemble_prompt(language, pid, _r, history, risk)
+            base_seed = sampling_seed(rep, pid, _r)
             text, value, failed, ti, to, cn = decide(llm, prompt, base_seed)
+            return pid, prompt, base_seed, text, value, failed, ti, to, cn
+
+        if _CONCURRENCY <= 1:
+            # Sequential (default): transient 429/503 retried in-thread; reliable on
+            # capacity-limited proxies. Byte-identical output to the parallel path.
+            round_results = [_decide_one(pid) for pid in range(N_PLAYERS)]
+        else:
+            with ThreadPoolExecutor(max_workers=_CONCURRENCY) as _ex:
+                # copy_context() per worker so the SDK active-run ContextVar propagates
+                # into the threads (else contexts.enter swallows proxy errors and
+                # _call_llm cannot retry). Futures in player order -> deterministic.
+                _futs = [_ex.submit(contextvars.copy_context().run, _decide_one, pid)
+                         for pid in range(N_PLAYERS)]
+                round_results = [f.result() for f in _futs]
+
+        round_contribs = []
+        for pid, prompt, base_seed, text, value, failed, ti, to, cn in round_results:
             tok_in += ti; tok_out += to; cost += cn
             parse_failed += int(failed)
 
