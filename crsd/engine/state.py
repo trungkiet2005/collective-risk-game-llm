@@ -38,6 +38,21 @@ class GameConfig:
     # Khung dẫn nhập trung lập (thay cho "tiền thật" mà LLM không có) — KHÔNG kê
     # toa chiến lược, chỉ neo mục tiêu là payoff của chính mình.
     framing: bool = False
+    # Framing HẬU QUẢ khi TRƯỢT mục tiêu (trục độc lập với `framing` neo-payoff ở trên):
+    #   "lottery" : bản gốc Milinski — "the computer runs a lottery ... the group is
+    #               hit by a disaster ..." / "máy tính quay xổ số ... nhóm gặp thảm hoạ ..."
+    #               (có neo cảm xúc: 'lottery' + 'disaster'/'xổ số' + 'thảm hoạ').
+    #   "plain"   : nêu XÁC SUẤT trực tiếp; bỏ 'the computer runs a lottery' và 'hit by
+    #               a disaster' (VN: 'máy tính quay xổ số' + 'gặp thảm hoạ').
+    # Mặc định "lottery" -> prompt GIỮ NGUYÊN byte-for-byte như cũ (mọi experiment cũ
+    # không đổi). Chỉ experiment nào set "plain" mới đổi cách mô tả rủi ro.
+    risk_framing: str = "lottery"
+    # Cung cấp SẴN các tổng đã tính (thay vì bắt agent tự cộng dồn — nối phát hiện
+    # read≠add: model đọc được state nhưng không tự cộng). Bật -> thêm khối "Current
+    # state" liệt kê: quỹ hiện tại + còn thiếu tới target, bạn đã đóng + người khác đã
+    # đóng. Mặc định False -> prompt GIỮ NGUYÊN. Chỉ có hiệu lực ở template full_history
+    # (crsd_en/vn); scratchpad CỐ Ý không có (điều kiện tự-ghi-nhớ, xem memory_mode).
+    show_computed_totals: bool = False
     language: str = "en"
     prompt_template: str = "crsd"
     agents_ref: str = "personas_default"
@@ -68,6 +83,8 @@ class GameConfig:
             memory_window=int(d.get("historyWindow", 1)),
             note_window=int(d.get("noteWindow", 0)),
             framing=bool(d.get("framing", False)),
+            risk_framing=str(d.get("riskFraming", "lottery")),
+            show_computed_totals=bool(d.get("showComputedTotals", False)),
             language=language or d.get("language", "en"),
             prompt_template=d.get("promptTemplate", "crsd"),
             agents_ref=d.get("agents", "personas_default"),
@@ -101,6 +118,8 @@ class TurnRecord:
     persona_set: Optional[str] = None
     memory_mode: Optional[str] = None
     framing: Optional[bool] = None
+    risk_framing: Optional[str] = None    # "lottery" (gốc) | "plain" (nêu xác suất trực tiếp)
+    show_computed_totals: Optional[bool] = None  # có đưa sẵn tổng tính trước vào prompt?
     rep: Optional[int] = None
 
     def to_dict(self) -> dict:

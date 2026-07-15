@@ -211,6 +211,8 @@ class CrsdGame:
                     persona_set=self.persona_set,
                     memory_mode=getattr(cfg, "memory_mode", "full_history"),
                     framing=bool(getattr(cfg, "framing", False)),
+                    risk_framing=getattr(cfg, "risk_framing", "lottery"),
+                    show_computed_totals=bool(getattr(cfg, "show_computed_totals", False)),
                     rep=self.rep,
                 )
             )

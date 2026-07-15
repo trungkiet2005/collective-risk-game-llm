@@ -1,0 +1,27 @@
+{
+  "name": "exp_riskframing",
+  "description": "FACTORIAL 2x2 (EN+VN): risk_framing (lottery|plain) x show_computed_totals (off|on). Giu nguyen moi tham so game (cung risk/target/seed/CRN) -> chenh lech chi do (a) CACH MO TA hau qua khi truot muc tieu, va (b) co dua san TONG TINH TRUOC hay khong. TRUC A framing: lottery = goc Milinski 'the computer runs a lottery ... the group is hit by a disaster ...' (neo cam xuc); plain = neu XAC SUAT truc tiep, bo 'may tinh quay xo so' + 'gap tham hoa'. TRUC B computed-totals (noi phat hien read≠add): off = agent tu cong don; on = them khoi Current state liet ke quy hien tai + con thieu toi target + ban da dong + nguoi khac da dong (so tien con lai cua minh van luon hien san). O (lottery, off) DUNG LAI game config baseline nen trung CRN voi exp_baseline. Agent trung tinh, full_history, KHONG persona/scratchpad. 12 game (3 risk x 4 dieu kien) x 2 lang x 10 rep = 240 game/model. Phan tich: pivot theo risk_framing x show_computed_totals x risk x language; do main effect tung truc + interaction.",
+  "games": [
+    "crsd_milinski_high_risk",
+    "crsd_milinski_medium_risk",
+    "crsd_milinski_low_risk",
+    "crsd_milinski_high_risk_plainframe",
+    "crsd_milinski_medium_risk_plainframe",
+    "crsd_milinski_low_risk_plainframe",
+    "crsd_milinski_high_risk_computed",
+    "crsd_milinski_medium_risk_computed",
+    "crsd_milinski_low_risk_computed",
+    "crsd_milinski_high_risk_plain_computed",
+    "crsd_milinski_medium_risk_plain_computed",
+    "crsd_milinski_low_risk_plain_computed"
+  ],
+  "agents": "personas_default",
+  "languages": ["en", "vn"],
+  "models": ["LocalQwen"],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}

@@ -162,6 +162,11 @@ def build_prompt(
     cumulative = sum(sum(r) for r in history)
     own_total = sum(r[player_index] for r in history)
     remaining = max(0.0, cfg.endowment - own_total)
+    # Tổng tính sẵn (chỉ dùng khi block computedTotals bật): phần người khác đã đóng,
+    # còn thiếu bao nhiêu để đạt target, số "người khác" trong nhóm.
+    others_total = max(0.0, cumulative - own_total)
+    needed_to_target = max(0.0, cfg.target - cumulative)
+    n_others = cfg.n_players - 1
     risk_percent = round(cfg.risk_probability * 100)
     safe_percent = 100 - risk_percent
     options_str = ", ".join(_fmt(o) for o in cfg.contribution_options)
@@ -175,6 +180,8 @@ def build_prompt(
     memory_window = getattr(cfg, "memory_window", 1)
     note_window = getattr(cfg, "note_window", 0)
     framing = getattr(cfg, "framing", False)
+    risk_framing = getattr(cfg, "risk_framing", "lottery")
+    show_computed_totals = getattr(cfg, "show_computed_totals", False)
     has_history = current_round > 1 and bool(history)
     is_scratchpad = memory_mode == "scratchpad"
     notepad_text = build_notepad_text(agent_notes or [], language, note_window)
@@ -182,10 +189,17 @@ def build_prompt(
     enabled = {
         "persona": bool(persona_text),
         "framing": bool(framing),
+        # Framing hậu quả rủi ro: bật ĐÚNG MỘT trong hai bản mô tả. Mặc định "lottery"
+        # (giữ nguyên prompt gốc); "plain" nêu xác suất trực tiếp. Template CŨ không có
+        # hai block này -> cả hai key vô hại (không khớp gì để bật/tắt).
+        "riskLottery": risk_framing != "plain",
+        "riskPlain": risk_framing == "plain",
         "gameLength": cfg.n_rounds_known,
         # full_history: nạp lại toàn bộ lịch sử; scratchpad: KHÔNG dùng block này.
         "history": (not is_scratchpad) and has_history,
         "showCumulative": (not is_scratchpad) and show_cum,
+        # Tổng tính sẵn: chỉ ở full_history (scratchpad cố ý tự-ghi-nhớ nên không đưa).
+        "computedTotals": (not is_scratchpad) and bool(show_computed_totals),
         # scratchpad: chỉ hiển thị vòng gần nhất + cuốn sổ tay ghi chú riêng.
         "lastRound": is_scratchpad and has_history,
         "scratchpadNote": is_scratchpad and bool(notepad_text),
@@ -210,6 +224,10 @@ def build_prompt(
         "currentRound": current_round,
         "groupAccount": _fmt(cumulative),
         "remainingEndowment": _fmt(remaining),
+        "ownContributed": _fmt(own_total),
+        "othersContributed": _fmt(others_total),
+        "neededToTarget": _fmt(needed_to_target),
+        "nOthers": n_others,
         "historyText": build_history_text(history, player_index, cfg, language),
         "lastRoundText": build_window_text(history, player_index, cfg, language, memory_window),
         "noteText": notepad_text,

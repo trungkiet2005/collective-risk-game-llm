@@ -1,0 +1,18 @@
+{
+  "name": "crsd_milinski_medium_risk_computed",
+  "engine": "collective_risk",
+  "nPlayers": 6,
+  "endowment": 40,
+  "contributionOptions": [0, 2, 4],
+  "target": 120,
+  "nRounds": 10,
+  "nRoundsIsKnown": true,
+  "riskProbability": 0.50,
+  "showIndividualContributions": true,
+  "showCumulative": false,
+  "agentsCommunicate": false,
+  "memoryMode": "full_history",
+  "showComputedTotals": true,
+  "promptTemplate": "crsd",
+  "agents": "personas_default"
+}

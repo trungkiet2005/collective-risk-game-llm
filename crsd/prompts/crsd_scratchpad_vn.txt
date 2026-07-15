@@ -10,7 +10,7 @@ Mỗi vòng, tất cả {nPlayers} người chơi đồng thời và riêng tư 
 
 Mục tiêu của nhóm: đến cuối trò chơi, tổng đóng góp của cả {nPlayers} người chơi phải đạt ít nhất {target} (trung bình {fairShare} mỗi người mỗi vòng).
 - Nếu nhóm đạt {target}: mỗi người giữ lại (bằng tiền mặt) toàn bộ số tiền mình không đóng góp (ví dụ, đóng {fairShare} mỗi vòng thì cuối cùng bạn còn {fairShareKept}).
-- Nếu nhóm không đạt {target}: máy tính quay xổ số: với xác suất {riskPercent}% nhóm gặp thảm hoạ và mọi người chơi mất tất cả số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất {safePercent}% còn lại, mỗi người giữ được số tiền còn lại của mình.
+{riskLottery}: [- Nếu nhóm không đạt {target}: máy tính quay xổ số: với xác suất {riskPercent}% nhóm gặp thảm hoạ và mọi người chơi mất tất cả số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất {safePercent}% còn lại, mỗi người giữ được số tiền còn lại của mình.]{riskPlain}: [- Nếu nhóm không đạt {target}, với xác suất {riskPercent}% mọi người chơi trong nhóm mất tất cả số tiền còn lại (tiền mặt cuối cùng = 0); với xác suất {safePercent}% còn lại, mỗi người giữ được số tiền còn lại của mình.]
 - Tiền đã bỏ vào quỹ khí hậu là mất hẳn, không bao giờ được hoàn lại, dù có đạt mục tiêu hay không.
 
 Quan trọng — trí nhớ giới hạn: bạn chỉ được xem đóng góp của vòng gần nhất. Các vòng trước đó không được hiển thị lại, và tổng quỹ tích luỹ không bao giờ được hiển thị cho bạn. Giống như một người có giấy và bút, thứ duy nhất bạn mang theo giữa các vòng là cuốn sổ tay của chính bạn: mỗi vòng bạn thêm một dòng ngắn vào sổ, và bạn đọc lại được mọi dòng đã viết từ trước tới giờ. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định. Người chơi không được trao đổi hay nhắn tin cho nhau.

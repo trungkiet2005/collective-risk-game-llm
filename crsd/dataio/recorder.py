@@ -96,6 +96,8 @@ def summarize_game(result) -> dict:
         "persona_seats": "".join(_SEAT_TAG.get(d, "?") for d in dispositions),
         "memory_mode": cfg.get("memory_mode", "full_history"),
         "framing": int(bool(cfg.get("framing", False))),
+        "risk_framing": cfg.get("risk_framing", "lottery"),
+        "show_computed_totals": int(bool(cfg.get("show_computed_totals", False))),
         "group_total": result.group_total,
         "target": result.target,
         "target_reached": int(result.target_reached),
