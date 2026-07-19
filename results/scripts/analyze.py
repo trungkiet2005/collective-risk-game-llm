@@ -2,17 +2,15 @@
 from pathlib import Path
 import pandas as pd, numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent / "data"   # results/data (script dưới results/scripts/)
-PATHS = {
- "baseline": ROOT/"baseline/crsd_results/crsd_all_models.csv",
- "framing":  ROOT/"framing/crsd_results/crsd_all_models.csv",
- "memory":   ROOT/"memory/crsd_results/crsd_all_models.csv",
-}
+ROOT = Path(__file__).resolve().parent.parent / "open_source"   # results/open_source
+# layout exp-first: đọc 1 master rồi lọc theo cột 'experiment'
+EXP_FILE = {"baseline": "exp_baseline", "framing": "exp_framing", "memory": "exp_memory_ablation"}
+_MASTER = pd.read_csv(ROOT / "crsd_all_models.csv")
 HUMAN = {0.9:0.50, 0.5:0.10, 0.1:0.00}
 
 fr=[]
-for e,p in PATHS.items():
-    d=pd.read_csv(p); d["exp_file"]=e; fr.append(d)
+for e,exp in EXP_FILE.items():
+    d=_MASTER[_MASTER.experiment==exp].copy(); d["exp_file"]=e; fr.append(d)
 a=pd.concat(fr, ignore_index=True)
 a["risk"]=a.risk_probability.astype(float); a["reach"]=a.target_reached.astype(int); a["cat"]=a.catastrophe.astype(int)
 def pct(x): return f"{100*x:5.1f}%"

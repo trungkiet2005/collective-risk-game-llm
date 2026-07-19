@@ -49,7 +49,7 @@ QORDER = [
 CATLBL = {"rules": "RULES · luật tĩnh", "time": "TIME · tra lịch sử", "state": "STATE · cộng dồn"}
 
 frames = [pd.read_csv(f) for f in
-          glob.glob(str(R / "extracted_comp/crsd_results/*/exp_comprehension/comprehension_summary.csv"))]
+          glob.glob(str(R / "open_source/exp_comprehension/*/comprehension_summary.csv"))]
 C = pd.concat(frames, ignore_index=True)
 
 def acc(model, qid):

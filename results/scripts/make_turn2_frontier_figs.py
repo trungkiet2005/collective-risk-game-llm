@@ -29,7 +29,7 @@ OSM = list(OSCOL)
 FRONT_CSV = R / "frontier/google-gemini-3.1-flash-lite-preview/exp_baseline/games.csv"
 fr = pd.read_csv(FRONT_CSV)
 os_ = pd.concat([pd.read_csv(f) for f in glob.glob(
-    str(R / "data/baseline/crsd_results/*/exp_baseline/games.csv"))], ignore_index=True)
+    str(R / "open_source/exp_baseline/*/games.csv"))], ignore_index=True)
 for d in (fr, os_):
     d["reach"] = d.target_reached.astype(int); d["risk"] = d.risk_probability.astype(float)
 

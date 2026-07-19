@@ -46,11 +46,10 @@ def save(fig, name):
 
 # ---------------------------------------------------------------- load behavior
 def loadcsv(p): return pd.read_csv(p)
+_os = pd.read_csv(R / "open_source/crsd_all_models.csv")       # layout exp-first
+_os = _os[_os.experiment == "exp_baseline"]
 A = pd.concat([
-    loadcsv(R / "data/baseline/crsd_results/crsd_all_models.csv"),
-    loadcsv(R / "extracted_large/crsd_results/crsd_all_models.csv"),
-    loadcsv(R / "extracted_new/llama70/crsd_results/crsd_all_models.csv"),
-    loadcsv(R / "extracted_new/qwen72/crsd_results/crsd_all_models.csv"),
+    _os,
     loadcsv(R / "frontier/google-gemini-3.1-flash-lite-preview/exp_baseline/games.csv"),
 ], ignore_index=True)
 A["reach"] = A.target_reached.astype(int); A["risk"] = A.risk_probability.astype(float)
@@ -58,17 +57,15 @@ A["reach"] = A.target_reached.astype(int); A["risk"] = A.risk_probability.astype
 def load_turns(pattern):
     rows = []
     for f in glob.glob(str(R / pattern)):
-        m = f.replace("\\", "/").split("/")[-3]
+        p = f.replace("\\", "/").split("/")   # open_source: <exp>/<model>/turns; frontier: <model>/<exp>/turns
+        m = p[-2] if not p[-2].startswith("exp_") else p[-3]
         for line in open(f, encoding="utf-8"):
             d = json.loads(line)
             rows.append((m, d["round"], d["contribution"], d.get("language"),
                          float(d.get("risk_probability", 0))))
     return rows
 T = pd.DataFrame(
-    load_turns("data/baseline/crsd_results/*/exp_baseline/turns.jsonl")
-    + load_turns("extracted_large/crsd_results/*/exp_baseline/turns.jsonl")
-    + load_turns("extracted_new/llama70/crsd_results/*/exp_baseline/turns.jsonl")
-    + load_turns("extracted_new/qwen72/crsd_results/*/exp_baseline/turns.jsonl")
+    load_turns("open_source/exp_baseline/*/turns.jsonl")
     + load_turns("frontier/google-gemini-3.1-flash-lite-preview/exp_baseline/turns.jsonl"),
     columns=["model", "round", "c", "lang", "risk"])
 
@@ -222,9 +219,7 @@ save(fig, "L6_llama70_lang_collapse.png")
 def read_comp(pattern):
     return [pd.read_csv(f) for f in glob.glob(str(R / pattern))]
 C = pd.concat(
-    read_comp("extracted_comp/crsd_results/*/exp_comprehension/comprehension_summary.csv")
-    + read_comp("extracted_new/comp_large/crsd_results/*/exp_comprehension/comprehension_summary.csv")
-    + read_comp("extracted_new/comp_xl/crsd_results/*/exp_comprehension/comprehension_summary.csv"),
+    read_comp("open_source/exp_comprehension/*/comprehension_summary.csv"),
     ignore_index=True)
 # thứ tự ghép cặp nhỏ→lớn theo họ (nay có cả 70–72B; Llama đo bản 3.3)
 CMODELS = ["qwen25-7b-instruct", "qwen25-32b-instruct", "qwen25-72b-instruct-awq",
@@ -354,9 +349,7 @@ def load_comp_probes(pattern):
                          bool(d["correct"]), bool(d["parse_failed"])))
     return rows
 CP = pd.DataFrame(
-    load_comp_probes("extracted_comp/crsd_results/*/exp_comprehension/comprehension.jsonl")
-    + load_comp_probes("extracted_new/comp_large/crsd_results/*/exp_comprehension/comprehension.jsonl")
-    + load_comp_probes("extracted_new/comp_xl_full/crsd_results/*/exp_comprehension/comprehension.jsonl"),
+    load_comp_probes("open_source/exp_comprehension/*/comprehension.jsonl"),
     columns=["model", "parsed", "truth", "correct", "pfail"])
 CP = CP[CP.truth.apply(lambda v: isinstance(v, (int, float)) and v > 0)]  # GT>0: có gì để cộng
 

@@ -32,11 +32,9 @@ PAR = {"qwen25-7b-instruct": 7, "qwen25-32b-instruct": 32, "qwen25-72b-instruct-
 famcol = {"Qwen": "#2C6E9B", "Gemma": "#14746F", "Llama": "#B23A22"}
 
 # ---- data: open scaling (giống make_turn2_figs) + frontier Gemini --------------
-paths = ["data/baseline/crsd_results/crsd_all_models.csv",
-         "extracted_large/crsd_results/crsd_all_models.csv",
-         "extracted_new/llama70/crsd_results/crsd_all_models.csv",
-         "extracted_new/qwen72/crsd_results/crsd_all_models.csv"]
-A = pd.concat([pd.read_csv(R / p) for p in paths if os.path.exists(R / p)], ignore_index=True)
+# layout exp-first: baseline mọi model open-source từ master
+A = pd.read_csv(R / "open_source/crsd_all_models.csv")
+A = A[A.experiment == "exp_baseline"].copy()
 gt = A.groupby("model").group_total.mean()
 fr = pd.read_csv(R / "frontier/google-gemini-3.1-flash-lite-preview/exp_baseline/games.csv")
 gem = fr.group_total.mean()

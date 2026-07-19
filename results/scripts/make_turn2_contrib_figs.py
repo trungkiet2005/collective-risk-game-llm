@@ -50,13 +50,9 @@ COLS = [COL[m] for m in ORDER]
 LABS = [LBL[m] for m in ORDER]
 
 # ---- data --------------------------------------------------------------------
-OS_PATHS = [
-    R / "data/baseline/crsd_results/crsd_all_models.csv",          # Qwen-7B, Llama-8B, Gemma-9B
-    R / "extracted_large/crsd_results/crsd_all_models.csv",        # Qwen-32B, Gemma-27B, (Llama-70B?)
-    R / "extracted_new/llama70/crsd_results/crsd_all_models.csv",  # Llama-70B
-    R / "extracted_new/qwen72/crsd_results/crsd_all_models.csv",   # Qwen-72B
-]
-os_ = pd.concat([pd.read_csv(p) for p in OS_PATHS if os.path.exists(p)], ignore_index=True)
+# layout exp-first: baseline mọi model open-source từ master
+os_ = pd.read_csv(R / "open_source/crsd_all_models.csv")
+os_ = os_[os_.experiment == "exp_baseline"].copy()
 os_ = os_.drop_duplicates(subset=["model", "language", "game_id"])
 fr = pd.read_csv(R / "frontier/google-gemini-3.1-flash-lite-preview/exp_baseline/games.csv")
 

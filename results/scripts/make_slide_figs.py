@@ -5,7 +5,7 @@ import pandas as pd, numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = Path(__file__).resolve().parent.parent / "data"   # results/data (script dưới results/scripts/)
+ROOT = Path(__file__).resolve().parent.parent / "open_source"   # results/open_source (script dưới results/scripts/)
 OUT = Path(__file__).resolve().parents[2] / "slides" / "week1" / "figs"; OUT.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams.update({
@@ -24,8 +24,11 @@ HUMAN = {0.9: 0.50, 0.5: 0.10, 0.1: 0.00}
 DARK, ACC = "#264653", "#E76F51"
 TEAL, YELL = "#2A9D8F", "#E9C46A"
 
+_EXP = {"baseline": "exp_baseline", "memory": "exp_memory_ablation",
+        "framing": "exp_framing", "persona": "exp_persona"}
+_MASTER = pd.read_csv(ROOT / "crsd_all_models.csv")
 def load(exp):
-    d = pd.read_csv(ROOT / f"{exp}/crsd_results/crsd_all_models.csv")
+    d = _MASTER[_MASTER.experiment == _EXP[exp]].copy()
     d["reach"] = d.target_reached.astype(int); d["risk"] = d.risk_probability.astype(float)
     d["nsel"] = d.persona_seats.fillna("").str.count("S")
     return d
@@ -60,8 +63,8 @@ save(fig, "B_contrib_vs_risk.png")
 
 # C. Round dynamics ----------------------------------------------------------
 rows = []
-for f in glob.glob(str(ROOT / "baseline/crsd_results/*/exp_baseline/turns.jsonl")):
-    m = f.replace("\\", "/").split("/")[-3]
+for f in glob.glob(str(ROOT / "exp_baseline/*/turns.jsonl")):
+    m = f.replace("\\", "/").split("/")[-2]
     for line in open(f, encoding="utf-8"):
         d = json.loads(line); rows.append((m, d["round"], d["contribution"]))
 gr = pd.DataFrame(rows, columns=["model", "round", "c"]).groupby(["model", "round"]).c.mean().reset_index()
@@ -169,8 +172,8 @@ save(fig, "E_persona_linear.png")
 
 # G. Individual disposition effect -------------------------------------------
 rows = []
-for f in glob.glob(str(ROOT / "persona/crsd_results/*/exp_persona/turns.jsonl")):
-    m = f.replace("\\", "/").split("/")[-3]
+for f in glob.glob(str(ROOT / "exp_test/exp_persona/*/turns.jsonl")):
+    m = f.replace("\\", "/").split("/")[-2]
     for line in open(f, encoding="utf-8"):
         d = json.loads(line); rows.append((m, d.get("disposition"), d["contribution"]))
 dd = pd.DataFrame(rows, columns=["model", "disp", "c"])
@@ -189,13 +192,13 @@ save(fig, "G_disposition.png")
 # ============================================================================
 #  HÌNH BỔ SUNG — đào sâu từng phần (số liệu bám results/insights.md đã verify)
 # ============================================================================
-INNER = {"baseline": "exp_baseline", "memory": "exp_memory_ablation",
-         "framing": "exp_framing", "persona": "exp_persona"}
+INNER = {"baseline": "exp_baseline", "memory": "exp_test/exp_memory_ablation",
+         "framing": "exp_test/exp_framing", "persona": "exp_test/exp_persona"}
 
 def load_turns(exp):
     rows = []
-    for f in glob.glob(str(ROOT / f"{exp}/crsd_results/*/{INNER[exp]}/turns.jsonl")):
-        m = f.replace("\\", "/").split("/")[-3]
+    for f in glob.glob(str(ROOT / f"{INNER[exp]}/*/turns.jsonl")):
+        m = f.replace("\\", "/").split("/")[-2]
         for line in open(f, encoding="utf-8"):
             d = json.loads(line)
             rows.append((m, d["game_id"], d["round"], d["player"], d["contribution"],

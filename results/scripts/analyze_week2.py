@@ -13,9 +13,8 @@ def banner(t): print("\n" + "=" * 78 + f"\n{t}\n" + "=" * 78)
 # ======================================================================
 # A. SCALING — small baseline vs large baseline
 # ======================================================================
-SMALL = pd.read_csv(R / "data/baseline/crsd_results/crsd_all_models.csv")
-LARGE = pd.read_csv(R / "extracted_large/crsd_results/crsd_all_models.csv")
-A = pd.concat([SMALL, LARGE], ignore_index=True)
+A = pd.read_csv(R / "open_source/crsd_all_models.csv")
+A = A[A.experiment == "exp_baseline"].copy()   # layout exp-first: lọc baseline từ master
 A["reach"] = A.target_reached.astype(int); A["risk"] = A.risk_probability.astype(float)
 A["kept"] = 240 - A.group_total
 
@@ -51,24 +50,15 @@ piv = A.groupby(["model","language"]).reach.mean().unstack("language").reindex(A
 print(piv.round(3).to_string())
 
 # choice distribution {0,2,4} from turns.jsonl
-def load_turns_small(model_dirs):
+def load_turns():
     rows=[]
-    for f in glob.glob(str(R/"data/baseline/crsd_results/*/exp_baseline/turns.jsonl")):
-        m=f.replace("\\","/").split("/")[-3]
+    for f in glob.glob(str(R/"open_source/exp_baseline/*/turns.jsonl")):
+        m=f.replace("\\","/").split("/")[-2]
         for line in open(f,encoding="utf-8"):
             d=json.loads(line); rows.append((m,d["round"],d["contribution"],
                 d.get("language"),float(d.get("risk_probability",0))))
     return rows
-def load_turns_large():
-    rows=[]
-    for f in glob.glob(str(R/"extracted_large/crsd_results/*/exp_baseline/turns.jsonl")):
-        m=f.replace("\\","/").split("/")[-3]
-        for line in open(f,encoding="utf-8"):
-            d=json.loads(line); rows.append((m,d["round"],d["contribution"],
-                d.get("language"),float(d.get("risk_probability",0))))
-    return rows
-T = pd.DataFrame(load_turns_small(None)+load_turns_large(),
-                 columns=["model","round","c","lang","risk"])
+T = pd.DataFrame(load_turns(), columns=["model","round","c","lang","risk"])
 
 banner("A6. Choice distribution {0,2,4} per model (% of turns)")
 for m in ALLM:
@@ -93,8 +83,8 @@ print(gr.round(2).to_string())
 # ======================================================================
 banner("B0. Load comprehension summaries")
 frames=[]
-for f in glob.glob(str(R/"extracted_comp/crsd_results/*/exp_comprehension/comprehension_summary.csv")):
-    m=f.replace("\\","/").split("/")[-3]
+for f in glob.glob(str(R/"open_source/exp_comprehension/*/comprehension_summary.csv")):
+    m=f.replace("\\","/").split("/")[-2]
     df=pd.read_csv(f); frames.append(df)
 C=pd.concat(frames,ignore_index=True)
 CMODELS=["qwen25-7b-instruct","gemma2-9b-it","llama-3-1-8b"]

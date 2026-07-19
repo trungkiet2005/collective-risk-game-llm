@@ -30,22 +30,20 @@ def save(fig, name):
     print("  ->", name)
 
 # ---------------------------------------------------------------- load behavior
-SMALL = pd.read_csv(R / "data/baseline/crsd_results/crsd_all_models.csv")
-LARGE = pd.read_csv(R / "extracted_large/crsd_results/crsd_all_models.csv")
-A = pd.concat([SMALL, LARGE], ignore_index=True)
+A = pd.read_csv(R / "open_source/crsd_all_models.csv")
+A = A[A.experiment == "exp_baseline"].copy()   # layout exp-first: lọc baseline từ master
 A["reach"] = A.target_reached.astype(int); A["risk"] = A.risk_probability.astype(float)
 
 def load_turns(pattern):
     rows = []
     for f in glob.glob(str(R / pattern)):
-        m = f.replace("\\", "/").split("/")[-3]
+        m = f.replace("\\", "/").split("/")[-2]
         for line in open(f, encoding="utf-8"):
             d = json.loads(line)
             rows.append((m, d["round"], d["contribution"], d.get("language"),
                          float(d.get("risk_probability", 0))))
     return rows
-T = pd.DataFrame(load_turns("data/baseline/crsd_results/*/exp_baseline/turns.jsonl")
-                 + load_turns("extracted_large/crsd_results/*/exp_baseline/turns.jsonl"),
+T = pd.DataFrame(load_turns("open_source/exp_baseline/*/turns.jsonl"),
                  columns=["model", "round", "c", "lang", "risk"])
 
 # ============================================================================
@@ -159,7 +157,7 @@ save(fig, "L5_scaling_lang.png")
 #  COMPREHENSION
 # ============================================================================
 frames = []
-for f in glob.glob(str(R / "extracted_comp/crsd_results/*/exp_comprehension/comprehension_summary.csv")):
+for f in glob.glob(str(R / "open_source/exp_comprehension/*/comprehension_summary.csv")):
     frames.append(pd.read_csv(f))
 C = pd.concat(frames, ignore_index=True)
 CMODELS = ["qwen25-7b-instruct", "gemma2-9b-it", "llama-3-1-8b"]
