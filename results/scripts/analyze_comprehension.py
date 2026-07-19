@@ -18,10 +18,10 @@ import numpy as np
 import pandas as pd
 
 # cho phép `from crsd...` khi chạy `python results/analyze_comprehension.py` từ repo root
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))   # repo root (script dưới results/scripts/)
 
-ROOT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(__file__).resolve().parent
-OUT = Path(__file__).resolve().parent / "analysis_comprehension"
+ROOT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent
+OUT = Path(__file__).resolve().parent.parent / "analysis_comprehension"
 FIG = OUT / "figures"
 
 CAT_ORDER = ["rules", "time", "state"]

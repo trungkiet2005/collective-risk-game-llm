@@ -12,7 +12,13 @@ venv/
 
 # Kết quả & model weights (đừng commit) — NEO GỐC (dấu /) để KHÔNG nuốt nhầm
 # package con như crsd/models/ hay crsd/.../results/.
-/results/
+# Ignore toàn bộ results/ NHƯNG giữ track: code phân tích + output frontier (proxy).
+# (data nặng: data/ raw/ extracted_*/ figures/ *.zip vẫn bị ignore)
+/results/**
+!/results/frontier/
+!/results/frontier/**
+!/results/scripts/
+!/results/scripts/*.py
 /crsd_results/
 /models/
 # Output CSV (3.4MB) của FAIRGAME — vendored, không cần public
@@ -25,8 +31,11 @@ FAIRGAME/resources/results/
 strategy_recognizer/saved_models/rf_coarse.pkl
 strategy_recognizer/saved_models/rf_fine.pkl
 
-# PDF bài báo gốc — bản quyền, KHÔNG public (giữ local; tham chiếu qua docs/papers/*.md + DOI)
-papers/
+# PDF bài báo gốc — bản quyền, KHÔNG public (giữ local; tham chiếu qua .md tóm tắt + DOI)
+# /papers/ = thư mục PDF ở gốc repo; docs/papers/*.pdf = PDF trong docs.
+# Nhưng .md tóm tắt trong docs/papers/papers_markdown/ VẪN được track.
+/papers/
+docs/papers/*.pdf
 
 # LaTeX build artifacts (slides/) — giữ .tex/.pdf/figs, bỏ file trung gian
 slides/*.aux

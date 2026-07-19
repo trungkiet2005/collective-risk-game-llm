@@ -5,8 +5,8 @@ import numpy as np, pandas as pd
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-R = Path(__file__).resolve().parent
-OUT = Path(__file__).resolve().parents[1] / "slides" / "week2" / "figs"; OUT.mkdir(parents=True, exist_ok=True)
+R = Path(__file__).resolve().parent.parent   # results/ (script dưới results/scripts/)
+OUT = Path(__file__).resolve().parents[2] / "slides" / "week2" / "figs"; OUT.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams.update({
     "figure.dpi": 150, "savefig.dpi": 150, "font.size": 13,

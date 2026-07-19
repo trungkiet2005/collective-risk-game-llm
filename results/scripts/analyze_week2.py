@@ -5,7 +5,7 @@ from pathlib import Path
 import json, glob
 import numpy as np, pandas as pd
 
-R = Path(__file__).resolve().parent
+R = Path(__file__).resolve().parent.parent   # results/ (script dưới results/scripts/)
 pd.set_option("display.width", 200); pd.set_option("display.max_columns", 40)
 
 def banner(t): print("\n" + "=" * 78 + f"\n{t}\n" + "=" * 78)

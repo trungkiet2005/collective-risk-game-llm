@@ -35,9 +35,8 @@ import random
 import re
 import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FutureTimeout
 from pathlib import Path
-import contextvars
-from concurrent.futures import ThreadPoolExecutor
 
 # Load MODEL_PROXY_* from .env for local runs (harmless on the Kaggle server, which
 # injects these as real env vars). Pick the model via CRG_MODEL, else flash-lite.
@@ -46,14 +45,7 @@ try:
     load_dotenv()
 except Exception:
     pass
-# Server-side model selection: `kaggle b t run -m <slug>` sets LLM_DEFAULT in the
-# server env BEFORE this module imports. Precedence: explicit CRG_MODEL (local
-# override) > server/.env-provided LLM_DEFAULT > flash-lite fallback. This is the
-# ONLY behavioural difference from crg_task.py, which hard-pins flash-lite here and
-# would therefore silently override the -m flag on the server.
-MODEL = (os.environ.get("CRG_MODEL")
-         or os.environ.get("LLM_DEFAULT")
-         or "google/gemini-3.1-flash-lite-preview")
+MODEL = os.environ.get("CRG_MODEL", "google/gemini-3.1-flash-lite-preview")
 os.environ["LLM_DEFAULT"] = MODEL
 
 import kaggle_benchmarks as kbench
@@ -77,27 +69,16 @@ SAMPLING_SEED_STRIDE = 100_000
 SAMPLING_SEED_MOD = 2_147_483_647    # 2**31 - 1
 RETRY_SEED_STEP = 1_000_003
 MAX_PARSE_RETRIES = 3
+# Hard per-request wall timeout (s), enforced by a THREAD watchdog (below). The proxy
+# intermittently leaves a request hanging forever and the OpenAI/httpx `timeout` does
+# NOT reliably fire on it (observed: a call stalled >11 min). Normal calls are ~1-2s,
+# so 60s is huge headroom but bounds a stall so the run self-heals instead of freezing.
+REQUEST_TIMEOUT = 60
 
 # Swept conditions (env-overridable so a smoke test doesn't need code edits).
 RISKS = [float(x) for x in os.environ.get("CRG_RISKS", "0.9,0.5,0.1").split(",")]
 LANGS = [s.strip() for s in os.environ.get("CRG_LANGS", "en,vn").split(",")]
 REPS = int(os.environ.get("CRG_REPS", "10"))
-
-# --- Kaggle push-validation guard ------------------------------------------
-# `kaggle b t push` executes the task ONCE on the server default model
-# (observed: gemini-3-flash-preview) over the FULL sweep before the task is
-# usable. 60 games on that slow reasoning model would cost ~$11 and time out
-# the kernel, so collapse to a 1-game smoke for THAT model only. The real run
-# (`kaggle b t run -m <model>` -> sets LLM_DEFAULT=<model>) gets the full sweep;
-# gpt/claude/deepseek/other Geminis are unaffected. Local CRG_* overrides win.
-_no_overrides = not any(os.environ.get(k) for k in ("CRG_RISKS", "CRG_LANGS", "CRG_REPS"))
-if "gemini-3-flash-preview" in MODEL and _no_overrides:
-    RISKS, LANGS, REPS = [0.9], ["en"], 1
-
-# Per-round decision concurrency. DEFAULT 1 = fully sequential (reliable on
-# capacity-limited proxies like gpt-nano, which 429s under bursts). Set
-# CRG_CONCURRENCY>1 (e.g. 6) for the parallel path on higher-capacity models.
-_CONCURRENCY = int(os.environ.get("CRG_CONCURRENCY", "1"))
 
 # risk -> crsd game name, so game_id matches the open-source arm's join key.
 GAME_NAME = {0.90: "crsd_milinski_high_risk",
@@ -107,7 +88,8 @@ GAME_NAME = {0.90: "crsd_milinski_high_risk",
 # Proxy models (esp. non-Gemini on staging) intermittently return 429/503. Retry
 # those; if a call STILL fails after retries, raise so the run aborts loudly.
 _TRANSIENT = ("429", "503", "500", "502", "504", "overloaded",
-              "unavailable", "not reachable", "rate limit", "heavy load")
+              "unavailable", "not reachable", "rate limit", "heavy load",
+              "timeout", "timed out", "connection", "read operation")
 
 
 # %% =====================  PROMPT (exact copy of crsd_en.txt / crsd_vn.txt)  ==========
@@ -288,10 +270,23 @@ _AUTH_ERR = ("expired token", "authentication", "unauthorized", "401",
              "invalid api key", "invalid_api_key", "403")
 
 
-def _reauth():
-    """Refresh the proxy token and rebuild the client so a long run survives expiry."""
+# Watchdog runs each proxy call in a worker thread so a stalled request can be
+# ABANDONED (Python can't kill the thread, but we stop waiting and retry on a fresh
+# client). Generous worker count absorbs the occasional leaked hung thread.
+_EXECUTOR = ThreadPoolExecutor(max_workers=32, thread_name_prefix="llm")
+
+
+def _rebuild_client():
+    """Rebuild the client with a fresh connection pool (no re-auth) — drops a stuck socket."""
     global _LLM
-    print("[auth] token rejected -> `kaggle b auth -y` + rebuild client ...", flush=True)
+    from kaggle_benchmarks.kaggle.models import load_default_model
+    _LLM = load_default_model()
+
+
+def _reauth():
+    """Refresh the proxy token AND rebuild the client so a long run survives expiry."""
+    global _LLM
+    print("[auth] refreshing token (`kaggle b auth -y`) + rebuild client ...", flush=True)
     subprocess.run(["kaggle", "b", "auth", "-y"], capture_output=True, text=True)
     try:
         from dotenv import load_dotenv
@@ -302,26 +297,38 @@ def _reauth():
     _LLM = load_default_model()                      # uses LLM_DEFAULT (still set) + new key
 
 
-def _call_llm(llm, prompt, seed, max_attempts=6):
-    """One free-text generation via the (rebuildable) global client `_LLM`. Returns
-    (text, usage). Auto-reauths on token expiry; exp-backoff on transient 429/503."""
+def _one_shot(prompt, seed):
+    with kbench.chats.new("turn", orphan=True) as chat:
+        text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed,
+                           extra_api_params={"timeout": REQUEST_TIMEOUT})
+    return text, chat.usage
+
+
+def _call_llm(llm, prompt, seed, max_attempts=8):
+    """One free-text generation via the (rebuildable) global client `_LLM`, under a hard
+    thread watchdog. Returns (text, usage). Recovers from: proxy stalls (watchdog ->
+    rebuild client), token expiry (401 -> reauth), transient 429/503 (exp backoff)."""
     attempt = 0
+    hangs = 0
     auth_retries = 0
     while True:
         attempt += 1
-        text = None
         try:
-            with kbench.chats.new("turn", orphan=True) as chat:
-                text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed)
-            if text is not None:
-                return text, chat.usage
-            # Parallel path: contexts.enter can SWALLOW a proxy error inside a
-            # worker thread (the run ContextVar does not propagate), leaving
-            # text=None. Raise a synthetic transient so the backoff below retries.
-            raise RuntimeError("503 no-text: proxy error swallowed under concurrency")
+            fut = _EXECUTOR.submit(_one_shot, prompt, seed)
+            return fut.result(timeout=REQUEST_TIMEOUT)
+        except _FutureTimeout:
+            hangs += 1
+            if hangs > 8:
+                raise TimeoutError(
+                    f"LLM call stalled {hangs}x (>{REQUEST_TIMEOUT}s each) — proxy hanging")
+            print(f"[watchdog] call stalled >{REQUEST_TIMEOUT}s (hang #{hangs}) -> "
+                  f"{'reauth' if hangs >= 2 else 'rebuild client'} + retry", flush=True)
+            _reauth() if hangs >= 2 else _rebuild_client()   # 2nd stall: maybe token expiry
+            attempt -= 1                                       # a stall isn't a bad answer
+            continue
         except Exception as e:
             msg = str(e).lower()
-            if any(t in msg for t in _AUTH_ERR):     # token expired -> refresh, don't burn budget
+            if any(t in msg for t in _AUTH_ERR):              # token expired -> refresh
                 auth_retries += 1
                 if auth_retries > 6:
                     raise
@@ -364,33 +371,12 @@ def play_game(llm, risk, language, rep, model_tag, turns_sink):
     parse_failed = 0
 
     for r in range(1, N_ROUNDS + 1):
-        # All N prompts built from COMPLETED-round history -> genuinely simultaneous,
-        # so the N per-round decisions are INDEPENDENT and run concurrently. Results
-        # are gathered in fixed player order (ThreadPoolExecutor.map preserves input
-        # order) and all bookkeeping/logging below stays single-threaded, so the output
-        # is byte-identical to the sequential version (seeds fixed per (rep, pid, round);
-        # history is only read inside the threads and appended after the batch).
-        def _decide_one(pid, _r=r):
-            prompt = assemble_prompt(language, pid, _r, history, risk)
-            base_seed = sampling_seed(rep, pid, _r)
-            text, value, failed, ti, to, cn = decide(llm, prompt, base_seed)
-            return pid, prompt, base_seed, text, value, failed, ti, to, cn
-
-        if _CONCURRENCY <= 1:
-            # Sequential (default): transient 429/503 retried in-thread; reliable on
-            # capacity-limited proxies. Byte-identical output to the parallel path.
-            round_results = [_decide_one(pid) for pid in range(N_PLAYERS)]
-        else:
-            with ThreadPoolExecutor(max_workers=_CONCURRENCY) as _ex:
-                # copy_context() per worker so the SDK active-run ContextVar propagates
-                # into the threads (else contexts.enter swallows proxy errors and
-                # _call_llm cannot retry). Futures in player order -> deterministic.
-                _futs = [_ex.submit(contextvars.copy_context().run, _decide_one, pid)
-                         for pid in range(N_PLAYERS)]
-                round_results = [f.result() for f in _futs]
-
+        # All N prompts built from COMPLETED-round history -> genuinely simultaneous.
         round_contribs = []
-        for pid, prompt, base_seed, text, value, failed, ti, to, cn in round_results:
+        for pid in range(N_PLAYERS):
+            prompt = assemble_prompt(language, pid, r, history, risk)
+            base_seed = sampling_seed(rep, pid, r)
+            text, value, failed, ti, to, cn = decide(llm, prompt, base_seed)
             tok_in += ti; tok_out += to; cost += cn
             parse_failed += int(failed)
 
@@ -436,7 +422,7 @@ def play_game(llm, risk, language, rep, model_tag, turns_sink):
 
 # %% =====================  SWEEP (== exp_baseline: 3 risk × 2 lang × 10 rep)  =========
 @kbench.task(
-    name="collective-risk-baseline-srv",
+    name="collective-risk-baseline",
     description="Milinski 2008 collective-risk dilemma, frontier arm — faithful port of "
                 "crsd exp_baseline (6 agents, 10 rounds, risk×lang×rep). Measures "
                 "reach-rate + cost/game; output joins the open-source games.csv.",
@@ -447,7 +433,7 @@ def collective_risk_baseline(llm) -> dict:
     # One filesystem+CSV-safe tag (no '/','@') used consistently in folder AND game_id,
     # mirroring the open-source arm's hyphenated model names (e.g. qwen25-7b-instruct).
     model_tag = re.sub(r"[^A-Za-z0-9._-]+", "-", MODEL)
-    out_dir = Path(os.environ.get("CRG_OUT", f"frontier_results/{model_tag}/exp_baseline"))
+    out_dir = Path(os.environ.get("CRG_OUT", f"results/frontier/{model_tag}/exp_baseline"))
     out_dir.mkdir(parents=True, exist_ok=True)
 
     games, turns = [], []
@@ -456,6 +442,16 @@ def collective_risk_baseline(llm) -> dict:
     done = 0
     t0 = time.time()
 
+    def _flush():
+        """Rewrite both crsd-schema files after each game -> live progress + crash recovery."""
+        with open(out_dir / "turns.jsonl", "w", encoding="utf-8") as f:
+            for t in turns:
+                f.write(json.dumps(t, ensure_ascii=False) + "\n")
+        if games:
+            with open(out_dir / "games.csv", "w", newline="", encoding="utf-8") as f:
+                w = csv.DictWriter(f, fieldnames=list(games[0].keys()))
+                w.writeheader(); w.writerows(games)
+
     for risk in RISKS:
         for language in LANGS:
             for rep in range(REPS):
@@ -463,16 +459,12 @@ def collective_risk_baseline(llm) -> dict:
                 games.append(row)
                 tok_in += ti; tok_out += to; cost += cn; parse_failed += pf
                 done += 1
+                _flush()                                     # persist after every game
+                el = time.time() - t0
+                eta = el / done * (total - done)
                 print(f"[{done}/{total}] {row['game_id']}  reach={row['target_reached']} "
-                      f"GT={row['group_total']} disaster={row['catastrophe']} parse_fail={pf}")
-
-    # Write logs that mirror the crsd schema (turns.jsonl + games.csv) for joint analysis.
-    with open(out_dir / "turns.jsonl", "w", encoding="utf-8") as f:
-        for t in turns:
-            f.write(json.dumps(t, ensure_ascii=False) + "\n")
-    with open(out_dir / "games.csv", "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=list(games[0].keys()))
-        w.writeheader(); w.writerows(games)
+                      f"GT={row['group_total']} disaster={row['catastrophe']} parse_fail={pf} "
+                      f"| {el/60:.1f}min in, ETA {eta/60:.1f}min", flush=True)
 
     n_turns = len(turns)
     reached = sum(g["target_reached"] for g in games)
@@ -487,13 +479,15 @@ def collective_risk_baseline(llm) -> dict:
         "n_decisions": n_turns,
         "parse_fail_rate": round(parse_failed / n_turns, 4) if n_turns else None,
         "overall_reach_rate": round(reached / len(games), 3),
+        # str keys: kbench serializes the return dict to run.json and chokes on float keys.
         "reach_by_risk": {str(r): reach_rate(lambda g, r=r: g["risk_probability"] == r) for r in RISKS},
         "reach_by_lang": {l: reach_rate(lambda g, l=l: g["language"] == l) for l in LANGS},
         "mean_group_total": round(sum(g["group_total"] for g in games) / len(games), 2),
         "usage_input_tokens": tok_in,
         "usage_output_tokens": tok_out,
         "usage_total_cost_usd": round(cost / 1e9, 6),
-        "games_per_10usd": int(10 / (cost / 1e9)) if cost else None,
+        # games per $10 = 10 / cost-per-game (not 10 / whole-run cost).
+        "games_per_10usd": int(10 * len(games) / (cost / 1e9)) if cost else None,
         "elapsed_sec": round(time.time() - t0, 1),
         "out_dir": str(out_dir),
     }
@@ -511,6 +505,8 @@ def collective_risk_baseline(llm) -> dict:
 
 
 # %%
-# Unguarded so the Kaggle server (which executes this as a module, __name__ != "__main__")
-# actually fires the run; local `python crg_task_server.py` still runs it too.
-collective_risk_baseline.run(kbench.llm)
+if __name__ == "__main__":
+    collective_risk_baseline.run(kbench.llm)
+    # Results are already on disk (written per-game). Force-exit so any worker thread
+    # still stuck on a hung proxy socket can't block interpreter shutdown.
+    os._exit(0)
