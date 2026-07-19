@@ -19,12 +19,12 @@ Current state:
 - Round {currentRound} of {nRounds}.
 - Your remaining money: {remainingEndowment}.
 {showCumulative}: [- The climate account so far holds {groupAccount} of the {target} target.]
-{computedTotals}: [- The climate account so far holds {groupAccount} of the {target} target; {neededToTarget} more is needed to reach it.
-- So far you have contributed {ownContributed} in total; the other {nOthers} players have contributed {othersContributed} in total.]
+{computedTotals}: [- Climate account so far: {groupAccount}.]
 {history}: [
 Previous rounds (each player keeps the same position; you are position {playerPosition}):
 {historyText}
-]
+]{computedTotals}: [- Total contributed so far by each player: {perPlayerTotals}.]
+
 Now decide your contribution for round {currentRound}. Allowed choices: {contributionOptions}.
 Output only your decision as a final line:
 CONTRIBUTION: <one of {contributionOptions}>

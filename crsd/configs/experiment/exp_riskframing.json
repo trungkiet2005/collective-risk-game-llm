@@ -1,16 +1,7 @@
 {
   "name": "exp_riskframing",
-  "description": "FACTORIAL 2x2 (EN+VN): risk_framing (lottery|plain) x show_computed_totals (off|on). Giu nguyen moi tham so game (cung risk/target/seed/CRN) -> chenh lech chi do (a) CACH MO TA hau qua khi truot muc tieu, va (b) co dua san TONG TINH TRUOC hay khong. TRUC A framing: lottery = goc Milinski 'the computer runs a lottery ... the group is hit by a disaster ...' (neo cam xuc); plain = neu XAC SUAT truc tiep, bo 'may tinh quay xo so' + 'gap tham hoa'. TRUC B computed-totals (noi phat hien read≠add): off = agent tu cong don; on = them khoi Current state liet ke quy hien tai + con thieu toi target + ban da dong + nguoi khac da dong (so tien con lai cua minh van luon hien san). O (lottery, off) DUNG LAI game config baseline nen trung CRN voi exp_baseline. Agent trung tinh, full_history, KHONG persona/scratchpad. 12 game (3 risk x 4 dieu kien) x 2 lang x 10 rep = 240 game/model. Phan tich: pivot theo risk_framing x show_computed_totals x risk x language; do main effect tung truc + interaction.",
+  "description": "MOT dieu kien duy nhat (EN+VN): risk_framing=plain (BO 'may tinh quay xo so' + 'gap tham hoa', neu XAC SUAT truc tiep) + show_computed_totals=on (dua san vao khoi Current state: TONG quy khi hau hien tai + TONG tich luy TUNG nguoi choi per-player P1..Pn; so tien con lai cua minh van luon hien san). Rut gon tu ban FACTORIAL 2x2 cu -> chi giu o (plain, computed). Quet 3 muc rui ro high/medium/low de do do nhay rui ro (bien cot loi Milinski). Agent trung tinh, full_history, KHONG persona/scratchpad. 3 game (3 risk x 1 dieu kien) x 2 lang x 10 rep = 60 game/model. Phan tich: pivot theo risk x language (risk_framing/show_computed_totals gio la hang so).",
   "games": [
-    "crsd_milinski_high_risk",
-    "crsd_milinski_medium_risk",
-    "crsd_milinski_low_risk",
-    "crsd_milinski_high_risk_plainframe",
-    "crsd_milinski_medium_risk_plainframe",
-    "crsd_milinski_low_risk_plainframe",
-    "crsd_milinski_high_risk_computed",
-    "crsd_milinski_medium_risk_computed",
-    "crsd_milinski_low_risk_computed",
     "crsd_milinski_high_risk_plain_computed",
     "crsd_milinski_medium_risk_plain_computed",
     "crsd_milinski_low_risk_plain_computed"

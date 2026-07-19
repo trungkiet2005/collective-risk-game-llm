@@ -19,12 +19,12 @@ Tình trạng hiện tại:
 - Vòng {currentRound} trên tổng {nRounds}.
 - Số tiền còn lại của bạn: {remainingEndowment}.
 {showCumulative}: [- Quỹ khí hậu đến lúc này có {groupAccount} trên mục tiêu {target}.]
-{computedTotals}: [- Quỹ khí hậu đến lúc này có {groupAccount} trên mục tiêu {target}; còn cần thêm {neededToTarget} để đạt.
-- Đến giờ bạn đã đóng tổng cộng {ownContributed}; {nOthers} người còn lại đã đóng tổng cộng {othersContributed}.]
+{computedTotals}: [- Quỹ khí hậu đến giờ: {groupAccount}.]
 {history}: [
 Các vòng trước (mỗi người giữ nguyên vị trí; bạn là vị trí {playerPosition}):
 {historyText}
-]
+]{computedTotals}: [- Tổng đã đóng đến giờ của từng người: {perPlayerTotals}.]
+
 Bây giờ hãy quyết định mức đóng góp của bạn cho vòng {currentRound}. Các lựa chọn hợp lệ: {contributionOptions}.
 Chỉ xuất ra quyết định của bạn ở dòng cuối:
 CONTRIBUTION: <một trong các giá trị {contributionOptions}>

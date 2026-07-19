@@ -48,10 +48,10 @@ class GameConfig:
     # không đổi). Chỉ experiment nào set "plain" mới đổi cách mô tả rủi ro.
     risk_framing: str = "lottery"
     # Cung cấp SẴN các tổng đã tính (thay vì bắt agent tự cộng dồn — nối phát hiện
-    # read≠add: model đọc được state nhưng không tự cộng). Bật -> thêm khối "Current
-    # state" liệt kê: quỹ hiện tại + còn thiếu tới target, bạn đã đóng + người khác đã
-    # đóng. Mặc định False -> prompt GIỮ NGUYÊN. Chỉ có hiệu lực ở template full_history
-    # (crsd_en/vn); scratchpad CỐ Ý không có (điều kiện tự-ghi-nhớ, xem memory_mode).
+    # read≠add: model đọc được state nhưng không tự cộng). Bật -> thêm vào khối "Current
+    # state": quỹ hiện tại + còn thiếu tới target, VÀ tổng tích luỹ TỪNG người chơi
+    # (P1..Pn, per-player). Mặc định False -> prompt GIỮ NGUYÊN. Chỉ có hiệu lực ở
+    # template full_history (crsd_en/vn); scratchpad CỐ Ý không có (điều kiện tự-ghi-nhớ).
     show_computed_totals: bool = False
     language: str = "en"
     prompt_template: str = "crsd"

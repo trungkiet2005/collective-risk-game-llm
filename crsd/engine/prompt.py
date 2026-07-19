@@ -76,6 +76,28 @@ def build_history_text(history: List[List[float]], player_index: int, cfg, langu
     return "\n".join(lines)
 
 
+def build_per_player_totals(history, player_index, cfg, language) -> str:
+    """Tổng đóng góp TÍCH LUỸ của TỪNG người chơi (P1..Pn) tính đến hiện tại.
+
+    Dùng cho block ``computedTotals`` (show_computed_totals): thay vì bắt agent tự
+    cộng dồn từng cột trong lịch sử, đưa sẵn tổng của mỗi ghế theo VỊ TRÍ CỐ ĐỊNH
+    (đánh dấu "you"/"bạn" cho chính agent), khớp nhãn với build_history_text. Lịch
+    sử rỗng (vòng 1) -> mọi người = 0.
+    """
+    n = cfg.n_players
+    totals = [0.0] * n
+    for round_contribs in history:
+        for i, c in enumerate(round_contribs):
+            if i < n:
+                totals[i] += c
+    you = "(bạn)" if language == "vn" else "(you)"
+    parts = [
+        f"P{i + 1}{you if i == player_index else ''}={_fmt(totals[i])}"
+        for i in range(n)
+    ]
+    return ", ".join(parts)
+
+
 def build_window_text(history, player_index, cfg, language, window):
     """Mô tả ``window`` vòng GẦN NHẤT cho chế độ scratchpad.
 
@@ -162,8 +184,10 @@ def build_prompt(
     cumulative = sum(sum(r) for r in history)
     own_total = sum(r[player_index] for r in history)
     remaining = max(0.0, cfg.endowment - own_total)
-    # Tổng tính sẵn (chỉ dùng khi block computedTotals bật): phần người khác đã đóng,
-    # còn thiếu bao nhiêu để đạt target, số "người khác" trong nhóm.
+    # Tổng tính sẵn (chỉ dùng khi block computedTotals bật): còn thiếu bao nhiêu để
+    # đạt target + tổng tích luỹ TỪNG người (per-player) đưa qua {perPlayerTotals}.
+    # (own_total/others_total/n_others giữ lại cho tương thích ngược — template mới
+    # dùng per-player nên không tham chiếu, nhưng vô hại nếu template khác cần.)
     others_total = max(0.0, cumulative - own_total)
     needed_to_target = max(0.0, cfg.target - cumulative)
     n_others = cfg.n_players - 1
@@ -228,6 +252,7 @@ def build_prompt(
         "othersContributed": _fmt(others_total),
         "neededToTarget": _fmt(needed_to_target),
         "nOthers": n_others,
+        "perPlayerTotals": build_per_player_totals(history, player_index, cfg, language),
         "historyText": build_history_text(history, player_index, cfg, language),
         "lastRoundText": build_window_text(history, player_index, cfg, language, memory_window),
         "noteText": notepad_text,
