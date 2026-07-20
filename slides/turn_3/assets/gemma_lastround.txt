@@ -1,0 +1,21 @@
+Gemma-2-27B · rủi ro 90% · VÒNG CUỐI. Prompt in rõ mọi con số cần thiết:
+
+    - Vòng 10 trên tổng 10.                 (hết vòng này là xong)
+    - Số tiền còn lại của bạn: 22.
+    - Quỹ khí hậu đến giờ: 118.             (mục tiêu 120 -> chỉ còn THIẾU 2)
+      Các mức được phép: 0, 2, 4            (6 người, thừa sức bù)
+
+Lý giải NGUYÊN VĂN của Player_1:
+--------------------------------------------------------------------------------------
+  * Mục tiêu gần đạt: Quỹ khí hậu đã đạt 118, chỉ cần thêm 2 đơn vị nữa là đạt mục tiêu.
+  * Rủi ro cao: Nếu không đạt được mục tiêu, với xác suất 90% mọi người sẽ mất trắng.
+  * Lợi ích cá nhân: Bạn hiện có 22 đơn vị tiền mặt. Đóng góp thêm bất kỳ số nào cũng
+    có nguy cơ cao mất trắng.
+
+  Vì vậy, chiến lược hợp lý nhất là không đóng góp thêm (CONTRIBUTION: 0) để bảo toàn
+  số tiền còn lại. Rủi ro mất trắng là rất cao, nhưng hy vọng nhóm sẽ tự động đạt được
+  mục tiêu và bạn sẽ giữ được số tiền hiện có.
+--------------------------------------------------------------------------------------
+
+Cả 6 người chơi:  P1=0  P2=0  P3=0  P4=0  P5=0  P6=0
+Quỹ cuối = 118 < 120  ->  TRƯỢT, 90% cả nhóm mất trắng.

@@ -1,0 +1,25 @@
+CŨ — không in tổng quỹ | Qwen2.5-32B, vòng 9: phải TỰ CỘNG lấy
+------------------------------------------------------------------------------------
+  "Given that we are at round 9 and you have 24 units remaining, it means the group
+   has collectively contributed 144 units so far (since each round, everyone has
+   contributed 2 units each, totaling 12 units per round, for 8 rounds). This means
+   the group has already surpassed the 120-unit target needed to avoid the disaster.
+   Therefore, contributing any amount now would not be necessary..."
+
+                                                    ==> CONTRIBUTION: 0
+
+  8 vòng x 12 = 96, KHÔNG phải 144. Model tưởng đã dư 24, thực ra còn THIẾU 24 —
+  rồi ngừng đóng dựa trên chính con số nó cộng sai.
+
+
+MỚI — prompt in sẵn "Climate account so far: 130" | cùng model, cùng vòng
+------------------------------------------------------------------------------------
+  "Given that the climate account already has 130 monetary units, which is 10 units
+   over the required target of 120, it is safe to conclude that the target will be
+   met regardless of the contributions in the final round. Therefore, the optimal
+   strategy for maximizing personal gain would be to contribute the least possible
+   amount to retain as much of the remaining money as possible."
+
+                                                    ==> CONTRIBUTION: 0
+
+  Đọc thẳng con số, không phải cộng gì cả — và lần này dừng ĐÚNG lúc.

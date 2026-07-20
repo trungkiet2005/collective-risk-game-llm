@@ -1,0 +1,23 @@
+THAY ĐỔI 2 — thêm hai dòng tổng vào khối "Current state" (cùng ván, cùng vòng 9)
+
+[CŨ] — muốn biết quỹ được bao nhiêu thì phải TỰ CỘNG 8 dòng lịch sử
+.........................................................................
+Current state:
+- Round 9 of 10.
+- Your remaining money: 18.
+
+Previous rounds (each player keeps the same position; you are position 1):
+Round 1: P1(you)=2, P2=2, P3=2, P4=2, P5=2, P6=2.
+   ... (8 dòng như vậy)
+
+[MỚI] — thêm đúng hai dòng, phần còn lại giữ nguyên từng byte
+.........................................................................
+Current state:
+- Round 9 of 10.
+- Your remaining money: 18.
+- Climate account so far: 130.                      <== MỚI: tổng quỹ
+Previous rounds (each player keeps the same position; you are position 1):
+Round 1: P1(you)=2, P2=2, P3=2, P4=2, P5=2, P6=2.
+   ... (8 dòng như vậy)
+- Total contributed so far by each player:          <== MỚI: tổng từng ghế
+  P1(you)=22, P2=20, P3=22, P4=22, P5=22, P6=22.

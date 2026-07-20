@@ -1,0 +1,18 @@
+{
+  "name": "exp_lowrisk",
+  "description": "GIONG HET exp_riskframing, CHI KHAC MUC RUI RO. Cung 1 dieu kien prompt (risk_framing=plain + show_computed_totals=on), cung agent trung tinh / full_history / KHONG persona-scratchpad, cung seed 12345 -> CRN khop tung rep voi exp_riskframing. Quet DAY THAP: 0% / 1% / 5% de bo sung cho 10/50/90% da chay o turn-3. Muc 0% la o CONTROL: khong con bat ky ly do nao de dong gop (EV dao ngu = 40 > 20 phan cong bang, va khong co mat trai), nen neu model VAN day toi 120 thi hanh vi la 'bam theo con so target duoc neu' chu khong phai quan tri rui ro. LUU Y PHAN TICH: o 0% thi catastrophe luon False va target_reached mat y nghia dien giai -> DV chinh phai la group_total. 3 game x 2 lang x 10 rep = 60 game/model.",
+  "games": [
+    "crsd_milinski_0pct_risk_plain_computed",
+    "crsd_milinski_1pct_risk_plain_computed",
+    "crsd_milinski_5pct_risk_plain_computed"
+  ],
+  "agents": "personas_default",
+  "languages": ["en", "vn"],
+  "models": ["LocalQwen"],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}
