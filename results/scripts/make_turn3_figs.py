@@ -345,4 +345,70 @@ ax.set_title(f"Trục Anh–Việt vẫn còn ở nhánh “{N_RF}”")
 ax.legend(frameon=False, loc="upper right")
 save(fig, "R9_lang.png")
 
+# ============================================================================
+# R4B. Nhịp theo vòng — TÁCH theo mức rủi ro (10 / 50 / 90%)
+#      Câu hỏi: hình dạng "vọt rồi tắt" có đổi khi rủi ro đổi không? -> KHÔNG.
+# ============================================================================
+RISKS = [0.1, 0.5, 0.9]
+fig, axes = plt.subplots(2, 3, figsize=(12.6, 7.0), sharey=True, sharex=True)
+for row, (T, arm) in enumerate([(TB, N_BASE), (TR, N_RF)]):
+    for col, rk in enumerate(RISKS):
+        ax = axes[row, col]
+        sub = T[T.risk == rk]
+        for m in PAIR:
+            s = sub[sub.model == m].groupby("round").c.mean()
+            ax.plot(s.index, s.values, "o-", color=COL[m], lw=2.0, ms=4, label=LBL[m], alpha=.9)
+        if row == 0:
+            ax.set_title(f"rủi ro {rk*100:.0f}%", fontsize=13.5)
+        if row == 1:
+            ax.set_xlabel("Vòng")
+        ax.set_xticks(range(1, 11)); ax.tick_params(labelsize=9.5)
+axes[0, 0].set_ylabel(f"{N_BASE}\n\nĐóng góp trung bình", fontsize=11.5)
+axes[1, 0].set_ylabel(f"{N_RF}\n\nĐóng góp trung bình", fontsize=11.5, color=RF_C)
+axes[0, 0].set_ylim(-0.18, 4.35)
+h, l = axes[0, 0].get_legend_handles_labels()
+fig.legend(h, l, frameon=False, fontsize=10, ncol=6, loc="upper center", bbox_to_anchor=(0.5, 0.0))
+fig.suptitle("Đổi rủi ro 10% → 90%: nhịp chơi gần như không nhúc nhích", fontsize=15.5, y=1.0)
+caption(fig, "Ba cột chồng lên nhau gần khít. Cái đổi được là HÀNG (can thiệp prompt), "
+             "không phải CỘT (mức rủi ro).", color=ACC, y=-0.055)
+save(fig, "R4B_dynamics_risk.png")
+
+# ============================================================================
+# R8B. Vân tay lựa chọn — TÁCH theo mức rủi ro
+# ============================================================================
+fig, axes = plt.subplots(1, 2, figsize=(13.0, 6.4), sharex=True)
+rows_rk = [(m, rk) for m in PAIR for rk in RISKS]
+yy = np.arange(len(rows_rk))
+choice_c = {0: ACC, 2: YELL, 4: TEAL}
+for ax, (T, arm) in zip(axes, [(TB, N_BASE), (TR, N_RF_SHORT)]):
+    left = np.zeros(len(rows_rk))
+    for v in [0, 2, 4]:
+        frac = np.array([T[(T.model == m) & (T.risk == rk)].c.eq(v).mean() for m, rk in rows_rk])
+        ax.barh(yy, frac, left=left, color=choice_c[v], label=f"đóng {v}", edgecolor="white", lw=1.0)
+        for i, (fr, lf) in enumerate(zip(frac, left)):
+            if fr > 0.075:
+                ax.text(lf + fr/2, yy[i], f"{fr*100:.0f}%", va="center", ha="center",
+                        fontsize=8.5, color="white", fontweight="bold")
+        left += frac
+    for k in range(3, len(rows_rk), 3):          # vạch ngăn giữa các model
+        ax.axhline(k - 0.5, color="#c8d2d6", lw=0.9)
+    ax.set_yticks(yy)
+    ax.set_yticklabels([f"{LBL[m]} · {rk*100:.0f}%" for m, rk in rows_rk], fontsize=9)
+    ax.invert_yaxis(); ax.set_xlim(0, 1); ax.set_xlabel("Tỉ lệ lượt chọn")
+    ax.set_title(arm, fontsize=13.5, color=(RF_C if arm == N_RF_SHORT else DARK))
+    ax.grid(axis="y", visible=False)
+axes[1].tick_params(labelleft=True)
+h, l = axes[0].get_legend_handles_labels()
+fig.legend(h, l, frameon=False, ncol=3, fontsize=11, loc="upper center", bbox_to_anchor=(0.5, 0.0))
+fig.suptitle("Vân tay lựa chọn dựng theo từng mức rủi ro — ba dòng nào cũng như ba dòng nào",
+             fontsize=15, y=1.0)
+# con số cho phần chốt: chênh lệch tỉ lệ chọn 0 giữa rủi ro 10% và 90%
+d0 = {m: abs(TR[(TR.model == m) & (TR.risk == .9)].c.eq(0).mean()
+             - TR[(TR.model == m) & (TR.risk == .1)].c.eq(0).mean()) for m in PAIR}
+worst = max(d0, key=d0.get)
+caption(fig, f"Chênh lệch tỉ lệ chọn “0” giữa rủi ro 90% và 10% lớn nhất chỉ "
+             f"{d0[worst]*100:.1f} điểm % ({LBL[worst]}) — nhiễu, không phải phản ứng.",
+        color=ACC, y=-0.045)
+save(fig, "R8B_choice_risk.png")
+
 print("\nDone ->", OUT)

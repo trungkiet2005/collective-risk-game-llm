@@ -115,6 +115,18 @@
   \take{Qwen-7B: \weak{0\%}$\to$\good{22\%} chọn 0; Qwen-32B \weak{3\%}$\to$\good{16\%}. Model học được cách \emph{không} đóng.}
 \end{frame}
 
+\begin{frame}{Bổ theo rủi ro: nhịp chơi có đổi khi 10\% / 50\% / 90\% không?}
+  \centering\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{R4B_dynamics_risk.png}
+  \take{Cùng một hình dạng ở cả ba mức rủi ro. Cái đổi được nhịp chơi là \good{hàng}
+  (can thiệp prompt), \weak{không phải cột} (mức rủi ro).}
+\end{frame}
+
+\begin{frame}{Bổ theo rủi ro: vân tay lựa chọn cũng không nhúc nhích}
+  \centering\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{R8B_choice_risk.png}
+  \take{Từ 10\% lên 90\% rủi ro, tỉ lệ chọn ``0'' lệch nhiều nhất \weak{2,8 điểm \%} (Qwen-7B).
+  Risk-blindness không chỉ ở tỉ lệ đạt --- nó nằm ngay trong \emph{từng lượt chọn}.}
+\end{frame}
+
 % ======================================================================
 \section{Kết quả 2 --- cái KHÔNG được: vẫn không sợ rủi ro}
 
