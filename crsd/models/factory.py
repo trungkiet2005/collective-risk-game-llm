@@ -134,6 +134,19 @@ def get_send_batch(
 
     def send_api(prompts: List[str], seeds=None) -> List[str]:
         # API connector chưa nhận seed per-request; bỏ qua (phase 2 sẽ bổ sung nếu cần).
-        return [model.send_prompt(p) for p in prompts]
+        #
+        # Giãn cách chủ động giữa các request: một round có thể gom hàng nghìn
+        # prompt (n_games x n_players) bắn gần như liên tục, vượt xa cả RPM lẫn
+        # TPM của tài khoản API dù mỗi request đã có retry-backoff riêng (xem
+        # OpenAIConnector.send_prompt) — retry một mình không đủ khi cả loạt
+        # request cùng lúc đụng trần. 0.4s/call ~= 150 call/phút, an toàn dưới
+        # TPM 200k/phút ngay cả với prompt VN dài nhất (~900 token/call).
+        import time
+        responses = []
+        for i, p in enumerate(prompts):
+            if i > 0:
+                time.sleep(0.4)
+            responses.append(model.send_prompt(p))
+        return responses
 
     return send_api

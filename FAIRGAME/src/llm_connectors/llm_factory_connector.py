@@ -29,6 +29,7 @@ MODEL_PROVIDER_MAP = {
     "Claude35Haiku": (_get_anthropic_connector, "claude-3-5-haiku-20241022"),
     "MistralLarge": (_get_mistral_connector, "mistral-large-latest"),
     "OpenAIGPT4o": (_get_openai_connector, "gpt-4o"),
+    "OpenAIGPT5Nano": (_get_openai_connector, "gpt-5.4-nano"),
     # Local models for offline/Kaggle use (model path set via init_local_llm())
     "LocalGemma": (LocalVLLMConnector, "local-gemma"),
     "LocalLlama": (LocalVLLMConnector, "local-llama"),

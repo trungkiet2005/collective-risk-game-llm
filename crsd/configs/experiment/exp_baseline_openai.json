@@ -1,0 +1,17 @@
+{
+  "name": "exp_baseline_openai",
+  "description": "Bản API (OpenAI gpt-5.4-nano) của exp_baseline — dùng ChatModelFactory qua API_KEY_OPENAI thay vì GPU offline. Cùng thiết kế games/agents/languages với exp_baseline để so sánh trực tiếp.",
+  "games": [
+    "crsd_milinski_high_risk",
+    "crsd_milinski_medium_risk",
+    "crsd_milinski_low_risk"
+  ],
+  "agents": "personas_default",
+  "languages": ["en", "vn"],
+  "models": ["OpenAIGPT5Nano"],
+  "useOffline": false,
+  "repetitions": 5,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}

@@ -1,0 +1,27 @@
+{
+  "name": "exp_persona_openai",
+  "description": "Bản API (OpenAI gpt-5.4-nano) của exp_persona — dùng ChatModelFactory qua API_KEY_OPENAI thay vì GPU offline. 5 lần lặp (thay vì 10) để kiểm soát chi phí API. Cùng thiết kế 7 điều kiện persona (gradient 0->6 agent ích kỷ) x 3 risk x 2 ngôn ngữ với exp_persona.",
+  "games": [
+    "crsd_milinski_high_risk",
+    "crsd_milinski_medium_risk",
+    "crsd_milinski_low_risk"
+  ],
+  "agents": "personas_default",
+  "agentsConditions": [
+    "personas_cooperative",
+    "personas_mixed_1sel_5coop",
+    "personas_mixed_2sel_4coop",
+    "personas_mixed_3sel_3coop",
+    "personas_mixed_4sel_2coop",
+    "personas_mixed_5sel_1coop",
+    "personas_selfish"
+  ],
+  "shufflePersonas": true,
+  "languages": ["en", "vn"],
+  "models": ["OpenAIGPT5Nano"],
+  "useOffline": false,
+  "repetitions": 5,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}
