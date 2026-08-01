@@ -29,6 +29,7 @@ Local run:
     CRG_REPS=1 CRG_LANGS=en CRG_RISKS=0.9 python crg_task.py
 """
 import csv
+import io
 import json
 import os
 import random
@@ -82,6 +83,14 @@ MAX_PARSE_RETRIES = 3
 RISKS = [float(x) for x in os.environ.get("CRG_RISKS", "0.9,0.5,0.1").split(",")]
 LANGS = [s.strip() for s in os.environ.get("CRG_LANGS", "en,vn").split(",")]
 REPS = int(os.environ.get("CRG_REPS", "10"))
+
+# Persist one atomic shard per completed game. If the process is restarted in the
+# same workspace, valid shards are loaded and those (risk, language, rep) cells are
+# skipped. Set CRG_RESUME=0 only when a deliberately clean rerun is required.
+RESUME = os.environ.get("CRG_RESUME", "1").strip().lower() not in {
+    "0", "false", "no", "off",
+}
+CHECKPOINT_SCHEMA_VERSION = 1
 
 # --- Kaggle push-validation guard ------------------------------------------
 # `kaggle b t push` executes the task ONCE on the server default model
@@ -434,6 +443,127 @@ def play_game(llm, risk, language, rep, model_tag, turns_sink):
     return game_row, parse_failed, tok_in, tok_out, cost
 
 
+# %% =====================  CHECKPOINT / RESUME  =====================
+def _condition_key(risk, language, rep):
+    """Canonical key for one completed experimental cell."""
+    return f"{float(risk):.12g}|{language}|{int(rep)}"
+
+
+def _checkpoint_filename(risk, language, rep):
+    risk_tag = f"{float(risk):.12g}".replace(".", "p").replace("-", "m")
+    return f"risk-{risk_tag}__lang-{language}__rep-{int(rep):03d}.json"
+
+
+def _checkpoint_signature(model_tag):
+    """Fields that must match before a shard is safe to resume."""
+    return {
+        "schema_version": CHECKPOINT_SCHEMA_VERSION,
+        "model": model_tag,
+        "risks": RISKS,
+        "languages": LANGS,
+        "reps": REPS,
+        "n_players": N_PLAYERS,
+        "n_rounds": N_ROUNDS,
+        "endowment": ENDOWMENT,
+        "target": TARGET,
+        "options": list(OPTIONS),
+        "temperature": TEMPERATURE,
+        "base_seed": BASE_SEED,
+        "persona_set": PERSONA_SET,
+        "memory_mode": "full_history",
+        "framing": False,
+    }
+
+
+def _atomic_write_text(path, text):
+    """Durably replace a text file without exposing a half-written checkpoint."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with open(tmp, "w", encoding="utf-8", newline="") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+
+
+def _write_materialized_outputs(out_dir, games, turns):
+    """Refresh analysis-friendly outputs after every durable game shard."""
+    out_dir = Path(out_dir)
+    turns_text = "".join(json.dumps(t, ensure_ascii=False) + "\n" for t in turns)
+    _atomic_write_text(out_dir / "turns.jsonl", turns_text)
+
+    if games:
+        buf = io.StringIO(newline="")
+        writer = csv.DictWriter(buf, fieldnames=list(games[0].keys()), lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(games)
+        _atomic_write_text(out_dir / "games.csv", buf.getvalue())
+
+
+def _save_game_checkpoint(checkpoint_dir, signature, row, game_turns,
+                          parse_failed, tok_in, tok_out, cost):
+    """Commit one complete game. An interrupted game never produces a valid shard."""
+    payload = {
+        "signature": signature,
+        "condition_key": _condition_key(
+            row["risk_probability"], row["language"], row["rep"]),
+        "game": row,
+        "turns": game_turns,
+        "parse_failed": int(parse_failed),
+        "usage_input_tokens": int(tok_in),
+        "usage_output_tokens": int(tok_out),
+        "usage_total_cost_nanodollars": int(cost),
+    }
+    path = Path(checkpoint_dir) / _checkpoint_filename(
+        row["risk_probability"], row["language"], row["rep"])
+    _atomic_write_text(path, json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+    return path
+
+
+def _load_game_checkpoints(checkpoint_dir, signature):
+    """Load only complete, compatible shards and return them in sweep order."""
+    checkpoint_dir = Path(checkpoint_dir)
+    expected_order = [
+        _condition_key(risk, language, rep)
+        for risk in RISKS for language in LANGS for rep in range(REPS)
+    ]
+    expected = set(expected_order)
+    records = {}
+
+    if checkpoint_dir.is_dir():
+        for path in sorted(checkpoint_dir.glob("*.json")):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    record = json.load(f)
+                key = record["condition_key"]
+                if record.get("signature") != signature or key not in expected:
+                    print(f"[checkpoint] ignore incompatible shard: {path.name}", flush=True)
+                    continue
+                if key in records:
+                    raise ValueError(f"duplicate checkpoint condition {key}")
+                if len(record.get("turns", [])) != N_PLAYERS * N_ROUNDS:
+                    raise ValueError("incomplete turn count")
+                records[key] = record
+            except Exception as exc:
+                print(f"[checkpoint] ignore invalid shard {path.name}: {exc}", flush=True)
+
+    ordered = [records[key] for key in expected_order if key in records]
+    games = [record["game"] for record in ordered]
+    turns = [turn for record in ordered for turn in record["turns"]]
+    stats = {
+        "parse_failed": sum(record["parse_failed"] for record in ordered),
+        "tok_in": sum(record["usage_input_tokens"] for record in ordered),
+        "tok_out": sum(record["usage_output_tokens"] for record in ordered),
+        "cost": sum(record["usage_total_cost_nanodollars"] for record in ordered),
+    }
+    return games, turns, stats, set(records)
+
+
 # %% =====================  SWEEP (== exp_baseline: 3 risk × 2 lang × 10 rep)  =========
 @kbench.task(
     name="collective-risk-baseline-srv",
@@ -450,29 +580,55 @@ def collective_risk_baseline(llm) -> dict:
     out_dir = Path(os.environ.get("CRG_OUT", f"results/frontier/{model_tag}/exp_baseline"))
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    games, turns = [], []
-    tok_in = tok_out = cost = parse_failed = 0
+    checkpoint_dir = out_dir / "checkpoints"
+    signature = _checkpoint_signature(model_tag)
+    if RESUME:
+        games, turns, prior, completed = _load_game_checkpoints(checkpoint_dir, signature)
+    else:
+        games, turns = [], []
+        prior = {"parse_failed": 0, "tok_in": 0, "tok_out": 0, "cost": 0}
+        completed = set()
+    resumed_games = len(games)
+    if resumed_games:
+        _write_materialized_outputs(out_dir, games, turns)
+        print(f"[resume] restored {resumed_games}/{len(RISKS) * len(LANGS) * REPS} "
+              f"completed games from {checkpoint_dir}", flush=True)
+
+    tok_in = prior["tok_in"]
+    tok_out = prior["tok_out"]
+    cost = prior["cost"]
+    parse_failed = prior["parse_failed"]
     total = len(RISKS) * len(LANGS) * REPS
-    done = 0
+    done = resumed_games
     t0 = time.time()
 
     for risk in RISKS:
         for language in LANGS:
             for rep in range(REPS):
-                row, pf, ti, to, cn = play_game(llm, risk, language, rep, model_tag, turns)
-                games.append(row)
-                tok_in += ti; tok_out += to; cost += cn; parse_failed += pf
-                done += 1
-                print(f"[{done}/{total}] {row['game_id']}  reach={row['target_reached']} "
-                      f"GT={row['group_total']} disaster={row['catastrophe']} parse_fail={pf}")
+                key = _condition_key(risk, language, rep)
+                if key in completed:
+                    print(f"[resume {done}/{total}] skip risk={risk} lang={language} rep={rep}",
+                          flush=True)
+                    continue
 
-    # Write logs that mirror the crsd schema (turns.jsonl + games.csv) for joint analysis.
-    with open(out_dir / "turns.jsonl", "w", encoding="utf-8") as f:
-        for t in turns:
-            f.write(json.dumps(t, ensure_ascii=False) + "\n")
-    with open(out_dir / "games.csv", "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=list(games[0].keys()))
-        w.writeheader(); w.writerows(games)
+                game_turns = []
+                row, pf, ti, to, cn = play_game(
+                    llm, risk, language, rep, model_tag, game_turns)
+                checkpoint_path = _save_game_checkpoint(
+                    checkpoint_dir, signature, row, game_turns, pf, ti, to, cn)
+                games.append(row)
+                turns.extend(game_turns)
+                tok_in += ti; tok_out += to; cost += cn; parse_failed += pf
+                completed.add(key)
+                done += 1
+                _write_materialized_outputs(out_dir, games, turns)
+                print(f"[checkpoint {done}/{total}] {row['game_id']}  "
+                      f"reach={row['target_reached']} GT={row['group_total']} "
+                      f"disaster={row['catastrophe']} parse_fail={pf} "
+                      f"saved={checkpoint_path.name}", flush=True)
+
+    # One final materialization is cheap and guarantees analysis files agree with shards.
+    _write_materialized_outputs(out_dir, games, turns)
 
     n_turns = len(turns)
     reached = sum(g["target_reached"] for g in games)
@@ -496,6 +652,9 @@ def collective_risk_baseline(llm) -> dict:
         "games_per_10usd": int(10 / (cost / 1e9)) if cost else None,
         "elapsed_sec": round(time.time() - t0, 1),
         "out_dir": str(out_dir),
+        "checkpoint_dir": str(checkpoint_dir),
+        "resumed_games": resumed_games,
+        "new_games": len(games) - resumed_games,
     }
 
     print("\n===== COLLECTIVE-RISK BASELINE (frontier) — SUMMARY =====")
@@ -511,6 +670,7 @@ def collective_risk_baseline(llm) -> dict:
 
 
 # %%
-# Unguarded so the Kaggle server (which executes this as a module, __name__ != "__main__")
-# actually fires the run; local `python crg_task_server.py` still runs it too.
-collective_risk_baseline.run(kbench.llm)
+# The Kaggle server executes this as a module (__name__ != "__main__"), so this must
+# fire by default. CRG_SKIP_RUN=1 exists solely for import-time unit tests.
+if os.environ.get("CRG_SKIP_RUN") != "1":
+    collective_risk_baseline.run(kbench.llm)
