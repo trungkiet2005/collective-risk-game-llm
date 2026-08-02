@@ -75,7 +75,7 @@ def load_turns(exp):
     return t
 
 
-TB, TR = load_turns("exp_baseline"), load_turns("exp_riskframing")
+TB, TR = load_turns("archive/exp_baseline"), load_turns("exp_riskframing")
 
 # ============================================================================
 # R1. HEADLINE — TỔNG đóng góp cả game (trên 240), so với mốc 120

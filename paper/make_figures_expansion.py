@@ -2,8 +2,8 @@
 
 Recomputes every quantity from raw games.csv:
   - fig8: open-source persona/composition sweep (results/open_source/exp_test/exp_persona/)
-  - fig9: frontier model gpt-5.4-nano, baseline + persona (results/exp_baseline_openai/,
-    results/exp_persona_openai/)
+  - fig9: frontier model gpt-5.4-nano, baseline + persona
+    (results/frontier/openai-gpt-5.4-nano/exp_baseline/, .../exp_persona/)
 
 Kept in a separate module from make_figures.py (which is scoped, by design, to
 results/open_source/crsd_all_models.csv only) so that the original figures stay
@@ -70,10 +70,10 @@ p_os = pd.concat(dfs, ignore_index=True)
 p_os["nsel"] = p_os.persona_set.map(NSEL)
 p_os["reach"] = p_os.target_reached.astype(int)
 
-fb = pd.read_csv(ROOT / "exp_baseline_openai/games.csv")
+fb = pd.read_csv(ROOT / "frontier/openai-gpt-5.4-nano/exp_baseline/games.csv")
 fb["reach"] = fb.target_reached.astype(int)
 
-fp = pd.read_csv(ROOT / "exp_persona_openai/games.csv")
+fp = pd.read_csv(ROOT / "frontier/openai-gpt-5.4-nano/exp_persona/games.csv")
 fp["nsel"] = fp.persona_set.map(NSEL)
 fp["reach"] = fp.target_reached.astype(int)
 

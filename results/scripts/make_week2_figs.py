@@ -43,7 +43,7 @@ def load_turns(pattern):
             rows.append((m, d["round"], d["contribution"], d.get("language"),
                          float(d.get("risk_probability", 0))))
     return rows
-T = pd.DataFrame(load_turns("open_source/exp_baseline/*/turns.jsonl"),
+T = pd.DataFrame(load_turns("open_source/archive/exp_baseline/*/turns.jsonl"),
                  columns=["model", "round", "c", "lang", "risk"])
 
 # ============================================================================
@@ -157,7 +157,7 @@ save(fig, "L5_scaling_lang.png")
 #  COMPREHENSION
 # ============================================================================
 frames = []
-for f in glob.glob(str(R / "open_source/exp_comprehension/*/comprehension_summary.csv")):
+for f in glob.glob(str(R / "open_source/archive/exp_comprehension/*/comprehension_summary.csv")):
     frames.append(pd.read_csv(f))
 C = pd.concat(frames, ignore_index=True)
 CMODELS = ["qwen25-7b-instruct", "gemma2-9b-it", "llama-3-1-8b"]

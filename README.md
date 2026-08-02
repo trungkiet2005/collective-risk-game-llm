@@ -86,7 +86,9 @@ còn ~45GB cho KV-cache). vLLM tự nhận quantization từ checkpoint — đ�
 2. **Model** (notebook Internet ON): chạy [FAIRGAME/download_model.py](FAIRGAME/download_model.py)
    với `MODEL_ID = "Qwen/Qwen2.5-72B-Instruct-AWQ"` (hoặc
    `hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4`) → Output → *New Dataset*.
-3. **Chạy** (notebook GPU 96GB, Internet OFF): dùng [kaggle/experiments/baseline_72b.py](kaggle/experiments/baseline_72b.py),
+3. **Chạy** (notebook GPU 96GB, Internet OFF): dùng [kaggle/experiments/baseline.py](kaggle/experiments/baseline.py)
+   (bản đang dùng hiện tại, chạy `exp_riskframing`; bản 72B cũ tham khảo ở
+   [kaggle/experiments/archive/baseline_72b.py](kaggle/experiments/archive/baseline_72b.py)),
    + Add Input: repo + 2 dataset trên. Cell 2.5 tự dò wheels và cài offline.
 4. Chạy local thì trỏ experiment tới preset có sẵn: `models_qwen2.5-72b-awq` ·
    `models_llama3.1-70b-awq` · `models_qwen2.5-72b-gptq-int4` · `models_qwen2.5-72b-bnb4bit`

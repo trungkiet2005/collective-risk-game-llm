@@ -65,7 +65,7 @@ def load_turns(pattern):
                          float(d.get("risk_probability", 0))))
     return rows
 T = pd.DataFrame(
-    load_turns("open_source/exp_baseline/*/turns.jsonl")
+    load_turns("open_source/archive/exp_baseline/*/turns.jsonl")
     + load_turns("frontier/google-gemini-3.1-flash-lite-preview/exp_baseline/turns.jsonl"),
     columns=["model", "round", "c", "lang", "risk"])
 
@@ -219,7 +219,7 @@ save(fig, "L6_llama70_lang_collapse.png")
 def read_comp(pattern):
     return [pd.read_csv(f) for f in glob.glob(str(R / pattern))]
 C = pd.concat(
-    read_comp("open_source/exp_comprehension/*/comprehension_summary.csv"),
+    read_comp("open_source/archive/exp_comprehension/*/comprehension_summary.csv"),
     ignore_index=True)
 # thứ tự ghép cặp nhỏ→lớn theo họ (nay có cả 70–72B; Llama đo bản 3.3)
 CMODELS = ["qwen25-7b-instruct", "qwen25-32b-instruct", "qwen25-72b-instruct-awq",
@@ -349,7 +349,7 @@ def load_comp_probes(pattern):
                          bool(d["correct"]), bool(d["parse_failed"])))
     return rows
 CP = pd.DataFrame(
-    load_comp_probes("open_source/exp_comprehension/*/comprehension.jsonl"),
+    load_comp_probes("open_source/archive/exp_comprehension/*/comprehension.jsonl"),
     columns=["model", "parsed", "truth", "correct", "pfail"])
 CP = CP[CP.truth.apply(lambda v: isinstance(v, (int, float)) and v > 0)]  # GT>0: có gì để cộng
 

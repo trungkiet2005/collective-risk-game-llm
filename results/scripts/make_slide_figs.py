@@ -63,7 +63,7 @@ save(fig, "B_contrib_vs_risk.png")
 
 # C. Round dynamics ----------------------------------------------------------
 rows = []
-for f in glob.glob(str(ROOT / "exp_baseline/*/turns.jsonl")):
+for f in glob.glob(str(ROOT / "archive/exp_baseline/*/turns.jsonl")):
     m = f.replace("\\", "/").split("/")[-2]
     for line in open(f, encoding="utf-8"):
         d = json.loads(line); rows.append((m, d["round"], d["contribution"]))
@@ -192,7 +192,7 @@ save(fig, "G_disposition.png")
 # ============================================================================
 #  HÌNH BỔ SUNG — đào sâu từng phần (số liệu bám results/insights.md đã verify)
 # ============================================================================
-INNER = {"baseline": "exp_baseline", "memory": "exp_test/exp_memory_ablation",
+INNER = {"baseline": "archive/exp_baseline", "memory": "exp_test/exp_memory_ablation",
          "framing": "exp_test/exp_framing", "persona": "exp_test/exp_persona"}
 
 def load_turns(exp):

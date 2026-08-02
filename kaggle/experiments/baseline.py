@@ -1,27 +1,56 @@
 """
 =====================================================================
-CRSD (package `crsd`) — Kaggle OFFLINE notebook (Internet OFF, GPU ON) — exp_baseline | MULTI-MODEL
+CRSD (package `crsd`) — Kaggle OFFLINE notebook (Internet OFF, GPU ON) — exp_riskframing (1 điều kiện) | 7 MODEL OPEN-SOURCE
 =====================================================================
-Chạy các experiment CRSD của project này (Milinski 2008 với LLM agents) trên GPU
-Kaggle, offline. Nạp LẦN LƯỢT nhiều model, mỗi model chạy các experiment đã chọn,
-lưu kết quả RIÊNG theo từng (model × experiment).
+Chạy experiment `exp_riskframing` (RÚT GỌN còn 1 điều kiện) trên 7 model mã nguồn mở
+đã dùng xuyên suốt project (Qwen2.5 7/32/72B · Gemma-2 9/27B · Llama-3.1 8/70B). Giữ
+NGUYÊN mọi tham số game (risk/target/seed/CRN). Chỉ CÒN MỘT cấu hình prompt cố định:
 
-Khác bản FAIRGAME-internal: notebook này tái dùng TRỰC TIẾP runner đã test của
-project — `crsd.runner.run_experiment.build_games_for_model`, `run_games_batched`,
-`crsd.dataio.recorder` — nên seed/CRN/scratchpad/framing giống hệt lúc chạy local.
+  · risk_framing = plain — BỎ "máy tính quay xổ số" + "nhóm gặp thảm hoạ", nêu XÁC SUẤT
+    trực tiếp: "... với xác suất P% mọi người chơi mất tất cả số tiền còn lại ...".
+  · show_computed_totals = on — thêm vào khối "Current state" các TỔNG TÍNH SẴN: tổng
+    quỹ khí hậu hiện tại + tổng tích luỹ TỪNG người chơi (per-player P1..Pn). (Số tiền
+    còn lại của mình vốn ĐÃ luôn hiển thị sẵn.)
+
+Tức là dùng đúng game config `crsd_milinski_<risk>_plain_computed`. Quét 3 mức rủi ro
+high/medium/low để đo độ nhạy rủi ro (biến cốt lõi Milinski). Agent trung tính,
+full_history, KHÔNG persona/scratchpad.
+3 game (3 risk × 1 điều kiện) × 2 lang (EN+VN) × 10 rep = 60 game/model.
+
+Notebook này = bản `archive/baseline_72b.py` (superset xử lý quantize) đổi 2 chỗ:
+MODELS[] (7 model), EXPERIMENTS (exp_riskframing). Cell 2/2.5/3/4/5/6/7/8 + runner giữ
+nguyên -> seed/CRN y hệt (risk_framing/show_computed_totals giờ là hằng số).
+
+(File này trước tên `riskframing.py`; các bản exp cũ — exp_baseline, comprehension,
+persona, framing, memory_ablation, lowrisk — đã chuyển vào archive/, hiện KHÔNG dùng.)
+
+⚠️  CHIA PHIÊN (1 phiên Kaggle ~9–12h) ──────────────────────────────
+  60 game/model × 60 gen = 3600 gen/model. 7 model một phiên vẫn dễ QUÁ GIỜ, nhất là
+  72B/70B (chậm hơn 7B ~10×). Khuyến nghị TÁCH:
+    · Theo model: chạy 1–2 model/phiên (comment bớt MODELS[]). 72B/70B nên chạy riêng.
+    · Theo tải: hạ REPS_OVERRIDE (vd 5) hoặc LANGUAGES_OVERRIDE=["en"] để soi nhanh trước.
+  Output ghi RIÊNG theo <model>/<experiment> nên gộp lại (Cell 7) không đụng nhau —
+  chạy nhiều phiên rồi + Add Input các output cũ, Cell 7 tự gộp hết.
+
+⚠️  VRAM 96 GB cho 72B AWQ — xem chi tiết số học trong archive/baseline_72b.py.
+  quantization=None: vLLM tự đọc quantization_config trong checkpoint (awq_marlin).
+  Model bf16 nhỏ (7B..32B) cứ để quantization=None -> nạp bf16 bình thường.
+  RTX PRO 6000 Blackwell sm_120: GIỮ VLLM_USE_FLASHINFER_SAMPLER=0 (Cell 2.5 set sẵn).
 
 CÁCH CHẠY:
-  1. Tạo notebook Kaggle mới — GPU: ON, Internet: OFF.
-  2. + Add Input:
-       a) Code/Dataset: repo này (chứa CẢ `crsd/` lẫn `FAIRGAME/` ở cùng một thư mục gốc).
-       b) Model(s): add MỖI model làm một input (Qwen2.5-7B, Gemma-2-9B, Llama-3.1-8B...).
-  3. Copy file này vào notebook, chia cell theo "# CELL N".
-  4. Sửa MODELS[], KAGGLE_CODE_INPUT, EXPERIMENTS ở Cell 1/3.
-       Chạy "!ls /kaggle/input/" để xem path thực của repo + từng model.
-  5. Run lần lượt Cell 1 → 8.
+  1. (nếu image Kaggle chưa có vLLM) chạy `kaggle_build_quant_wheels.py` (Internet ON)
+     -> Output -> New Dataset (vd "crsd-quant-wheels").
+  2. + Add Input mỗi model: model bf16 từ Kaggle Models hub; model AWQ tải bằng
+     `FAIRGAME/download_model.py` (vd "Qwen/Qwen2.5-72B-Instruct-AWQ") -> New Dataset.
+  3. Tạo notebook mới — GPU ON, Internet OFF. + Add Input: (a) repo (crsd/ + FAIRGAME/),
+     (b) dataset wheels, (c) các dataset/model ở bước 2.
+  4. Copy file này vào notebook, chia cell theo "# CELL N".
+  5. Sửa MODELS[] theo path thực (`!ls /kaggle/input/`). Run Cell 1 → 8.
 
 Output: /kaggle/working/crsd_results/<model_short>/<experiment>/{turns.jsonl, games.csv}
   + crsd_all_models.csv gộp + run_manifest.json + crsd_results.zip ở Output tab.
+  Cột phân tích chính cho experiment này: `risk_probability` × `language`
+  (risk_framing=plain và show_computed_totals=1 giờ là HẰNG SỐ, không tách nữa).
 =====================================================================
 """
 
@@ -29,12 +58,18 @@ Output: /kaggle/working/crsd_results/<model_short>/<experiment>/{turns.jsonl, ga
 # CELL 1: CẤU HÌNH — SỬA Ở ĐÂY
 # =====================================================================
 
-# --- Danh sách model. Mỗi model đã add làm Kaggle input. -------------------- #
-# path:        thư mục model trong /kaggle/input/...  (xem bằng "!ls /kaggle/input/")
-# short_name:  tên thư mục output + cột "model" trong CSV (phải DUY NHẤT).
-# engine:      "vllm" (throughput cao) | "transformers" (ổn định, free GPU sạch giữa các model).
-# (tuỳ chọn)   temperature / max_tokens / max_model_len: override riêng cho model đó.
+# --- Danh sách 7 model open-source. Mỗi model đã add làm Kaggle input. ------ #
+# path:          thư mục model trong /kaggle/input/... (xem bằng "!ls /kaggle/input/")
+# short_name:    tên thư mục output + cột "model" trong CSV (phải DUY NHẤT).
+# engine:        "vllm" (khuyên dùng) | "transformers".
+# quantization:  None = vLLM TỰ nhận từ checkpoint (bf16 nhỏ để None; AWQ/GPTQ cũng để
+#                None -> vLLM tự đọc quantization_config). Ép "awq"/"gptq" nếu kernel lỗi.
+# (tuỳ chọn)     dtype / kv_cache_dtype / max_num_seqs / cpu_offload_gb / gpu_util
+#                / temperature / max_tokens / max_model_len: override riêng model đó.
+#
+# GỢI Ý CHIA PHIÊN: comment bớt để mỗi phiên vừa giờ (5 model nhỏ→vừa 1 phiên; 2 AWQ 1 phiên).
 MODELS = [
+    # --- nhỏ (bf16, GPU thường đủ) ---
     {
         "path": "/kaggle/input/models/qwen-lm/qwen2.5/transformers/7b-instruct/1",
         "short_name": "qwen25-7b-instruct",
@@ -50,33 +85,64 @@ MODELS = [
         "short_name": "llama-3-1-8b",
         "engine": "vllm",
     },
+    # --- vừa (bf16, cần VRAM lớn hơn) ---
+    {
+        "path": "/kaggle/input/models/qwen-lm/qwen2.5/transformers/32b-instruct/1",
+        "short_name": "qwen25-32b-instruct",
+        "engine": "vllm",
+    },
+    {
+        "path": "/kaggle/input/models/google/gemma-2/transformers/gemma-2-27b-it/2",
+        "short_name": "gemma2-27b-it",
+        "engine": "vllm",
+    },
+    # --- lớn (AWQ int4, cần GPU 96GB + dataset wheels) ---
+    {
+        "path": "/kaggle/input/qwen25-72b-instruct-awq/model_weights",
+        "short_name": "qwen25-72b-instruct-awq",
+        "engine": "vllm",
+        "quantization": None,     # AWQ quantize sẵn -> vLLM tự nhận
+        "dtype": "auto",          # auto -> float16 (chuẩn cho AWQ)
+    },
+    {
+        # Llama 3.3 70B Instruct AWQ int4 — KAGGLE MODELS hub (không phải dataset).
+        # Nguồn: kaggle.com/models/jagatkiran/meta-llama-3.3-70b/Transformers/ibnzterrell-instruct-awq-int4/1
+        # Path mount = /kaggle/input/models/<owner>/<model>/<framework>/<variation>/<version>.
+        # NHỚ verify bằng `!ls /kaggle/input/...` (Cell 3 in exists=) — sai path thì sửa lại đây.
+        "path": "/kaggle/input/models/jagatkiran/meta-llama-3.3-70b/transformers/ibnzterrell-instruct-awq-int4/1",
+        "short_name": "llama-3-3-70b-instruct-awq",
+        "engine": "vllm",
+        "quantization": None,     # AWQ int4 quantize sẵn -> vLLM tự nhận (awq_marlin)
+        "dtype": "auto",          # auto -> float16 (chuẩn cho AWQ)
+    },
 ]
 
 # --- Experiment(s) cần chạy (tên file trong crsd/configs/experiment/, KHÔNG .json) --- #
-# Có sẵn (tất cả đã EN+VN):
-#   exp_baseline        - replicate Milinski thuần (đối chứng; cũng đo hiệu ứng ngôn ngữ sạch nhất)
-#   exp_memory_ablation - full_history vs scratchpad
-#   exp_framing         - baseline vs framed
-#   exp_persona         - neutral vs selfish vs cooperative (kiểu FairGame)
-# Lưu ý runtime (đã khử trùng đối chứng, lấy từ exp_baseline): baseline 60; memory 60; framing 120 (full+scratchpad); persona 420 (gradient 0-6 ích kỷ, 7 điều kiện). Bớt bằng nút trim dưới.
-EXPERIMENTS = ["exp_baseline"]   # notebook chuyen cho experiment nay (EN + VN)
+EXPERIMENTS = ["exp_riskframing"]   # 1 điều kiện: plain + computed-totals, 3 risk, EN+VN
 
 # --- Tham số sinh MẶC ĐỊNH (model có thể override từng cái trong MODELS[]) --- #
 DEFAULT_ENGINE = "vllm"   # "vllm" | "transformers"
 MAX_MODEL_LEN = 4096
 TEMPERATURE = 0.7         # >0 để 6 agent khác nhau; 0.7–1.0
 MAX_TOKENS = 512          # đủ cho reasoning ngắn + dòng "CONTRIBUTION: X"
-GPU_UTIL = 0.90           # chỉ dùng cho vllm
-TP_SIZE = 1               # tensor parallel (vllm); single GPU = 1
-BATCH_SIZE = 256          # prompts/forward; 0 = cả batch một lần. 7B trên GPU lớn: 256 an toàn.
-SAMPLING_SEED_BASE = 0    # offset toàn cục cho seed sinh văn bản (seed per-lượt vẫn theo exp.seed+rep+round+agent)
+GPU_UTIL = 0.92           # 0.92×96GB ≈ 88GB (đủ cho 72B AWQ ~41GB + KV; model nhỏ dư sức)
+TP_SIZE = 1               # 1 card 96GB -> 1. Chỉ >1 khi accelerator NHIỀU GPU.
+BATCH_SIZE = 256          # vLLM tự lên lịch nội bộ -> an toàn kể cả 72B (dư xếp hàng)
+SAMPLING_SEED_BASE = 0    # offset toàn cục cho seed sinh văn bản
+
+# --- Knob quantize MẶC ĐỊNH (override per-model trong MODELS[]) ------------- #
+QUANTIZATION = None       # None = tự nhận từ checkpoint (bf16 nhỏ + AWQ/GPTQ cứ để None)
+DTYPE = "auto"            # "auto" | "float16" | "bfloat16" (AWQ/GPTQ: để "auto")
+KV_CACHE_DTYPE = None     # None/"auto" | "fp8" (nén KV-cache khi VRAM sát nút)
+MAX_NUM_SEQS = None       # None = mặc định vLLM; vd 32 để ghìm VRAM lúc chạy
+CPU_OFFLOAD_GB = 0        # >0 = đẩy bớt trọng số sang RAM (chậm — van xả cuối)
 
 # --- Nút TRIM (giảm tải cho vừa 1 phiên Kaggle ~9–12h) --------------------- #
-# Cả 3 experiment đã mặc định chạy EN+VN. Nếu sợ vượt giờ (memory/framing = 120
-# game × 3 model), hạ tải bằng 1 trong các cách dưới (KHÔNG cần sửa file config):
-LANGUAGES_OVERRIDE = None   # None = theo config (en+vn); vd ["en"] để chỉ chạy 1 ngôn ngữ
-REPS_OVERRIDE = None        # None = theo config (10 group/điều kiện); vd 5 để chạy nửa
-ENFORCE_EAGER = True        # True = an toàn mọi GPU (chậm hơn); False = bật CUDA graph (nhanh hơn cho 9B)
+# 60 game/model (3 risk × 1 điều kiện × 2 lang × 10 rep). Nếu ETA thô (smoke test) báo quá dài, hạ tải
+# ở đây HOẶC comment bớt model / tách phiên (xem docstring — nên chạy 1–2 model/phiên):
+LANGUAGES_OVERRIDE = None   # None = theo config (en+vn); vd ["en"] chỉ chạy 1 ngôn ngữ
+REPS_OVERRIDE = None        # None = theo config (10 group/điều kiện); vd 5 chạy nửa
+ENFORCE_EAGER = True        # True = an toàn + tiết kiệm VRAM (không CUDA graph)
 
 from pathlib import Path  # noqa: E402
 
@@ -122,24 +188,26 @@ def ensure_importable():
 print("Internet OFF: dùng thư viện có sẵn trên image Kaggle (trừ cell 2.5 nếu cần vLLM).")
 
 # =====================================================================
-# CELL 2.5: (TUỲ CHỌN) Cài vLLM OFFLINE từ wheels đã build sẵn
+# CELL 2.5: Cài vLLM (+bitsandbytes nếu cần) OFFLINE từ wheels dataset
 # =====================================================================
-# Chỉ cần khi muốn engine="vllm" mà image Kaggle CHƯA có vllm. Yêu cầu một Dataset
-# chứa toàn bộ .whl (build trong notebook Internet ON CÙNG image GPU), đã + Add Input.
+# Yêu cầu dataset wheels từ `kaggle_build_quant_wheels.py` (Internet ON) đã + Add Input.
 import importlib.util
 import subprocess
 
-# TỰ DÒ thư mục chứa wheel vLLM (vllm*.whl) dưới /kaggle/input/ — path dataset khác
-# nhau tuỳ cách add; dò trượt thì set VLLM_WHEELS_DIR thủ công tới thư mục chứa .whl.
-def find_wheels_dir(root="/kaggle/input", max_depth=6):
+
+# TỰ DÒ thư mục wheels dưới /kaggle/input/ theo ĐÚNG các package cần cài (không
+# chỉ vllm*.whl — nếu chỉ thiếu bitsandbytes thì dò bitsandbytes*.whl). Thư mục
+# hợp lệ = chứa wheel cho TẤT CẢ package cần. Dò trượt thì set VLLM_WHEELS_DIR
+# thủ công tới thư mục chứa .whl.
+def find_wheels_dir(patterns, root="/kaggle/input", max_depth=6):
     root = Path(root)
-    if not root.is_dir():
+    if not root.is_dir() or not patterns:
         return None
     stack = [(root, 0)]
     while stack:
         d, depth = stack.pop()
         try:
-            if any(d.glob("vllm*.whl")):
+            if all(any(d.glob(pat)) for pat in patterns):
                 return d
         except OSError:
             pass
@@ -153,36 +221,56 @@ def find_wheels_dir(root="/kaggle/input", max_depth=6):
     return None
 
 
-VLLM_WHEELS_DIR = find_wheels_dir("/kaggle/input") or Path("/kaggle/input/vllm-offline-wheels")
-VLLM_VERSION = ""   # "" = bản trong wheels; hoặc ghim "0.6.x"
+VLLM_VERSION = ""   # "" = bản trong wheels; hoặc ghim "0.11.0"
 
 _want_vllm = (DEFAULT_ENGINE == "vllm") or any(
     m.get("engine", DEFAULT_ENGINE) == "vllm" for m in MODELS)
+
+
+def _model_quant(m):
+    return str(m.get("quantization", QUANTIZATION) or "").lower()
+
+
+# bitsandbytes cần khi: quantization "bitsandbytes" (vllm) hoặc "bnb-*" (transformers)
+_want_bnb = any(("bnb" in _model_quant(m)) or ("bitsandbytes" in _model_quant(m))
+                for m in MODELS)
 _have_vllm = importlib.util.find_spec("vllm") is not None
+_have_bnb = importlib.util.find_spec("bitsandbytes") is not None
 
 if _want_vllm:
     # Tắt FlashInfer sampler: trên GPU mới (Blackwell sm_120) nó JIT-compile và ngã.
     os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     print("VLLM_USE_FLASHINFER_SAMPLER=0 (sampler PyTorch-native).")
 
-if not _want_vllm:
-    print("Không model nào dùng vllm — bỏ qua cài đặt.")
-elif _have_vllm:
-    print("vLLM đã có sẵn trên image — không cần cài.")
+_to_install = []
+if _want_vllm and not _have_vllm:
+    _to_install.append("vllm" + (f"=={VLLM_VERSION}" if VLLM_VERSION else ""))
+if _want_bnb and not _have_bnb:
+    _to_install.append("bitsandbytes")
+
+# Pattern dò = wheel của từng package cần cài (bỏ phần ==version; '-' trong tên
+# package thành '_' trong tên wheel — vllm/bitsandbytes không có '-', replace vô hại).
+_pkg_patterns = [p.split("==")[0].replace("-", "_") + "*.whl" for p in _to_install]
+VLLM_WHEELS_DIR = (find_wheels_dir(_pkg_patterns)
+                   or Path("/kaggle/input/crsd-quant-wheels/quant_wheels"))
+
+if not _to_install:
+    print("Đủ thư viện sẵn trên image (vllm"
+          + (", bitsandbytes" if _want_bnb else "") + ") — không cần cài.")
 elif not VLLM_WHEELS_DIR.is_dir():
     raise FileNotFoundError(
-        f"Cần engine vllm nhưng không thấy wheels ở {VLLM_WHEELS_DIR}. "
-        "Hãy + Add Input dataset wheels, sửa VLLM_WHEELS_DIR, hoặc đổi engine='transformers'.")
+        f"Cần cài {_to_install} nhưng không thấy thư mục wheels chứa đủ "
+        f"{_pkg_patterns} (fallback: {VLLM_WHEELS_DIR}). Hãy + Add Input dataset "
+        "wheels (từ kaggle_build_quant_wheels.py) hoặc sửa VLLM_WHEELS_DIR.")
 else:
-    _spec = "vllm" + (f"=={VLLM_VERSION}" if VLLM_VERSION else "")
     _cmd = [sys.executable, "-m", "pip", "install", "--no-index",
-            f"--find-links={VLLM_WHEELS_DIR}", _spec]
-    print(f"Cài vLLM offline từ {VLLM_WHEELS_DIR} ... (ẩn log pip, chỉ hiện khi lỗi)")
+            f"--find-links={VLLM_WHEELS_DIR}"] + _to_install
+    print(f"Cài offline {_to_install} từ {VLLM_WHEELS_DIR} ... (ẩn log pip, chỉ hiện khi lỗi)")
     _r = subprocess.run(_cmd, capture_output=True, text=True)
     if _r.returncode != 0:
         print(_r.stdout[-3000:])
         print(_r.stderr[-3000:])
-        raise RuntimeError("pip install vllm offline thất bại — xem log phía trên.")
+        raise RuntimeError("pip install offline thất bại — xem log phía trên.")
     importlib.invalidate_caches()
     _probe = ("import torch; torch.zeros(1).cuda(); print('GPU_OK', torch.__version__)")
     _rp = subprocess.run([sys.executable, "-c", _probe], capture_output=True, text=True)
@@ -191,18 +279,18 @@ else:
         print(_rp.stderr)
         raise RuntimeError(
             "torch vừa cài KHÔNG init được GPU — gần như chắc do wheels build SAI CUDA so với "
-            "driver Kaggle. Build lại wheels khớp torch của Kaggle, hoặc tạm đổi engine='transformers'.")
+            "driver Kaggle. Build lại wheels (kaggle_build_quant_wheels.py) trên CÙNG image GPU.")
     print(_rp.stdout.strip())
-    print("vLLM đã cài từ wheels và torch init GPU OK.")
+    print(f"Đã cài {_to_install} từ wheels và torch init GPU OK.")
 
 # =====================================================================
 # CELL 3: Setup source (copy repo, đặt marker)
 # =====================================================================
 import shutil
 
+
 # Repo đã add làm input (read-only). TỰ DÒ thư mục chứa crsd/ + FAIRGAME/ dưới
-# /kaggle/input/ (đường dẫn khác nhau tuỳ cách add: dataset, GitHub repo, notebook
-# output...). Auto-detect trượt thì sửa KAGGLE_CODE_INPUT thủ công cho đúng path.
+# /kaggle/input/. Auto-detect trượt thì sửa KAGGLE_CODE_INPUT thủ công cho đúng path.
 def find_repo_input(root="/kaggle/input", max_depth=6):
     root = Path(root)
     if not root.is_dir():
@@ -242,19 +330,22 @@ MARKER_ROOT.write_text(str(REPO_ROOT), encoding="utf-8")
 _need = [REPO_ROOT / "crsd" / "runner" / "run_experiment.py",
          REPO_ROOT / "crsd" / "prompts" / "crsd_en.txt",
          REPO_ROOT / "crsd" / "prompts" / "crsd_scratchpad_en.txt",
-         REPO_ROOT / "crsd" / "configs" / "experiment",
+         REPO_ROOT / "crsd" / "configs" / "experiment" / "exp_riskframing.json",
+         REPO_ROOT / "crsd" / "configs" / "game" / "crsd_milinski_high_risk_plainframe.json",
+         REPO_ROOT / "crsd" / "configs" / "game" / "crsd_milinski_high_risk_computed.json",
+         REPO_ROOT / "crsd" / "configs" / "game" / "crsd_milinski_high_risk_plain_computed.json",
          REPO_ROOT / "FAIRGAME" / "src" / "llm_connectors" / "local_vllm_connector.py"]
 _missing = [str(p) for p in _need if not p.exists()]
 print(f"Repo root: {REPO_ROOT}")
 print("Models khai báo:")
 for m in MODELS:
-    print(f"   - {m['short_name']:<22} exists={Path(m['path']).exists()}  ({m['path']})")
+    print(f"   - {m['short_name']:<28} exists={Path(m['path']).exists()}  ({m['path']})")
 if _missing:
     print("THIẾU file (push & re-add input):")
     for m in _missing:
         print("   -", m)
 else:
-    print("OK — crsd/ + FAIRGAME/ + configs/prompts đầy đủ.")
+    print("OK — crsd/ + FAIRGAME/ + configs/prompts + exp_riskframing đầy đủ.")
 
 # =====================================================================
 # CELL 4: Import runner + đếm kế hoạch
@@ -302,7 +393,11 @@ print(f"Tổng {len(MODELS)} model × {sum(n for _, n in _plan)} games = "
 
 
 def offline_settings_for(model_cfg):
-    """Dựng offline_settings dict cho factory.init_offline_backend (từ Cell 1)."""
+    """Dựng offline_settings dict cho factory.init_offline_backend (từ Cell 1).
+
+    Knob quantize đi qua block "engine" — factory chỉ truyền knob nào đặt tường
+    minh (khác None/"auto"/0) nên checkpoint thường chạy y hệt notebook cũ.
+    """
     engine = model_cfg.get("engine", DEFAULT_ENGINE)
     return {
         "backend": engine,
@@ -313,9 +408,14 @@ def offline_settings_for(model_cfg):
         },
         "engine": {
             "maxModelLen": int(model_cfg.get("max_model_len", MAX_MODEL_LEN)),
-            "gpuMemoryUtilization": GPU_UTIL,
-            "tensorParallelSize": TP_SIZE,
+            "gpuMemoryUtilization": float(model_cfg.get("gpu_util", GPU_UTIL)),
+            "tensorParallelSize": int(model_cfg.get("tensor_parallel_size", TP_SIZE)),
             "enforceEager": bool(model_cfg.get("enforce_eager", ENFORCE_EAGER)),
+            "quantization": model_cfg.get("quantization", QUANTIZATION),
+            "dtype": model_cfg.get("dtype", DTYPE),
+            "kvCacheDtype": model_cfg.get("kv_cache_dtype", KV_CACHE_DTYPE),
+            "maxNumSeqs": model_cfg.get("max_num_seqs", MAX_NUM_SEQS),
+            "cpuOffloadGb": model_cfg.get("cpu_offload_gb", CPU_OFFLOAD_GB),
         },
     }
 
@@ -329,7 +429,9 @@ GEN_PER_MODEL = sum(n for _, n in _plan) * 6 * 10
 def load_model(model_cfg):
     """Nạp model vào GPU (force=True để thay model trong cùng tiến trình)."""
     osettings = offline_settings_for(model_cfg)
-    print(f"Loading {model_cfg['short_name']} ({osettings['backend']}) <- {model_cfg['path']}")
+    print(f"Loading {model_cfg['short_name']} ({osettings['backend']}, "
+          f"quant={osettings['engine']['quantization'] or 'auto-detect'}, "
+          f"TP={osettings['engine']['tensorParallelSize']}) <- {model_cfg['path']}")
     factory.init_offline_backend(osettings, {"modelPath": model_cfg["path"]}, force=True)
     print(f"{model_cfg['short_name']} loaded.")
 
@@ -350,7 +452,7 @@ def smoke_test(model_cfg, exp, agents_cfg, agents_name):
     print(f"Parsed CONTRIBUTION = {val}  (parse_failed={failed})")
     print(f"ETA THÔ: 1 gen ~{dt:.1f}s -> ~{dt * GEN_PER_MODEL / 3600:.1f} h/model cho "
           f"{GEN_PER_MODEL} gen (CẬN TRÊN — chưa tính batching {BATCH_SIZE}, thực tế nhanh hơn nhiều). "
-          f"Nếu quá lâu: hạ REPS_OVERRIDE / LANGUAGES_OVERRIDE ở Cell 1, hoặc tách model.")
+          f"Nếu quá lâu: hạ REPS_OVERRIDE / LANGUAGES_OVERRIDE ở Cell 1, hoặc tách model/phiên.")
 
 
 def run_experiment_for_model(model_cfg, exp_name):
@@ -401,7 +503,10 @@ import traceback  # noqa: E402
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 manifest = {"sampling_seed_base": SAMPLING_SEED_BASE, "experiments": EXPERIMENTS,
-            "batch_size": BATCH_SIZE, "runs": []}
+            "batch_size": BATCH_SIZE,
+            "quantization": {m["short_name"]: (m.get("quantization", QUANTIZATION) or "auto-detect")
+                             for m in MODELS},
+            "runs": []}
 
 
 def _write_manifest():
@@ -436,7 +541,7 @@ _done = sum(1 for r in manifest["runs"] if r.get("n_games"))
 print(f"\nHoàn tất {_done} lượt (model × experiment). Chi tiết: run_manifest.json")
 
 # =====================================================================
-# CELL 7: Gộp mọi games.csv (so sánh chéo model × experiment)
+# CELL 7: Gộp mọi games.csv (so sánh chéo model × framing)
 # =====================================================================
 import pandas as pd  # noqa: E402
 
@@ -451,9 +556,11 @@ if _frames:
     combined = pd.concat(_frames, ignore_index=True)
     combined.to_csv(OUTPUT_DIR / "crsd_all_models.csv", index=False)
     print(f"Gộp {len(_frames)} file -> {OUTPUT_DIR / 'crsd_all_models.csv'} ({len(combined)} games).")
-    # Success-rate TÁCH theo từng nhánh. PHẢI tách language/memory_mode/framing, nếu
-    # không bảng sẽ TRUNG BÌNH NHẦM 2 nhánh ablation (full_history+scratchpad, baseline+framed).
-    idx = [c for c in ["model", "experiment", "persona_set", "language", "memory_mode", "framing"]
+    # Success-rate TÁCH theo từng nhánh. exp_riskframing giờ CHỈ 1 điều kiện nên
+    # `risk_framing`/`show_computed_totals` là hằng số (vẫn để trong idx cũng vô hại);
+    # trục phân tích thực sự còn lại là `risk_probability` × `language`.
+    idx = [c for c in ["model", "experiment", "persona_set", "language", "memory_mode",
+                       "framing", "risk_framing", "show_computed_totals"]
            if c in combined.columns]
     try:
         piv = combined.pivot_table(index=idx, columns="risk_probability",

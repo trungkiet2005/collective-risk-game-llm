@@ -52,7 +52,7 @@ print(piv.round(3).to_string())
 # choice distribution {0,2,4} from turns.jsonl
 def load_turns():
     rows=[]
-    for f in glob.glob(str(R/"open_source/exp_baseline/*/turns.jsonl")):
+    for f in glob.glob(str(R/"open_source/archive/exp_baseline/*/turns.jsonl")):
         m=f.replace("\\","/").split("/")[-2]
         for line in open(f,encoding="utf-8"):
             d=json.loads(line); rows.append((m,d["round"],d["contribution"],
@@ -83,7 +83,7 @@ print(gr.round(2).to_string())
 # ======================================================================
 banner("B0. Load comprehension summaries")
 frames=[]
-for f in glob.glob(str(R/"open_source/exp_comprehension/*/comprehension_summary.csv")):
+for f in glob.glob(str(R/"open_source/archive/exp_comprehension/*/comprehension_summary.csv")):
     m=f.replace("\\","/").split("/")[-2]
     df=pd.read_csv(f); frames.append(df)
 C=pd.concat(frames,ignore_index=True)
