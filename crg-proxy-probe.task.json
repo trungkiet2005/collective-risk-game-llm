@@ -1,0 +1,6 @@
+{
+  "versionNumber": 1,
+  "name": "crg-proxy-probe",
+  "description": "One cheap prompt to check whether a given proxy model actually serves.",
+  "definition": "@kbench.task(\n    name=\"crg-proxy-probe\",\n    description=\"One cheap prompt to check whether a given proxy model actually serves.\",\n)\ndef crg_proxy_probe(llm) -> dict:\n    with kbench.chats.new(\"probe\", orphan=True) as chat:\n        reply = llm.prompt(\"Reply with only the single word: OK\", temperature=0)\n    u = chat.usage\n    result = {\n        \"reply\": reply.strip()[:80],\n        \"input_tokens\": u.input_tokens,\n        \"output_tokens\": u.output_tokens,\n        \"cost_usd\": round((u.total_cost_nanodollars or 0) / 1e9, 6),\n    }\n    print(\"PROBE RESULT:\", result)\n    kbench.assertions.assert_equal(\n        True, bool(reply and reply.strip()),\n        expectation=\"Model returned a non-empty reply (it is reachable on this proxy)\")\n    return result\n"
+}

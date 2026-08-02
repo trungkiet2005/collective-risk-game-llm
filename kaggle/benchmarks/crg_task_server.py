@@ -90,7 +90,9 @@ REPS = int(os.environ.get("CRG_REPS", "10"))
 RESUME = os.environ.get("CRG_RESUME", "1").strip().lower() not in {
     "0", "false", "no", "off",
 }
-CHECKPOINT_SCHEMA_VERSION = 1
+# Bump whenever checkpoint compatibility changes. Version 2 invalidates shards
+# produced before re-auth was guaranteed to preserve the selected model.
+CHECKPOINT_SCHEMA_VERSION = 2
 
 # --- Kaggle push-validation guard ------------------------------------------
 # `kaggle b t push` executes the task ONCE on the server default model
@@ -307,8 +309,12 @@ def _reauth():
         load_dotenv(override=True)                   # pull the fresh MODEL_PROXY_API_KEY
     except Exception:
         pass
+    # `kaggle b auth` also rewrites LLM_DEFAULT in .env. Re-pin the task-selected
+    # model after loading the new credential or a long run can silently switch to
+    # the account default model at the first token refresh.
+    os.environ["LLM_DEFAULT"] = MODEL
     from kaggle_benchmarks.kaggle.models import load_default_model
-    _LLM = load_default_model()                      # uses LLM_DEFAULT (still set) + new key
+    _LLM = load_default_model()                      # selected MODEL + refreshed key
 
 
 def _call_llm(llm, prompt, seed, max_attempts=6):

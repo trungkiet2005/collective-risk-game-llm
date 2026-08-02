@@ -1,6 +1,7 @@
 import csv
 import importlib.util
 import json
+import os
 from pathlib import Path
 
 
@@ -66,3 +67,31 @@ def test_incompatible_or_partial_checkpoint_is_not_resumed(tmp_path, monkeypatch
     assert turns == []
     assert completed == set()
     assert stats == {"parse_failed": 0, "tok_in": 0, "tok_out": 0, "cost": 0}
+
+
+def test_reauth_preserves_selected_model(monkeypatch):
+    task = _load_task_module(monkeypatch)
+    selected = "anthropic/claude-haiku-4-5@20251001"
+    task.MODEL = selected
+
+    import dotenv
+    from kaggle_benchmarks.kaggle import models
+
+    monkeypatch.setattr(task.subprocess, "run", lambda *args, **kwargs: None)
+
+    def fake_load_dotenv(override=False):
+        assert override is True
+        os.environ["LLM_DEFAULT"] = "google/gemini-3-flash-preview"
+
+    observed = {}
+
+    def fake_load_default_model():
+        observed["model"] = os.environ["LLM_DEFAULT"]
+        return object()
+
+    monkeypatch.setattr(dotenv, "load_dotenv", fake_load_dotenv)
+    monkeypatch.setattr(models, "load_default_model", fake_load_default_model)
+
+    task._reauth()
+    assert observed["model"] == selected
+    assert os.environ["LLM_DEFAULT"] == selected

@@ -1,0 +1,29 @@
+{
+  "taskVersion": {
+    "versionNumber": 1,
+    "name": "crg-proxy-probe",
+    "description": "One cheap prompt to check whether a given proxy model actually serves.",
+    "definition": "@kbench.task(\n    name=\"crg-proxy-probe\",\n    description=\"One cheap prompt to check whether a given proxy model actually serves.\",\n)\ndef crg_proxy_probe(llm) -> dict:\n    with kbench.chats.new(\"probe\", orphan=True) as chat:\n        reply = llm.prompt(\"Reply with only the single word: OK\", temperature=0)\n    u = chat.usage\n    result = {\n        \"reply\": reply.strip()[:80],\n        \"input_tokens\": u.input_tokens,\n        \"output_tokens\": u.output_tokens,\n        \"cost_usd\": round((u.total_cost_nanodollars or 0) / 1e9, 6),\n    }\n    print(\"PROBE RESULT:\", result)\n    kbench.assertions.assert_equal(\n        True, bool(reply and reply.strip()),\n        expectation=\"Model returned a non-empty reply (it is reachable on this proxy)\")\n    return result\n"
+  },
+  "modelVersion": {
+    "slug": "anthropic/claude-haiku-4-5@20251001"
+  },
+  "state": "BENCHMARK_TASK_RUN_STATE_ERRORED",
+  "startTime": "2026-08-01T10:28:47.382849Z",
+  "endTime": "2026-08-01T10:28:49.833849Z",
+  "conversations": [
+    {
+      "id": "crg-proxy-probe-1f02623b",
+      "metrics": {},
+      "modelVersionSlug": "model_version_slug for conversation is DEPRECATED"
+    }
+  ],
+  "results": [
+    {
+      "type": "AGGREGATED",
+      "booleanResult": false
+    }
+  ],
+  "pyRunId": "crg-proxy-probe-Run #1",
+  "errorMessage": "Traceback (most recent call last):\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\kaggle_benchmarks\\tasks.py\", line 171, in run\n    run.result = self.func(*args, **kwargs)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AI_PhD\\GameTheory\\Colective_Risk_Game\\kaggle\\benchmarks\\proxy_probe_task.py\", line 26, in crg_proxy_probe\n    reply = llm.prompt(\"Reply with only the single word: OK\", temperature=0)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\kaggle_benchmarks\\actors\\llms.py\", line 259, in prompt\n    response = self.respond(schema=schema, **kwargs, **extra)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\kaggle_benchmarks\\chats.py\", line 124, in wrapper\n    result = func(self, *args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\kaggle_benchmarks\\actors\\llms.py\", line 326, in respond\n    invoke_response = self.invoke(\n                      ^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\kaggle_benchmarks\\actors\\llms.py\", line 457, in invoke\n    return self._call_api(raw_messages, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\kaggle_benchmarks\\actors\\llms.py\", line 508, in _call_api\n    response = method(\n               ^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_utils\\_utils.py\", line 279, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\resources\\chat\\completions\\completions.py\", line 914, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_base_client.py\", line 1247, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_base_client.py\", line 920, in request\n    return self._request(\n           ^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_base_client.py\", line 1013, in _request\n    return self._retry_request(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_base_client.py\", line 1062, in _retry_request\n    return self._request(\n           ^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_base_client.py\", line 1013, in _request\n    return self._retry_request(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_base_client.py\", line 1062, in _retry_request\n    return self._request(\n           ^^^^^^^^^^^^^^\n  File \"C:\\Users\\huynh\\anaconda3\\Lib\\site-packages\\openai\\_base_client.py\", line 1028, in _request\n    raise self._make_status_error_from_response(err.response) from None\nopenai.InternalServerError: Error code: 503 - {'code': '', 'message': 'The requested model is currently unavailable.', 'param': '', 'type': 'server_error'}\n"
+}
