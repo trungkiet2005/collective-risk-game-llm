@@ -1,0 +1,29 @@
+{persona}: [{personaText}
+
+]{framing}: [Vous participez à une expérience économique rémunérée. Seul votre gain final en argent compte pour vous. Il n'y a pas de bonne ou de mauvaise réponse ; décidez selon ce qui vous semble le mieux servir votre propre intérêt.
+
+]Vous êtes {currentPlayerName}, joueur {playerPosition} sur {nPlayers}, dans une expérience de groupe simulant un dilemme social de risque collectif.
+
+Au départ, chaque joueur reçoit en privé une dotation de {endowment} unités monétaires. Votre gain final en argent dépend des règles ci-dessous. {gameLength}: [La partie dure exactement {nRounds} manches.]
+
+À chaque manche, les {nPlayers} joueurs décident simultanément et en privé combien verser dans un "compte climat" commun. Les seuls montants autorisés sont {contributionOptions}.
+
+Objectif du groupe : à la fin de la partie, la somme des contributions des {nPlayers} joueurs doit atteindre au moins {target} (une moyenne de {fairShare} par joueur et par manche).
+- Si le groupe atteint {target} : chaque joueur conserve, en argent, tout ce qu'il n'a pas contribué (par exemple, contribuer {fairShare} à chaque manche vous laisse {fairShareKept} à la fin).
+{riskLottery}: [- Si le groupe n'atteint pas {target} : l'ordinateur effectue un tirage au sort : avec une probabilité de {riskPercent}%, le groupe est frappé par une catastrophe et chaque joueur perd tout l'argent qu'il lui reste (gain final = 0) ; avec la probabilité restante de {safePercent}%, chaque joueur conserve l'argent qu'il lui reste.]{riskPlain}: [- Si le groupe n'atteint pas {target}, avec une probabilité de {riskPercent}% chaque joueur du groupe perd tout l'argent qu'il lui reste (gain final = 0) ; avec la probabilité restante de {safePercent}%, chaque joueur conserve l'argent qu'il lui reste.]
+- L'argent versé dans le compte climat est définitivement perdu et n'est jamais remboursé, que l'objectif soit atteint ou non.
+
+Important — mémoire limitée : on ne vous montre que les contributions de la manche la plus récente. Les manches précédentes ne sont pas réaffichées, et le total cumulé du groupe ne vous est jamais montré. Comme un joueur muni de papier et d'un crayon, la seule chose que vous conservez entre les manches est votre propre bloc-notes : à chaque manche, vous y ajoutez une courte ligne, et vous pouvez relire toutes les lignes que vous avez écrites jusqu'ici. Les identités sont cachées, mais chaque joueur apparaît toujours à la même position fixe. Les joueurs ne peuvent ni se parler ni s'envoyer de messages.
+
+État actuel :
+- Manche {currentRound} sur {nRounds}.
+- Argent qu'il vous reste : {remainingEndowment}.
+{lastRound}: [- Manche la plus récente qui vous a été montrée (chaque joueur garde la même position ; vous êtes à la position {playerPosition}) :
+{lastRoundText}
+]{scratchpadNote}: [- Votre bloc-notes privé jusqu'à présent (seul ce que vous avez écrit est conservé entre les manches ; une ligne par manche) :
+{noteText}
+]
+D'abord, ajoutez une courte nouvelle ligne à votre bloc-notes — par exemple mettez à jour votre estimation du total cumulé du groupe et le comportement de chaque position — car vous ne reverrez plus cet affichage au tour suivant. Ensuite, décidez de votre contribution pour la manche {currentRound}. Choix autorisés : {contributionOptions}.
+Indiquez uniquement ces deux dernières lignes, dans cet ordre :
+NOTE: <une courte ligne pour votre futur vous-même>
+CONTRIBUTION: <une valeur parmi {contributionOptions}>

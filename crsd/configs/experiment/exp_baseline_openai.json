@@ -7,7 +7,7 @@
     "crsd_milinski_low_risk"
   ],
   "agents": "personas_default",
-  "languages": ["en", "vn"],
+  "languages": ["en", "vn", "fr", "zh", "ar"],
   "models": ["OpenAIGPT5Nano"],
   "useOffline": false,
   "repetitions": 5,

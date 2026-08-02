@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from typing import Callable, List, Optional, Tuple
 
 from . import scoring
-from .prompt import _fmt
+from .prompt import _fmt, _lang
 from .state import ComprehensionRecord
 
 
@@ -57,12 +57,17 @@ def _parse_int_set(captured: str) -> Tuple[Optional[set], bool]:
     return set(int(x) for x in nums), False
 
 
+_NO_MARKERS = ("không", "chưa", "non", "否", "没有", "不", "لا")
+_YES_MARKERS = ("có", "rồi", "đã đạt", "oui", "是", "已", "有", "نعم")
+
+
 def _parse_yesno(captured: str) -> Tuple[Optional[bool], bool]:
     s = captured.strip().lower()
-    # Phủ định trước (tránh 'không' bị 'có'/'yes' nuốt — 'không' không chứa 'có').
-    if "không" in s or "chưa" in s or re.search(r"\bno\b", s):
+    # Phủ định trước (tránh dấu hiệu "có/yes" bị nuốt bởi câu phủ định chứa nó,
+    # vd zh "不是" chứa "是" nhưng phải chấm là "không" vì bắt được "不" trước).
+    if re.search(r"\bno\b", s) or any(m in s for m in _NO_MARKERS):
         return False, False
-    if "có" in s or "rồi" in s or "đã đạt" in s or "yes" in s:
+    if re.search(r"\byes\b", s) or any(m in s for m in _YES_MARKERS):
         return True, False
     return None, True
 
@@ -145,10 +150,14 @@ def _select_rounds(num_past: int, cap: Optional[int]) -> List[int]:
 
 
 def _seat_label(x_pos: int, player_index: int, language: str) -> str:
-    """Nhãn vị trí 'P{x}', thêm '(you)/(bạn)' nếu là ghế đang được probe."""
+    """Nhãn vị trí 'P{x}', thêm marker 'bạn/you/vous/你/أنت' nếu là ghế đang probe.
+
+    Tái dùng bảng ``_LANG_STRINGS`` của prompt.py (key "you") để khỏi lặp danh sách
+    ngôn ngữ hỗ trợ ở hai chỗ.
+    """
     base = f"P{x_pos}"
     if x_pos - 1 == player_index:
-        return base + (" (bạn)" if language == "vn" else " (you)")
+        return base + " " + _lang(language)["you"]
     return base
 
 
@@ -223,169 +232,276 @@ def _own_total(H, pi) -> int:
     return int(sum(row[pi] for row in H))
 
 
-# ----- render helpers (EN/VN) -----
+# ----- render helpers (EN/VN/FR/ZH/AR) -----
 
 def _opts_str(cfg) -> str:
     return ", ".join(_fmt(o) for o in cfg.contribution_options)
+
+
+def _tr(lang: str, strings: dict) -> str:
+    """Chọn chuỗi câu hỏi theo ngôn ngữ, fallback English nếu thiếu bản dịch.
+
+    Dùng cùng ``_Q_TEXT`` dưới đây cho MỌI QuestionSpec -> thêm ngôn ngữ mới chỉ
+    cần thêm key vào từng entry, không phải sửa logic từng lambda.
+    """
+    return strings.get(lang, strings["en"])
+
+
+# Bảng câu hỏi đọc-hiểu theo 5 ngôn ngữ. Câu có tham số ({i}/{seat}/{n}/{pnum}/{p})
+# là chuỗi .format()-able; render lambda truyền tham số vào sau khi _tr() chọn ngôn ngữ.
+_Q_TEXT = {
+    "rules_actions": {
+        "en": "Which contribution amounts are you allowed to choose each round?",
+        "vn": "Mỗi vòng bạn được phép chọn những mức đóng góp nào?",
+        "fr": "Quelles sont les montants de contribution que vous pouvez choisir à chaque manche ?",
+        "zh": "每一轮你可以选择哪些投入金额？",
+        "ar": "ما هي مبالغ المساهمة المسموح لك باختيارها في كل جولة؟",
+    },
+    "rules_endowment": {
+        "en": "How many monetary units did each player receive as their starting endowment?",
+        "vn": "Mỗi người chơi nhận bao nhiêu đơn vị tiền làm vốn ban đầu?",
+        "fr": "Combien d'unités monétaires chaque joueur a-t-il reçu comme dotation de départ ?",
+        "zh": "每位玩家获得了多少个货币单位作为初始资金？",
+        "ar": "كم عدد الوحدات النقدية التي حصل عليها كل لاعب كمخصصات ابتدائية؟",
+    },
+    "rules_target": {
+        "en": "What combined total must all players reach by the end of the game to avoid the risk?",
+        "vn": "Tổng đóng góp của tất cả người chơi phải đạt ít nhất bao nhiêu vào cuối trò chơi để tránh rủi ro?",
+        "fr": "Quel total combiné tous les joueurs doivent-ils atteindre d'ici la fin de la partie pour éviter le risque ?",
+        "zh": "到游戏结束时，全体玩家的总投入必须达到多少才能避免风险？",
+        "ar": "ما هو المجموع الذي يجب أن يصل إليه جميع اللاعبين بحلول نهاية اللعبة لتجنب المخاطرة؟",
+    },
+    "rules_n_rounds": {
+        "en": "How many rounds does the game last in total?",
+        "vn": "Trò chơi kéo dài tổng cộng bao nhiêu vòng?",
+        "fr": "Combien de manches dure la partie au total ?",
+        "zh": "游戏总共持续多少轮？",
+        "ar": "كم عدد الجولات التي تستمر فيها اللعبة إجمالاً؟",
+    },
+    "rules_risk_pct": {
+        "en": "If the group does NOT reach the target, what is the percent chance (0-100) that everyone loses all of their remaining money?",
+        "vn": "Nếu nhóm KHÔNG đạt mục tiêu, xác suất (theo phần trăm, 0-100) mọi người mất hết số tiền còn lại là bao nhiêu?",
+        "fr": "Si le groupe n'atteint PAS l'objectif, quelle est la probabilité (en pourcentage, 0-100) que tout le monde perde tout l'argent qu'il lui reste ?",
+        "zh": "如果小组未达到目标，所有人失去剩余全部资金的概率（百分比，0-100）是多少？",
+        "ar": "إذا لم تحقق المجموعة الهدف، ما هي نسبة الاحتمال (0-100) أن يخسر الجميع كل ما تبقى من أموالهم؟",
+    },
+    "rules_payoff_disaster": {
+        "en": "If the group fails to reach the target and the disaster does strike, what is your final cash payoff?",
+        "vn": "Nếu nhóm không đạt mục tiêu và thảm hoạ XẢY RA, số tiền mặt cuối cùng của bạn là bao nhiêu?",
+        "fr": "Si le groupe n'atteint pas l'objectif et que la catastrophe SURVIENT, quel est votre gain final en argent ?",
+        "zh": "如果小组未达到目标且灾难确实发生了，你最终的现金收益是多少？",
+        "ar": "إذا لم تحقق المجموعة الهدف ووقعت الكارثة فعلاً، ما هو صافي ربحك النقدي النهائي؟",
+    },
+    "rules_max_contrib": {
+        "en": "What is the largest amount any single player may put into the climate account in one round?",
+        "vn": "Mức LỚN NHẤT mà một người chơi có thể bỏ vào quỹ khí hậu trong một vòng là bao nhiêu?",
+        "fr": "Quel est le montant le PLUS ÉLEVÉ qu'un seul joueur peut verser dans le compte climat en une manche ?",
+        "zh": "单个玩家在一轮中最多可以向气候账户投入多少？",
+        "ar": "ما هو أكبر مبلغ يمكن لأي لاعب واحد وضعه في حساب المناخ في جولة واحدة؟",
+    },
+    "rules_min_contrib": {
+        "en": "What is the smallest amount any single player may put into the climate account in one round?",
+        "vn": "Mức NHỎ NHẤT mà một người chơi có thể bỏ vào quỹ khí hậu trong một vòng là bao nhiêu?",
+        "fr": "Quel est le montant le PLUS FAIBLE qu'un seul joueur peut verser dans le compte climat en une manche ?",
+        "zh": "单个玩家在一轮中最少可以向气候账户投入多少？",
+        "ar": "ما هو أصغر مبلغ يمكن لأي لاعب واحد وضعه في حساب المناخ في جولة واحدة؟",
+    },
+    "time_round": {
+        "en": "Which round is the game currently in (the round you are about to play)?",
+        "vn": "Trò chơi hiện đang ở vòng nào (vòng bạn sắp chơi)?",
+        "fr": "À quelle manche la partie en est-elle actuellement (la manche que vous allez jouer) ?",
+        "zh": "游戏目前正处于第几轮（你即将进行的这一轮）？",
+        "ar": "في أي جولة تجري اللعبة حاليًا (الجولة التي أنت على وشك لعبها)؟",
+    },
+    "time_action_i": {
+        "en": "In round {i}, how much did the player in position {seat} put into the climate account?",
+        "vn": "Ở vòng {i}, người chơi ở vị trí {seat} đã bỏ bao nhiêu vào quỹ khí hậu?",
+        "fr": "À la manche {i}, combien le joueur en position {seat} a-t-il versé dans le compte climat ?",
+        "zh": "在第{i}轮，位于{seat}位置的玩家向气候账户投入了多少？",
+        "ar": "في الجولة {i}، كم ساهم اللاعب في الموضع {seat} في حساب المناخ؟",
+    },
+    "time_own_action_i": {
+        "en": "In round {i}, how much did YOU (position P{pnum}) put into the climate account?",
+        "vn": "Ở vòng {i}, BẠN (vị trí P{pnum}) đã bỏ bao nhiêu vào quỹ khí hậu?",
+        "fr": "À la manche {i}, combien VOUS (position P{pnum}) avez-vous versé dans le compte climat ?",
+        "zh": "在第{i}轮，你（位置P{pnum}）向气候账户投入了多少？",
+        "ar": "في الجولة {i}، كم ساهمتَ أنت (الموضع P{pnum}) في حساب المناخ؟",
+    },
+    "time_round_total_i": {
+        "en": "In round {i}, what was the combined total that all {n} players put into the climate account?",
+        "vn": "Ở vòng {i}, tổng số tiền mà cả {n} người chơi bỏ vào quỹ khí hậu là bao nhiêu?",
+        "fr": "À la manche {i}, quel était le total combiné versé dans le compte climat par les {n} joueurs ?",
+        "zh": "在第{i}轮，全体{n}名玩家向气候账户投入的总额是多少？",
+        "ar": "في الجولة {i}، ما هو المجموع الذي وضعه جميع اللاعبين الـ{n} في حساب المناخ؟",
+    },
+    "state_pool": {
+        "en": "Across all rounds played so far, what is the total amount currently in the climate account (all players combined)?",
+        "vn": "Tính tất cả các vòng đã chơi đến giờ, hiện quỹ khí hậu có tổng cộng bao nhiêu (gộp mọi người chơi)?",
+        "fr": "En comptant toutes les manches jouées jusqu'à présent, quel est le montant total actuellement dans le compte climat (tous joueurs confondus) ?",
+        "zh": "计算到目前为止已进行的所有轮次，气候账户目前的总金额（所有玩家合计）是多少？",
+        "ar": "بحساب جميع الجولات الملعوبة حتى الآن، ما هو المبلغ الإجمالي الموجود حاليًا في حساب المناخ (جميع اللاعبين مجتمعين)؟",
+    },
+    "state_remaining_to_target": {
+        "en": "How much more must the group still put into the climate account to reach the target?",
+        "vn": "Nhóm còn phải bỏ thêm bao nhiêu nữa vào quỹ khí hậu để đạt mục tiêu?",
+        "fr": "Combien le groupe doit-il encore verser dans le compte climat pour atteindre l'objectif ?",
+        "zh": "小组还需要向气候账户再投入多少才能达到目标？",
+        "ar": "كم يجب أن تضع المجموعة أيضًا في حساب المناخ للوصول إلى الهدف؟",
+    },
+    "state_X_total": {
+        "en": "Across all rounds so far, what is the total amount the player in position {seat} has put into the climate account?",
+        "vn": "Tính tất cả các vòng đến giờ, người chơi ở vị trí {seat} đã bỏ tổng cộng bao nhiêu vào quỹ khí hậu?",
+        "fr": "En comptant toutes les manches jusqu'à présent, quel est le montant total versé dans le compte climat par le joueur en position {seat} ?",
+        "zh": "计算到目前为止的所有轮次，位于{seat}位置的玩家总共向气候账户投入了多少？",
+        "ar": "بحساب جميع الجولات حتى الآن، ما هو المبلغ الإجمالي الذي وضعه اللاعب في الموضع {seat} في حساب المناخ؟",
+    },
+    "state_own_total": {
+        "en": "Across all rounds so far, what is the total amount YOU (position P{pnum}) have put into the climate account?",
+        "vn": "Tính tất cả các vòng đến giờ, BẠN (vị trí P{pnum}) đã bỏ tổng cộng bao nhiêu vào quỹ khí hậu?",
+        "fr": "En comptant toutes les manches jusqu'à présent, quel est le montant total que VOUS (position P{pnum}) avez versé dans le compte climat ?",
+        "zh": "计算到目前为止的所有轮次，你（位置P{pnum}）总共向气候账户投入了多少？",
+        "ar": "بحساب جميع الجولات حتى الآن، ما هو المبلغ الإجمالي الذي وضعتَه أنت (الموضع P{pnum}) في حساب المناخ؟",
+    },
+    "state_own_remaining": {
+        "en": "Right now, how much of your own endowment do you have left (the part not yet contributed)?",
+        "vn": "Ngay lúc này, bạn còn lại bao nhiêu trong khoản vốn của mình (phần chưa đóng góp)?",
+        "fr": "En ce moment, combien vous reste-t-il de votre propre dotation (la part non encore contribuée) ?",
+        "zh": "现在，你自己的资金还剩多少（尚未投入的部分）？",
+        "ar": "الآن، كم تبقى من مخصصاتك الخاصة (الجزء الذي لم تساهم به بعد)؟",
+    },
+    "state_count_p": {
+        "en": "Across all rounds so far, how many times has the player in position {seat} contributed exactly {p}?",
+        "vn": "Tính tất cả các vòng đến giờ, người chơi ở vị trí {seat} đã đóng đúng {p} bao nhiêu lần?",
+        "fr": "En comptant toutes les manches jusqu'à présent, combien de fois le joueur en position {seat} a-t-il contribué exactement {p} ?",
+        "zh": "计算到目前为止的所有轮次，位于{seat}位置的玩家恰好投入{p}的次数是多少？",
+        "ar": "بحساب جميع الجولات حتى الآن، كم مرة ساهم اللاعب في الموضع {seat} بمبلغ {p} بالضبط؟",
+    },
+    "state_rounds_left": {
+        "en": "Including the current round, how many rounds are left to play?",
+        "vn": "Tính CẢ vòng hiện tại, còn lại bao nhiêu vòng để chơi?",
+        "fr": "En comptant la manche actuelle, combien de manches reste-t-il à jouer ?",
+        "zh": "包括当前这一轮，还剩多少轮要玩？",
+        "ar": "بما في ذلك الجولة الحالية، كم عدد الجولات المتبقية للعب؟",
+    },
+    "state_target_reached": {
+        "en": "Has the group already reached the target? Answer yes or no.",
+        "vn": "Nhóm đã đạt mục tiêu chưa? Trả lời có hoặc không.",
+        "fr": "Le groupe a-t-il déjà atteint l'objectif ? Répondez par oui ou non.",
+        "zh": "小组是否已经达到目标？请回答是或否。",
+        "ar": "هل حققت المجموعة الهدف بالفعل؟ أجب بنعم أو لا.",
+    },
+}
 
 
 REGISTRY: List[QuestionSpec] = [
     # ===================== RULES (đáp án in sẵn trong luật) =====================
     QuestionSpec(
         "rules_actions", "rules", "int_set",
-        lambda cfg, H, r, pi, p, lang: (
-            "Mỗi vòng bạn được phép chọn những mức đóng góp nào?" if lang == "vn"
-            else "Which contribution amounts are you allowed to choose each round?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_actions"]),
         lambda cfg, H, r, pi, p: set(int(o) for o in cfg.contribution_options),
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "rules_endowment", "rules", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Mỗi người chơi nhận bao nhiêu đơn vị tiền làm vốn ban đầu?" if lang == "vn"
-            else "How many monetary units did each player receive as their starting endowment?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_endowment"]),
         lambda cfg, H, r, pi, p: int(round(cfg.endowment)),
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "rules_target", "rules", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Tổng đóng góp của tất cả người chơi phải đạt ít nhất bao nhiêu vào cuối trò chơi để tránh rủi ro?"
-            if lang == "vn" else
-            "What combined total must all players reach by the end of the game to avoid the risk?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_target"]),
         lambda cfg, H, r, pi, p: int(round(cfg.target)),
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "rules_n_rounds", "rules", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Trò chơi kéo dài tổng cộng bao nhiêu vòng?" if lang == "vn"
-            else "How many rounds does the game last in total?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_n_rounds"]),
         lambda cfg, H, r, pi, p: int(cfg.n_rounds),
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "rules_risk_pct", "rules", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Nếu nhóm KHÔNG đạt mục tiêu, xác suất (theo phần trăm, 0-100) mọi người mất hết số tiền còn lại là bao nhiêu?"
-            if lang == "vn" else
-            "If the group does NOT reach the target, what is the percent chance (0-100) that everyone loses all of their remaining money?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_risk_pct"]),
         lambda cfg, H, r, pi, p: int(round(cfg.risk_probability * 100)),
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "rules_payoff_disaster", "rules", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Nếu nhóm không đạt mục tiêu và thảm hoạ XẢY RA, số tiền mặt cuối cùng của bạn là bao nhiêu?"
-            if lang == "vn" else
-            "If the group fails to reach the target and the disaster does strike, what is your final cash payoff?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_payoff_disaster"]),
         lambda cfg, H, r, pi, p: 0,
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "rules_max_contrib", "rules", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Mức LỚN NHẤT mà một người chơi có thể bỏ vào quỹ khí hậu trong một vòng là bao nhiêu?"
-            if lang == "vn" else
-            "What is the largest amount any single player may put into the climate account in one round?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_max_contrib"]),
         lambda cfg, H, r, pi, p: int(max(cfg.contribution_options)),
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "rules_min_contrib", "rules", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Mức NHỎ NHẤT mà một người chơi có thể bỏ vào quỹ khí hậu trong một vòng là bao nhiêu?"
-            if lang == "vn" else
-            "What is the smallest amount any single player may put into the climate account in one round?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["rules_min_contrib"]),
         lambda cfg, H, r, pi, p: int(min(cfg.contribution_options)),
         _enum_none, lambda cfg: True),
 
     # ===================== TIME (tra cứu lịch sử) =====================
     QuestionSpec(
         "time_round", "time", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Trò chơi hiện đang ở vòng nào (vòng bạn sắp chơi)?" if lang == "vn"
-            else "Which round is the game currently in (the round you are about to play)?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["time_round"]),
         lambda cfg, H, r, pi, p: int(r),
         _enum_none, lambda cfg: True),
     QuestionSpec(
         "time_action_i", "time", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            f"Ở vòng {p['i']}, người chơi ở vị trí {_seat_label(p['x'], pi, lang)} đã bỏ bao nhiêu vào quỹ khí hậu?"
-            if lang == "vn" else
-            f"In round {p['i']}, how much did the player in position {_seat_label(p['x'], pi, lang)} put into the climate account?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["time_action_i"]).format(
+            i=p["i"], seat=_seat_label(p["x"], pi, lang)),
         lambda cfg, H, r, pi, p: int(H[p["i"] - 1][p["x"] - 1]),
         _enum_time_action, lambda cfg: bool(cfg.show_individual_contributions)),
     QuestionSpec(
         "time_own_action_i", "time", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            f"Ở vòng {p['i']}, BẠN (vị trí P{pi + 1}) đã bỏ bao nhiêu vào quỹ khí hậu?"
-            if lang == "vn" else
-            f"In round {p['i']}, how much did YOU (position P{pi + 1}) put into the climate account?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["time_own_action_i"]).format(
+            i=p["i"], pnum=pi + 1),
         lambda cfg, H, r, pi, p: int(H[p["i"] - 1][pi]),
         _enum_time_rounds, lambda cfg: bool(cfg.show_individual_contributions)),
     QuestionSpec(
         "time_round_total_i", "time", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            f"Ở vòng {p['i']}, tổng số tiền mà cả {cfg.n_players} người chơi bỏ vào quỹ khí hậu là bao nhiêu?"
-            if lang == "vn" else
-            f"In round {p['i']}, what was the combined total that all {cfg.n_players} players put into the climate account?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["time_round_total_i"]).format(
+            i=p["i"], n=cfg.n_players),
         lambda cfg, H, r, pi, p: int(scoring.group_total(H[p["i"] - 1])),
         _enum_time_rounds, lambda cfg: False),
 
     # ===================== STATE (thống kê tích luỹ — phần lớn phải tự cộng) =====================
     QuestionSpec(
         "state_pool", "state", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Tính tất cả các vòng đã chơi đến giờ, hiện quỹ khí hậu có tổng cộng bao nhiêu (gộp mọi người chơi)?"
-            if lang == "vn" else
-            "Across all rounds played so far, what is the total amount currently in the climate account (all players combined)?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_pool"]),
         lambda cfg, H, r, pi, p: _pool(H),
         _enum_scalar_state, lambda cfg: bool(cfg.show_cumulative)),
     QuestionSpec(
         "state_remaining_to_target", "state", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Nhóm còn phải bỏ thêm bao nhiêu nữa vào quỹ khí hậu để đạt mục tiêu?" if lang == "vn"
-            else "How much more must the group still put into the climate account to reach the target?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_remaining_to_target"]),
         lambda cfg, H, r, pi, p: int(max(0, int(round(cfg.target)) - _pool(H))),
         _enum_scalar_state, lambda cfg: False),
     QuestionSpec(
         "state_X_total", "state", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            f"Tính tất cả các vòng đến giờ, người chơi ở vị trí {_seat_label(p['x'], pi, lang)} đã bỏ tổng cộng bao nhiêu vào quỹ khí hậu?"
-            if lang == "vn" else
-            f"Across all rounds so far, what is the total amount the player in position {_seat_label(p['x'], pi, lang)} has put into the climate account?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_X_total"]).format(
+            seat=_seat_label(p["x"], pi, lang)),
         lambda cfg, H, r, pi, p: int(sum(row[p["x"] - 1] for row in H)),
         _enum_state_x_total, lambda cfg: False),
     QuestionSpec(
         "state_own_total", "state", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            f"Tính tất cả các vòng đến giờ, BẠN (vị trí P{pi + 1}) đã bỏ tổng cộng bao nhiêu vào quỹ khí hậu?"
-            if lang == "vn" else
-            f"Across all rounds so far, what is the total amount YOU (position P{pi + 1}) have put into the climate account?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_own_total"]).format(pnum=pi + 1),
         lambda cfg, H, r, pi, p: _own_total(H, pi),
         _enum_scalar_state, lambda cfg: False),
     QuestionSpec(
         "state_own_remaining", "state", "int",   # CONTROL: số này IN SẴN trong prompt
-        lambda cfg, H, r, pi, p, lang: (
-            "Ngay lúc này, bạn còn lại bao nhiêu trong khoản vốn của mình (phần chưa đóng góp)?"
-            if lang == "vn" else
-            "Right now, how much of your own endowment do you have left (the part not yet contributed)?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_own_remaining"]),
         lambda cfg, H, r, pi, p: int(round(scoring.player_remaining(cfg.endowment, _own_total(H, pi)))),
         _enum_scalar_state, lambda cfg: True),
     QuestionSpec(
         "state_count_p", "state", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            f"Tính tất cả các vòng đến giờ, người chơi ở vị trí {_seat_label(p['x'], pi, lang)} đã đóng đúng {_fmt(p['p'])} bao nhiêu lần?"
-            if lang == "vn" else
-            f"Across all rounds so far, how many times has the player in position {_seat_label(p['x'], pi, lang)} contributed exactly {_fmt(p['p'])}?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_count_p"]).format(
+            seat=_seat_label(p["x"], pi, lang), p=_fmt(p["p"])),
         lambda cfg, H, r, pi, p: int(sum(1 for row in H if int(row[p["x"] - 1]) == int(p["p"]))),
         _enum_state_count, lambda cfg: False),
     QuestionSpec(
         "state_rounds_left", "state", "int",
-        lambda cfg, H, r, pi, p, lang: (
-            "Tính CẢ vòng hiện tại, còn lại bao nhiêu vòng để chơi?" if lang == "vn"
-            else "Including the current round, how many rounds are left to play?"),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_rounds_left"]),
         lambda cfg, H, r, pi, p: int(cfg.n_rounds - r + 1),
         _enum_scalar_state, lambda cfg: False),
     QuestionSpec(
         "state_target_reached", "state", "yesno",
-        lambda cfg, H, r, pi, p, lang: (
-            "Nhóm đã đạt mục tiêu chưa? Trả lời có hoặc không." if lang == "vn"
-            else "Has the group already reached the target? Answer yes or no."),
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["state_target_reached"]),
         lambda cfg, H, r, pi, p: bool(_pool(H) >= int(round(cfg.target))),
         _enum_scalar_state, lambda cfg: False),
 ]

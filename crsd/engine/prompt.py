@@ -21,6 +21,57 @@ from typing import List
 
 _BLOCK_RE = re.compile(r"\{(\w+)\}:\s*\[(.*?)\]", re.DOTALL)
 
+# Chuỗi phụ thuộc ngôn ngữ dùng để dựng lịch sử/sổ tay động (KHÔNG phải phần
+# template tĩnh — những đoạn đó nằm trong crsd_{lang}.txt). Mỗi ngôn ngữ mới
+# thêm vào đây là đủ để build_history_text/build_window_text/build_notepad_text/
+# build_per_player_totals hỗ trợ ngôn ngữ đó; không cần sửa logic.
+_LANG_STRINGS = {
+    "en": {
+        "you": "(you)",
+        "round_label": lambda n: f"Round {n}",
+        "contributed": lambda own, total: f"you contributed {own}; group round total {total}",
+        "cum_inline": lambda c: f" (cumulative {c}).",
+        "cum_suffix": lambda c: f"; cumulative {c}.",
+        "period": ".",
+    },
+    "vn": {
+        "you": "(bạn)",
+        "round_label": lambda n: f"Vòng {n}",
+        "contributed": lambda own, total: f"bạn đóng {own}; tổng nhóm vòng này {total}",
+        "cum_inline": lambda c: f" (tích luỹ {c}).",
+        "cum_suffix": lambda c: f"; tích luỹ {c}.",
+        "period": ".",
+    },
+    "fr": {
+        "you": "(vous)",
+        "round_label": lambda n: f"Manche {n}",
+        "contributed": lambda own, total: f"vous avez contribué {own} ; total du groupe pour cette manche {total}",
+        "cum_inline": lambda c: f" (cumulé {c}).",
+        "cum_suffix": lambda c: f" ; cumulé {c}.",
+        "period": ".",
+    },
+    "zh": {
+        "you": "(你)",
+        "round_label": lambda n: f"第{n}轮",
+        "contributed": lambda own, total: f"你贡献了{own}；本轮小组总额为{total}",
+        "cum_inline": lambda c: f"（累计{c}）。",
+        "cum_suffix": lambda c: f"；累计{c}。",
+        "period": "。",
+    },
+    "ar": {
+        "you": "(أنت)",
+        "round_label": lambda n: f"الجولة {n}",
+        "contributed": lambda own, total: f"لقد ساهمت بـ{own}؛ إجمالي المجموعة لهذه الجولة {total}",
+        "cum_inline": lambda c: f" (تراكمي {c}).",
+        "cum_suffix": lambda c: f"؛ تراكمي {c}.",
+        "period": ".",
+    },
+}
+
+
+def _lang(language: str) -> dict:
+    return _LANG_STRINGS.get(language, _LANG_STRINGS["en"])
+
 
 def _fmt(x) -> str:
     """40.0 -> '40'; 0.9 -> '0.9' (tránh đuôi .0 thừa trong prompt)."""
@@ -48,6 +99,7 @@ def build_history_text(history: List[List[float]], player_index: int, cfg, langu
     if not history:
         return ""
     show_cum = getattr(cfg, "show_cumulative", False)
+    L = _lang(language)
     lines: List[str] = []
     cumulative = 0.0
     for r, round_contribs in enumerate(history, start=1):
@@ -56,22 +108,14 @@ def build_history_text(history: List[List[float]], player_index: int, cfg, langu
         own = round_contribs[player_index]
         if cfg.show_individual_contributions:
             labeled = ", ".join(
-                f"P{i + 1}{('(bạn)' if language == 'vn' else '(you)') if i == player_index else ''}={_fmt(c)}"
+                f"P{i + 1}{L['you'] if i == player_index else ''}={_fmt(c)}"
                 for i, c in enumerate(round_contribs)
             )
-            if language == "vn":
-                line = f"Vòng {r}: {labeled}"
-                line += f" (tích luỹ {_fmt(cumulative)})." if show_cum else "."
-            else:
-                line = f"Round {r}: {labeled}"
-                line += f" (cumulative {_fmt(cumulative)})." if show_cum else "."
+            line = f"{L['round_label'](r)}: {labeled}"
+            line += L["cum_inline"](_fmt(cumulative)) if show_cum else L["period"]
         else:
-            if language == "vn":
-                line = f"Vòng {r}: bạn đóng {_fmt(own)}; tổng nhóm vòng này {_fmt(total)}"
-                line += f"; tích luỹ {_fmt(cumulative)}." if show_cum else "."
-            else:
-                line = f"Round {r}: you contributed {_fmt(own)}; group round total {_fmt(total)}"
-                line += f"; cumulative {_fmt(cumulative)}." if show_cum else "."
+            line = f"{L['round_label'](r)}: {L['contributed'](_fmt(own), _fmt(total))}"
+            line += L["cum_suffix"](_fmt(cumulative)) if show_cum else L["period"]
         lines.append(line)
     return "\n".join(lines)
 
@@ -90,7 +134,7 @@ def build_per_player_totals(history, player_index, cfg, language) -> str:
         for i, c in enumerate(round_contribs):
             if i < n:
                 totals[i] += c
-    you = "(bạn)" if language == "vn" else "(you)"
+    you = _lang(language)["you"]
     parts = [
         f"P{i + 1}{you if i == player_index else ''}={_fmt(totals[i])}"
         for i in range(n)
@@ -109,6 +153,7 @@ def build_window_text(history, player_index, cfg, language, window):
         return ""
     window = max(1, int(window))
     start = max(0, len(history) - window)
+    L = _lang(language)
     lines: List[str] = []
     for r in range(start, len(history)):
         round_contribs = history[r]
@@ -116,19 +161,15 @@ def build_window_text(history, player_index, cfg, language, window):
         round_no = r + 1
         if cfg.show_individual_contributions:
             labeled = ", ".join(
-                f"P{i + 1}{('(bạn)' if language == 'vn' else '(you)') if i == player_index else ''}={_fmt(c)}"
+                f"P{i + 1}{L['you'] if i == player_index else ''}={_fmt(c)}"
                 for i, c in enumerate(round_contribs)
             )
-            if language == "vn":
-                lines.append(f"Vòng {round_no}: {labeled}.")
-            else:
-                lines.append(f"Round {round_no}: {labeled}.")
+            lines.append(f"{L['round_label'](round_no)}: {labeled}{L['period']}")
         else:
             own = round_contribs[player_index]
-            if language == "vn":
-                lines.append(f"Vòng {round_no}: bạn đóng {_fmt(own)}; tổng nhóm vòng này {_fmt(total)}.")
-            else:
-                lines.append(f"Round {round_no}: you contributed {_fmt(own)}; group round total {_fmt(total)}.")
+            lines.append(
+                f"{L['round_label'](round_no)}: {L['contributed'](_fmt(own), _fmt(total))}{L['period']}"
+            )
     return "\n".join(lines)
 
 
@@ -144,16 +185,14 @@ def build_notepad_text(notes, language, window):
         return ""
     n = len(notes)
     start = 0 if window <= 0 else max(0, n - int(window))
+    round_label = _lang(language)["round_label"]
     lines: List[str] = []
     for i in range(start, n):
         note = (notes[i] or "").strip()
         if not note:
             continue
         round_no = i + 1
-        if language == "vn":
-            lines.append(f"[Vòng {round_no}] {note}")
-        else:
-            lines.append(f"[Round {round_no}] {note}")
+        lines.append(f"[{round_label(round_no)}] {note}")
     return "\n".join(lines)
 
 

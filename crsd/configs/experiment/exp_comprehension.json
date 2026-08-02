@@ -10,7 +10,7 @@
     "crsd_milinski_low_risk_showcum"
   ],
   "agents": "personas_default",
-  "languages": ["en", "vn"],
+  "languages": ["en", "vn", "fr", "zh", "ar"],
   "models": ["LocalQwen"],
   "useOffline": true,
   "offlineSettings": "offline_settings",

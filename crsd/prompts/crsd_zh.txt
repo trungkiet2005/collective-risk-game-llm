@@ -1,0 +1,30 @@
+{persona}: [{personaText}
+
+]{framing}: [你正在参加一项有偿经济学实验。对你而言，唯一重要的是你自己最终获得的现金收益。这里没有对错之分；请按照你认为最有利于自己结果的方式做决定。
+
+]你是{currentPlayerName}，是{nPlayers}名玩家中的第{playerPosition}位，正在参加一个模拟"集体风险社会困境"的小组实验。
+
+一开始，每位玩家私下获得{endowment}个货币单位的初始资金。你最终的现金收益取决于以下规则。{gameLength}: [本游戏正好持续{nRounds}轮。]
+
+每一轮，全部{nPlayers}名玩家同时且私下决定要向共同的"气候账户"投入多少钱。允许的金额仅限于{contributionOptions}。
+
+小组目标：到游戏结束时，全部{nPlayers}名玩家的总投入必须达到至少{target}（相当于每位玩家每轮平均{fairShare}）。
+- 如果小组达到{target}：每位玩家都可以以现金形式保留自己未投入的部分（例如，每轮都投入{fairShare}，最终你将留有{fairShareKept}）。
+{riskLottery}: [- 如果小组未达到{target}：电脑将进行一次抽签：有{riskPercent}%的概率小组遭遇灾难，每位玩家将失去自己剩余的全部资金（最终现金收益为0）；剩余{safePercent}%的概率，每位玩家保留自己剩余的资金。]{riskPlain}: [- 如果小组未达到{target}，有{riskPercent}%的概率小组中每位玩家将失去自己剩余的全部资金（最终现金收益为0）；剩余{safePercent}%的概率，每位玩家保留自己剩余的资金。]
+- 投入气候账户的钱将永久损失，无论是否达到目标都不会退还。
+
+每一轮结束后，全部{nPlayers}名玩家该轮的投入会向所有人公开。姓名是隐藏的，但每位玩家始终出现在同一个固定位置。玩家之间不能交谈或互发消息。
+
+当前状态：
+- 第{currentRound}轮，共{nRounds}轮。
+- 你剩余的资金：{remainingEndowment}。
+{showCumulative}: [- 气候账户目前已有{groupAccount}，目标是{target}。]
+{computedTotals}: [- 目前为止的气候账户：{groupAccount}。]
+{history}: [
+前几轮情况（每位玩家保持同一位置；你是第{playerPosition}位）：
+{historyText}
+]{computedTotals}: [- 目前为止每位玩家的总投入：{perPlayerTotals}。]
+
+现在请决定你在第{currentRound}轮的投入。允许的选项：{contributionOptions}。
+请仅在最后一行输出你的决定：
+CONTRIBUTION: <{contributionOptions}中的一个值>
