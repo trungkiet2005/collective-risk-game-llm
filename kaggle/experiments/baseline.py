@@ -1,10 +1,11 @@
 """
 =====================================================================
-CRSD (package `crsd`) — Kaggle OFFLINE notebook (Internet OFF, GPU ON) — exp_riskframing (1 điều kiện) | 7 MODEL OPEN-SOURCE
+CRSD (package `crsd`) — Kaggle OFFLINE notebook (Internet OFF, GPU ON) — BASELINE CHUẨN | 7 MODEL OPEN-SOURCE
 =====================================================================
-Chạy experiment `exp_riskframing` (RÚT GỌN còn 1 điều kiện) trên 7 model mã nguồn mở
-đã dùng xuyên suốt project (Qwen2.5 7/32/72B · Gemma-2 9/27B · Llama-3.1 8/70B). Giữ
-NGUYÊN mọi tham số game (risk/target/seed/CRN). Chỉ CÒN MỘT cấu hình prompt cố định:
+Đây là notebook BASELINE CHÍNH THỨC của project (mọi so sánh model/persona/comprehension
+sau này đều dựa trên prompt này). Chạy trên 7 model mã nguồn mở dùng xuyên suốt project
+(Qwen2.5 7/32/72B · Gemma-2 9/27B · Llama-3.1 8/70B), agent trung tính, full_history,
+KHÔNG persona/scratchpad. Cấu hình prompt CHUẨN (đã cố định, không còn là biến thí nghiệm):
 
   · risk_framing = plain — BỎ "máy tính quay xổ số" + "nhóm gặp thảm hoạ", nêu XÁC SUẤT
     trực tiếp: "... với xác suất P% mọi người chơi mất tất cả số tiền còn lại ...".
@@ -12,17 +13,24 @@ NGUYÊN mọi tham số game (risk/target/seed/CRN). Chỉ CÒN MỘT cấu hìn
     quỹ khí hậu hiện tại + tổng tích luỹ TỪNG người chơi (per-player P1..Pn). (Số tiền
     còn lại của mình vốn ĐÃ luôn hiển thị sẵn.)
 
-Tức là dùng đúng game config `crsd_milinski_<risk>_plain_computed`. Quét 3 mức rủi ro
-high/medium/low để đo độ nhạy rủi ro (biến cốt lõi Milinski). Agent trung tính,
-full_history, KHÔNG persona/scratchpad.
-3 game (3 risk × 1 điều kiện) × 2 lang (EN+VN) × 10 rep = 60 game/model.
+Lý do chốt cấu hình này làm chuẩn: xem [[results-turn3-riskframing]] — bản plain+computed
+là bản duy nhất được đo, và show_computed_totals giúp giảm lãng phí quỹ đóng góp rõ rệt so
+với bản không có tổng tính sẵn (baseline cũ, nay đã archive).
+
+Dùng đúng game config `crsd_milinski_<risk>_plain_computed`. Quét 3 mức rủi ro high/medium/low
+để đo độ nhạy rủi ro (biến cốt lõi Milinski). 3 game (3 risk) × 2 lang (EN+VN) × 10 rep =
+60 game/model. Experiment JSON đứng sau vẫn tên `exp_riskframing` (lịch sử đặt tên khi đây
+còn là 1 điều kiện thử nghiệm) — KHÔNG đổi tên config để tránh vỡ seed/CRN.
 
 Notebook này = bản `archive/baseline_72b.py` (superset xử lý quantize) đổi 2 chỗ:
 MODELS[] (7 model), EXPERIMENTS (exp_riskframing). Cell 2/2.5/3/4/5/6/7/8 + runner giữ
 nguyên -> seed/CRN y hệt (risk_framing/show_computed_totals giờ là hằng số).
 
-(File này trước tên `riskframing.py`; các bản exp cũ — exp_baseline, comprehension,
-persona, framing, memory_ablation, lowrisk — đã chuyển vào archive/, hiện KHÔNG dùng.)
+(File này trước tên `riskframing.py`, đổi tên thành `baseline.py` vì đây giờ là chuẩn dùng
+cho mọi so sánh. Các bản cũ — exp_baseline gốc, comprehension, persona, framing,
+memory_ablation, lowrisk — đã chuyển vào archive/, hiện KHÔNG dùng. Kết quả tương ứng
+cũng đã chuyển vào results/open_source/archive/; kết quả hiện hành nằm ở
+results/open_source/exp_riskframing/.)
 
 ⚠️  CHIA PHIÊN (1 phiên Kaggle ~9–12h) ──────────────────────────────
   60 game/model × 60 gen = 3600 gen/model. 7 model một phiên vẫn dễ QUÁ GIỜ, nhất là
@@ -48,7 +56,8 @@ CÁCH CHẠY:
   5. Sửa MODELS[] theo path thực (`!ls /kaggle/input/`). Run Cell 1 → 8.
 
 Output: /kaggle/working/crsd_results/<model_short>/<experiment>/{turns.jsonl, games.csv}
-  + crsd_all_models.csv gộp + run_manifest.json + crsd_results.zip ở Output tab.
+  + crsd_all_models.csv gộp + run_manifest.json + baseline_results.zip ở Output tab.
+  (Tên zip = <tên file notebook>_results.zip để tải về bỏ vào results/raw/ khỏi lẫn.)
   Cột phân tích chính cho experiment này: `risk_probability` × `language`
   (risk_framing=plain và show_computed_totals=1 giờ là HẰNG SỐ, không tách nữa).
 =====================================================================
@@ -576,9 +585,11 @@ else:
 # =====================================================================
 # CELL 8: Zip để download
 # =====================================================================
+# Tên zip đặt theo TÊN NOTEBOOK (baseline.py -> baseline_results.zip) để khi tải về
+# bỏ vào results/raw/ còn phân biệt được nguồn (persona.py -> persona_results.zip).
 import zipfile  # noqa: E402
 
-zip_path = Path("/kaggle/working/crsd_results.zip")
+zip_path = Path("/kaggle/working/baseline_results.zip")
 with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
     for fp in OUTPUT_DIR.rglob("*"):
         if fp.is_file():
