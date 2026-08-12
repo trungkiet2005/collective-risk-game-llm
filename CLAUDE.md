@@ -8,7 +8,8 @@ quy ước bắt buộc khi sửa code.
 `plan/` giữ kế hoạch **đang thực thi** + trạng thái data hiện có + checkbox tiến độ.
 PROJECT.md đã lạc hậu so với thực tế; `plan/` mới là nguồn đúng cho câu "giờ làm gì tiếp".
 
-- [plan/frontier-run-plan.md](plan/frontier-run-plan.md) — kế hoạch mở rộng nhánh frontier, lệnh cụ thể
+- [plan/runbook-top-tier.md](plan/runbook-top-tier.md) — **đang chạy**: hướng dẫn thực thi bậc đỉnh (phân account, chia shard, gom result)
+- [plan/frontier-run-plan.md](plan/frontier-run-plan.md) — kế hoạch tổng nhánh frontier
 - [plan/model-availability.md](plan/model-availability.md) — 38 slug proxy: sống/chết/giá (probe 12-08-2026)
 
 **Ba sự thật đắt tiền, đừng phát hiện lại:** (1) local và server-side dùng 2 proxy KHÁC

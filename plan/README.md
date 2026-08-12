@@ -10,9 +10,15 @@ Thư mục này giữ kế hoạch **đang thực thi**, để một session/cha
 
 | File | Nội dung |
 |---|---|
-| [frontier-run-plan.md](frontier-run-plan.md) | **Kế hoạch chính.** Ngày 1→4, model nào chạy, lệnh cụ thể, checkbox tiến độ |
+| [runbook-top-tier.md](runbook-top-tier.md) | **⚡ ĐANG CHẠY.** Hướng dẫn thực thi bậc đỉnh: phân account, chia shard, gom result, sự cố |
+| [frontier-run-plan.md](frontier-run-plan.md) | Kế hoạch tổng: panel theo lưới nhà cung cấp × bậc, Ngày 1→4 |
 | [model-availability.md](model-availability.md) | 38 slug trên Kaggle Model Proxy: cái nào sống, sống ở đâu, giá bao nhiêu |
-| [scripts/](scripts/) | Script probe tái sử dụng — chạy lại khi cần kiểm tra availability |
+| [scripts/](scripts/) | `probe_all_models.py`, `probe_crg_prompt.py` (kiểm availability) và `merge_shards.py` (gom shard) |
+
+**Người dùng đã chọn chạy bậc đỉnh (top tier) TRƯỚC**, không screen trước — 4 model
+`claude-opus-5` · `gemini-3.1-pro-preview` · `gpt-5.6-sol` · `grok-4.20-reasoning`, ~$88.
+Rủi ro (cả 4 có thể cán trần) đã được nêu và người dùng vẫn chọn. **Đừng tự ý đổi sang
+screen-trước**; muốn đổi thì hỏi.
 
 ## Trạng thái tính đến 13-08-2026
 
@@ -29,8 +35,10 @@ Thư mục này giữ kế hoạch **đang thực thi**, để một session/cha
 | frontier | `gpt-5.4-nano` | exp_persona | 210 |
 | frontier | `claude-haiku-4-5` | — | 1 ván smoke trong `archive/`, chưa có data thật |
 
-**Việc tiếp theo:** Ngày 1 trong [frontier-run-plan.md](frontier-run-plan.md) — sửa 2 chỗ
-trong `kaggle/benchmarks/crg_task_server.py` rồi smoke 4 họ model chưa từng chạy.
+**Việc tiếp theo:** [runbook-top-tier.md](runbook-top-tier.md) — Bước 3 (đo giá thật, BẮT
+BUỘC trước khi chia shard), rồi Ngày A trong bảng phân công ở mục 5. Vẫn cần 2 chỗ sửa code
+ở Ngày 1 của [frontier-run-plan.md](frontier-run-plan.md) (cap `max_output_tokens` + chặn
+reply rỗng) — model bậc đỉnh là loại dễ bị 403 tiền cọc nhất nên chỗ này không bỏ được.
 
 **Panel đang nhắm tới:** lưới **nhà cung cấp × bậc năng lực** — 13 model / 4 nhà cung cấp
 (Anthropic 3, Google 4 gồm 1 open-weight, OpenAI 4, xAI 2). Proxy chỉ còn 4 nhà cung cấp;
