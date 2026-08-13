@@ -94,8 +94,13 @@ chọn hợp tác ở mức tối thiểu đúng 120.
 
 ## Việc tiếp theo
 
-- [ ] Viết lại claim trung tâm của [paper](../paper/main.tex): null về risk **không phổ quát**.
-      Công thức đúng là "năng lực cần nhưng không đủ", kèm đối chứng flash-lite vs pro.
+- [x] ~~Viết lại claim trung tâm của [paper](../paper/main.tex)~~ **XONG 13-08-2026.**
+      Title mới: *"capability enables risk sensitivity but does not confer it"*. Panel 13 model /
+      14 cấu hình. Results gộp 9 → 5 mục: (a) null nhánh open-weight + uncensored test,
+      (b) prompt vs incentive, (c) **null vỡ ở bậc đỉnh, 2/6 model**, (d) hai đối chứng
+      (capability flash-lite↔pro, reasoning grok on↔off), (e) comprehension.
+      Hình mới `fig10_toptier.pdf` (`paper/make_figures_toptier.py`), bảng 1 thêm 7 dòng
+      commercial + cột `Δ risk (en)`. Đã build sạch, 19 trang.
 - [ ] Chạy `gpt-5.6-luna` / `gpt-5.6-terra` (~$3 + $7): hiệu ứng thuộc **thế hệ 5.6** hay
       riêng bậc `sol`? Rẻ và trả lời một câu hỏi sạch.
 - [ ] Comprehension cho frontier — vẫn chưa có điểm dữ liệu nào.

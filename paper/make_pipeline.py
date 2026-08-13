@@ -142,8 +142,8 @@ txt(4.6, SY + 32.3, "Do the agents cooperate more when the risk is", size=6.3,
     color=INK2, ha="left", box_rect=s1, label="q1a")
 txt(4.6, SY + 29.6, "higher, as humans do (Milinski et al. 2008)?", size=6.3,
     color=INK2, ha="left", box_rect=s1, label="q1b")
-txt(4.6, SY + 26.4, "full factorial", size=5.9, color=MUTED, style="italic",
-    ha="left", box_rect=s1, label="ff")
+txt(4.6, SY + 26.4, "full factorial · 7B to frontier", size=5.9, color=MUTED,
+    style="italic", ha="left", box_rect=s1, label="ff")
 
 def chip(x, y, w, s, fc, ec, tc, size=6.1, h=4.6, label=""):
     r = box(x, y, w, h, fc=fc, ec=ec, lw=1.0, r=0.3, z=3)
@@ -151,12 +151,12 @@ def chip(x, y, w, s, fc, ec, tc, size=6.1, h=4.6, label=""):
         box_rect=r, label=label)
 
 CY = SY + 20.8
-chip(4.6, CY, 17.0, "7 models · 7B–72B", BLUEF, BLUE, BLUE, label="c1")
-txt(22.9, CY + 2.3, "×", size=7.5, color=MUTED)
-chip(24.6, CY, 12.2, "$p$ = .1 / .5 / .9", SURF, EDGE, INK, label="c2")
-txt(38.0, CY + 2.3, "×", size=7.5, color=MUTED)
-chip(39.4, CY, 7.4, "EN · VN", SURF, EDGE, INK, label="c3")
-txt(25.25, SY + 17.4, "= 60 games per model", size=6.3, color=INK2,
+chip(7.15, CY, 11.0, "13 models", BLUEF, BLUE, BLUE, label="c1")
+txt(19.55, CY + 2.3, "×", size=7.5, color=MUTED)
+chip(20.95, CY, 12.2, "$p$ = .1 / .5 / .9", SURF, EDGE, INK, label="c2")
+txt(34.55, CY + 2.3, "×", size=7.5, color=MUTED)
+chip(35.95, CY, 7.4, "EN · VN", SURF, EDGE, INK, label="c3")
+txt(25.25, SY + 17.4, "= 60 games per configuration", size=6.3, color=INK2,
     box_rect=s1, label="ng")
 txt(25.25, SY + 12.6, "human benchmark: 0% · 10% · 50% reach", size=6.1,
     color=MUTED, box_rect=s1, label="hb")
