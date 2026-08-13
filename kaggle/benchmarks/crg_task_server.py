@@ -83,6 +83,11 @@ MAX_PARSE_RETRIES = 3
 RISKS = [float(x) for x in os.environ.get("CRG_RISKS", "0.9,0.5,0.1").split(",")]
 LANGS = [s.strip() for s in os.environ.get("CRG_LANGS", "en,vn").split(",")]
 REPS = int(os.environ.get("CRG_REPS", "10"))
+# Chia shard theo rep khi chia theo risk×lang vẫn còn quá đắt cho trần $10/account.
+# An toàn về seed: sampling_seed(rep, agent, round) và xổ số thảm hoạ Random(BASE+rep)
+# đều keyed theo rep, nên mỗi shard giữ một khoảng rep riêng biệt là bất biến.
+# REP_START=5, REPS=5 -> chạy rep 5..9.
+REP_START = int(os.environ.get("CRG_REP_START", "0"))
 
 # Persist one atomic shard per completed game. If the process is restarted in the
 # same workspace, valid shards are loaded and those (risk, language, rep) cells are
@@ -90,6 +95,20 @@ REPS = int(os.environ.get("CRG_REPS", "10"))
 RESUME = os.environ.get("CRG_RESUME", "1").strip().lower() not in {
     "0", "false", "no", "off",
 }
+
+# --- Per-model output cap (REQUIRED for expensive models) -------------------
+# The Model Proxy RESERVES `max_output_tokens x output price` up front, so an
+# UNSET cap makes a pricey model 403 with "max estimated cost of operation
+# ($3.200045) exceeds your available quota (based on max_output_tokens)" even
+# though the real spend is cents. Observed on claude-opus-4-7 (2026-08-12).
+# Reasoning models need a generous cap or they return EMPTY content: measured
+# gemini-3.6-flash empty at 64 tokens, gemini-3.5-flash unable to emit a
+# parseable answer at 2000; 6000 was enough for every flash variant tested.
+_REASONING_HINTS = ("reasoning", "thinking", "-pro", "opus", "gpt-5.5",
+                    "gpt-5.6", "3-flash", "3.5-flash", "3.6-flash")
+MAX_OUT = int(os.environ.get("CRG_MAX_OUT", "0")) or (
+    6000 if any(h in MODEL.lower() for h in _REASONING_HINTS) else 512
+)
 # Bump whenever checkpoint compatibility changes. Version 2 invalidates shards
 # produced before re-auth was guaranteed to preserve the selected model.
 CHECKPOINT_SCHEMA_VERSION = 2
@@ -103,7 +122,12 @@ CHECKPOINT_SCHEMA_VERSION = 2
 # gpt/claude/deepseek/other Geminis are unaffected. Local CRG_* overrides win.
 _no_overrides = not any(os.environ.get(k) for k in ("CRG_RISKS", "CRG_LANGS", "CRG_REPS"))
 if "gemini-3-flash-preview" in MODEL and _no_overrides:
-    RISKS, LANGS, REPS = [0.9], ["en"], 1
+    RISKS, LANGS, REPS, REP_START = [0.9], ["en"], 1, 0
+
+# PHAI tinh SAU guard: guard doi REPS/REP_START, neu tinh truoc thi validation
+# luc push van chay du so rep cua shard (5 van thay vi 1) tren mot reasoning
+# model cham -> ton 5x va co the timeout ca lenh push.
+REP_RANGE = range(REP_START, REP_START + REPS)
 
 # Per-round decision concurrency. DEFAULT 1 = fully sequential (reliable on
 # capacity-limited proxies like gpt-nano, which 429s under bursts). Set
@@ -327,15 +351,30 @@ def _call_llm(llm, prompt, seed, max_attempts=6):
         text = None
         try:
             with kbench.chats.new("turn", orphan=True) as chat:
-                text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed)
-            if text is not None:
+                text = _LLM.prompt(prompt, temperature=TEMPERATURE, seed=seed,
+                                   extra_api_params={"max_completion_tokens": MAX_OUT})
+            if text is not None and text.strip():
                 return text, chat.usage
+            if text is not None:
+                # HTTP 200 but NO text: the model burned its whole output budget in a
+                # reasoning channel (measured on gemini-3.6-flash at 64 tokens, and
+                # gpt-oss-120b returns '' at any cap). This must NEVER fall through to
+                # a parsed contribution -- run 1 fabricated all-zero "games" that way.
+                raise RuntimeError(
+                    f"503 empty-content: model returned no text "
+                    f"(max_completion_tokens={MAX_OUT}); raise CRG_MAX_OUT if it persists")
             # Parallel path: contexts.enter can SWALLOW a proxy error inside a
             # worker thread (the run ContextVar does not propagate), leaving
             # text=None. Raise a synthetic transient so the backoff below retries.
             raise RuntimeError("503 no-text: proxy error swallowed under concurrency")
         except Exception as e:
             msg = str(e).lower()
+            # A cost-reservation 403 is NOT an auth failure. `_AUTH_ERR` contains
+            # "403", so without this guard a quota 403 would burn six `kaggle b auth`
+            # reauth cycles and then surface the wrong cause. Reauth cannot fix it:
+            # lower CRG_MAX_OUT or use an account with quota left.
+            if "max estimated cost" in msg or "available quota" in msg:
+                raise
             if any(t in msg for t in _AUTH_ERR):     # token expired -> refresh, don't burn budget
                 auth_retries += 1
                 if auth_retries > 6:
@@ -468,6 +507,8 @@ def _checkpoint_signature(model_tag):
         "risks": RISKS,
         "languages": LANGS,
         "reps": REPS,
+        "rep_start": REP_START,
+        "max_completion_tokens": MAX_OUT,
         "n_players": N_PLAYERS,
         "n_rounds": N_ROUNDS,
         "endowment": ENDOWMENT,
@@ -536,7 +577,7 @@ def _load_game_checkpoints(checkpoint_dir, signature):
     checkpoint_dir = Path(checkpoint_dir)
     expected_order = [
         _condition_key(risk, language, rep)
-        for risk in RISKS for language in LANGS for rep in range(REPS)
+        for risk in RISKS for language in LANGS for rep in REP_RANGE
     ]
     expected = set(expected_order)
     records = {}
@@ -608,9 +649,14 @@ def collective_risk_baseline(llm) -> dict:
     done = resumed_games
     t0 = time.time()
 
+    # One banner line so a shard's log identifies itself without guessing.
+    print(f"[cfg] model={MODEL} tag={model_tag} risks={RISKS} langs={LANGS} "
+          f"reps={REPS} games={total} max_completion_tokens={MAX_OUT} "
+          f"concurrency={_CONCURRENCY} out={out_dir}", flush=True)
+
     for risk in RISKS:
         for language in LANGS:
-            for rep in range(REPS):
+            for rep in REP_RANGE:
                 key = _condition_key(risk, language, rep)
                 if key in completed:
                     print(f"[resume {done}/{total}] skip risk={risk} lang={language} rep={rep}",

@@ -33,10 +33,24 @@ EXPECTED_REPS = set(range(10))
 EXPECTED_CELLS = len(EXPECTED_RISKS) * len(EXPECTED_LANGS) * len(EXPECTED_REPS)  # 60
 
 
-def find_shards(src):
-    """Mọi thư mục có games.csv là một shard. Trả về [(games_path, turns_path)]."""
+def find_shards(srcs, exclude=("SMOKE",)):
+    """Mọi thư mục có games.csv là một shard. Trả về [(games_path, turns_path)].
+
+    Bỏ qua đường dẫn chứa tiền tố trong `exclude`: shard smoke chạy đúng cell
+    (0.9, en, rep0) nên game_id của nó TRÙNG với shard thật của cell đó. Giữ lại
+    thì dataset cuối lẫn một ván có nguồn gốc khác — loại cho sạch provenance.
+    """
     shards = []
-    for games in sorted(Path(src).rglob("games.csv")):
+    seen_paths = set()
+    for src in ([srcs] if isinstance(srcs, (str, Path)) else srcs):
+      for games in sorted(Path(src).rglob("games.csv")):
+        parts = set(games.parts)
+        if any(any(p.startswith(x) for p in parts) for x in exclude):
+            continue
+        key = games.resolve()
+        if key in seen_paths:
+            continue
+        seen_paths.add(key)
         turns = games.parent / "turns.jsonl"
         shards.append((games, turns if turns.is_file() else None))
     return shards
@@ -55,10 +69,10 @@ def load_shard(games_path, turns_path):
     return games, turns
 
 
-def merge(src, out, only=None, dry_run=False, want_experiment="exp_baseline"):
-    shards = find_shards(src)
+def merge(srcs, out, only=None, dry_run=False, want_experiment="exp_baseline", exclude=None):
+    shards = find_shards(srcs, tuple(x for x in (exclude or "").split(",") if x) or ("SMOKE",))
     if not shards:
-        print(f"KHONG tim thay games.csv nao duoi {src}", file=sys.stderr)
+        print(f"KHONG tim thay games.csv nao duoi {srcs}", file=sys.stderr)
         return 1
 
     by_model_games = defaultdict(dict)   # model_tag -> {game_id: row}
@@ -80,6 +94,7 @@ def merge(src, out, only=None, dry_run=False, want_experiment="exp_baseline"):
         if only and only not in tag:
             continue
         added = 0
+        fresh = set()          # game_id mà CHÍNH shard này đóng góp
         for row in games:
             gid = row["game_id"]
             if gid in by_model_games[tag]:
@@ -88,9 +103,13 @@ def merge(src, out, only=None, dry_run=False, want_experiment="exp_baseline"):
                     conflicts.append((tag, gid, str(games_path)))
                 continue
             by_model_games[tag][gid] = row
+            fresh.add(gid)
             added += 1
-        seen = set(by_model_games[tag])
-        by_model_turns[tag].extend(t for t in turns if t["game_id"] in seen)
+        # CHỈ lấy lượt của những ván shard này thực sự đóng góp. Nếu lấy theo
+        # `game_id in <tất cả đã thấy>` thì một game_id trùng ở 2 shard sẽ nhân đôi
+        # số lượt (1 ván 120 lượt) trong khi ván chỉ được đếm 1 lần — sai lệch âm
+        # thầm, chỉ lộ ra ở phép kiểm 60-lượt/ván.
+        by_model_turns[tag].extend(t for t in turns if t["game_id"] in fresh)
         shard_info.append((tag, str(games_path.parent), len(games), added))
 
     if conflicts:
@@ -167,14 +186,17 @@ def merge(src, out, only=None, dry_run=False, want_experiment="exp_baseline"):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", required=True, help="thu muc chua cac shard da tai ve")
+    ap.add_argument("--src", required=True, nargs="+",
+                    help="mot hoac nhieu thu muc chua shard da tai ve")
     ap.add_argument("--out", default="results/frontier")
     ap.add_argument("--only", default=None, help="chi gom model co ten chua chuoi nay")
     ap.add_argument("--experiment", default="exp_baseline",
                     help="ten experiment = ten thu muc chua games.csv (mac dinh exp_baseline)")
+    ap.add_argument("--exclude", default="SMOKE",
+                    help="bo qua shard co duong dan chua tien to nay (phay ngan cach)")
     ap.add_argument("--dry-run", action="store_true", help="chi kiem tra, khong ghi")
     args = ap.parse_args()
-    return merge(args.src, args.out, args.only, args.dry_run, args.experiment)
+    return merge(args.src, args.out, args.only, args.dry_run, args.experiment, args.exclude)
 
 
 if __name__ == "__main__":

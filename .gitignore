@@ -52,3 +52,6 @@ slides/*.xdv
 # OS
 .DS_Store
 Thumbs.db
+
+# plan/runs = log + ket qua tai ve cua tung shard (nang, khong commit)
+/plan/runs/

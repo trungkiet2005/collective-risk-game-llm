@@ -10,10 +10,24 @@ Thư mục này giữ kế hoạch **đang thực thi**, để một session/cha
 
 | File | Nội dung |
 |---|---|
+| [findings-top-tier.md](findings-top-tier.md) | **🔥 KẾT QUẢ.** `gpt-5.6-sol` PHẢN ỨNG với risk (+118.2 điểm) — đảo ngược claim trung tâm của paper |
 | [runbook-top-tier.md](runbook-top-tier.md) | **⚡ ĐANG CHẠY.** Hướng dẫn thực thi bậc đỉnh: phân account, chia shard, gom result, sự cố |
 | [frontier-run-plan.md](frontier-run-plan.md) | Kế hoạch tổng: panel theo lưới nhà cung cấp × bậc, Ngày 1→4 |
 | [model-availability.md](model-availability.md) | 38 slug trên Kaggle Model Proxy: cái nào sống, sống ở đâu, giá bao nhiêu |
-| [scripts/](scripts/) | `probe_all_models.py`, `probe_crg_prompt.py` (kiểm availability) và `merge_shards.py` (gom shard) |
+| [scripts/](scripts/) | xem bảng script dưới |
+
+### Script
+
+| Script | Việc |
+|---|---|
+| `launch_day_a.py` | phóng cả 12 shard Ngày A song song (`--dry-run` để xem trước) |
+| `launch_shard.py` | chạy 1 shard trên 1 account: auth → sinh file shard → push → run → download |
+| `check_runs.py` | xem trạng thái mọi shard (đọc log, không gọi API), `--watch` để tự làm mới |
+| `merge_shards.py` | gom shard thành dataset, kiểm phủ đủ 60 cell + `parse_failed=0` |
+| `probe_all_models.py` | probe liveness song song ở local (staging proxy) |
+| `probe_crg_prompt.py` | kiểm model trả lời được 1 lượt CRG thật và parse được |
+
+Kết quả + log của mỗi shard nằm ở `plan/runs/<label>/` (đã gitignore, không commit).
 
 **Người dùng đã chọn chạy bậc đỉnh (top tier) TRƯỚC**, không screen trước — 4 model
 `claude-opus-5` · `gemini-3.1-pro-preview` · `gpt-5.6-sol` · `grok-4.20-reasoning`, ~$88.
@@ -35,10 +49,32 @@ screen-trước**; muốn đổi thì hỏi.
 | frontier | `gpt-5.4-nano` | exp_persona | 210 |
 | frontier | `claude-haiku-4-5` | — | 1 ván smoke trong `archive/`, chưa có data thật |
 
-**Việc tiếp theo:** [runbook-top-tier.md](runbook-top-tier.md) — Bước 3 (đo giá thật, BẮT
-BUỘC trước khi chia shard), rồi Ngày A trong bảng phân công ở mục 5. Vẫn cần 2 chỗ sửa code
-ở Ngày 1 của [frontier-run-plan.md](frontier-run-plan.md) (cap `max_output_tokens` + chặn
-reply rỗng) — model bậc đỉnh là loại dễ bị 403 tiền cọc nhất nên chỗ này không bỏ được.
+## 🌅 Việc đầu tiên sáng 13-08-2026
+
+Ngày A đã chạy đêm 12→13/08. **14/16 shard xong, $49.54.** Làm đúng 3 lệnh này:
+
+```bash
+# 1) Shard nào run xong mà chưa có data trên máy -> tải lại. KHÔNG chạy lại run.
+python plan/scripts/redownload_all.py
+
+# 2) Kiểm phủ đủ 60 cell chưa (exit 1 + liệt kê cell thiếu nếu chưa)
+python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --dry-run
+
+# 3) Ghi vào results/frontier/
+python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --out results/frontier
+```
+
+**Mọi shard phóng trước 03:00 ngày 13/08 đều bị lỗi download do đường dẫn Windows 260 ký
+tự** — run thành công, đã tốn tiền, nhưng data không xuống máy. Data VẪN CÒN trên server,
+`redownload_all.py` lấy về. Đừng chạy lại run.
+
+Kết quả đã có: xem [findings-top-tier.md](findings-top-tier.md).
+`gpt-5.6-sol` và `grok-4.20-reasoning` đã đủ 60 ván và nằm trong `results/frontier/`.
+Còn 2 shard `gemini-3.1-pro` risk 0.1 (`hunhtrungkit`, `tnkiet`) — nếu chúng lỗi thì chạy
+lại bằng `launch_shard.py` với account dự phòng `chiboiz`.
+
+Sau đó: Ngày B (`claude-opus-5`, 6 shard × 10 ván × $5.85 = $35.11), và phép thử rẻ giá trị
+cao **`grok-4.20-0309-non-reasoning`** (~$1.7) — xem lý do trong findings.
 
 **Panel đang nhắm tới:** lưới **nhà cung cấp × bậc năng lực** — 13 model / 4 nhà cung cấp
 (Anthropic 3, Google 4 gồm 1 open-weight, OpenAI 4, xAI 2). Proxy chỉ còn 4 nhà cung cấp;

@@ -89,16 +89,27 @@ kaggle b t run  crg-top-calib -m claude-opus-5-default --wait 900
 kaggle b t log  crg-top-calib -m claude-opus-5-default | grep -E "cost|usd|games_per"
 ```
 
-Ghi kết quả vào bảng này rồi tính cỡ shard:
+### ĐÃ ĐO XONG — 12-08-2026, smoke 1 ván/model server-side (risk 0.9, en)
 
-| Model | $/ván thật | Ván/shard = ⌊5 / $ván⌋ | Số shard = ⌈60 / ván-shard⌉ |
-|---|---|---|---|
-| `claude-opus-5-default` | | | |
-| `gemini-3.1-pro-preview` | | | |
-| `gpt-5.6-sol` | | | |
-| `grok-4.20-0309-reasoning` | | | |
+Cả 4 model: **COMPLETED, `parse_fail=0`, cap `max_completion_tokens=6000` áp dụng đúng**.
 
-**Nhắm $5/shard chứ không $10.** Chừa gấp đôi để một cú đắt bất ngờ không giết run.
+| Model | $/ván ĐO THẬT | Ước tính cũ | Lệch | $/60 ván thật | Ván/shard đã chọn |
+|---|---|---|---|---|---|
+| `grok-4.20-0309-reasoning` | **0.141571** | 0.0578 | **2.45× đắt hơn** | 8.49 | 20 → $2.83 |
+| `gpt-5.6-sol` | **0.32409** | 0.2422 | 1.34× đắt hơn | 19.45 | 10 → $3.24 |
+| `gemini-3.1-pro-preview` | **0.433008** | 0.5110 | 0.85× rẻ hơn | 25.98 | 10 → $4.33 |
+| `claude-opus-5-default` | **0.58516** | 0.6512 | 0.90× rẻ hơn | 35.11 | 10 → $5.85 (Ngày B) |
+
+Ngày A thật = 180 ván / **$53.92** (không phải $48.66 như ước tính).
+
+**Bài học về estimator:** cột "độ khớp" trong [model-availability.md](model-availability.md)
+đoán đúng hướng lệch. `grok` bị gắn nhãn *thiếu* (probe 99.7% input) và thật sự đắt hơn
+2.45× — vì model reasoning sinh nhiều output token mỗi quyết định mà probe 1 chữ không
+thấy được. Với model reasoning, **luôn đo thật, đừng suy từ probe input-heavy.**
+
+**Nhắm ≤$5/shard chứ không $10.** Chừa gấp đôi để một cú đắt bất ngờ không giết run.
+Kịch bản đã tránh được nhờ đo: `gpt-5.6-sol` định chia 3 shard × 20 ván, với giá thật
+thành $6.48/shard = 65% trần — quá sát khi prompt tiếng Việt dài hơn. Đã chia 6.
 
 ---
 
@@ -142,7 +153,22 @@ Ba cỡ shard có sẵn, chọn theo $/ván thật ở Bước 3:
 Dùng cỡ shard theo ước tính hiện tại. **Nếu Bước 3 cho giá khác, tính lại số shard** rồi
 cập nhật bảng này.
 
-### Ngày A — 3 model, 10 account, ~$49
+### Ngày A — ĐÃ PHÓNG 12-08-2026 lúc 01:47 · 15 shard, 15 account, $53.92
+
+Chia lại theo **giá đo thật**, không theo ước tính. Shard đắt nhất $4.33 = 43% trần $10.
+Bảng sống nằm trong `plan/scripts/launch_day_a.py`; theo dõi bằng
+`python plan/scripts/check_runs.py`.
+
+| Model | Số shard | Chia theo | Ván/shard | $/shard | Account |
+|---|---|---|---|---|---|
+| `grok-4.20-0309-reasoning` | 3 | risk | 20 | 2.83 | chinguyentran, chisboiz, chunaiu |
+| `gpt-5.6-sol` | 6 | risk×lang | 10 | 3.24 | trunkdabest, vinhdinhthien, acc1–acc4 |
+| `gemini-3.1-pro-preview` | 6 | risk×lang | 10 | 4.33 | acc5, trungkiet, foundnotkiet, kit567, hunhtrungkit, tnkiet |
+
+Dự phòng: `chiboiz` (đã dùng ~$1.6 cho smoke, còn ~$8.4). Quota nạp lại mỗi ngày nên
+shard lỗi chạy lại được hôm sau trên đúng account đó.
+
+<details><summary>Bảng phân công dự kiến ban đầu (theo giá ước tính — đã bị thay)</summary>
 
 | ✓ | Account | Model | RISKS | LANGS | Ván | $ ước | $ thật |
 |---|---|---|---|---|---|---|---|
@@ -171,15 +197,63 @@ dự phòng chạy lại shard lỗi**, đừng dùng hết trong một ngày.
 | [ ] | `hunhtrungkit` | `0.1` | `en` | 10 | 6.51 | |
 | [ ] | `tnkiet` | `0.1` | `vn` | 10 | 6.51 | |
 
-$6.51/shard là **65% của trần $10** — sát. Nếu Bước 3 cho $/ván > 0.75 thì phải chia nhỏ
-hơn theo rep ([mục 8](#8--nếu-shard-vẫn-quá-đắt-chia-theo-rep)).
+Giá thật của opus-5 là **$0.58516/ván** → shard 10 ván = **$5.85** (58% trần), chạy được
+không cần chia nhỏ thêm. Tổng Ngày B = **$35.11**.
 
-**Quota nạp lại mỗi ngày**, nên Ngày B có thể dùng lại đúng các account của Ngày A nếu
-muốn — bảng trên tách ra chỉ để dễ theo dõi.
+**Quota nạp lại mỗi ngày**, nên Ngày B dùng lại đúng các account của Ngày A được.
+
+</details>
 
 ---
 
-## 6 · Chạy một shard: 5 lệnh
+## 5b · Script đã có — dùng cái này, đừng làm tay
+
+Toàn bộ mục 2, 4, 6 đã được gói vào script. Đường chạy thật là:
+
+```bash
+# 1) Xem sẽ chạy gì (không gọi API)
+python plan/scripts/launch_day_a.py --dry-run
+
+# 2) Phóng cả 12 shard song song, mỗi shard 1 account 1 tiến trình
+python plan/scripts/launch_day_a.py
+
+# 3) Theo dõi (đọc log, không gọi API) — chạy được ở terminal khác
+python plan/scripts/check_runs.py
+python plan/scripts/check_runs.py --watch      # tự làm mới 60s
+
+# 4) Shard nào run xong mà chưa có data trên máy thì tải lại (KHÔNG chạy lại run)
+python plan/scripts/redownload_all.py --dry-run
+python plan/scripts/redownload_all.py
+
+# 5) Gom kết quả — phải truyền CẢ HAI nguồn: plan/runs (bản launcher cũ) và D:/tmp/crgdl
+python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --dry-run
+python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --out results/frontier
+```
+
+Một shard lẻ (chạy lại shard lỗi bằng account dự phòng):
+
+```bash
+python plan/scripts/launch_shard.py --account kit567 \
+    --model gemini-3.1-pro-preview --risks 0.9 --langs en --reps 10
+```
+
+`launch_shard.py` tự làm: nạp credential đúng kiểu cho account → `kaggle b auth` kiểm
+account sống → sinh file shard (thay dòng 83–85, và thay cả `@kbench.task(name=...)`
+nếu `--task` khác) → `push` → đợi tới `Completed` → `run --wait` → lấy `status` + `log`
+từng model → `download`. Mọi thứ ghi vào `plan/runs/<label>/shard.log`.
+
+**Ba cái bẫy script đã xử lý, đừng làm lại bằng tay:**
+
+- **Không bao giờ pipe output của run qua `head`.** SIGPIPE giết run giữa đường — tui đã
+  mắc đúng lỗi này khi test: thư mục output tạo ra nhưng rỗng hoàn toàn.
+- **`kaggle b t push <task>` bắt buộc khớp `name=` khai trong file**, nếu không nó báo
+  `Task '<task>' not found in <file>`. Script tự đổi tên trong file khi cần.
+- **`load_dotenv()` tìm .env từ thư mục của SCRIPT, không phải cwd.** Script ở nơi khác
+  phải chỉ đường tường minh tới `.env` của repo.
+
+---
+
+## 6 · Chạy một shard bằng tay: 5 lệnh (chỉ khi cần gỡ lỗi)
 
 Làm **một shard một lần**, xong hẳn mới sang shard kế. Đừng chạy nhiều shard đắt song song
 trên **cùng một account** — tiền cọc cộng dồn và shard sau bị 403.
@@ -247,11 +321,17 @@ Script tự kiểm và **exit 1** nếu chưa dùng được. Nó báo:
 - `luot` — phải đúng `60 × số ván` (3600 nếu đủ), lệch là shard bị cắt giữa đường
 - `=> DAY DU` / `=> CHUA DUNG DUOC`
 
-Hai điều script đã xử lý, đừng sửa lại:
+Ba điều script đã xử lý, đừng sửa lại:
 
 - **Tách theo experiment**, không chỉ theo model. Cùng một model có nhiều experiment
   (`exp_baseline`, `exp_persona`) — gộp chung là trộn 2 thí nghiệm. Mặc định chỉ lấy
   `exp_baseline`, đổi bằng `--experiment`.
+- **Lượt chỉ lấy từ shard thực sự đóng góp ván đó.** Lỗi thật đã gặp 12-08: shard smoke
+  chạy đúng cell (0.9, en, rep0) nên `game_id` trùng shard thật → ván dedupe nhưng lượt
+  thì không, cho ra **1 ván 120 lượt** (40 ván / 2460 lượt thay vì 2400). Sai lệch này
+  âm thầm, **chỉ lộ ra ở phép kiểm 60-lượt/ván** — đó là lý do phép kiểm đó tồn tại.
+- **Bỏ shard smoke khỏi merge** (`--exclude SMOKE`, mặc định) để dataset cuối không lẫn
+  một ván có nguồn gốc khác. `--exclude ""` nếu muốn gộp cả smoke.
 - **Trùng `game_id` mà nội dung khác nhau** thì báo động, vì nghĩa là 2 shard chạy trùng
   cell → cách chia sweep sai.
 
@@ -314,12 +394,14 @@ for p in glob.glob('results/frontier/*/exp_baseline/games.csv'):
 | `403 max estimated cost ... exceeds your available quota (based on max_output_tokens)` | proxy đặt cọc trước = `max_output_tokens × giá output`; hoặc nhiều shard song song trên cùng account làm cọc cộng dồn | set `max_output_tokens` tường minh (512 model thường, 6000 model reasoning); chạy 1 shard/account/lần |
 | `503 The requested model is currently unavailable` | model chết phía Kaggle | đổi account **không** cứu được (đã kiểm 3 account cùng kết quả); đợi và probe lại |
 | `429 heavy load` | proxy quá tải | thử lại sau; giữ `CRG_CONCURRENCY=1` |
+| `!! push validate THAT BAI` kèm 429, nhiều shard cùng lúc | **Phóng song song quá dày.** `push` chạy 1 ván validate trên model mặc định của server; N lệnh push đồng thời đập vào CÙNG model đó → 429 → validate Errored → push hủy. Gặp thật: **7/15 shard Ngày B chết** với `--stagger 20` | `launch_shard.py` giờ tự retry push 3 lần (chờ 120s, 240s). Khi phóng >8 shard, dùng `--stagger 150` trở lên. Shard đã chạy được KHÔNG bị ảnh hưởng — chỉ phóng lại đúng shard chết |
 | `400 BatchScheduleBenchmarkTaskRuns` | quá 7 `-m` trong một lệnh | chia lệnh, tối đa 7 model |
 | Run báo `Completed` nhưng `reply` rỗng | model dồn token vào reasoning channel, content trống | phải fail to tiếng, không được ghi thành ván đóng góp 0 — xem Ngày 1 của [frontier-run-plan.md](frontier-run-plan.md) |
 | `KERNEL_WITHOUT_RUN` khi push | `.run()` bị bọc trong `if __name__=="__main__"`, hoặc dict result có key kiểu float | bản `crg_task_server.py` đã sửa cả hai — đừng copy lại từ `crg_task.py` |
 | `kaggle b t log` trả rỗng, không báo lỗi | fetch song song > 3 luồng bị rate-limit **im lặng** | giữ concurrency ≤ 3, thử lại |
 | Kết quả `charmap codec can't encode` | thiếu `PYTHONIOENCODING=utf-8` | set biến đó |
 | Run đứt giữa đường | mỗi run server-side khởi động container sạch, `CRG_RESUME` không cứu được qua run | chạy lại cả shard đó trên account dự phòng |
+| `download` báo `[Errno 2] No such file or directory` với đường dẫn rất dài | **giới hạn 260 ký tự của Windows.** Cây Kaggle sinh ra đã 174 ký tự (`<task>/<ver>/<model>/<runid>.download/results/frontier/<model_tag>/exp_baseline/checkpoints/risk-0p9__lang-en__rep-000.json`); để `-o` trong `plan/runs/<label>/` là 273 > 260 | **Data VẪN CÒN trên server — ĐỪNG chạy lại run, chỉ tải lại**: `python plan/scripts/redownload_all.py`. Tải về `D:/tmp/crgdl/<account>` (tổng ~200 ký tự) |
 
 ---
 
