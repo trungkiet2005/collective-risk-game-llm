@@ -346,6 +346,13 @@ def _call_llm(llm, prompt, seed, max_attempts=6):
     (text, usage). Auto-reauths on token expiry; exp-backoff on transient 429/503."""
     attempt = 0
     auth_retries = 0
+    # Content rỗng có NGÂN SÁCH RETRY RIÊNG. Đo được 13-08-2026: opus-5 trả content
+    # rỗng không tất định ở CẢ cap 6000 và 16000 (cùng cell tiếng Việt, shard này
+    # chết shard kia trọn vẹn) → không phải cạn token, mà là hiện tượng nhất thời.
+    # Nếu để nó tiêu ngân sách 6 lượt chung thì một chùm rỗng sẽ giết cả run và mất
+    # các ván CHƯA chạy của shard đó.
+    empty_retries = 0
+    MAX_EMPTY_RETRIES = 15
     while True:
         attempt += 1
         text = None
@@ -356,13 +363,25 @@ def _call_llm(llm, prompt, seed, max_attempts=6):
             if text is not None and text.strip():
                 return text, chat.usage
             if text is not None:
-                # HTTP 200 but NO text: the model burned its whole output budget in a
-                # reasoning channel (measured on gemini-3.6-flash at 64 tokens, and
-                # gpt-oss-120b returns '' at any cap). This must NEVER fall through to
-                # a parsed contribution -- run 1 fabricated all-zero "games" that way.
-                raise RuntimeError(
-                    f"503 empty-content: model returned no text "
-                    f"(max_completion_tokens={MAX_OUT}); raise CRG_MAX_OUT if it persists")
+                # HTTP 200 but NO text. Two known causes: the model spent its whole
+                # output budget in a reasoning channel (gemini-3.6-flash at cap 64,
+                # gpt-oss-120b at any cap), or an intermittent proxy/model hiccup
+                # (opus-5 on Vietnamese prompts, at BOTH cap 6000 and 16000).
+                # This must NEVER fall through to a parsed contribution -- run 1
+                # fabricated all-zero "games" exactly that way. Retry generously on
+                # its own budget, then fail loudly.
+                empty_retries += 1
+                if empty_retries > MAX_EMPTY_RETRIES:
+                    raise RuntimeError(
+                        f"empty-content {empty_retries}x lien tiep: model tra ve khong "
+                        f"co text (max_completion_tokens={MAX_OUT}). Khong phai can "
+                        f"token neu da thu cap cao hon -- kiem tai proxy.")
+                sleep_s = min(5 * empty_retries, 60)
+                print(f"[empty-content] lan {empty_retries}/{MAX_EMPTY_RETRIES}, "
+                      f"doi {sleep_s}s roi thu lai (cap={MAX_OUT})", flush=True)
+                time.sleep(sleep_s)
+                attempt -= 1          # khong tinh vao ngan sach retry chung
+                continue
             # Parallel path: contexts.enter can SWALLOW a proxy error inside a
             # worker thread (the run ContextVar does not propagate), leaving
             # text=None. Raise a synthetic transient so the backoff below retries.
