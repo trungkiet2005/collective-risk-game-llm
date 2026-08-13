@@ -110,7 +110,8 @@ def run_cmd(handle, env, args, timeout=None):
 TASK_NAME_IN_FILE = "collective-risk-baseline-srv"
 
 
-def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0"):
+def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0",
+                    max_out=None):
     """Copy task, thay 3 dòng sweep (83-85) bằng giá trị của shard này.
 
     Nếu `task` khác tên khai trong file thì đổi luôn `@kbench.task(name=...)`:
@@ -131,6 +132,14 @@ def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0"):
     if (n_r, n_l, n_p) != (1, 1, 1):
         raise SystemExit(f"Thay sweep that bai (risks={n_r} langs={n_l} reps={n_p}) "
                          f"- crg_task_server.py da doi cau truc? Kiem dong 83-85.")
+    if max_out:
+        # Nướng cứng cap vào file: server KHONG nhan bien moi truong, nen dat
+        # CRG_MAX_OUT o shell la vo ich. Can khi cap mac dinh 6000 khong du va
+        # model tra content RONG (opus-5 tieng Viet: 16/16 cell thieu deu la vn).
+        new, n_m = re.subn(r'os\.environ\.get\("CRG_MAX_OUT", "[^"]*"\)',
+                           f'os.environ.get("CRG_MAX_OUT", "{max_out}")', new)
+        if n_m != 1:
+            raise SystemExit(f"Thay CRG_MAX_OUT that bai ({n_m} cho).")
     if task and task != TASK_NAME_IN_FILE:
         new, n_t = re.subn(rf'name="{re.escape(TASK_NAME_IN_FILE)}"',
                            f'name="{task}"', new)
@@ -139,6 +148,32 @@ def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0"):
                              f"(thay {n_t} cho). Kiem @kbench.task o dong ~605.")
     dest.write_text(new, encoding="utf-8")
     return dest
+
+
+def task_status(handle, env, task):
+    """Trả về trạng thái task ('Running'/'Completed'/'Errored'/None nếu chưa có)."""
+    rc, out = run_cmd(handle, env, ["kaggle", "b", "t", "status", task], timeout=300)
+    m = re.search(r"Status:\s*(\w+)", out)
+    return m.group(1) if m else None
+
+
+def wait_task_idle(handle, env, task, timeout=2400):
+    """Đợi tới khi task KHÔNG còn Running.
+
+    `kaggle b t push` bị TỪ CHỐI NGAY (rc=1, output RỖNG, ~3 giây) nếu version
+    trước còn đang validate. Không có thông báo lỗi nào, nên rất dễ chẩn đoán sai
+    thành 429/quota. Đây là nguyên nhân thật của việc 12/15 shard Ngày B chết.
+    """
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        st = task_status(handle, env, task)
+        if st != "Running":
+            log(handle, f"   task idle (status={st}) -> push duoc")
+            return True
+        log(handle, "   task dang Running (validate version truoc), doi 30s ...")
+        time.sleep(30)
+    log(handle, "!! task ket Running qua lau")
+    return False
 
 
 def wait_push_complete(handle, env, task, timeout=1800):
@@ -167,6 +202,8 @@ def main():
     ap.add_argument("--reps", default="10")
     ap.add_argument("--rep-start", default="0",
                     help="rep bat dau (chia shard theo rep): REP_START=5 --reps 5 -> rep 5..9")
+    ap.add_argument("--max-out", default=None,
+                    help="ghi de max_completion_tokens (mac dinh 512/6000 theo model)")
     ap.add_argument("--task", default="collective-risk-baseline-srv")
     ap.add_argument("--wait", default="7200", help="giay cho `run --wait`")
     ap.add_argument("--label", default=None, help="ten shard dung cho thu muc log/ket qua")
@@ -213,7 +250,7 @@ def main():
         if not args.download_only and not args.run_only:
             shard_py = make_shard_file(shard_dir / "shard_task.py",
                                        args.risks, args.langs, args.reps, args.task,
-                                       args.rep_start)
+                                       args.rep_start, args.max_out)
             log(h, f"da sinh {shard_py}")
 
             # `push` chạy task 1 ván để validate, trên model mặc định của server. Khi
@@ -223,6 +260,9 @@ def main():
             # Ngày B chết kiểu này với stagger 20s).
             pushed = False
             for attempt in range(1, 4):
+                # Bắt buộc: task còn Running thì push bị từ chối ngay, không có
+                # thông báo. Chờ rảnh rồi mới push.
+                wait_task_idle(h, env, args.task)
                 rc, _ = run_cmd(h, env, ["kaggle", "b", "t", "push", args.task,
                                          "-f", str(shard_py)], timeout=3600)
                 if rc != 0:
@@ -253,8 +293,15 @@ def main():
                 if re.search(r"(COMPLETED|ERRORED|Error code|quota|parse_fail)", line):
                     log(h, f"   >> {line.strip()}")
 
-        # Trạng thái + log chi tiết từng model
-        run_cmd(h, env, ["kaggle", "b", "t", "status", args.task], timeout=300)
+        # Trạng thái + log chi tiết từng model.
+        # PHẢI kiểm Errored ở đây: run có thể chết giữa đường (ví dụ guard
+        # empty-content kích hoạt) mà vẫn để lại data MỘT PHẦN tải về được -> nếu chỉ
+        # dựa vào download thành công thì shard bị báo rc=0 trong khi thiếu ván.
+        # Đã bị đúng lỗi này ở Ngày B: 15/15 rc=0 nhưng opus-5 chỉ có 44/60 ván.
+        _, status_out = run_cmd(h, env, ["kaggle", "b", "t", "status", args.task],
+                                timeout=300)
+        errored = [m for m in args.model
+                   if re.search(rf"{re.escape(m)}\s+Errored", status_out)]
         for m in args.model:
             rc, out = run_cmd(h, env, ["kaggle", "b", "t", "log", args.task, "-m", m],
                               timeout=600)
@@ -292,6 +339,11 @@ def main():
             log(h, f"!! SHARD CHUA XONG - download loi: {dl_failed}")
             print(f"\nlog: {log_path}")
             return 4
+        if errored:
+            log(h, f"!! SHARD CHUA XONG - run ERRORED: {errored} "
+                   f"(data tai ve chi la MOT PHAN, thieu van)")
+            print(f"\nlog: {log_path}")
+            return 5
 
         log(h, f"XONG shard {label}")
     print(f"\nlog: {log_path}")

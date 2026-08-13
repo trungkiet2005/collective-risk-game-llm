@@ -19,6 +19,12 @@ def shard_state(d):
     if not log.is_file():
         return "?", "chua co log", 0, 0, None
     text = log.read_text(encoding="utf-8", errors="replace")
+    # shard.log ghi NỐI TIẾP qua nhiều lần thử. Chỉ đọc lần thử CUỐI, nếu không
+    # trạng thái và cột ghi chú (429/503/...) lấy cả của lần cũ đã chết -> báo sai.
+    # Mỗi lần launch_shard chạy đều mở đầu bằng một dòng toàn dấu '='.
+    blocks = re.split(r"^\[[0-9:]+\] ={40,}\s*$", text, flags=re.M)
+    if len(blocks) > 1:
+        text = blocks[-1]
 
     games = len(re.findall(r"\[game \d+/", text)) or None
     # dòng tiến độ do task in ra: "[12/20] risk=... disaster=... parse_fail=0"
@@ -32,7 +38,12 @@ def shard_state(d):
 
     pf = sum(int(x) for x in re.findall(r"parse_fail=(\d+)", text))
 
-    if "XONG shard" in text:
+    # Thứ tự QUAN TRỌNG: "PUSH XONG shard" cũng chứa "XONG shard", nên phải bắt
+    # nhãn push-only TRƯỚC, nếu không shard mới push xong bị báo là đã chạy xong.
+    # Dùng khớp theo định dạng dòng log "[HH:MM:SS] <nhãn>" cho chắc.
+    if re.search(r"\]\s+PUSH XONG shard", text) and not re.search(r"\]\s+XONG shard", text):
+        state = "push-ok"
+    elif re.search(r"\]\s+XONG shard", text):
         state = "XONG"
     elif "SHARD CHUA XONG" in text or re.search(r"!! download .* THAT BAI", text):
         # Run xong + tốn tiền rồi nhưng KHÔNG có data trên máy. Data vẫn còn trên

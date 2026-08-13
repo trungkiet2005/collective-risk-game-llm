@@ -73,8 +73,30 @@ Kết quả đã có: xem [findings-top-tier.md](findings-top-tier.md).
 Còn 2 shard `gemini-3.1-pro` risk 0.1 (`hunhtrungkit`, `tnkiet`) — nếu chúng lỗi thì chạy
 lại bằng `launch_shard.py` với account dự phòng `chiboiz`.
 
-Sau đó: Ngày B (`claude-opus-5`, 6 shard × 10 ván × $5.85 = $35.11), và phép thử rẻ giá trị
-cao **`grok-4.20-0309-non-reasoning`** (~$1.7) — xem lý do trong findings.
+## Ngày B — PHẢI chạy theo 2 PHA
+
+Ngày B = `claude-opus-5` (12 shard × 5 ván) + `grok-4.20-non-reasoning` (3 shard × 20 ván),
+120 ván, ~$56. **Đừng phóng song song kiểu Ngày A** — 12/15 shard sẽ chết ở bước push.
+
+```bash
+python plan/scripts/stage_day_b.py --phase push   # tối đa 3 push cùng lúc, có chờ + retry
+python plan/scripts/stage_day_b.py --phase run    # rồi mới phóng run song song hết
+python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --out results/frontier
+```
+
+**Vì sao 2 pha:** `kaggle b t push` bị **từ chối ngay (rc=1, output RỖNG, 3 giây)** nếu
+version trước còn đang validate (`status` = `Running`). Không có thông báo lỗi nào — rất dễ
+chẩn đoán sai thành 429. Còn `run` thì phóng song song thoải mái vì nó dùng đúng model mình
+chọn, không đập vào model mặc định của server như push.
+
+**Trước khi phóng lại bất cứ thứ gì:** kiểm tiến trình mồ côi. `TaskStop`/Ctrl-C chỉ giết
+shell cha, `launch_shard.py` con vẫn sống và vẫn push → xung đột.
+
+```powershell
+Get-CimInstance Win32_Process -Filter "Name like '%python%'" |
+  Where-Object { $_.CommandLine -match 'launch_shard|launch_day|stage_day' } |
+  ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+```
 
 **Panel đang nhắm tới:** lưới **nhà cung cấp × bậc năng lực** — 13 model / 4 nhà cung cấp
 (Anthropic 3, Google 4 gồm 1 open-weight, OpenAI 4, xAI 2). Proxy chỉ còn 4 nhà cung cấp;
