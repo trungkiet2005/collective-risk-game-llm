@@ -51,6 +51,32 @@ def sub(text: str, old: str, new: str, what: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# GPU: hai notebook nay chay qua `kaggle kernels push`, KHONG qua UI.
+#
+# API chi cho chon NvidiaTeslaT4 / NvidiaTeslaP100 / Tpu1VmV38. RTX PRO 6000
+# Blackwell 96GB ma project van dung la tuy chon CHI CO TREN UI.
+#   - P100 = sm_60. Wheels vLLM trong trungkiet/vllm-wheels build cho sm_120, va
+#     torch trong do chi ho tro sm_75/80/86/90/100/120 -> EngineCore chet ngay.
+#     Da do thuc te 13-08-2026: ca hai kernel hong o day, 0 van.
+#   - T4 = sm_75 -> torch chay duoc. Nhung MOT T4 chi 16GB, khong du cho
+#     gemma-2-9b (~18.5GB fp16) hay llama-3.1-8b (~16.1GB) cong KV cache.
+#     Kaggle cap T4 x2 -> phai TP_SIZE=2 de trai model qua ca hai card.
+# Neu chay lai tren UI voi RTX PRO 6000 96GB thi doi TP_SIZE ve 1.
+# --------------------------------------------------------------------------- #
+TP_OLD = "TP_SIZE = 1"
+TP_NEW = ("TP_SIZE = 2               # T4 x2 qua API (1 card 16GB khong du cho 9B); "
+          "ve 1 neu chay UI tren RTX PRO 6000")
+
+
+def set_tp2(text: str) -> str:
+    if TP_OLD not in text:
+        raise SystemExit("KHONG TIM THAY TP_SIZE = 1")
+    i = text.index(TP_OLD)
+    j = text.index("\n", i)
+    return text[:i] + TP_NEW + text[j:]
+
+
+# --------------------------------------------------------------------------- #
 # 1. nohint.py  — ablation bo mo neo equal-split (reviewer Q1)
 # --------------------------------------------------------------------------- #
 NOHINT_DOC = '''"""
@@ -132,6 +158,7 @@ def build_nohint() -> None:
     n0 = out.index('_need = [REPO_ROOT')
     n1 = out.index(']', out.index('local_vllm_connector.py', n0)) + 1
     out = out[:n0] + NOHINT_NEED + out[n1:]
+    out = set_tp2(out)
     out = sub(out, 'print("OK — crsd/ + FAIRGAME/ + configs/prompts + exp_riskframing đầy đủ.")',
               'print("OK — crsd/ + FAIRGAME/ + template nohint + exp_nohint đầy đủ.")',
               "OK message")
@@ -211,6 +238,7 @@ def build_evprobe() -> None:
     out = sub(out, 'REPO_ROOT / "crsd" / "runner" / "run_comprehension.py"',
               'REPO_ROOT / "crsd" / "runner" / "run_comprehension.py"', "need anchor")
     out = out.replace('"exp_comprehension.json"', '"exp_evprobe.json"')
+    out = set_tp2(out)
     out = sub(out, 'zip_path = Path("/kaggle/working/crsd_results.zip")',
               'zip_path = Path("/kaggle/working/evprobe_results.zip")', "zip name")
     (HERE / "evprobe.py").write_bytes(out.encode("utf-8"))

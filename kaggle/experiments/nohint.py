@@ -88,7 +88,7 @@ MAX_MODEL_LEN = 4096
 TEMPERATURE = 0.7         # >0 để 6 agent khác nhau; 0.7–1.0
 MAX_TOKENS = 512          # đủ cho reasoning ngắn + dòng "CONTRIBUTION: X"
 GPU_UTIL = 0.92           # 0.92×96GB ≈ 88GB (đủ cho 72B AWQ ~41GB + KV; model nhỏ dư sức)
-TP_SIZE = 1               # 1 card 96GB -> 1. Chỉ >1 khi accelerator NHIỀU GPU.
+TP_SIZE = 2               # T4 x2 qua API (1 card 16GB khong du cho 9B); ve 1 neu chay UI tren RTX PRO 6000
 BATCH_SIZE = 256          # vLLM tự lên lịch nội bộ -> an toàn kể cả 72B (dư xếp hàng)
 SAMPLING_SEED_BASE = 0    # offset toàn cục cho seed sinh văn bản
 

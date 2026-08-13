@@ -84,7 +84,7 @@ TEMPERATURE = 0.7         # chế độ B: stochastic, 6 agent ra quyết địn
 MAX_TOKENS = 512          # ÁP CHO CẢ decision lẫn probe. 512 = an toàn khỏi cắt cụt dòng
                           # CONTRIBUTION:/ANSWER: (model phát EOS sớm nên không tốn thêm giờ).
 GPU_UTIL = 0.90
-TP_SIZE = 1
+TP_SIZE = 2               # T4 x2 qua API (1 card 16GB khong du cho 9B); ve 1 neu chay UI tren RTX PRO 6000
 BATCH_SIZE = 256          # probe thêm nhiều prompt/vòng -> batch giúp throughput
 SAMPLING_SEED_BASE = 0
 

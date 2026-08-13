@@ -70,8 +70,8 @@ mọi con số cũ đều tái tạo khớp (uncensored `+0.97`, CI `[-2.2,+4.1]
 
 | Việc | Trạng thái |
 |---|---|
-| **Q1** ablation bỏ mỏ neo | 🟢 **ĐANG CHẠY** trên Kaggle GPU — [`trungkiet/crsd-nohint`](https://www.kaggle.com/code/trungkiet/crsd-nohint) |
-| **Q3** probe so sánh EV | 🟢 **ĐANG CHẠY** trên Kaggle GPU — [`trungkiet/crsd-evprobe`](https://www.kaggle.com/code/trungkiet/crsd-evprobe) |
+| **Q1** ablation bỏ mỏ neo | 🟢 chạy lại trên **T4×2** — [`trungkiet/crsd-nohint`](https://www.kaggle.com/code/trungkiet/crsd-nohint) v3. Lần 1 hỏng, xem §2d |
+| **Q3** probe so sánh EV | 🟡 chờ slot GPU rồi tự đẩy — [`trungkiet/crsd-evprobe`](https://www.kaggle.com/code/trungkiet/crsd-evprobe) |
 | **Q8** mức risk trung gian p=0.3, 0.7 | 🟡 **CHỜ NGÂN SÁCH — duyệt ngày 14-08-2026.** ~$16–32. Xem §2c bên dưới cho lệnh chạy sẵn |
 | **Q10** salience một phần | ⬜ dùng `memoryMode`/`memoryWindow` sẵn có, chưa chạy |
 | **Q9** nhóm trộn model | ⬜ cần sửa engine cho phép mỗi ghế một model |
@@ -109,6 +109,40 @@ kẹp: ở p=0.3 EV vẫn nghiêng về bỏ mặc (28 > 20), ở p=0.7 đã ngh
 0.5, đó là hàm bậc thang đúng ngưỡng EV — củng cố claim hiện tại. Nếu có ván lưng chừng ở
 0.3 hoặc 0.7 thì ngưỡng bị nhoè, và câu "step function at the expected-value threshold"
 trong paper phải nới lại.
+
+### 2d. ⚠️ Chạy notebook GPU qua API ≠ chạy qua UI — sự thật đắt tiền
+
+**API Kaggle KHÔNG cho chọn RTX PRO 6000.** `kaggle kernels push --accelerator` chỉ nhận
+ba giá trị: `NvidiaTeslaT4`, `NvidiaTeslaP100`, `Tpu1VmV38`. Con RTX PRO 6000 Blackwell
+96GB mà cả project dựa vào là **tuỳ chọn chỉ có trên giao diện web**. Không có cờ nào lấy
+được nó từ CLI.
+
+Hệ quả, đo thật ngày 13-08-2026:
+
+- Mặc định (`enable_gpu: true`, không truyền accelerator) → Kaggle cấp **Tesla P100 (sm_60)**.
+  Wheels vLLM trong `trungkiet/vllm-wheels` build cho sm_120, torch trong đó chỉ hỗ trợ
+  sm_75/80/86/90/100/120. EngineCore chết ngay khi khởi tạo. **Cả hai kernel chạy 15 phút
+  rồi báo COMPLETE với 0 ván** — `COMPLETE` chỉ nghĩa là script chạy hết, KHÔNG nghĩa là
+  thành công. Luôn phải đọc log, đừng tin status.
+- Lỗi hiện ra dưới dạng `FileNotFoundError` ở `os.getcwd()` trong `multiprocessing.spawn`.
+  **Đó là triệu chứng, không phải nguyên nhân** — cwd biến mất vì tiến trình EngineCore
+  chết, chứ không phải vì `os.chdir` sai. Đừng đi sửa CELL 3.
+- T4 = sm_75 → torch chạy được. Nhưng **một** T4 chỉ 16GB, không đủ cho gemma-2-9b
+  (~18.5GB fp16) hay llama-3.1-8b (~16.1GB) cộng KV cache. Kaggle cấp T4 **×2** nên phải
+  `TP_SIZE=2`. Notebook sinh ra đã đặt sẵn — **chạy trên UI với RTX PRO 6000 thì đổi về 1**.
+- **Tối đa 2 phiên GPU đồng thời/account.** Đẩy cái thứ ba báo
+  `Maximum batch GPU session count of 2 reached`.
+- `kaggle kernels push` đọc file code bằng codepage hệ thống → **tiếng Việt trong docstring
+  làm nó chết** với `'charmap' codec can't decode`. Phải đặt `PYTHONUTF8=1`.
+- `--accelerator ?` **không bị validate** — nó nhận luôn làm giá trị và đẩy một version mới,
+  tức là tốn một lượt chạy. Đừng dò giá trị bằng cách thử.
+
+**Mọi thứ còn lại đã kiểm và chạy đúng:** dataset `trungkiet/crsd-code` được tự dò ra,
+ba model mount đủ (`exists=True`), wheels vLLM cài offline OK, config + template nohint
+đầy đủ, kế hoạch in ra đúng "60 games/model, 3 model × 60 = 180 games". Chỉ kẹt ở GPU.
+
+**Nếu T4×2 quá chậm hoặc hết quota:** chạy tay trên UI theo đúng hướng dẫn trong docstring
+`baseline.py` (chọn RTX PRO 6000, TP_SIZE về 1) — nhanh hơn nhiều lần.
 
 ### ⚠️ Ẩn danh và tự trích dẫn
 
