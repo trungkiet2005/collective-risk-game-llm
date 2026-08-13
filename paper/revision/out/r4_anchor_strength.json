@@ -1,0 +1,452 @@
+{
+  "focal_action": 2,
+  "overall_p_focal": {
+    "Claude-Opus-5": {
+      "p_focal": 0.8678,
+      "p_zero": 0.0469,
+      "p_max": 0.0853,
+      "n_turns": 3600
+    },
+    "Gemma-2-27B": {
+      "p_focal": 0.9464,
+      "p_zero": 0.0006,
+      "p_max": 0.0531,
+      "n_turns": 3600
+    },
+    "Gemma-2-9B": {
+      "p_focal": 0.9261,
+      "p_zero": 0.0,
+      "p_max": 0.0739,
+      "n_turns": 3600
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "p_focal": 0.9908,
+      "p_zero": 0.0011,
+      "p_max": 0.0081,
+      "n_turns": 3600
+    },
+    "Gemini-3.1-Pro": {
+      "p_focal": 0.6672,
+      "p_zero": 0.3328,
+      "p_max": 0.0,
+      "n_turns": 3600
+    },
+    "Llama-3.1-70B": {
+      "p_focal": 0.8658,
+      "p_zero": 0.0631,
+      "p_max": 0.0711,
+      "n_turns": 3600
+    },
+    "Llama-3.1-8B": {
+      "p_focal": 0.2822,
+      "p_zero": 0.0864,
+      "p_max": 0.6314,
+      "n_turns": 3600
+    },
+    "GPT-5.4-nano": {
+      "p_focal": 0.2461,
+      "p_zero": 0.3089,
+      "p_max": 0.445,
+      "n_turns": 1800
+    },
+    "GPT-5.6-sol": {
+      "p_focal": 0.7056,
+      "p_zero": 0.2811,
+      "p_max": 0.0133,
+      "n_turns": 3600
+    },
+    "Qwen2.5-32B": {
+      "p_focal": 0.8797,
+      "p_zero": 0.0283,
+      "p_max": 0.0919,
+      "n_turns": 3600
+    },
+    "Qwen2.5-72B": {
+      "p_focal": 0.8961,
+      "p_zero": 0.0,
+      "p_max": 0.1039,
+      "n_turns": 3600
+    },
+    "Qwen2.5-7B": {
+      "p_focal": 0.0544,
+      "p_zero": 0.0031,
+      "p_max": 0.9425,
+      "n_turns": 3600
+    },
+    "Grok-4.20 (no reasoning)": {
+      "p_focal": 0.1178,
+      "p_zero": 0.0031,
+      "p_max": 0.8792,
+      "n_turns": 3600
+    },
+    "Grok-4.20 (reasoning)": {
+      "p_focal": 0.9997,
+      "p_zero": 0.0,
+      "p_max": 0.0003,
+      "n_turns": 3600
+    }
+  },
+  "moved_by_risk_baseline": {
+    "Claude-Opus-5": {
+      "levels": {
+        "0.1": 0.905,
+        "0.5": 0.86,
+        "0.9": 0.8383
+      },
+      "range_pp": 6.67
+    },
+    "Gemma-2-27B": {
+      "levels": {
+        "0.1": 0.9533,
+        "0.5": 0.945,
+        "0.9": 0.9408
+      },
+      "range_pp": 1.25
+    },
+    "Gemma-2-9B": {
+      "levels": {
+        "0.1": 0.9675,
+        "0.5": 0.9167,
+        "0.9": 0.8942
+      },
+      "range_pp": 7.33
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "levels": {
+        "0.1": 0.9883,
+        "0.5": 0.9883,
+        "0.9": 0.9958
+      },
+      "range_pp": 0.75
+    },
+    "Gemini-3.1-Pro": {
+      "levels": {
+        "0.1": 0.0017,
+        "0.5": 1.0,
+        "0.9": 1.0
+      },
+      "range_pp": 99.83
+    },
+    "Llama-3.1-70B": {
+      "levels": {
+        "0.1": 0.8917,
+        "0.5": 0.8592,
+        "0.9": 0.8467
+      },
+      "range_pp": 4.5
+    },
+    "Llama-3.1-8B": {
+      "levels": {
+        "0.1": 0.2867,
+        "0.5": 0.2767,
+        "0.9": 0.2833
+      },
+      "range_pp": 1.0
+    },
+    "GPT-5.4-nano": {
+      "levels": {
+        "0.1": 0.2783,
+        "0.5": 0.2367,
+        "0.9": 0.2233
+      },
+      "range_pp": 5.5
+    },
+    "GPT-5.6-sol": {
+      "levels": {
+        "0.1": 0.1192,
+        "0.5": 1.0,
+        "0.9": 0.9975
+      },
+      "range_pp": 88.08
+    },
+    "Qwen2.5-32B": {
+      "levels": {
+        "0.1": 0.8858,
+        "0.5": 0.8775,
+        "0.9": 0.8758
+      },
+      "range_pp": 1.0
+    },
+    "Qwen2.5-72B": {
+      "levels": {
+        "0.1": 0.9058,
+        "0.5": 0.9033,
+        "0.9": 0.8792
+      },
+      "range_pp": 2.67
+    },
+    "Qwen2.5-7B": {
+      "levels": {
+        "0.1": 0.0567,
+        "0.5": 0.0558,
+        "0.9": 0.0508
+      },
+      "range_pp": 0.58
+    },
+    "Grok-4.20 (no reasoning)": {
+      "levels": {
+        "0.1": 0.1758,
+        "0.5": 0.1033,
+        "0.9": 0.0742
+      },
+      "range_pp": 10.17
+    },
+    "Grok-4.20 (reasoning)": {
+      "levels": {
+        "0.1": 1.0,
+        "0.5": 1.0,
+        "0.9": 0.9992
+      },
+      "range_pp": 0.08
+    }
+  },
+  "moved_by_language_baseline": {
+    "Claude-Opus-5": {
+      "levels": {
+        "en": 0.9489,
+        "vn": 0.7867
+      },
+      "range_pp": 16.22
+    },
+    "Gemma-2-27B": {
+      "levels": {
+        "en": 0.8928,
+        "vn": 1.0
+      },
+      "range_pp": 10.72
+    },
+    "Gemma-2-9B": {
+      "levels": {
+        "en": 1.0,
+        "vn": 0.8522
+      },
+      "range_pp": 14.78
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "levels": {
+        "en": 0.9828,
+        "vn": 0.9989
+      },
+      "range_pp": 1.61
+    },
+    "Gemini-3.1-Pro": {
+      "levels": {
+        "en": 0.6667,
+        "vn": 0.6678
+      },
+      "range_pp": 0.11
+    },
+    "Llama-3.1-70B": {
+      "levels": {
+        "en": 0.8094,
+        "vn": 0.9222
+      },
+      "range_pp": 11.28
+    },
+    "Llama-3.1-8B": {
+      "levels": {
+        "en": 0.1906,
+        "vn": 0.3739
+      },
+      "range_pp": 18.33
+    },
+    "GPT-5.4-nano": {
+      "levels": {
+        "en": 0.2278,
+        "vn": 0.2644
+      },
+      "range_pp": 3.67
+    },
+    "GPT-5.6-sol": {
+      "levels": {
+        "en": 0.6683,
+        "vn": 0.7428
+      },
+      "range_pp": 7.44
+    },
+    "Qwen2.5-32B": {
+      "levels": {
+        "en": 0.8939,
+        "vn": 0.8656
+      },
+      "range_pp": 2.83
+    },
+    "Qwen2.5-72B": {
+      "levels": {
+        "en": 0.8056,
+        "vn": 0.9867
+      },
+      "range_pp": 18.11
+    },
+    "Qwen2.5-7B": {
+      "levels": {
+        "en": 0.01,
+        "vn": 0.0989
+      },
+      "range_pp": 8.89
+    },
+    "Grok-4.20 (no reasoning)": {
+      "levels": {
+        "en": 0.2333,
+        "vn": 0.0022
+      },
+      "range_pp": 23.11
+    },
+    "Grok-4.20 (reasoning)": {
+      "levels": {
+        "en": 0.9994,
+        "vn": 1.0
+      },
+      "range_pp": 0.06
+    }
+  },
+  "moved_by_composition": {
+    "Gemma-2-9B": {
+      "levels": {
+        "0.0": 0.7658,
+        "1.0": 0.7925,
+        "2.0": 0.8197,
+        "3.0": 0.7458,
+        "4.0": 0.6517,
+        "5.0": 0.5253,
+        "6.0": 0.3944
+      },
+      "range_pp": 42.53
+    },
+    "Llama-3.1-8B": {
+      "levels": {
+        "0.0": 0.2375,
+        "1.0": 0.2431,
+        "2.0": 0.2492,
+        "3.0": 0.2567,
+        "4.0": 0.2328,
+        "5.0": 0.2531,
+        "6.0": 0.2467
+      },
+      "range_pp": 2.39
+    },
+    "GPT-5.4-nano": {
+      "levels": {
+        "0.0": 0.3356,
+        "1.0": 0.2878,
+        "2.0": 0.2444,
+        "3.0": 0.1928,
+        "4.0": 0.1428,
+        "5.0": 0.1028,
+        "6.0": 0.0661
+      },
+      "range_pp": 26.94
+    },
+    "Qwen2.5-7B": {
+      "levels": {
+        "0.0": 0.0194,
+        "1.0": 0.0183,
+        "2.0": 0.015,
+        "3.0": 0.0214,
+        "4.0": 0.0161,
+        "5.0": 0.0147,
+        "6.0": 0.0133
+      },
+      "range_pp": 0.81
+    }
+  },
+  "moved_by_risk_in_composition": {
+    "Gemma-2-9B": {
+      "levels": {
+        "0.1": 0.6864,
+        "0.5": 0.6838,
+        "0.9": 0.642
+      },
+      "range_pp": 4.44
+    },
+    "Llama-3.1-8B": {
+      "levels": {
+        "0.1": 0.2489,
+        "0.5": 0.2471,
+        "0.9": 0.2406
+      },
+      "range_pp": 0.83
+    },
+    "GPT-5.4-nano": {
+      "levels": {
+        "0.1": 0.1967,
+        "0.5": 0.2062,
+        "0.9": 0.1852
+      },
+      "range_pp": 2.1
+    },
+    "Qwen2.5-7B": {
+      "levels": {
+        "0.1": 0.0211,
+        "0.5": 0.016,
+        "0.9": 0.0137
+      },
+      "range_pp": 0.74
+    }
+  },
+  "median_range_pp": {
+    "risk (baseline)": 3.58,
+    "risk (composition study)": 1.47,
+    "language (baseline)": 9.8,
+    "composition 0->6 selfish": 14.67
+  },
+  "anchor_overridden_at_p01_en": {
+    "Gemini-3.1-Pro": {
+      "p_zero": 1.0,
+      "p_focal": 0.0,
+      "n_turns": 600
+    },
+    "GPT-5.6-sol": {
+      "p_zero": 0.9883,
+      "p_focal": 0.01,
+      "n_turns": 600
+    }
+  },
+  "anchor_vs_risk_effect": {
+    "pearson_r_p_focal_vs_abs_risk_effect": -0.057,
+    "weakest_anchor_grip": [
+      {
+        "model": "Qwen2.5-7B",
+        "p_focal": 0.054,
+        "abs_risk_effect": 0.0
+      },
+      {
+        "model": "Grok-4.20 (no reasoning)",
+        "p_focal": 0.118,
+        "abs_risk_effect": 23.6
+      },
+      {
+        "model": "GPT-5.4-nano",
+        "p_focal": 0.246,
+        "abs_risk_effect": 7.2
+      },
+      {
+        "model": "Llama-3.1-8B",
+        "p_focal": 0.282,
+        "abs_risk_effect": 3.4
+      }
+    ],
+    "strongest_anchor_grip": [
+      {
+        "model": "Gemma-2-9B",
+        "p_focal": 0.926,
+        "abs_risk_effect": 0.0
+      },
+      {
+        "model": "Gemma-2-27B",
+        "p_focal": 0.946,
+        "abs_risk_effect": 3.8
+      },
+      {
+        "model": "Gemini-3.1-Flash-Lite",
+        "p_focal": 0.991,
+        "abs_risk_effect": 1.8
+      },
+      {
+        "model": "Grok-4.20 (reasoning)",
+        "p_focal": 1.0,
+        "abs_risk_effect": 0.2
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{Economy of play and risk sensitivity are separate axes.} For each
+configuration: how much the group pooled overall (of $240$; lower is thriftier), the
+risk effect in English, and the target-reach rate at $p=0.1$, the risk level at which
+reaching the target is the wrong thing to do. Within every family the larger or more
+expensive member is thriftier; only in one family does it also become risk-sensitive.}
+\label{tab:axes}
+\small
+\begin{tabular}{@{}llccll@{}}
+\toprule
+Family & Configuration & Pooled & $\Delta$ risk & Reach at $p{=}0.1$ & Reading \\
+\midrule
+Qwen2.5 & Qwen2.5-7B & $232.7$ & $+0.0$ & $100\%$ & profligate, risk-blind \\
+ & Qwen2.5-32B & $127.6$ & $+1.4$ & $100\%$ & thrifty, risk-blind \\
+ & Qwen2.5-72B & $132.5$ & $+2.4$ & $100\%$ & thrifty, risk-blind \\
+\addlinespace[1pt]
+Llama-3.1 & Llama-3.1-8B & $185.4$ & $+3.4$ & $100\%$ & profligate, risk-blind \\
+ & Llama-3.1-70B & $121.0$ & $+0.4$ & $100\%$ & thrifty, risk-blind \\
+\addlinespace[1pt]
+Gemma-2 & Gemma-2-9B & $128.9$ & $+0.0$ & $100\%$ & thrifty, risk-blind \\
+ & Gemma-2-27B & $126.3$ & $+3.8$ & $100\%$ & thrifty, risk-blind \\
+\addlinespace[1pt]
+Gemini-3.1 & Gemini-3.1-Flash-Lite & $120.8$ & $-1.8$ & $100\%$ & thrifty, risk-blind \\
+ & Gemini-3.1-Pro & $80.1$ & $+120.0$ & $0\%$ & EV solution \\
+\addlinespace[1pt]
+GPT-5 & GPT-5.4-nano & $136.3$ & $+7.2$ & $100\%$ & profligate, risk-blind \\
+ & GPT-5.6-sol & $87.9$ & $+118.2$ & $0\%$ & EV solution \\
+\addlinespace[1pt]
+Claude & Claude-Opus-5 & $124.6$ & $+8.0$ & $100\%$ & thrifty, risk-blind \\
+\addlinespace[1pt]
+Grok-4.20 & Grok-4.20 (no reasoning) & $225.1$ & $+23.6$ & $100\%$ & profligate, risk-blind \\
+ & Grok-4.20 (reasoning) & $120.0$ & $+0.2$ & $100\%$ & thrifty, risk-blind \\
+\bottomrule
+\end{tabular}
+\end{table}

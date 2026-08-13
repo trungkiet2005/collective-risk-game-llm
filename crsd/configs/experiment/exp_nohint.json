@@ -1,0 +1,23 @@
+{
+  "name": "exp_nohint",
+  "description": "ABLATION MO NEO (revision, reviewer Q1). Y HET exp_baseline nhung dung template crsd_nohint_* : da BO '(an average of 2 per player per round)' va vi du '(contributing 2 every round leaves you 20)'. Moi thu khac giu nguyen byte-for-byte -> hieu ung do duoc la TAC DUNG CUA MO NEO, khong lan thu gi khac. Doi chieu voi exp_baseline cung model, cung seed.",
+  "games": [
+    "crsd_milinski_high_risk_nohint",
+    "crsd_milinski_medium_risk_nohint",
+    "crsd_milinski_low_risk_nohint"
+  ],
+  "agents": "personas_default",
+  "languages": [
+    "en",
+    "vn"
+  ],
+  "models": [
+    "LocalQwen"
+  ],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false
+}

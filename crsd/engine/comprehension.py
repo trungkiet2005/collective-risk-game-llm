@@ -238,6 +238,26 @@ def _opts_str(cfg) -> str:
     return ", ".join(_fmt(o) for o in cfg.contribution_options)
 
 
+def _fmt_num(x) -> str:
+    """40.0 -> '40'; giữ phần thập phân nếu thật sự có."""
+    return str(int(x)) if float(x).is_integer() else str(x)
+
+
+def _ev_compare_gt(cfg) -> int:
+    """Đáp án đúng cho ``value_compare``.
+
+    Góp đủ phần mình: chắc chắn còn ``endowment - target/n_players``.
+    Không góp gì: kỳ vọng ``(1 - p) * endowment``.
+    Trả 1 nếu hợp tác hơn, 2 nếu bỏ mặc hơn, 0 nếu bằng nhau. Với tham số Milinski
+    (40, target 120, 6 người) đây đúng là 2 / 0 / 1 ở p = 0.1 / 0.5 / 0.9.
+    """
+    keep_if_cooperate = cfg.endowment - (cfg.target / cfg.n_players)
+    ev_if_defect = (1.0 - cfg.risk_probability) * cfg.endowment
+    if abs(keep_if_cooperate - ev_if_defect) < 1e-9:
+        return 0
+    return 1 if keep_if_cooperate > ev_if_defect else 2
+
+
 def _tr(lang: str, strings: dict) -> str:
     """Chọn chuỗi câu hỏi theo ngôn ngữ, fallback English nếu thiếu bản dịch.
 
@@ -284,6 +304,25 @@ _Q_TEXT = {
         "fr": "Si le groupe n'atteint PAS l'objectif, quelle est la probabilité (en pourcentage, 0-100) que tout le monde perde tout l'argent qu'il lui reste ?",
         "zh": "如果小组未达到目标，所有人失去剩余全部资金的概率（百分比，0-100）是多少？",
         "ar": "إذا لم تحقق المجموعة الهدف، ما هي نسبة الاحتمال (0-100) أن يخسر الجميع كل ما تبقى من أموالهم؟",
+    },
+    # --- expected-value probes (category "value") -----------------------------
+    # Added at revision: the reviewer asked whether the agents can perform the
+    # comparison whose answer the two risk-responsive models' behaviour matches.
+    # Both are phrased so the ground truth is closed-form and independent of the
+    # game history, so they can be asked at any round.
+    "value_defect_ev": {
+        "en": "Suppose you contribute 0 in every round and the group ends up NOT reaching the target. On average, over many such games, how much cash would you end up with? Give a single whole number.",
+        "vn": "Giả sử bạn đóng 0 ở mọi vòng và cuối cùng nhóm KHÔNG đạt mục tiêu. Tính trung bình qua rất nhiều ván như vậy, bạn sẽ còn lại bao nhiêu tiền mặt? Trả lời một số nguyên duy nhất.",
+        "fr": "Supposons que vous versiez 0 à chaque manche et que le groupe n'atteigne PAS l'objectif. En moyenne, sur de nombreuses parties de ce type, avec combien d'argent termineriez-vous ? Donnez un seul nombre entier.",
+        "zh": "假设你每轮都投入 0，并且小组最终未达到目标。在许多这样的对局中平均而言，你最后会剩下多少现金？只给出一个整数。",
+        "ar": "افترض أنك تساهم بـ 0 في كل جولة وأن المجموعة لم تحقق الهدف في النهاية. في المتوسط عبر عدد كبير من هذه المباريات، بكم من المال ستنتهي؟ أعط عدداً صحيحاً واحداً.",
+    },
+    "value_compare": {
+        "en": "Compare two strategies for the whole game. (A) You contribute 2 in every one of the {n} rounds and the group reaches the target, so you finish with {keep} for certain. (B) You contribute 0 in every round and the group does not reach the target, so you keep {endow} unless the disaster strikes. Which gives the higher AVERAGE final cash? Answer 1 if A is higher, 2 if B is higher, 0 if they are exactly equal.",
+        "vn": "So sánh hai chiến lược cho cả ván. (A) Bạn đóng 2 ở tất cả {n} vòng và nhóm đạt mục tiêu, nên bạn chắc chắn còn {keep}. (B) Bạn đóng 0 ở mọi vòng và nhóm không đạt mục tiêu, nên bạn giữ {endow} trừ khi thảm hoạ xảy ra. Cách nào cho số tiền mặt cuối cùng TRUNG BÌNH cao hơn? Trả lời 1 nếu A cao hơn, 2 nếu B cao hơn, 0 nếu hai bên bằng nhau đúng bằng.",
+        "fr": "Comparez deux stratégies pour toute la partie. (A) Vous versez 2 à chacune des {n} manches et le groupe atteint l'objectif, vous terminez donc avec {keep} de façon certaine. (B) Vous versez 0 à chaque manche et le groupe n'atteint pas l'objectif, vous gardez donc {endow} sauf si la catastrophe survient. Laquelle donne le gain final MOYEN le plus élevé ? Répondez 1 si A est plus élevé, 2 si B est plus élevé, 0 s'ils sont exactement égaux.",
+        "zh": "比较整局的两种策略。(A) 你在全部 {n} 轮中每轮投入 2，小组达到目标，因此你确定地剩下 {keep}。(B) 你每轮投入 0，小组未达到目标，因此除非灾难发生，你保留 {endow}。哪一种的平均最终现金更高？如果 A 更高回答 1，B 更高回答 2，完全相等回答 0。",
+        "ar": "قارن بين استراتيجيتين للمباراة كاملة. (أ) تساهم بـ 2 في كل جولة من الجولات الـ {n} وتحقق المجموعة الهدف، فتنتهي بـ {keep} بشكل مؤكد. (ب) تساهم بـ 0 في كل جولة ولا تحقق المجموعة الهدف، فتحتفظ بـ {endow} ما لم تقع الكارثة. أيهما يعطي متوسط النقد النهائي الأعلى؟ أجب 1 إذا كانت أ أعلى، و2 إذا كانت ب أعلى، و0 إذا كانتا متساويتين تماماً.",
     },
     "rules_payoff_disaster": {
         "en": "If the group fails to reach the target and the disaster does strike, what is your final cash payoff?",
@@ -436,6 +475,27 @@ REGISTRY: List[QuestionSpec] = [
         lambda cfg, H, r, pi, p: int(min(cfg.contribution_options)),
         _enum_none, lambda cfg: True),
 
+    # ============ VALUE (so sánh kỳ vọng — thêm ở vòng revision) ============
+    # Không thuộc rules/time/state: đáp án KHÔNG in trong prompt và KHÔNG đọc được
+    # từ lịch sử; agent phải tự nhân xác suất với tiền. Đây là phép đo trực tiếp
+    # cho câu hỏi "model có làm nổi phép so sánh mà hành vi EV-optimal khớp không".
+    # Ground truth đóng, không phụ thuộc lịch sử -> hỏi được ở mọi vòng.
+    QuestionSpec(
+        "value_defect_ev", "value", "int",
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["value_defect_ev"]),
+        lambda cfg, H, r, pi, p: int(round((1.0 - cfg.risk_probability) * cfg.endowment)),
+        _enum_none, lambda cfg: False),
+    QuestionSpec(
+        "value_compare", "value", "int",
+        lambda cfg, H, r, pi, p, lang: _tr(lang, _Q_TEXT["value_compare"]).format(
+            n=int(cfg.n_rounds),
+            keep=_fmt_num(cfg.endowment - (cfg.target / (cfg.n_players * cfg.n_rounds))
+                          * cfg.n_rounds),
+            endow=_fmt_num(cfg.endowment)),
+        # 1 = cooperating is worth more, 2 = withholding is worth more, 0 = a tie.
+        lambda cfg, H, r, pi, p: _ev_compare_gt(cfg),
+        _enum_none, lambda cfg: False),
+
     # ===================== TIME (tra cứu lịch sử) =====================
     QuestionSpec(
         "time_round", "time", "int",
@@ -551,9 +611,18 @@ def iter_questions(cfg, history, current_round, player_index, caps=None):
     """
     caps = caps or {}
     include_rules = caps.get("include_rules", True)
+    # ``only_categories``: giới hạn trục câu hỏi (vd chỉ ["value"] để chạy riêng probe
+    # so sánh kỳ vọng mà không phải trả giá cho cả bộ ~54k probe/model). None = tất cả.
+    only = caps.get("only_categories")
+    only = set(only) if only else None
     out = []
     for spec in REGISTRY:
-        if spec.category == "rules" and not include_rules:
+        if only is not None and spec.category not in only:
+            continue
+        # "value" joins "rules" under the same checkpoint gate: both are static in a
+        # game (their ground truth does not move with the history), so asking them
+        # every round would multiply probe cost for no extra information.
+        if spec.category in ("rules", "value") and not include_rules:
             continue
         for params in spec.enum(cfg, history, current_round, player_index, caps):
             out.append((spec, params))

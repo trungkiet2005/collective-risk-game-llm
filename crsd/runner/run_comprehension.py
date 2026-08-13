@@ -35,13 +35,19 @@ from .batch import run_games_batched
 from .run_experiment import build_games_for_model, load_template
 
 
-def make_probe_builder(comp_templates, probe_players, max_seats, max_past_rounds, rules_checkpoints):
+def make_probe_builder(comp_templates, probe_players, max_seats, max_past_rounds,
+                       rules_checkpoints, only_categories=None):
     """Trả về ``probe_builder(game) -> (prompts, seeds, metas)`` cho ``run_games_batched``.
 
     Mỗi vòng, với mỗi ghế trong ``probe_players``, sinh toàn bộ câu hỏi đọc-hiểu trên
-    ĐÚNG trạng thái hiện tại. ``rules_checkpoints`` (nếu có) giới hạn nhóm Rules vào
-    vài vòng cố định (đáp án Rules bất biến nên không cần hỏi mỗi vòng)."""
+    ĐÚNG trạng thái hiện tại. ``rules_checkpoints`` (nếu có) giới hạn nhóm Rules (và
+    nhóm Value, cũng tĩnh trong một ván) vào vài vòng cố định.
+
+    ``only_categories`` giới hạn trục câu hỏi — dùng để chạy riêng một trục mới mà
+    không phải trả giá cho cả bộ probe."""
     base_caps = {"max_seats": int(max_seats), "max_past_rounds": max_past_rounds}
+    if only_categories:
+        base_caps["only_categories"] = list(only_categories)
 
     def builder(game):
         prompts, seeds, metas = [], [], []
@@ -114,6 +120,7 @@ def main(argv):
         comp_cfg.get("maxSeats", 4),
         comp_cfg.get("maxPastRounds", None),
         comp_cfg.get("rulesCheckpoints", None),
+        comp_cfg.get("onlyCategories", None),
     )
 
     offline_settings = None

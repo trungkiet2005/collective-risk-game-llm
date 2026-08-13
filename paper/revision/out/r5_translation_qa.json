@@ -1,0 +1,325 @@
+{
+  "prompt_audit": {
+    "lines_en": 30,
+    "lines_vn": 30,
+    "placeholders_en": 42,
+    "placeholders_vn": 42,
+    "placeholder_multiset_identical": true,
+    "placeholders_only_in_en": [],
+    "placeholders_only_in_vn": [],
+    "literal_numbers_en": [
+      "0",
+      "0"
+    ],
+    "literal_numbers_vn": [
+      "0",
+      "0"
+    ],
+    "answer_token_identical": true
+  },
+  "comprehension": {
+    "by_category": {
+      "rules": {
+        "by_language_pct": {
+          "en": 99.4,
+          "vn": 98.74
+        },
+        "gap_pp": 0.66,
+        "n_probes": 20160
+      },
+      "state": {
+        "by_language_pct": {
+          "en": 73.63,
+          "vn": 61.8
+        },
+        "gap_pp": 11.83,
+        "n_probes": 163800
+      },
+      "time": {
+        "by_language_pct": {
+          "en": 95.65,
+          "vn": 93.17
+        },
+        "gap_pp": 2.48,
+        "n_probes": 197400
+      }
+    },
+    "by_question": {
+      "rules_actions": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0,
+        "n_probes": 2520
+      },
+      "rules_endowment": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0,
+        "n_probes": 2520
+      },
+      "rules_max_contrib": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 97.22,
+          "vn": 100.0
+        },
+        "gap_pp": -2.78,
+        "n_probes": 2520
+      },
+      "rules_min_contrib": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 99.92
+        },
+        "gap_pp": 0.08,
+        "n_probes": 2520
+      },
+      "rules_n_rounds": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0,
+        "n_probes": 2520
+      },
+      "rules_payoff_disaster": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0,
+        "n_probes": 2520
+      },
+      "rules_risk_pct": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 98.02,
+          "vn": 98.97
+        },
+        "gap_pp": -0.95,
+        "n_probes": 2520
+      },
+      "rules_target": {
+        "category": "rules",
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 91.03
+        },
+        "gap_pp": 8.97,
+        "n_probes": 2520
+      },
+      "state_X_total": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 65.46,
+          "vn": 60.23
+        },
+        "gap_pp": 5.23,
+        "n_probes": 22680
+      },
+      "state_count_p": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 74.6,
+          "vn": 57.76
+        },
+        "gap_pp": 16.84,
+        "n_probes": 90720
+      },
+      "state_own_remaining": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 92.4,
+          "vn": 95.48
+        },
+        "gap_pp": -3.08,
+        "n_probes": 8400
+      },
+      "state_own_total": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 78.98,
+          "vn": 71.02
+        },
+        "gap_pp": 7.96,
+        "n_probes": 8400
+      },
+      "state_pool": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 71.79,
+          "vn": 72.48
+        },
+        "gap_pp": -0.69,
+        "n_probes": 8400
+      },
+      "state_remaining_to_target": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 59.95,
+          "vn": 51.62
+        },
+        "gap_pp": 8.33,
+        "n_probes": 8400
+      },
+      "state_rounds_left": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 60.05,
+          "vn": 38.17
+        },
+        "gap_pp": 21.88,
+        "n_probes": 8400
+      },
+      "state_target_reached": {
+        "category": "state",
+        "by_language_pct": {
+          "en": 90.1,
+          "vn": 89.95
+        },
+        "gap_pp": 0.15,
+        "n_probes": 8400
+      },
+      "time_action_i": {
+        "category": "time",
+        "by_language_pct": {
+          "en": 99.76,
+          "vn": 98.35
+        },
+        "gap_pp": 1.41,
+        "n_probes": 113400
+      },
+      "time_own_action_i": {
+        "category": "time",
+        "by_language_pct": {
+          "en": 99.96,
+          "vn": 99.82
+        },
+        "gap_pp": 0.14,
+        "n_probes": 37800
+      },
+      "time_round": {
+        "category": "time",
+        "by_language_pct": {
+          "en": 96.52,
+          "vn": 89.64
+        },
+        "gap_pp": 6.88,
+        "n_probes": 8400
+      },
+      "time_round_total_i": {
+        "category": "time",
+        "by_language_pct": {
+          "en": 78.83,
+          "vn": 71.75
+        },
+        "gap_pp": 7.08,
+        "n_probes": 37800
+      }
+    },
+    "rules_by_model": {
+      "Gemma-2-27B": {
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0
+      },
+      "Gemma-2-9B": {
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0
+      },
+      "Llama-3.1-8B": {
+        "by_language_pct": {
+          "en": 96.32,
+          "vn": 91.18
+        },
+        "gap_pp": 5.14
+      },
+      "llama33-70b-instruct-awq": {
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0
+      },
+      "Qwen2.5-32B": {
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0
+      },
+      "Qwen2.5-72B": {
+        "by_language_pct": {
+          "en": 100.0,
+          "vn": 100.0
+        },
+        "gap_pp": 0.0
+      },
+      "Qwen2.5-7B": {
+        "by_language_pct": {
+          "en": 99.51,
+          "vn": 100.0
+        },
+        "gap_pp": -0.49
+      }
+    }
+  },
+  "tokenisation": {
+    "Claude-Opus-5": {
+      "mean_tokens_en": 537.4,
+      "mean_tokens_vn": 642.6,
+      "vn_over_en": 1.203,
+      "rounds_matched": 10
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "mean_tokens_en": 537.4,
+      "mean_tokens_vn": 642.6,
+      "vn_over_en": 1.203,
+      "rounds_matched": 10
+    },
+    "Gemini-3.1-Pro": {
+      "mean_tokens_en": 537.4,
+      "mean_tokens_vn": 642.6,
+      "vn_over_en": 1.203,
+      "rounds_matched": 10
+    },
+    "GPT-5.4-nano": {
+      "mean_tokens_en": 537.4,
+      "mean_tokens_vn": 642.6,
+      "vn_over_en": 1.203,
+      "rounds_matched": 10
+    },
+    "GPT-5.6-sol": {
+      "mean_tokens_en": 537.4,
+      "mean_tokens_vn": 642.6,
+      "vn_over_en": 1.203,
+      "rounds_matched": 10
+    },
+    "Grok-4.20 (no reasoning)": {
+      "mean_tokens_en": 537.4,
+      "mean_tokens_vn": 642.6,
+      "vn_over_en": 1.203,
+      "rounds_matched": 10
+    },
+    "Grok-4.20 (reasoning)": {
+      "mean_tokens_en": 537.4,
+      "mean_tokens_vn": 642.6,
+      "vn_over_en": 1.203,
+      "rounds_matched": 10
+    }
+  }
+}

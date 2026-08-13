@@ -1,0 +1,399 @@
+{
+  "n_baseline_games": 810,
+  "drift_by_rep": {
+    "commercial": {
+      "pooled": {
+        "n": 390,
+        "slope": -0.03036303630363048,
+        "se": 0.19459804906898803,
+        "t": -0.15602950003299526,
+        "p": 0.8760909152596121
+      },
+      "per_model": {
+        "OpenAIGPT5Nano": {
+          "n": 30,
+          "slope": -1.733333333333333,
+          "se": 0.7331168511637947,
+          "t": -2.364334322123047,
+          "p": 0.0252315243581951
+        },
+        "anthropic-claude-opus-5-default": {
+          "n": 60,
+          "slope": -0.11313131313131317,
+          "se": 0.11828105994589452,
+          "t": -0.9564617799592173,
+          "p": 0.34280882013036146
+        },
+        "google-gemini-3.1-flash-lite-preview": {
+          "n": 60,
+          "slope": 0.06666666666666667,
+          "se": 0.1012289513534946,
+          "t": 0.6585731233534626,
+          "p": 0.5127758734460489
+        },
+        "google-gemini-3.1-pro-preview": {
+          "n": 60,
+          "slope": 0.0282828282828283,
+          "se": 0.014461229113604238,
+          "t": 1.9557693236615377,
+          "p": 0.055314956695918134
+        },
+        "openai-gpt-5.6-sol": {
+          "n": 60,
+          "slope": -0.9050505050505053,
+          "se": 0.8361423372496591,
+          "t": -1.0824120065819263,
+          "p": 0.2835491680303471
+        },
+        "xai-grok-4.20-0309-non-reasoning": {
+          "n": 60,
+          "slope": 0.9575757575757577,
+          "se": 0.8712544172187197,
+          "t": 1.0990770762834112,
+          "p": 0.2762757917087341
+        },
+        "xai-grok-4.20-0309-reasoning": {
+          "n": 60,
+          "slope": -0.010101010101010104,
+          "se": 0.011119024445289286,
+          "t": -0.908443915265383,
+          "p": 0.3674031139786881
+        }
+      }
+    },
+    "open_source": {
+      "pooled": {
+        "n": 420,
+        "slope": 0.03318903318903336,
+        "se": 0.10281625488111854,
+        "t": 0.3227994758942371,
+        "p": 0.7470085146810981
+      },
+      "per_model": {
+        "gemma2-27b-it": {
+          "n": 60,
+          "slope": 0.2363636363636364,
+          "se": 0.10687698937763702,
+          "t": 2.2115484141162867,
+          "p": 0.030952352745062677
+        },
+        "gemma2-9b-it": {
+          "n": 60,
+          "slope": 1.0424242424242427,
+          "se": 0.3665815941448291,
+          "t": 2.8436349753348544,
+          "p": 0.006150166440310573
+        },
+        "llama-3-1-70b-instruct-awq": {
+          "n": 60,
+          "slope": 0.10707070707070711,
+          "se": 0.16503118695852453,
+          "t": 0.6487907470338683,
+          "p": 0.5190343808625506
+        },
+        "llama-3-1-8b": {
+          "n": 60,
+          "slope": 0.4969696969696969,
+          "se": 0.3854613801698157,
+          "t": 1.2892853150444177,
+          "p": 0.2024170216409567
+        },
+        "qwen25-32b-instruct": {
+          "n": 60,
+          "slope": 0.050505050505050636,
+          "se": 0.18086226516289347,
+          "t": 0.27924592484542476,
+          "p": 0.7810494537131566
+        },
+        "qwen25-72b-instruct-awq": {
+          "n": 60,
+          "slope": -0.545454545454546,
+          "se": 0.22326596971610602,
+          "t": -2.4430706844760937,
+          "p": 0.0176285210419821
+        },
+        "qwen25-7b-instruct": {
+          "n": 60,
+          "slope": -1.1555555555555561,
+          "se": 0.2773099508759681,
+          "t": -4.167017995226574,
+          "p": 0.00010404007877086478
+        }
+      }
+    }
+  },
+  "prev_catastrophe_feedback": {
+    "commercial": {
+      "n": 348,
+      "slope": -2.4996632996633017,
+      "se": 2.526694797384262,
+      "t": -0.9893016371629274,
+      "p": 0.32320690294117477,
+      "n_prev_catastrophe": 18
+    },
+    "open_source": {
+      "n": 378,
+      "slope": 0.022408963585430184,
+      "se": 1.3669399395443451,
+      "t": 0.01639352464373817,
+      "p": 0.9869291408105283,
+      "n_prev_catastrophe": 21
+    }
+  },
+  "resampled_lottery": {
+    "commercial::OpenAIGPT5Nano": {
+      "n_games": 30,
+      "observed_mean_payoff": 5.489,
+      "resampled_mean": 9.845,
+      "resampled_ci95": [
+        7.367,
+        12.378
+      ],
+      "expected_no_catastrophe": 17.278
+    },
+    "commercial::anthropic-claude-opus-5-default": {
+      "n_games": 60,
+      "observed_mean_payoff": 19.233,
+      "resampled_mean": 19.233,
+      "resampled_ci95": [
+        19.233,
+        19.233
+      ],
+      "expected_no_catastrophe": 19.233
+    },
+    "commercial::google-gemini-3.1-flash-lite-preview": {
+      "n_games": 60,
+      "observed_mean_payoff": 19.861,
+      "resampled_mean": 19.861,
+      "resampled_ci95": [
+        19.861,
+        19.861
+      ],
+      "expected_no_catastrophe": 19.861
+    },
+    "commercial::google-gemini-3.1-pro-preview": {
+      "n_games": 60,
+      "observed_mean_payoff": 23.989,
+      "resampled_mean": 25.309,
+      "resampled_ci95": [
+        23.322,
+        26.656
+      ],
+      "expected_no_catastrophe": 26.656
+    },
+    "commercial::openai-gpt-5.6-sol": {
+      "n_games": 60,
+      "observed_mean_payoff": 22.489,
+      "resampled_mean": 23.842,
+      "resampled_ci95": [
+        21.987,
+        25.017
+      ],
+      "expected_no_catastrophe": 25.356
+    },
+    "commercial::xai-grok-4.20-0309-non-reasoning": {
+      "n_games": 60,
+      "observed_mean_payoff": 2.478,
+      "resampled_mean": 2.478,
+      "resampled_ci95": [
+        2.478,
+        2.478
+      ],
+      "expected_no_catastrophe": 2.478
+    },
+    "commercial::xai-grok-4.20-0309-reasoning": {
+      "n_games": 60,
+      "observed_mean_payoff": 19.994,
+      "resampled_mean": 19.994,
+      "resampled_ci95": [
+        19.994,
+        19.994
+      ],
+      "expected_no_catastrophe": 19.994
+    },
+    "open_source::gemma2-27b-it": {
+      "n_games": 60,
+      "observed_mean_payoff": 18.95,
+      "resampled_mean": 18.95,
+      "resampled_ci95": [
+        18.95,
+        18.95
+      ],
+      "expected_no_catastrophe": 18.95
+    },
+    "open_source::gemma2-9b-it": {
+      "n_games": 60,
+      "observed_mean_payoff": 18.522,
+      "resampled_mean": 18.522,
+      "resampled_ci95": [
+        18.522,
+        18.522
+      ],
+      "expected_no_catastrophe": 18.522
+    },
+    "open_source::llama-3-1-70b-instruct-awq": {
+      "n_games": 60,
+      "observed_mean_payoff": 12.0,
+      "resampled_mean": 14.507,
+      "resampled_ci95": [
+        13.061,
+        15.928
+      ],
+      "expected_no_catastrophe": 19.839
+    },
+    "open_source::llama-3-1-8b": {
+      "n_games": 60,
+      "observed_mean_payoff": 9.1,
+      "resampled_mean": 9.1,
+      "resampled_ci95": [
+        9.1,
+        9.1
+      ],
+      "expected_no_catastrophe": 9.1
+    },
+    "open_source::qwen25-32b-instruct": {
+      "n_games": 60,
+      "observed_mean_payoff": 18.383,
+      "resampled_mean": 18.383,
+      "resampled_ci95": [
+        18.044,
+        18.728
+      ],
+      "expected_no_catastrophe": 18.728
+    },
+    "open_source::qwen25-72b-instruct-awq": {
+      "n_games": 60,
+      "observed_mean_payoff": 17.922,
+      "resampled_mean": 17.922,
+      "resampled_ci95": [
+        17.922,
+        17.922
+      ],
+      "expected_no_catastrophe": 17.922
+    },
+    "open_source::qwen25-7b-instruct": {
+      "n_games": 60,
+      "observed_mean_payoff": 1.211,
+      "resampled_mean": 1.211,
+      "resampled_ci95": [
+        1.211,
+        1.211
+      ],
+      "expected_no_catastrophe": 1.211
+    },
+    "__headline_p0.1_en__": {
+      "OpenAIGPT5Nano": {
+        "observed_mean_payoff": 5.733,
+        "resampled_mean": 5.733,
+        "resampled_ci95": [
+          5.733,
+          5.733
+        ]
+      },
+      "anthropic-claude-opus-5-default": {
+        "observed_mean_payoff": 20.0,
+        "resampled_mean": 20.0,
+        "resampled_ci95": [
+          20.0,
+          20.0
+        ]
+      },
+      "gemma2-27b-it": {
+        "observed_mean_payoff": 18.267,
+        "resampled_mean": 18.267,
+        "resampled_ci95": [
+          18.267,
+          18.267
+        ]
+      },
+      "gemma2-9b-it": {
+        "observed_mean_payoff": 20.0,
+        "resampled_mean": 20.0,
+        "resampled_ci95": [
+          20.0,
+          20.0
+        ]
+      },
+      "google-gemini-3.1-flash-lite-preview": {
+        "observed_mean_payoff": 19.667,
+        "resampled_mean": 19.667,
+        "resampled_ci95": [
+          19.667,
+          19.667
+        ]
+      },
+      "google-gemini-3.1-pro-preview": {
+        "observed_mean_payoff": 32.0,
+        "resampled_mean": 35.996,
+        "resampled_ci95": [
+          28.0,
+          40.0
+        ]
+      },
+      "llama-3-1-70b-instruct-awq": {
+        "observed_mean_payoff": 18.467,
+        "resampled_mean": 18.467,
+        "resampled_ci95": [
+          18.467,
+          18.467
+        ]
+      },
+      "llama-3-1-8b": {
+        "observed_mean_payoff": 5.7,
+        "resampled_mean": 5.7,
+        "resampled_ci95": [
+          5.7,
+          5.7
+        ]
+      },
+      "openai-gpt-5.6-sol": {
+        "observed_mean_payoff": 31.8,
+        "resampled_mean": 35.707,
+        "resampled_ci95": [
+          27.767,
+          39.733
+        ]
+      },
+      "qwen25-32b-instruct": {
+        "observed_mean_payoff": 18.667,
+        "resampled_mean": 18.667,
+        "resampled_ci95": [
+          18.667,
+          18.667
+        ]
+      },
+      "qwen25-72b-instruct-awq": {
+        "observed_mean_payoff": 16.233,
+        "resampled_mean": 16.233,
+        "resampled_ci95": [
+          16.233,
+          16.233
+        ]
+      },
+      "qwen25-7b-instruct": {
+        "observed_mean_payoff": 0.367,
+        "resampled_mean": 0.367,
+        "resampled_ci95": [
+          0.367,
+          0.367
+        ]
+      },
+      "xai-grok-4.20-0309-non-reasoning": {
+        "observed_mean_payoff": 7.133,
+        "resampled_mean": 7.133,
+        "resampled_ci95": [
+          7.133,
+          7.133
+        ]
+      },
+      "xai-grok-4.20-0309-reasoning": {
+        "observed_mean_payoff": 20.0,
+        "resampled_mean": 20.0,
+        "resampled_ci95": [
+          20.0,
+          20.0
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,343 @@
+{
+  "uncensored_risk": {
+    "open_weight": {
+      "n_cells_total": 42,
+      "n_cells_uncensored": 7,
+      "risk_effect": {
+        "n": 70,
+        "mean": 0.9714285714285714,
+        "ci": [
+          -2.1601721340702094,
+          4.103029276927352
+        ],
+        "p": 0.5380622128658982
+      },
+      "reach_p01": 0.514,
+      "reach_p09": 0.557,
+      "mde_80pct": 4.4
+    },
+    "gpt-5.4-nano": {
+      "n_cells_total": 14,
+      "n_cells_uncensored": 3,
+      "risk_effect": {
+        "n": 15,
+        "mean": 7.466666666666667,
+        "ci": [
+          -6.274429317574548,
+          21.20776265090788
+        ],
+        "p": 0.2633143077140789
+      },
+      "reach_p01": 0.4,
+      "reach_p09": 0.467,
+      "mde_80pct": 17.95
+    }
+  },
+  "salience": {
+    "Gemma-2-27B": {
+      "hidden": 126.2,
+      "printed": 123.3,
+      "delta": -2.9,
+      "p": 0.15693078742981176,
+      "n_pairs": 60
+    },
+    "Gemma-2-9B": {
+      "hidden": 129.4,
+      "printed": 121.2,
+      "delta": -8.2,
+      "p": 2.4706022288347774e-06,
+      "n_pairs": 60
+    },
+    "Llama-3.1-8B": {
+      "hidden": 187.9,
+      "printed": 161.3,
+      "delta": -26.6,
+      "p": 2.0358668545465447e-17,
+      "n_pairs": 60
+    },
+    "Qwen2.5-32B": {
+      "hidden": 128.9,
+      "printed": 126.1,
+      "delta": -2.9,
+      "p": 0.0025920168128307263,
+      "n_pairs": 60
+    },
+    "Qwen2.5-7B": {
+      "hidden": 232.5,
+      "printed": 137.2,
+      "delta": -95.3,
+      "p": 5.729619001287334e-34,
+      "n_pairs": 60
+    }
+  },
+  "composition": {
+    "Gemma-2-9B": {
+      "en": {
+        "all_cooperative": 124.3,
+        "all_selfish": 0.0,
+        "delta": -124.3
+      },
+      "vn": {
+        "all_cooperative": 171.9,
+        "all_selfish": 95.5,
+        "delta": -76.5
+      },
+      "pooled": {
+        "all_cooperative": 148.1,
+        "all_selfish": 47.7,
+        "delta": -100.4
+      }
+    },
+    "Llama-3.1-8B": {
+      "en": {
+        "all_cooperative": 225.7,
+        "all_selfish": 92.4,
+        "delta": -133.3
+      },
+      "vn": {
+        "all_cooperative": 173.0,
+        "all_selfish": 118.4,
+        "delta": -54.6
+      },
+      "pooled": {
+        "all_cooperative": 199.4,
+        "all_selfish": 105.4,
+        "delta": -94.0
+      }
+    },
+    "Qwen2.5-7B": {
+      "en": {
+        "all_cooperative": 239.9,
+        "all_selfish": 216.0,
+        "delta": -23.9
+      },
+      "vn": {
+        "all_cooperative": 235.5,
+        "all_selfish": 195.7,
+        "delta": -39.7
+      },
+      "pooled": {
+        "all_cooperative": 237.7,
+        "all_selfish": 205.9,
+        "delta": -31.8
+      }
+    },
+    "GPT-5.4-nano": {
+      "en": {
+        "all_cooperative": 209.1,
+        "all_selfish": 96.7,
+        "delta": -112.4
+      },
+      "vn": {
+        "all_cooperative": 78.7,
+        "all_selfish": 13.6,
+        "delta": -65.1
+      },
+      "pooled": {
+        "all_cooperative": 143.9,
+        "all_selfish": 55.1,
+        "delta": -88.7
+      }
+    }
+  },
+  "language": {
+    "GPT-5.4-nano": {
+      "en": 209.7,
+      "vn": 62.9,
+      "delta": 146.8,
+      "p": 1.0417477148052674e-16,
+      "n_pairs": 15
+    },
+    "Claude-Opus-5": {
+      "en": 124.9,
+      "vn": 124.3,
+      "delta": 0.7,
+      "p": 0.4356130791817339,
+      "n_pairs": 30
+    },
+    "Gemma-2-27B": {
+      "en": 132.6,
+      "vn": 120.0,
+      "delta": 12.6,
+      "p": 3.462705375571756e-17,
+      "n_pairs": 30
+    },
+    "Gemma-2-9B": {
+      "en": 120.0,
+      "vn": 137.7,
+      "delta": -17.7,
+      "p": 2.1371718517260918e-07,
+      "n_pairs": 30
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "en": 121.5,
+      "vn": 120.1,
+      "delta": 1.4,
+      "p": 0.032294168508648045,
+      "n_pairs": 30
+    },
+    "Gemini-3.1-Pro": {
+      "en": 80.0,
+      "vn": 80.1,
+      "delta": -0.1,
+      "p": 0.16078820842587663,
+      "n_pairs": 30
+    },
+    "Llama-3.1-70B": {
+      "en": 130.3,
+      "vn": 111.6,
+      "delta": 18.7,
+      "p": 2.4078832009081504e-17,
+      "n_pairs": 30
+    },
+    "Llama-3.1-8B": {
+      "en": 207.5,
+      "vn": 163.3,
+      "delta": 44.3,
+      "p": 1.4978366159943926e-17,
+      "n_pairs": 30
+    },
+    "GPT-5.6-sol": {
+      "en": 80.5,
+      "vn": 95.3,
+      "delta": -14.8,
+      "p": 0.024233534417712525,
+      "n_pairs": 30
+    },
+    "Qwen2.5-32B": {
+      "en": 129.0,
+      "vn": 126.3,
+      "delta": 2.7,
+      "p": 0.005546592216552324,
+      "n_pairs": 30
+    },
+    "Qwen2.5-72B": {
+      "en": 143.3,
+      "vn": 121.6,
+      "delta": 21.7,
+      "p": 2.173502997416717e-15,
+      "n_pairs": 30
+    },
+    "Qwen2.5-7B": {
+      "en": 237.9,
+      "vn": 227.6,
+      "delta": 10.3,
+      "p": 3.397939146994818e-07,
+      "n_pairs": 30
+    },
+    "Grok-4.20 (no reasoning)": {
+      "en": 211.1,
+      "vn": 239.2,
+      "delta": -28.1,
+      "p": 9.584733850031962e-06,
+      "n_pairs": 30
+    },
+    "Grok-4.20 (reasoning)": {
+      "en": 120.1,
+      "vn": 120.0,
+      "delta": 0.1,
+      "p": 0.3255819880161935,
+      "n_pairs": 30
+    }
+  },
+  "risk_by_model": {
+    "GPT-5.4-nano": {
+      "p01": 205.6,
+      "p09": 212.8,
+      "delta": 7.2,
+      "mean_contribution_all": 136.3,
+      "reach_p01_en": 1.0
+    },
+    "Claude-Opus-5": {
+      "p01": 120.0,
+      "p09": 128.0,
+      "delta": 8.0,
+      "mean_contribution_all": 124.6,
+      "reach_p01_en": 1.0
+    },
+    "Gemma-2-27B": {
+      "p01": 130.4,
+      "p09": 134.2,
+      "delta": 3.8,
+      "mean_contribution_all": 126.3,
+      "reach_p01_en": 1.0
+    },
+    "Gemma-2-9B": {
+      "p01": 120.0,
+      "p09": 120.0,
+      "delta": 0.0,
+      "mean_contribution_all": 128.9,
+      "reach_p01_en": 1.0
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "p01": 122.0,
+      "p09": 120.2,
+      "delta": -1.8,
+      "mean_contribution_all": 120.8,
+      "reach_p01_en": 1.0
+    },
+    "Gemini-3.1-Pro": {
+      "p01": 0.0,
+      "p09": 120.0,
+      "delta": 120.0,
+      "mean_contribution_all": 80.1,
+      "reach_p01_en": 0.0
+    },
+    "Llama-3.1-70B": {
+      "p01": 129.2,
+      "p09": 129.6,
+      "delta": 0.4,
+      "mean_contribution_all": 121.0,
+      "reach_p01_en": 1.0
+    },
+    "Llama-3.1-8B": {
+      "p01": 205.8,
+      "p09": 209.2,
+      "delta": 3.4,
+      "mean_contribution_all": 185.4,
+      "reach_p01_en": 1.0
+    },
+    "GPT-5.6-sol": {
+      "p01": 1.6,
+      "p09": 119.8,
+      "delta": 118.2,
+      "mean_contribution_all": 87.9,
+      "reach_p01_en": 0.0
+    },
+    "Qwen2.5-32B": {
+      "p01": 128.0,
+      "p09": 129.4,
+      "delta": 1.4,
+      "mean_contribution_all": 127.6,
+      "reach_p01_en": 1.0
+    },
+    "Qwen2.5-72B": {
+      "p01": 142.6,
+      "p09": 145.0,
+      "delta": 2.4,
+      "mean_contribution_all": 132.5,
+      "reach_p01_en": 1.0
+    },
+    "Qwen2.5-7B": {
+      "p01": 237.8,
+      "p09": 237.8,
+      "delta": 0.0,
+      "mean_contribution_all": 232.7,
+      "reach_p01_en": 1.0
+    },
+    "Grok-4.20 (no reasoning)": {
+      "p01": 197.2,
+      "p09": 220.8,
+      "delta": 23.6,
+      "mean_contribution_all": 225.1,
+      "reach_p01_en": 1.0
+    },
+    "Grok-4.20 (reasoning)": {
+      "p01": 120.0,
+      "p09": 120.2,
+      "delta": 0.2,
+      "mean_contribution_all": 120.0,
+      "reach_p01_en": 1.0
+    }
+  }
+}

@@ -1,0 +1,397 @@
+%% Electronic supplementary material for
+%% "Large language model agents in a collective-risk social dilemma:
+%%  capability enables risk sensitivity but does not confer it"
+%%
+%% Standalone: pdflatex esm && pdflatex esm
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage[T5,T1]{fontenc}   % T5 carries the Vietnamese diacritics
+\usepackage[utf8]{inputenc}
+\usepackage{ragged2e}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\ph}[1]{\texttt{\{#1\}}}
+\renewcommand{\arraystretch}{1.15}
+
+% T1 stays the document default; Vietnamese diacritics need T5 (vntex), so switch
+% encoding only where Vietnamese actually appears. \vnhead is the column-type version.
+\newcommand{\vn}[1]{{\fontencoding{T5}\selectfont #1}}
+\newcolumntype{V}[1]{>{\fontencoding{T5}\selectfont\RaggedRight}p{#1}}
+
+\title{Electronic supplementary material\\[2pt]
+\large Large language model agents in a collective-risk social dilemma:\\
+capability enables risk sensitivity but does not confer it}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-2.4em}
+
+\noindent Every quantity below is regenerated from the raw per-game and per-probe logs
+by the scripts in \texttt{paper/revision/}; none is transcribed by hand.
+
+\tableofcontents
+
+% ==========================================================================
+\section{Vietnamese prompt: line-by-line back-translation}
+\label{sec:backtranslation}
+
+The Vietnamese decision template was prepared by a native speaker and holds the English
+structure line for line. Both files are thirty lines and carry the identical multiset of
+$42$ substitution slots, and neither writes any game parameter as a literal, so the two
+languages cannot disagree about a value; this is checked mechanically by
+\texttt{r5\_translation\_qa.py}. The back-translations below are literal rather than
+idiomatic: they are meant to expose drift, not to read well. A dagger (\dag) marks a
+segment carrying a number or a conditional, the two things most at risk in translation.
+
+\begin{longtable}{@{}p{0.3\textwidth}V{0.31\textwidth}p{0.31\textwidth}@{}}
+\toprule
+English (original) & Vietnamese (as run) & Back-translation \\
+\midrule
+\endfirsthead
+\toprule
+English (original) & Vietnamese (as run) & Back-translation \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\dag\ At the start, each player privately receives an endowment of \ph{endowment}
+monetary units. Your final cash payoff depends on the rules below. The game lasts
+exactly \ph{nRounds} rounds.
+&
+Khi bắt đầu, mỗi người chơi được nhận riêng một khoản vốn \ph{endowment} đơn vị tiền.
+Số tiền mặt cuối cùng bạn thực nhận phụ thuộc vào các quy tắc dưới đây. Trò chơi kéo
+dài đúng \ph{nRounds} vòng.
+&
+At the start, each player privately receives a capital of \ph{endowment} money units.
+The final cash you actually receive depends on the rules below. The game lasts exactly
+\ph{nRounds} rounds. \\
+\addlinespace
+
+Each round, all \ph{nPlayers} players decide simultaneously and in private how much to
+put into a shared ``climate account''. The only amounts allowed are
+\ph{contributionOptions}.
+&
+Mỗi vòng, tất cả \ph{nPlayers} người chơi đồng thời và riêng tư quyết định đóng bao
+nhiêu vào một ``quỹ khí hậu'' chung. Các mức được phép chỉ gồm \ph{contributionOptions}.
+&
+Each round, all \ph{nPlayers} players simultaneously and privately decide how much to
+contribute to a shared ``climate fund''. The permitted amounts consist only of
+\ph{contributionOptions}. \\
+\addlinespace
+
+\dag\ The group's target: by the end of the game, the combined contributions of all
+\ph{nPlayers} players must reach at least \ph{target} (an average of \ph{fairShare} per
+player per round).
+&
+Mục tiêu của nhóm: đến cuối trò chơi, tổng đóng góp của cả \ph{nPlayers} người chơi phải
+đạt ít nhất \ph{target} (trung bình \ph{fairShare} mỗi người mỗi vòng).
+&
+The group's target: by the end of the game, the total contribution of all \ph{nPlayers}
+players must reach at least \ph{target} (on average \ph{fairShare} per person per
+round). \emph{The equal-split hint is present in both languages and therefore cannot
+generate a language effect.} \\
+\addlinespace
+
+\dag\ If the group reaches \ph{target}: every player keeps, in cash, whatever they did
+not contribute (for example, contributing \ph{fairShare} every round leaves you
+\ph{fairShareKept} at the end).
+&
+Nếu nhóm đạt \ph{target}: mỗi người giữ lại (bằng tiền mặt) toàn bộ số tiền mình không
+đóng góp (ví dụ, đóng \ph{fairShare} mỗi vòng thì cuối cùng bạn còn \ph{fairShareKept}).
+&
+If the group reaches \ph{target}: each person keeps (in cash) all the money they did not
+contribute (for example, contributing \ph{fairShare} every round leaves you with
+\ph{fairShareKept} at the end). \\
+\addlinespace
+
+\dag\ If the group does not reach \ph{target}: the computer runs a lottery: with
+probability \ph{riskPercent}\% the group is hit by a disaster and every player loses all
+of their remaining money (final cash payoff 0); with the remaining \ph{safePercent}\%
+probability, each player keeps their remaining money.
+&
+Nếu nhóm không đạt \ph{target}: máy tính quay xổ số: với xác suất \ph{riskPercent}\%
+nhóm gặp thảm hoạ và mọi người chơi mất tất cả số tiền còn lại (tiền mặt cuối cùng = 0);
+với xác suất \ph{safePercent}\% còn lại, mỗi người giữ được số tiền còn lại của mình.
+&
+If the group does not reach \ph{target}: the computer draws a lottery: with probability
+\ph{riskPercent}\% the group meets a disaster and every player loses all remaining money
+(final cash = 0); with the remaining \ph{safePercent}\% probability, each person keeps
+their remaining money. \emph{The critical conditional: antecedent, both branches, both
+percentages and the zero payoff are preserved in the same order.} \\
+\addlinespace
+
+Money put into the climate account is gone for good and is never refunded, whether or
+not the target is reached.
+&
+Tiền đã bỏ vào quỹ khí hậu là mất hẳn, không bao giờ được hoàn lại, dù có đạt mục tiêu
+hay không.
+&
+Money put into the climate fund is lost for good, never refunded, whether or not the
+target is reached. \\
+\addlinespace
+
+After each round, all \ph{nPlayers} contributions for that round are revealed to
+everyone. Names are hidden, but each player always appears in the same fixed position.
+Players cannot talk to or message each other.
+&
+Sau mỗi vòng, đóng góp của cả \ph{nPlayers} người trong vòng đó được hiển thị cho mọi
+người. Danh tính được ẩn, nhưng mỗi người luôn xuất hiện ở cùng một vị trí cố định.
+Người chơi không được trao đổi hay nhắn tin cho nhau.
+&
+After each round, the contributions of all \ph{nPlayers} people in that round are
+displayed to everyone. Identities are hidden, but each person always appears in the same
+fixed position. Players may not converse or message each other. \\
+\addlinespace
+
+\dag\ Current state: Round \ph{currentRound} of \ph{nRounds}. Your remaining money:
+\ph{remainingEndowment}.
+&
+Tình trạng hiện tại: Vòng \ph{currentRound} trên tổng \ph{nRounds}. Số tiền còn lại của
+bạn: \ph{remainingEndowment}.
+&
+Current situation: Round \ph{currentRound} of a total \ph{nRounds}. Your remaining
+money: \ph{remainingEndowment}. \\
+\addlinespace
+
+\dag\ The climate account so far holds \ph{groupAccount} of the \ph{target} target.
+\emph{(printed-total arm only)}
+&
+Quỹ khí hậu đến lúc này có \ph{groupAccount} trên mục tiêu \ph{target}.
+&
+The climate fund so far has \ph{groupAccount} of the \ph{target} target. \\
+\addlinespace
+
+\dag\ Now decide your contribution for round \ph{currentRound}. Allowed choices:
+\ph{contributionOptions}. Output only your decision as a final line:
+\texttt{CONTRIBUTION: <one of \ph{contributionOptions}>}
+&
+Bây giờ hãy quyết định mức đóng góp của bạn cho vòng \ph{currentRound}. Các lựa chọn hợp
+lệ: \ph{contributionOptions}. Chỉ xuất ra quyết định của bạn ở dòng cuối:
+\texttt{CONTRIBUTION: <một trong các giá trị \ph{contributionOptions}>}
+&
+Now decide your contribution for round \ph{currentRound}. Valid choices:
+\ph{contributionOptions}. Output only your decision on the final line. \emph{The answer
+token} \texttt{CONTRIBUTION:} \emph{is left untranslated in both, so parsing is
+language-independent.} \\
+\end{longtable}
+
+The round history is built by the engine rather than the template, and is localised
+alongside it: \texttt{(you)}~$\to$~\vn{\texttt{(bạn)}}, \texttt{Round \emph{n}}~$\to$~%
+\vn{\texttt{Vòng \emph{n}}}, \texttt{you contributed \emph{c}; group round total
+\emph{t}}~$\to$~\vn{\texttt{bạn đóng \emph{c}; tổng nhóm vòng này \emph{t}}}, and
+\texttt{(cumulative \emph{c})}~$\to$~\vn{\texttt{(tích luỹ \emph{c})}}. No English leaks
+into a Vietnamese prompt.
+
+\subsection{Behavioural validation of the translation}
+
+If the Vietnamese prompt had corrupted a number, a rule or the conditional, the agents
+reading it would answer questions about that content worse. Table~\ref{tab:esm-rules}
+shows they do not. The gap is confined to the \emph{State} axis, which asks for
+quantities the agent must compute rather than read, and to one model on one question.
+
+\begin{table}[h]
+\centering
+\caption{Comprehension accuracy by language. \emph{Rules} covers the endowment, target,
+action set, round count, catastrophe probability and the payoff under catastrophe.}
+\label{tab:esm-rules}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Probe & English & Vietnamese & Gap (pp) \\
+\midrule
+Rules axis, all questions ($20{,}160$ probes) & $99.40\%$ & $98.74\%$ & $+0.66$ \\
+\quad \texttt{rules\_risk\_pct} (state the catastrophe probability) & $98.02\%$ & $98.97\%$ & $-0.95$ \\
+\quad \texttt{rules\_payoff\_disaster} & $100.00\%$ & $100.00\%$ & $0.00$ \\
+\quad \texttt{rules\_actions}, \texttt{rules\_endowment}, \texttt{rules\_n\_rounds} & $100.00\%$ & $100.00\%$ & $0.00$ \\
+\quad \texttt{rules\_min\_contrib} & $100.00\%$ & $99.92\%$ & $+0.08$ \\
+\quad \texttt{rules\_max\_contrib} & $97.22\%$ & $100.00\%$ & $-2.78$ \\
+\quad \texttt{rules\_target} & $100.00\%$ & $91.03\%$ & $+8.97$ \\
+\midrule
+Time axis ($197{,}400$ probes) & $95.65\%$ & $93.17\%$ & $+2.48$ \\
+State axis ($163{,}800$ probes) & $73.63\%$ & $61.80\%$ & $+11.83$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent The one Rules question with a gap is a property of a single model, not of the
+translation. On \texttt{rules\_target}, Qwen2.5-7B, Gemma-2-9B, Gemma-2-27B,
+Qwen2.5-32B, Llama-3.3-70B and Qwen2.5-72B all answer at $100\%$ in both languages;
+Llama-3.1-8B falls from $100\%$ to $37.2\%$. A corrupted prompt would degrade every
+reader of it. Llama-3.1-8B is also the only model with a non-negligible probe
+parse-failure rate, $2.05\%$ of its Vietnamese probes.
+
+\paragraph{Tokenisation.} Measured on the rendered prompts logged in
+\texttt{turns.jsonl}, matched by round, with \texttt{o200k\_base} as a proxy for the
+hosted tokenisers, the mean prompt is $537.4$ tokens in English and $642.6$ in
+Vietnamese, a ratio of $1.203$. Both are far inside the $4{,}096$-token context used for
+the open-weight arm, so nothing is truncated in either language.
+
+% ==========================================================================
+\section{Decoding parameters and run-to-run stability}
+\label{sec:decoding}
+
+\begin{table}[h]
+\centering
+\caption{What was sent to the hosted models. Read from the task source
+(\texttt{kaggle/benchmarks/crg\_task\_server.py}) rather than transcribed.}
+\label{tab:esm-decoding}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Parameter & Value & Set by \\
+\midrule
+\texttt{temperature} & $0.7$, every request & us (matches the open-weight arm) \\
+per-turn \texttt{seed} & $(\mathrm{base}+\mathrm{rep})\cdot10^5+\mathrm{round}\cdot100+\mathrm{agent}$ & us (honouring not guaranteed) \\
+\texttt{top\_p} & not set & provider default, undocumented \\
+\texttt{max\_completion\_tokens} & $512$ non-reasoning; $6{,}000$ reasoning & us \\
+\quad Grok-4.20 (no reasoning) & $6{,}000$ and $8{,}000$ across shards & us \\
+\quad Claude-Opus-5 & $6{,}000$ and $16{,}000$ across shards & us \\
+parse retries & $3$, with a fresh seed each attempt & us \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent \textbf{Accidental replication.} Six games were executed twice, hours apart in a
+separate session and in four cases on a different Kaggle account, because the smoke pass
+and a path-length download failure both left duplicate coverage. Five reproduced the
+group total exactly; one differed by $4$ points of $240$ (Claude-Opus-5, $p=0.1$,
+Vietnamese: $124$ versus $120$).
+
+\begin{center}
+\begin{tabular}{@{}llrl@{}}
+\toprule
+Configuration & Cell & Group totals & Sources \\
+\midrule
+Claude-Opus-5            & $p{=}0.1$, vn & $124$, $120$ & two accounts \\
+Claude-Opus-5            & $p{=}0.9$, en & $128$, $128$ & smoke pass, production shard \\
+Gemini-3.1-Pro           & $p{=}0.9$, en & $120$, $120$ & smoke pass, production shard \\
+GPT-5.6-sol              & $p{=}0.9$, en & $120$, $120$ & smoke pass, production shard \\
+Grok-4.20 (no reasoning) & $p{=}0.1$, vn & $240$, $240$ & two accounts \\
+Grok-4.20 (reasoning)    & $p{=}0.9$, en & $120$, $120$ & smoke pass, production shard \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\noindent \textbf{Execution-batch test.} Every Claude-Opus-5 cell was assembled from two
+to four separate executions. A one-way permutation ANOVA ($10{,}000$ permutations) of
+group contribution on execution batch, within cell, finds no effect in any of the eleven
+cells that span more than one batch: $F \le 1.91$, all $P > 0.22$.
+
+% ==========================================================================
+\section{The lottery cannot induce learning}
+\label{sec:lottery}
+
+The catastrophe is drawn once, after round ten
+(\texttt{crsd/engine/scoring.py::compute\_outcome}), and its outcome is never shown to
+any agent; agents carry no state between games. The following are therefore
+confirmations, not tests of a live hypothesis.
+
+\begin{table}[h]
+\centering
+\caption{No drift across repetitions, and no response to a previous repetition's
+catastrophe. Contributions are centred within (model, risk, language) cell so the
+coefficients are pure within-cell contrasts. Units are points of $240$.}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Test & Arm & Coefficient & SE & $P$ \\
+\midrule
+Contribution on repetition index & open-weight & $+0.033$ & $0.103$ & $0.747$ \\
+                                 & commercial  & $-0.030$ & $0.195$ & $0.876$ \\
+Contribution on previous repetition's catastrophe & open-weight & $+0.022$ & $1.367$ & $0.987$ \\
+                                 & commercial  & $-2.500$ & $2.527$ & $0.323$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent \textbf{Independent per-game lottery.} Because the lottery never touches
+behaviour, the alternative implementation is a recomputation over the observed
+contribution vectors. Redrawing an independent uniform per game, $10{,}000$ times, at
+$p=0.1$ in English: Gemini-3.1-Pro earns $36.0$ per agent ($95\%$ interval
+$[28.0,40.0]$), GPT-5.6-sol $35.7$ ($[27.8,39.7]$). Every configuration that reached the
+target faces no lottery at all and earns its deterministic amount, $20.0$ for
+Claude-Opus-5 and for Grok-4.20 with reasoning.
+
+% ==========================================================================
+\section{Within-game adaptation}
+\label{sec:pace}
+
+Let $\mathrm{need}(r)=(120-S_r)/(6\,(11-r))$ be the per-agent contribution still needed
+at the start of round $r$, where $S_r$ is the pool before that round. We regress an
+agent's contribution on $\mathrm{need}$, its own mean contribution in earlier rounds
+(which removes the mechanical path by which an agent's own generosity lowers
+$\mathrm{need}$), and round fixed effects. The composition study is the right arm for
+this: the standard deviation of $\mathrm{need}$ is $2.18$ there against $1.66$ in the
+baseline, where almost every group is on pace at almost every round.
+
+\begin{table}[h]
+\centering
+\caption{Pace tracking in the composition study. A coefficient of $1.0$ on
+$\mathrm{need}$ would be an agent that exactly covers the remaining shortfall; $0$ an
+agent that ignores it. The interaction is the reviewer's question: does falling behind
+matter more when the catastrophe is more likely?}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Model & $\mathrm{need}$ & $P$ & $\mathrm{need}\times\mathrm{risk}$ & $P$ \\
+\midrule
+Gemma-2-9B    & $-0.070$ & $<10^{-4}$ & $-0.005$ & $0.311$ \\
+Llama-3.1-8B  & $-0.083$ & $<10^{-4}$ & $+0.018$ & $0.531$ \\
+GPT-5.4-nano  & $-0.093$ & $<10^{-4}$ & $-0.018$ & $0.160$ \\
+Qwen2.5-7B    & $+0.438$ & $<10^{-4}$ & $-0.022$ & $0.480$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent \textbf{Endgame push.} Of the composition games, $548$ needed more than $2$
+per agent per round at the start of round eight. Comparing each group's mean
+contribution in rounds nine and ten with its own mean in rounds five to seven, the push
+is $-0.151$ at $p=0.1$ ($n=183$), $-0.108$ at $p=0.5$ ($n=181$) and $-0.056$ at $p=0.9$
+($n=184$). Regressing the push on risk gives $+0.119$ per unit probability (SE $0.061$,
+$P=0.051$): about $1.1$ points of $240$ across the full risk sweep.
+
+% ==========================================================================
+\section{How strong is the equal-split anchor?}
+\label{sec:anchor}
+
+\begin{table}[h]
+\centering
+\caption{Probability of taking the focal action named by the prompt (contribute $2$),
+over all baseline turns, against the size of the model's English risk effect. If
+anchoring produced the risk null, models that ignore the anchor would be free to
+respond to risk. The correlation between the two columns is $-0.06$.}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Configuration & $P(\text{contribute }2)$ & $P(0)$ & $P(4)$ & $|\Delta$ risk$|$ \\
+\midrule
+Grok-4.20 (reasoning)    & $1.000$ & $0.000$ & $0.000$ & $0.2$ \\
+Gemini-3.1-Flash-Lite    & $0.991$ & $0.001$ & $0.008$ & $1.8$ \\
+Gemma-2-27B              & $0.946$ & $0.001$ & $0.053$ & $3.8$ \\
+Gemma-2-9B               & $0.926$ & $0.000$ & $0.074$ & $0.0$ \\
+Qwen2.5-72B              & $0.896$ & $0.000$ & $0.104$ & $2.4$ \\
+Qwen2.5-32B              & $0.880$ & $0.028$ & $0.092$ & $1.4$ \\
+Claude-Opus-5            & $0.868$ & $0.047$ & $0.085$ & $8.0$ \\
+Llama-3.1-70B            & $0.866$ & $0.063$ & $0.071$ & $0.4$ \\
+GPT-5.6-sol              & $0.706$ & $0.281$ & $0.013$ & $118.2$ \\
+Gemini-3.1-Pro           & $0.667$ & $0.333$ & $0.000$ & $120.0$ \\
+Llama-3.1-8B             & $0.282$ & $0.086$ & $0.631$ & $3.4$ \\
+GPT-5.4-nano             & $0.246$ & $0.309$ & $0.445$ & $7.2$ \\
+Grok-4.20 (no reasoning) & $0.118$ & $0.003$ & $0.879$ & $23.6$ \\
+Qwen2.5-7B               & $0.054$ & $0.003$ & $0.943$ & $0.0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent How far each manipulation moves $P(\text{contribute }2)$, as the median range
+across the models run in that arm: catastrophe risk $3.58$ percentage points in the
+baseline and $1.47$ in the composition study; language $9.80$; composition from zero to
+six selfish agents $14.67$. At $p=0.1$ in English, Gemini-3.1-Pro contributes $0$ in
+$100.0\%$ of its turns and GPT-5.6-sol in $98.8\%$, overriding the focal action
+entirely.
+
+\end{document}

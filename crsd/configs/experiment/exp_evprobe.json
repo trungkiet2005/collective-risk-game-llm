@@ -1,0 +1,40 @@
+{
+  "name": "exp_evprobe",
+  "description": "PROBE SO SANH KY VONG (revision, reviewer Q3). Nhu exp_comprehension nhung them truc 'value': value_defect_ev (ky vong khi bo mac = (1-p)*40) va value_compare (hop tac hay bo mac loi hon: 2/0/1 o p=0.1/0.5/0.9). Hai cau nay KHONG doc duoc tu prompt, phai tu nhan xac suat voi tien -> do truc tiep xem model co lam noi phep so sanh ma hanh vi EV-optimal khop. Hoi o rulesCheckpoints thay vi moi vong (dap an tinh trong mot van). onlyCategories=['value','rules'] -> chi hoi truc moi + Rules lam doi chung, KHONG chay lai ca bo ~54k probe/model. Rules/Value deu tinh trong mot van nen chi hoi o rulesCheckpoints [1,5,10].",
+  "games": [
+    "crsd_milinski_high_risk",
+    "crsd_milinski_medium_risk",
+    "crsd_milinski_low_risk"
+  ],
+  "agents": "personas_default",
+  "languages": [
+    "en",
+    "vn"
+  ],
+  "models": [
+    "LocalQwen"
+  ],
+  "useOffline": true,
+  "offlineSettings": "offline_settings",
+  "repetitions": 10,
+  "seed": 12345,
+  "captureReasoning": true,
+  "captureLogprobs": false,
+  "comprehension": {
+    "template": "crsd_comprehension",
+    "probePlayers": [
+      0
+    ],
+    "maxSeats": 4,
+    "maxPastRounds": null,
+    "rulesCheckpoints": [
+      1,
+      5,
+      10
+    ],
+    "onlyCategories": [
+      "value",
+      "rules"
+    ]
+  }
+}

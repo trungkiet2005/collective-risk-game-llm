@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{What moves an agent, on one scale.} Change in group contribution
+(of a possible $240$) produced by each manipulation. \emph{Channel} is how the
+manipulation reaches the agent: through the incentive structure of the game, through
+the text of the prompt, or through the model itself. The $\Delta$ column gives the
+largest effect any model shows, with the range across models in the last column; the
+one manipulation that carries information about payoffs is the smallest, for every
+model except the two that solve the game. Every value is recomputed from the raw
+per-game logs by \texttt{paper/revision/r6\_summary\_tables.py}.}
+\label{tab:effects}
+\footnotesize
+\begin{tabular}{@{}llccll@{}}
+\toprule
+Manipulation & Channel & $\Delta$ contribution & $95\%$ CI & $P$ & Largest effect, and range \\
+\midrule
+Catastrophe risk, $p{=}0.1\!\to\!0.9$ & incentive & $+0.97$ & $[-2.2, +4.1]$ & $0.538$ & 11 models pooled, uncensored cells ($n{=}70$) \\
+\quad the same, GPT-5.4-nano alone & incentive & $+7.5$ & $[-6.3, +21.2]$ & $0.263$ & cheap tier, uncensored ($n{=}15$) \\
+\quad the same, the two EV models & incentive & $+118.2$, $+120.0$ & -- & -- & GPT-5.6-sol, Gemini-3.1-Pro \\
+Printing the running pool total & prompt & $-95.3$ & -- & $<10^{-4}$ & Qwen2.5-7B ($2.9$--$95.3$, 5 models) \\
+Group composition, $0\!\to\!6$ selfish & prompt & $-112.4$ & -- & -- & GPT-5.4-nano ($31.8$--$112.4$, 4 models) \\
+Prompt language, Vietnamese $\to$ English & prompt & $+146.8$ & -- & $<10^{-4}$ & GPT-5.4-nano; reach $0\%\!\to\!100\%$ \\
+Explicit reasoning, off $\to$ on & model & $-105.1$ & -- & -- & Grok-4.20; risk effect $+23.6\!\to\!+0.2$ \\
+\bottomrule
+\end{tabular}
+\end{table*}

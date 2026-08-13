@@ -185,10 +185,12 @@ def test_render_no_float_suffix():
 
 # --------------------------- 4. ENUMERATE / CAPS ---------------------------
 
-def test_iter_questions_has_three_categories():
+def test_iter_questions_has_all_categories():
+    # "value" (expected-value comparison) was added at the revision alongside the
+    # original three axes; it is not answerable from the prompt by construction.
     items = iter_questions(_cfg(), HISTORY, R, PI)
     cats = {spec.category for spec, _ in items}
-    assert cats == {"rules", "time", "state"}
+    assert cats == {"rules", "time", "state", "value"}
     assert len(items) > 0
 
 
