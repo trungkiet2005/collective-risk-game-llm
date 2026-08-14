@@ -141,21 +141,30 @@ Hệ quả, đo thật ngày 13-08-2026:
 ba model mount đủ (`exists=True`), wheels vLLM cài offline OK, config + template nohint
 đầy đủ, kế hoạch in ra đúng "60 games/model, 3 model × 60 = 180 games". Chỉ kẹt ở GPU.
 
-**Ba lần thử qua API đều hỏng, mỗi lần một lý do khác** (13-08-2026):
+**BỐN lần thử qua API đều hỏng. ĐÃ DỪNG ĐƯỜNG API.** (13-08-2026)
 
 | Lần | GPU | Chết ở đâu | Nguyên nhân |
 |---|---|---|---|
 | 1 | P100 (sm_60) | khởi tạo EngineCore | torch trong wheels không hỗ trợ sm_60 |
 | 2 | T4×2 (sm_75) | warmup attention | không có FA2 → rơi về FlashInfer → JIT ninja **link lỗi** |
 | 3 | T4×2 | import module backend | ép `TRITON_ATTN` → `ImportError: cannot import name 'is_opaque_value' from torch._library.opaque_object` |
+| 4 | T4×2 | import vLLM | vẫn `is_opaque_value` — **kể cả khi KHÔNG ép backend nào** |
 
-Lỗi lần 3 mới là gốc rễ thật: **wheel vLLM 0.22.1 trong `trungkiet/vllm-wheels` được build với
-một bản torch khác bản có sẵn trên image Kaggle hiện tại** (image chỉ cài thêm `vllm`, torch
-lấy từ image — 2.11.0+cu130). Mismatch đó nằm im cho tới khi có module nào chạm vào API đã
-đổi. Wheels build 09-06-2026, giờ là 13-08 — image đã trôi hai tháng.
+Lần 4 chốt được gốc rễ: **wheel vLLM 0.22.1 trong `trungkiet/vllm-wheels` không tương thích
+với bản torch đang có trên image Kaggle**. Notebook chỉ cài thêm `vllm`, torch lấy từ image
+(2.11.0+cu130). Wheels build 09-06-2026, giờ 13-08 — image đã trôi hai tháng. Đây **không
+phải chuyện chọn backend**: lần 4 không ép gì cả mà vẫn cùng lỗi.
 
-Lần 4 (đang chạy) **dò backend thay vì đoán**: thử import `FLEX_ATTENTION` rồi `TRITON_ATTN`,
-cái nào import được thì dùng, không cái nào được thì in cảnh báo rõ ràng.
+(Lần 4 còn lộ một lỗi của chính tôi: đoạn dò backend đặt **trước** bước cài vLLM nên báo
+`No module named 'vllm'` và không đặt được gì. Đã gỡ bỏ hẳn — xem dưới.)
+
+**Notebook đã dọn về trạng thái tốt nhất cho đường UI:** gỡ đoạn dò backend chưa kiểm chứng,
+`TP_SIZE` về 1. `diff` xác nhận `nohint.py` khác `baseline.py` **chỉ ở phần cấu hình**
+(danh sách model, `EXPERIMENTS`, `_need`, tên zip) — không đụng một dòng code hành vi nào.
+
+**Muốn cứu đường API thì phải build lại wheels** bằng `kaggle/setup/build_quant_wheels.py`
+trên image Kaggle HIỆN TẠI (Internet ON), rồi thay dataset `trungkiet/vllm-wheels`. Chưa làm
+vì đường UI nhanh hơn và không cần gì thêm.
 
 ### 2e. Chạy tay trên UI — đường chắc ăn cho Q1 + Q3
 

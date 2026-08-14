@@ -1,0 +1,236 @@
+{
+  "by_model": {
+    "GPT-5.4-nano": {
+      "0.1": {
+        "n_games": 5,
+        "contribution_mean": 205.6,
+        "contribution_sd": 6.12,
+        "reach_rate": 1.0,
+        "ev_prediction": 0.0
+      },
+      "0.5": {
+        "n_games": 5,
+        "contribution_mean": 210.8,
+        "contribution_sd": 6.27,
+        "reach_rate": 1.0,
+        "ev_prediction": NaN
+      },
+      "0.9": {
+        "n_games": 5,
+        "contribution_mean": 212.8,
+        "contribution_sd": 4.83,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
+      }
+    },
+    "Claude-Opus-5": {
+      "0.1": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": 0.0
+      },
+      "0.5": {
+        "n_games": 10,
+        "contribution_mean": 126.8,
+        "contribution_sd": 2.71,
+        "reach_rate": 1.0,
+        "ev_prediction": NaN
+      },
+      "0.9": {
+        "n_games": 10,
+        "contribution_mean": 128.0,
+        "contribution_sd": 2.37,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
+      }
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "0.1": {
+        "n_games": 10,
+        "contribution_mean": 122.0,
+        "contribution_sd": 3.58,
+        "reach_rate": 1.0,
+        "ev_prediction": 0.0
+      },
+      "0.5": {
+        "n_games": 10,
+        "contribution_mean": 122.4,
+        "contribution_sd": 3.88,
+        "reach_rate": 1.0,
+        "ev_prediction": NaN
+      },
+      "0.9": {
+        "n_games": 10,
+        "contribution_mean": 120.2,
+        "contribution_sd": 0.6,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
+      }
+    },
+    "Gemini-3.1-Pro": {
+      "0.1": {
+        "n_games": 10,
+        "contribution_mean": 0.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 0.0,
+        "ev_prediction": 0.0
+      },
+      "0.5": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": NaN
+      },
+      "0.9": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
+      }
+    },
+    "GPT-5.6-sol": {
+      "0.1": {
+        "n_games": 10,
+        "contribution_mean": 1.6,
+        "contribution_sd": 1.5,
+        "reach_rate": 0.0,
+        "ev_prediction": 0.0
+      },
+      "0.5": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": NaN
+      },
+      "0.9": {
+        "n_games": 10,
+        "contribution_mean": 119.8,
+        "contribution_sd": 0.6,
+        "reach_rate": 0.9,
+        "ev_prediction": 120.0
+      }
+    },
+    "Grok-4.20 (no reasoning)": {
+      "0.1": {
+        "n_games": 10,
+        "contribution_mean": 197.2,
+        "contribution_sd": 30.93,
+        "reach_rate": 1.0,
+        "ev_prediction": 0.0
+      },
+      "0.5": {
+        "n_games": 10,
+        "contribution_mean": 215.2,
+        "contribution_sd": 23.99,
+        "reach_rate": 1.0,
+        "ev_prediction": NaN
+      },
+      "0.9": {
+        "n_games": 10,
+        "contribution_mean": 220.8,
+        "contribution_sd": 26.17,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
+      }
+    },
+    "Grok-4.20 (reasoning)": {
+      "0.1": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": 0.0
+      },
+      "0.5": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": NaN
+      },
+      "0.9": {
+        "n_games": 10,
+        "contribution_mean": 120.2,
+        "contribution_sd": 0.6,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
+      }
+    }
+  },
+  "pivot": {
+    "GPT-5.4-nano": {
+      "tested_levels": [
+        0.1,
+        0.5,
+        0.9
+      ],
+      "crossing": null,
+      "note": "reach never crosses 0.5 in the tested range"
+    },
+    "Claude-Opus-5": {
+      "tested_levels": [
+        0.1,
+        0.5,
+        0.9
+      ],
+      "crossing": null,
+      "note": "reach never crosses 0.5 in the tested range"
+    },
+    "Gemini-3.1-Flash-Lite": {
+      "tested_levels": [
+        0.1,
+        0.5,
+        0.9
+      ],
+      "crossing": null,
+      "note": "reach never crosses 0.5 in the tested range"
+    },
+    "Gemini-3.1-Pro": {
+      "tested_levels": [
+        0.1,
+        0.5,
+        0.9
+      ],
+      "crossing": [
+        0.1,
+        0.5
+      ],
+      "consistent_with_ev_threshold": true
+    },
+    "GPT-5.6-sol": {
+      "tested_levels": [
+        0.1,
+        0.5,
+        0.9
+      ],
+      "crossing": [
+        0.1,
+        0.5
+      ],
+      "consistent_with_ev_threshold": true
+    },
+    "Grok-4.20 (no reasoning)": {
+      "tested_levels": [
+        0.1,
+        0.5,
+        0.9
+      ],
+      "crossing": null,
+      "note": "reach never crosses 0.5 in the tested range"
+    },
+    "Grok-4.20 (reasoning)": {
+      "tested_levels": [
+        0.1,
+        0.5,
+        0.9
+      ],
+      "crossing": null,
+      "note": "reach never crosses 0.5 in the tested range"
+    }
+  }
+}
