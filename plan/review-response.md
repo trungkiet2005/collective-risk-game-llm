@@ -12,66 +12,88 @@ social dilemma: capability enables risk sensitivity but does not confer it"*.
 
 ---
 
-## 0. ĐANG Ở ĐÂU — cập nhật 14-08-2026, 17:35
+## 0. ĐANG Ở ĐÂU — cập nhật 14-08-2026, 21:10
 
-### 0.1 🔥 Kết quả sơ bộ Q8 đã ĐẢO một claim của paper
+### 0.1 ✅ Q8 XONG TOÀN BỘ — và nó cho một phát hiện MẠNH HƠN dự đoán
 
-**4/8 shard xong.** Số đã có (tiếng Anh, 10 ván/cell):
+8/8 shard chạy xong (push 26 phút, run 105 phút), gộp sạch: **4 model bậc đỉnh × 5 mức
+risk × 10 ván, tiếng Anh, `parse_failed=0`**, mỗi model 80 ván / 4.800 lượt.
 
-| Model | p=0.1 | **p=0.3** | p=0.5 | **p=0.7** | p=0.9 |
-|---|---|---|---|---|---|
-| `gpt-5.6-sol` đóng góp | 1.6 | **118.4** | 120.0 | **120.0** | 119.8 |
-| `gpt-5.6-sol` reach | 0% | **70%** | 100% | **100%** | 90% |
-| `claude-opus-5` đóng góp | 120.0 | **120.6** | ~124 | **chờ** | 128.0 |
-| `gemini-3.1-pro` | 0.0 | **chờ** | 120.0 | **chờ** | 120.0 |
+| Model (EN) | p=0.1 | **p=0.3** | p=0.5 | **p=0.7** | p=0.9 | bản lề |
+|---|---|---|---|---|---|---|
+| `gemini-3.1-pro` | 0.0 / 0% | **4.2 / 0%** | 120.0 / 100% | 120.0 / 100% | 120.0 / 100% | **(0.3, 0.5]** ✅ đúng EV |
+| `gpt-5.6-sol` | 1.6 / 0% | **118.4 / 70%** | 120.0 / 100% | 120.0 / 100% | 119.8 / 90% | **(0.1, 0.3]** ⚠️ SỚM hơn EV |
+| `claude-opus-5` | 120.0 / 100% | 120.6 / 100% | 126.8 / 100% | 128.0 / 100% | 128.0 / 100% | không có |
+| `grok-4.20-reasoning` | 120.0 / 100% | 120.0 / 100% | 120.0 / 100% | 120.0 / 100% | 120.2 / 100% | không có |
 
-**GPT-5.6-sol KHÔNG phải hàm bậc thang ở ngưỡng EV.** Nó đã hợp tác phần lớn ở **p=0.3**,
-nơi EV vẫn bảo bỏ mặc (0.7 × 40 = **28** > 20 chắc chắn). Và cell 0.3 là **cell trung gian
-thật** — reach 70%, tổng đóng góp trải 114/120/122, không phải hằng số.
+**Phát hiện: lưới 3 điểm đã GỘP hai model vốn khác nhau.**
 
-Nghĩa là: model chuyển sang hợp tác **SỚM HƠN** mức trung tính rủi ro đòi hỏi, tức là nó
-**e ngại rủi ro** chứ không phải trung tính. Đây chính xác là thứ reviewer nghi ngờ khi hỏi
-*"or if small hysteresis/noise exists around the threshold"* — và câu trả lời là **có**.
+- `gemini-3.1-pro` nhảy đúng chỗ trung tính rủi ro đòi hỏi → **risk-neutral thật**.
+- `gpt-5.6-sol` đã nhảy **trước** một nấc: ở p=0.3 nó bỏ 28 kỳ vọng để lấy 20 chắc chắn,
+  tức nhường ≥ **28.6%** giá trị kỳ vọng → **e ngại rủi ro**, CRRA ≈ **0.485**.
+- Cell `gpt-5.6-sol` @ p=0.3 là **cell trung gian DUY NHẤT** của cả bảng bậc đỉnh
+  (reach 70%, tổng trải 114/120/122) — 20/44 cell còn lại có SD **đúng bằng 0**.
+- `claude-opus-5`: reach 100% ở cả 5 mức nhưng lượng góp **tăng đơn điệu** 120.0 → 128.0.
+  Hiệu ứng risk +8.0 của nó là **biên an toàn nới rộng**, không phải quyết định.
+- `grok-4.20-reasoning`: đúng 120.0 ở 4/5 mức, SD=0 → **null còn chắc hơn** trên lưới mịn.
 
-⚠️ **Câu "step function at the expected-value threshold" trong paper phải sửa** ở **bảy chỗ**
-(số dòng trong `main.tex` tính đến commit `d3a2e28`): abstract 30 · intro finding 4 dòng 51 ·
-§toptier 189 · caption fig10 196 · discussion 293 · next steps 314 · conclusion 318.
+Đây là dạng sắc nhất của luận điểm trung tâm paper: hai model **không phân biệt được trên
+3 điểm** của thiết kế, tách ra ngay khi làm mịn lưới.
 
-**ĐỪNG sửa vội** — còn chờ `gemini-3.1-pro` ở 0.3/0.7. Nếu Gemini nhảy gọn 0→120 đúng giữa
-0.3 và 0.5 thì hai model KHÁC NHAU về vị trí bản lề, và đó lại là một phát hiện khác nữa
-(không phải "hai model cùng chơi EV" mà "hai model cùng phản ứng risk theo hai kiểu").
+### 0.2 Đã sửa gì trong paper (commit này)
 
-### 0.2 Đang chạy / đang chờ
+| Chỗ | Sửa |
+|---|---|
+| abstract | "step function at the EV threshold" → "within a single grid step"; thêm câu lưới 5 mức đặt hai bậc ở hai chỗ khác nhau |
+| intro finding 4 | viết lại: hai bậc không cùng chỗ, Gemini đúng EV, GPT sớm hơn một nấc |
+| §methods (2 chỗ) | khai báo lưới 5 mức: risk levels + số ván/lượt của 4 config bậc đỉnh |
+| §methods account check | 11 → **12 cell**, thêm cell 0.3 **chia cố ý** 5+5 account (F=0.40, P=1.00) |
+| §toptier | bỏ "at the expected-value threshold", trỏ tới §pivot |
+| caption fig10 | như trên + trỏ hình mới |
+| **§results MỚI** | `\subsection{Where the step falls...}` `\label{sec:pivot}` — 3 đoạn + **hình 12** (in ra là *Figure 9*) |
+| §discussion | viết lại: trên 3 điểm thì trùng EV, trên 5 điểm thì không → "trùng khớp với nghiệm chuẩn tắc là **hiện vật của độ phân giải lưới**" |
+| §limitations | 16/36 → **20/44** cell SD=0; thêm giới hạn lưới mịn (chỉ EN, chỉ bậc đỉnh) |
+| §next steps | bỏ mục "quét mức trung gian" (đã làm), thay bằng mở rộng sang VN + bậc rẻ |
+| §conclusion | thêm câu hai model KHÁC NHAU về vị trí bậc |
+| `esm.tex` | **§mới `sec:pivot-cells`** + bảng 7 (toàn bộ 20 cell); cập nhật execution-batch 11→12 |
+
+### 0.3 ⚠️ Bẫy đã gài chốt: `CORE_RISKS`
+
+Thêm 2 mức risk làm **lệch mọi số trung bình gộp theo cell** (cột "Pooled" ở tab_axes,
+"Gemini-3.1 từ 120.8 xuống 80.1"...) vì 2 mức mới chỉ có ở **4/14 config và chỉ tiếng Anh**.
+
+Đã chốt trong [`paper/revision/_data.py`](../paper/revision/_data.py):
+`CORE_RISKS = (0.1, 0.5, 0.9)`, và `frontier_games()` / `all_turns()` **lọc mặc định**.
+Chỉ `r7` truyền `all_risks=True`. Đã chạy lại cả r1–r7: **`tab_axes.tex` và
+`tab_effects.tex` không đổi một ký tự** → mọi số cũ trong paper vẫn đúng.
+
+`r1` có đổi (nó đọc thẳng `plan/runs/`, không qua `_data`): 300 → 380 ván, account check
+11 → 12 cell, vẫn **0 cell có hiệu ứng account**. Đây là cải thiện, đã đưa vào paper.
+
+### 0.4 Còn lại — chỉ chờ NGƯỜI DÙNG
 
 | Việc | Trạng thái | Cần ai |
 |---|---|---|
-| Q8 pha run | 4/8 shard xong, còn `acc1`+`acc2` (gemini-pro), `chinguyentran` (opus 0.7), `chisboiz` (grok) | tự chạy |
-| Q1 ablation mỏ neo | ⛔ **chờ người dùng chạy tay trên UI** — xem [§2e](#2e-chạy-tay-trên-ui--đường-chắc-ăn-cho-q1--q3) | **người dùng** |
-| Q3 probe EV | ⛔ **chờ người dùng chạy tay trên UI** | **người dùng** |
-| 9 mục vòng 1 | ✅ xong, đã vào paper, build sạch | — |
-
-### 0.3 Làm gì tiếp, theo thứ tự
-
-```bash
-# 1) Khi cả 8 shard Q8 xong — gộp (CHÚ Ý hai cờ expect, xem §2c)
-python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --out results/frontier \
-    --expect-risks 0.1,0.3,0.5,0.7,0.9 --expect-langs en
-
-# 2) Phân tích + hình 12
-python paper/revision/r7_intermediate_risk.py
-
-# 3) Sửa 7 chỗ "step function" trong main.tex theo số thật, rồi build
-cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
-```
+| Q8 | ✅ **XONG**, đã vào paper | — |
+| 9 mục vòng 1 | ✅ xong, đã vào paper | — |
+| Q1 ablation mỏ neo | ⛔ chạy tay trên UI Kaggle — [§2e](#2e-chạy-tay-trên-ui--đường-chắc-ăn-cho-q1--q3) | **người dùng** |
+| Q3 probe EV | ⛔ chạy tay trên UI Kaggle | **người dùng** |
 
 Khi người dùng đưa về `nohint_results.zip` / `evprobe_results.zip`: giải nén vào
 `results/raw/`, rồi so `exp_nohint` với `exp_baseline` (ghép cặp theo risk/lang/rep) và
-chấm trục `value` của `exp_evprobe`. Chưa có script cho hai việc đó — phải viết.
+chấm trục `value` của `exp_evprobe`. **Chưa có script cho hai việc đó — phải viết.**
 
-### 0.4 Trạng thái paper
+### 0.5 Trạng thái paper
 
-`main.pdf` **23 trang**, `esm.pdf` **6 trang**, build sạch, 0 citation undefined.
-Commit gần nhất: `d3a2e28`. Working tree sạch trước khi vào phiên này.
+`main.pdf` **24 trang**, `esm.pdf` **7 trang**, build sạch, **0 undefined ref, 0 undefined
+citation**, không có overfull hbox mới (2 cái còn lại là của `\maketitle` và bảng decoding,
+có từ trước).
+
+Lệnh build lại:
+```bash
+python paper/revision/r6_summary_tables.py && python paper/revision/r7_intermediate_risk.py
+cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main && pdflatex esm && pdflatex esm
+```
 
 ---
 
@@ -107,7 +129,7 @@ Cột "Cần gì": `TEXT` = chỉ sửa chữ · `OFFLINE` = phân tích lại d
 | **W5** | Gán ghế persona không ngẫu nhiên hoàn toàn | TEXT | 0đ | ✅ paper đã có kiểm định χ² + ΔR² |
 | **Q1** | Ablation bỏ mỏ neo equal-split (chạy thật) | RUN | GPU miễn phí / ~$20 proxy | 🟡 **artifact đã sẵn**, chưa phóng |
 | **Q3** | Probe so sánh EV | RUN | GPU miễn phí / ~$5 proxy | 🟡 **artifact đã sẵn**, chưa phóng |
-| **Q8** | Thêm mức risk trung gian p=0.3, 0.7 | RUN | ~$16–32 | ⬜ chờ duyệt ngân sách |
+| **Q8** | Thêm mức risk trung gian p=0.3, 0.7 | RUN | ~$18 thực tế | ✅ **XONG** — `r7`, hình 12, mục §pivot, ESM bảng 7. Xem [§0.1](#01--q8-xong-toàn-bộ--và-nó-cho-một-phát-hiện-mạnh-hơn-dự-đoán) |
 | **Q4** | Persona có đổi lời biện minh trong game không? | RUN | ~$10 hoặc GPU | ⬜ ⚠️ xem §4.2 |
 | **Q10** | Salience một phần / nhiễu (chỉ hiện vòng trước) | RUN (GPU) | 0đ, chậm | ⬜ dùng `memoryMode`/`memoryWindow` sẵn có |
 | **Q9** | Nhóm trộn nhiều model | RUN + sửa engine | ~$10 | ⬜ chờ duyệt ngân sách |
@@ -135,7 +157,7 @@ mọi con số cũ đều tái tạo khớp (uncensored `+0.97`, CI `[-2.2,+4.1]
 |---|---|
 | **Q1** ablation bỏ mỏ neo | 🟢 chạy lại trên **T4×2** — [`trungkiet/crsd-nohint`](https://www.kaggle.com/code/trungkiet/crsd-nohint) v3. Lần 1 hỏng, xem §2d |
 | **Q3** probe so sánh EV | 🟡 chờ slot GPU rồi tự đẩy — [`trungkiet/crsd-evprobe`](https://www.kaggle.com/code/trungkiet/crsd-evprobe) |
-| **Q8** mức risk trung gian p=0.3, 0.7 | 🟡 **CHỜ NGÂN SÁCH — duyệt ngày 14-08-2026.** ~$16–32. Xem §2c bên dưới cho lệnh chạy sẵn |
+| **Q8** mức risk trung gian p=0.3, 0.7 | ✅ **XONG 14-08-2026** — 8/8 shard, 80 ván mới, ~$18. Kết quả ở [§0.1](#01--q8-xong-toàn-bộ--và-nó-cho-một-phát-hiện-mạnh-hơn-dự-đoán) |
 | **Q10** salience một phần | ⬜ dùng `memoryMode`/`memoryWindow` sẵn có, chưa chạy |
 | **Q9** nhóm trộn model | ⬜ cần sửa engine cho phép mỗi ghế một model |
 | **Q4** lời biện minh dưới persona | ⬜ cần prompt có scratchpad giữ full-history |
@@ -439,23 +461,70 @@ cùng "MORAL SIM". **Phải tra và xác minh từng cái** (tiêu đề, tác g
 `refs.bib`. `paper/README.md` ghi rõ quy ước: mọi reference đều đã web-verify DOI/arXiv id — giữ
 đúng quy ước đó. Trích sai tên/tiêu đề là lỗi nặng hơn thiếu trích dẫn.
 
-## 5. Khung thư phản hồi (điền dần khi làm xong từng mục)
+## 5. Khung thư phản hồi
 
 Cấu trúc chuẩn: một đoạn cảm ơn, rồi từng comment → trả lời → chỉ đích danh chỗ sửa trong bản mới.
+Đánh số **Qn** theo đúng "Questions for Authors" ở [§6](#questions-for-authors).
+✅ = viết được ngay, số đã có. ⛔ = còn chờ chạy.
 
 ```
-R1.1 (equal-split anchor) — [ablation] Chúng tôi đã chạy lại N model không có gợi ý equal-split.
-     Kết quả: … Chỗ sửa: §Methods đoạn 2, §Results §X mới, Fig SY.
-R1.2 (Vietnamese QA) — Bổ sung Supplementary S1: bảng back-translation từng dòng + bằng chứng
-     Rules accuracy chênh <1pp giữa hai ngôn ngữ.
-R1.3 (decoding params) — Sửa mô tả sai ở §Methods: temperature đặt tường minh 0.7 khớp nhánh
-     open-weight; bổ sung Bảng SZ tham số decode.
-R1.4 (lottery) — Bổ sung lập luận cấu trúc (không có đường phản hồi) + kiểm trôi theo rep
-     + mô phỏng rút lại xổ số.
-R1.5 (round-by-round) — Hình mới FigN.
-R1.6 (EV probe) — …
-R1.7 (mixed-model groups) — …
-R1.8 (related work) — Bổ sung K reference; §Discussion đoạn "These findings connect…".
+Q1  (bỏ mỏ neo equal-split) ⛔ CHỜ CHẠY
+    Trả lời tạm bằng bằng chứng gián tiếp đã có: P(góp 2) trải 0.054–1.000 khắp panel và
+    tương quan với |Δrisk| chỉ −0.06 → mỏ neo KHÔNG giải thích được null. ESM §5, bảng 6.
+    Khi có data nohint: thêm §Results mới + ghép cặp với exp_baseline.
+
+Q2  (QA bản dịch tiếng Việt) ✅
+    Bổ sung ESM §1: back-translation TỪNG DÒNG của prompt VN, cộng bằng chứng hành vi —
+    Rules accuracy EN 99.40% vs VN 98.74% trên 20.160 probe (chênh 0.66pp), và câu hỏi
+    xác suất thảm hoạ VN còn ĐÚNG HƠN EN. Khoảng cách rules_target là của riêng
+    Llama-3.1-8B (100%→37.2%); sáu model kia 100%/100%.
+
+Q3  (probe so sánh EV) ⛔ CHỜ CHẠY
+    Đã dựng trục câu hỏi `value` thứ tư trong engine (`crsd/engine/comprehension.py`),
+    ground truth do engine tính. Chưa có data.
+
+Q4  (persona → lời biện minh trong game) ⛔ KHÔNG TRẢ LỜI ĐƯỢC TỪ DATA CŨ
+    Nói thẳng: `turns.jsonl` chỉ lưu dòng `CONTRIBUTION: n`, không lưu lập luận. Cần
+    prompt có scratchpad. Đã ghi vào §next steps. Xem §4.2.
+
+Q5  (quỹ đạo từng vòng) ✅
+    §Results mới "Inside the game: the agents track the deadline, not what missing it
+    costs" + hình 11. Ba đường risk chồng khít mọi vòng; NHƯNG 3 config có cú tăng tốc
+    cuối game xảy ra ở CÙNG vòng và CÙNG độ cao ở mọi mức risk. Tương tác need×risk ns
+    ở cả 4 model (P=0.16–0.53). Đây là câu trả lời mạnh hơn reviewer hỏi.
+
+Q6  (tham số decode + độ ổn định) ✅ + ĐÍNH CHÍNH
+    Paper cũ nói sai ("provider-default temperature"). Thực tế temperature = 0.7 đặt
+    tường minh, KHỚP nhánh open-weight; seed có truyền; top_p để mặc định. ESM §2 bảng 5.
+    Độ ổn định: 6 ván bị chạy trùng → 5/6 y hệt, 1 lệch 4/240; permutation ANOVA trên
+    12 cell nhiều batch → 0 cell có hiệu ứng batch (mọi P>0.22).
+
+Q7  (xổ số độc lập từng ván) ✅ + KẾT QUẢ MẠNH HƠN
+    Hai lớp: (a) cấu trúc — xổ số quay SAU quyết định cuối và KHÔNG hiện cho agent nào,
+    nên không có đường phản hồi; (b) thực nghiệm — không trôi theo rep (P=0.75/0.88),
+    không phản ứng với thảm hoạ ván trước (P=0.99/0.32). Mô phỏng rút lại xổ số độc lập
+    10.000 lần: hai model EV kiếm 36.0 và 35.7 thay vì 32.0/31.8 → lợi thế so với
+    cooperator tốt nhất TĂNG từ +60% lên +79%. Xổ số dùng chung đã LÀM HẠI họ.
+
+Q8  (mức risk trung gian 0.3, 0.7) ✅ ĐÃ CHẠY — và nó đổi một câu của paper
+    Chạy 4 config bậc đỉnh ở p=0.3 và 0.7 (EN, 10 ván/cell): 80 ván, 4.800 lượt,
+    parse_failed=0. Kết quả: HAI BẬC KHÔNG CÙNG CHỖ. Gemini-3.1-Pro nhảy giữa 0.3 và 0.5
+    — đúng chỗ trung tính rủi ro. GPT-5.6-sol đã nhảy TRƯỚC p=0.3 (góp 118.4, reach 70%)
+    ở mức mà bỏ mặc còn đáng 28 kỳ vọng so với 20 chắc chắn → e ngại rủi ro, CRRA≈0.5.
+    Trả lời trực tiếp vế "small hysteresis/noise around the threshold": CÓ, và nó nằm
+    gọn trong đúng một cell rộng một nấc lưới. Chỗ sửa: §Results §pivot mới + hình 12,
+    ESM §6 bảng 7, và bỏ cụm "step function at the expected-value threshold" ở 7 chỗ.
+
+Q9  (nhóm trộn nhiều model) ⛔ CHƯA CHẠY — cần sửa engine cho mỗi ghế một model.
+    Đã có trong §next steps như "the configuration most deployments will actually have".
+
+Q10 (salience một phần/nhiễu) ⛔ CHƯA CHẠY — engine đã có sẵn `memoryMode`/`memoryWindow`.
+
+W1  (mỏ neo gây null?) ✅ BÁC BỎ ĐƯỢC — xem Q1.
+W5  (gán ghế persona không ngẫu nhiên) ✅ paper đã có χ²=23.0, P=0.0003 + ΔR²=0.005–0.029.
+W7  (bảng độ lớn hiệu ứng) ✅ Bảng 2 `tab:effects`, sinh từ script nên không lệch với text.
+W8  (thrift vs risk theo họ model) ✅ Bảng 3 `tab:axes`.
+W9  (related work) ✅ 9 reference mới, đã xác minh tác giả thật (KHÔNG đoán).
 ```
 
 ## 6. Toàn văn review (nguyên bản)
@@ -672,11 +741,14 @@ mechanistic claims.
 | 13-08-2026 | Nhận review, dựng file này, soát code tìm việc làm được offline | Phát hiện §4.1 (paper sai về temperature), §4.2 (không có log lời biện minh) |
 | 13-08-2026 | Vòng 1 trọn vẹn: 6 script phân tích, sửa `main.tex`, dựng ESM | 9/15 mục XONG. `main.pdf` 23 trang, `esm.pdf` 6 trang, build sạch, 0 citation undefined |
 | 13-08-2026 | Dựng artifact vòng 2 cho Q1 + Q3 | Template no-hint, 3 game config, 2 experiment config, 2 probe EV mới; test suite pass |
+| 14-08-2026 | 4 lần thử chạy notebook GPU qua API | Thất bại có nguyên nhân rõ, xem §2d. Chuyển Q1+Q3 sang chạy tay trên UI |
+| 14-08-2026 | **Q8 trọn vẹn**: 8 shard × 2 pha (push 26', run 105'), gộp, phân tích, vào paper | **Bậc của hai model KHÔNG cùng chỗ** — Gemini đúng EV, GPT sớm hơn một nấc (e ngại rủi ro, CRRA≈0.5). `main.pdf` 24 trang, `esm.pdf` 7 trang |
 
 ### Đã đụng vào file nào
 
-**Paper:** `main.tex` (8 chỗ), `refs.bib` (+9 ref), `esm.tex` (mới), `figures/fig11_*` (mới),
-`revision/*.py` (6 script mới) + `revision/out/*` (JSON + 2 bảng `.tex` được `\input`).
+**Paper:** `main.tex` (8 chỗ vòng 1 + 11 chỗ vòng 2), `refs.bib` (+9 ref), `esm.tex` (mới,
++§6 bảng 7), `figures/fig11_*` + `figures/fig12_pivot.*` (mới),
+`revision/*.py` (7 script) + `revision/out/*` (JSON + 2 bảng `.tex` được `\input`).
 
 **Code:** `crsd/prompts/crsd_nohint_{en,vn}.txt` (mới), `crsd/configs/game/*_nohint.json`
 (3 mới), `crsd/configs/experiment/exp_{nohint,evprobe}.json` (2 mới),
@@ -696,3 +768,12 @@ mechanistic claims.
    Ghi xong phải `.replace(b'\r\n', b'\n')` nếu không `diff` sẽ báo đổi cả file.
 4. **ESM cần font T5 (vntex) cho dấu tiếng Việt.** T1 không có `ơ ư ă â`. Đã xử lý bằng
    `\newcolumntype{V}` + macro `\vn{}`; đừng đổi `\usepackage[T5,T1]{fontenc}` thành T1 đơn.
+5. **Thêm mức risk mới làm LỆCH mọi trung bình gộp theo cell.** p=0.3/0.7 chỉ tồn tại ở
+   4/14 config và chỉ tiếng Anh, nên cột "Pooled" trong `tab_axes` và mọi số dạng "trung
+   bình khắp cell" sẽ âm thầm đổi. Đã chốt `CORE_RISKS = (0.1, 0.5, 0.9)` trong
+   `paper/revision/_data.py`, lọc MẶC ĐỊNH ở `frontier_games()` và `all_turns()`; muốn lấy
+   đủ 5 mức phải truyền `all_risks=True` (chỉ `r7` làm thế). Sau khi chốt, chạy lại r1–r7
+   thì `tab_axes.tex` và `tab_effects.tex` không đổi một ký tự.
+6. **Số trong TÊN FILE hình ≠ số hình in ra.** `fig12_pivot.pdf` in ra là *Figure 9*,
+   `fig10_toptier.pdf` là *Figure 7*. LaTeX đánh số theo thứ tự float được ĐẶT. Tên file
+   chỉ là nhãn thứ tự tạo ra. Đừng "sửa cho khớp" — thứ tự in hiện tại đã đúng và liên tục.

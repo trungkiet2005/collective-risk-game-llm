@@ -43,12 +43,29 @@ OPEN_LABELS = {
 }
 
 
-def frontier_games(experiment: str = "exp_baseline") -> pd.DataFrame:
+#: The risk grid every configuration in the panel shares, in both languages.
+#: The four top-tier commercial configurations were additionally run at p=0.3 and
+#: p=0.7 in ENGLISH ONLY (reviewer Q8, analysed by r7). Those cells exist for 4 of
+#: 14 configurations and on one side of the language factor, so pooling over them
+#: makes any cross-panel mean incomparable and silently moves numbers the
+#: manuscript already quotes. Loaders therefore drop them by default; pass
+#: all_risks=True to get them back, which only r7 should need.
+CORE_RISKS = (0.1, 0.5, 0.9)
+
+
+def _core(df: pd.DataFrame, all_risks: bool) -> pd.DataFrame:
+    if all_risks or "risk_probability" not in df.columns:
+        return df
+    return df[df["risk_probability"].isin(CORE_RISKS)].copy()
+
+
+def frontier_games(experiment: str = "exp_baseline",
+                   all_risks: bool = False) -> pd.DataFrame:
     paths = sorted((RESULTS / "frontier").glob(f"*/{experiment}/games.csv"))
     df = pd.concat([pd.read_csv(p) for p in paths], ignore_index=True)
     df["arm"] = "commercial"
     df["experiment"] = experiment
-    return df
+    return _core(df, all_risks)
 
 
 def open_games(experiment: str = "exp_baseline") -> pd.DataFrame:
@@ -95,8 +112,11 @@ def turns(model_dir: Path) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def all_turns(experiment: str = "exp_baseline") -> pd.DataFrame:
-    """Every turn of `experiment`, both arms, with a model column."""
+def all_turns(experiment: str = "exp_baseline",
+              all_risks: bool = False) -> pd.DataFrame:
+    """Every turn of `experiment`, both arms, with a model column.
+
+    Filtered to CORE_RISKS by default; see the note on that constant."""
     frames = []
     for p in sorted((RESULTS / "frontier").glob(f"*/{experiment}/turns.jsonl")):
         t = turns(p)
@@ -115,4 +135,4 @@ def all_turns(experiment: str = "exp_baseline") -> pd.DataFrame:
         frames.append(t)
     if not frames:
         raise FileNotFoundError(f"no turns.jsonl found for {experiment}")
-    return pd.concat(frames, ignore_index=True)
+    return _core(pd.concat(frames, ignore_index=True), all_risks)

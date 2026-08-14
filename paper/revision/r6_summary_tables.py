@@ -172,7 +172,13 @@ def language_effect() -> dict:
 def risk_effect_by_model() -> dict:
     """Group contribution at p=0.9 minus p=0.1 in English (the paper's risk column),
     alongside the overall pooled contribution over BOTH languages (the paper's
-    contribution column in table 1) so the two tables agree."""
+    contribution column in table 1) so the two tables agree.
+
+    The pooled column runs over CORE_RISKS only, which the loaders enforce: the
+    p=0.3/0.7 cells exist for four configurations out of fourteen and in English
+    only, so averaging over them would make this column incomparable across the
+    panel and would move numbers the manuscript already quotes.
+    """
     df = pd.concat([open_games(), frontier_games()], ignore_index=True)
     out = {}
     for model, g_all in df.groupby("model"):

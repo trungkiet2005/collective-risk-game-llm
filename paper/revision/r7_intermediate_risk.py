@@ -28,6 +28,9 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _data import FRONTIER_LABELS, OUT, frontier_games, label   # noqa: E402
 
+# This is the one analysis that wants the p=0.3/0.7 cells; every other script
+# takes the shared three-level grid so its cross-panel means stay comparable.
+
 FIGDIR = Path(__file__).resolve().parents[1] / "figures"
 TARGET, ENDOWMENT, N_PLAYERS = 120.0, 40.0, 6
 
@@ -125,7 +128,7 @@ def make_figure(df: pd.DataFrame, summary: dict) -> bool:
     axB.set_ylim(-0.07, 1.10)
     axB.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     axB.set_ylabel("Target-reach rate")
-    axB.set_title("(b)  The pivot sits at the EV threshold", loc="left", fontsize=8)
+    axB.set_title("(b)  The two pivots are not in the same place", loc="left", fontsize=8)
     for ax in (axA, axB):
         ax.set_xlabel("Catastrophe risk $p$")
         ax.set_xticks([0.1, 0.3, 0.5, 0.7, 0.9])
@@ -142,7 +145,7 @@ def make_figure(df: pd.DataFrame, summary: dict) -> bool:
 
 
 def main() -> None:
-    df = frontier_games("exp_baseline")
+    df = frontier_games("exp_baseline", all_risks=True)
     summary = summarise(df)
     pivots = {m: pivot_location(rows) for m, rows in summary.items()}
     report = {"by_model": summary, "pivot": pivots}

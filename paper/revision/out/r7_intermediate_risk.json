@@ -31,12 +31,26 @@
         "reach_rate": 1.0,
         "ev_prediction": 0.0
       },
+      "0.3": {
+        "n_games": 10,
+        "contribution_mean": 120.6,
+        "contribution_sd": 0.92,
+        "reach_rate": 1.0,
+        "ev_prediction": 0.0
+      },
       "0.5": {
         "n_games": 10,
         "contribution_mean": 126.8,
         "contribution_sd": 2.71,
         "reach_rate": 1.0,
         "ev_prediction": NaN
+      },
+      "0.7": {
+        "n_games": 10,
+        "contribution_mean": 128.0,
+        "contribution_sd": 1.79,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
       },
       "0.9": {
         "n_games": 10,
@@ -77,12 +91,26 @@
         "reach_rate": 0.0,
         "ev_prediction": 0.0
       },
+      "0.3": {
+        "n_games": 10,
+        "contribution_mean": 4.2,
+        "contribution_sd": 3.84,
+        "reach_rate": 0.0,
+        "ev_prediction": 0.0
+      },
       "0.5": {
         "n_games": 10,
         "contribution_mean": 120.0,
         "contribution_sd": 0.0,
         "reach_rate": 1.0,
         "ev_prediction": NaN
+      },
+      "0.7": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
       },
       "0.9": {
         "n_games": 10,
@@ -100,12 +128,26 @@
         "reach_rate": 0.0,
         "ev_prediction": 0.0
       },
+      "0.3": {
+        "n_games": 10,
+        "contribution_mean": 118.4,
+        "contribution_sd": 2.94,
+        "reach_rate": 0.7,
+        "ev_prediction": 0.0
+      },
       "0.5": {
         "n_games": 10,
         "contribution_mean": 120.0,
         "contribution_sd": 0.0,
         "reach_rate": 1.0,
         "ev_prediction": NaN
+      },
+      "0.7": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
       },
       "0.9": {
         "n_games": 10,
@@ -146,12 +188,26 @@
         "reach_rate": 1.0,
         "ev_prediction": 0.0
       },
+      "0.3": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": 0.0
+      },
       "0.5": {
         "n_games": 10,
         "contribution_mean": 120.0,
         "contribution_sd": 0.0,
         "reach_rate": 1.0,
         "ev_prediction": NaN
+      },
+      "0.7": {
+        "n_games": 10,
+        "contribution_mean": 120.0,
+        "contribution_sd": 0.0,
+        "reach_rate": 1.0,
+        "ev_prediction": 120.0
       },
       "0.9": {
         "n_games": 10,
@@ -175,7 +231,9 @@
     "Claude-Opus-5": {
       "tested_levels": [
         0.1,
+        0.3,
         0.5,
+        0.7,
         0.9
       ],
       "crossing": null,
@@ -193,11 +251,13 @@
     "Gemini-3.1-Pro": {
       "tested_levels": [
         0.1,
+        0.3,
         0.5,
+        0.7,
         0.9
       ],
       "crossing": [
-        0.1,
+        0.3,
         0.5
       ],
       "consistent_with_ev_threshold": true
@@ -205,14 +265,16 @@
     "GPT-5.6-sol": {
       "tested_levels": [
         0.1,
+        0.3,
         0.5,
+        0.7,
         0.9
       ],
       "crossing": [
         0.1,
-        0.5
+        0.3
       ],
-      "consistent_with_ev_threshold": true
+      "consistent_with_ev_threshold": false
     },
     "Grok-4.20 (no reasoning)": {
       "tested_levels": [
@@ -226,7 +288,9 @@
     "Grok-4.20 (reasoning)": {
       "tested_levels": [
         0.1,
+        0.3,
         0.5,
+        0.7,
         0.9
       ],
       "crossing": null,

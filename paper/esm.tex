@@ -7,6 +7,7 @@
 
 \usepackage[margin=2.4cm]{geometry}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{amsmath}
@@ -281,8 +282,11 @@ Grok-4.20 (reasoning)    & $p{=}0.9$, en & $120$, $120$ & smoke pass, production
 \smallskip
 \noindent \textbf{Execution-batch test.} Every Claude-Opus-5 cell was assembled from two
 to four separate executions. A one-way permutation ANOVA ($10{,}000$ permutations) of
-group contribution on execution batch, within cell, finds no effect in any of the eleven
-cells that span more than one batch: $F \le 1.91$, all $P > 0.22$.
+group contribution on execution batch, within cell, finds no effect in any of the twelve
+cells that span more than one batch: $F \le 1.91$, all $P > 0.22$. Eleven of those splits
+were accidents of sharding; the twelfth, the $p=0.3$ cell added later
+(\S\ref{sec:pivot-cells}), was split deliberately, five games on each of two accounts,
+and gives $F=0.40$, $P=1.00$.
 
 % ==========================================================================
 \section{The lottery cannot induce learning}
@@ -393,5 +397,52 @@ baseline and $1.47$ in the composition study; language $9.80$; composition from 
 six selfish agents $14.67$. At $p=0.1$ in English, Gemini-3.1-Pro contributes $0$ in
 $100.0\%$ of its turns and GPT-5.6-sol in $98.8\%$, overriding the focal action
 entirely.
+
+% ==========================================================================
+\section{The five-point risk grid, cell by cell}
+\label{sec:pivot-cells}
+
+\noindent The four top-tier configurations were re-run in English at $p=0.3$ and
+$p=0.7$, ten games per cell, to locate the switch that the original three levels
+could only bracket. Table~\ref{tab:esm-pivot} gives every cell of the resulting grid.
+The expected-value solution contributes $0$ at $p=0.1$ and $p=0.3$, is indifferent at
+$p=0.5$, and contributes $120$ at $p=0.7$ and $p=0.9$.
+
+\begin{table}[htb]
+\centering
+\caption{Group contribution of a possible $240$ (standard deviation across the ten
+games in parentheses) and target-reach rate, in English, at five catastrophe risks.
+Only GPT-5.6-sol at $p=0.3$ is an intermediate cell: seven of its ten groups reached
+the target and three did not, with pooled totals of $114$, $120$ and $122$. Its switch
+therefore falls at or below $p=0.3$, one grid step earlier than risk neutrality
+requires, whereas Gemini-3.1-Pro's falls between $p=0.3$ and $p=0.5$, where risk
+neutrality puts it.}
+\label{tab:esm-pivot}
+\small
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Configuration & & $p{=}0.1$ & $p{=}0.3$ & $p{=}0.5$ & $p{=}0.7$ & $p{=}0.9$ \\
+\midrule
+\multirow{2}{*}{Gemini-3.1-Pro} & contribution & $0.0$ ($0$) & $4.2$ ($3.8$) & $120.0$ ($0$) & $120.0$ ($0$) & $120.0$ ($0$) \\
+ & reach & $0\%$ & $0\%$ & $100\%$ & $100\%$ & $100\%$ \\
+\addlinespace
+\multirow{2}{*}{GPT-5.6-sol} & contribution & $1.6$ ($1.5$) & $118.4$ ($2.9$) & $120.0$ ($0$) & $120.0$ ($0$) & $119.8$ ($0.6$) \\
+ & reach & $0\%$ & $70\%$ & $100\%$ & $100\%$ & $90\%$ \\
+\addlinespace
+\multirow{2}{*}{Claude-Opus-5} & contribution & $120.0$ ($0$) & $120.6$ ($0.9$) & $126.8$ ($2.7$) & $128.0$ ($1.8$) & $128.0$ ($2.4$) \\
+ & reach & $100\%$ & $100\%$ & $100\%$ & $100\%$ & $100\%$ \\
+\addlinespace
+\multirow{2}{*}{Grok-4.20 (reasoning)} & contribution & $120.0$ ($0$) & $120.0$ ($0$) & $120.0$ ($0$) & $120.0$ ($0$) & $120.2$ ($0.6$) \\
+ & reach & $100\%$ & $100\%$ & $100\%$ & $100\%$ & $100\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent The added cells were executed on separate Kaggle accounts from the original
+sweep, and the $p=0.3$ Claude-Opus-5 cell was deliberately split five games to one
+account and five to another as a further check on that source of variation; a
+permutation ANOVA on execution batch within that cell gives $F=0.40$, $P=1.00$.
+Contributions parsed without failure in all $80$ added games, that is, in all $4{,}800$
+added agent-turns.
 
 \end{document}

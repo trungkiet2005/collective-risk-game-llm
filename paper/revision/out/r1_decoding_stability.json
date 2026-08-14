@@ -15,13 +15,22 @@
       6000,
       16000
     ],
+    "google/gemini-3.1-pro-preview": [
+      6000
+    ],
+    "openai/gpt-5.6-sol": [
+      6000
+    ],
     "xai/grok-4.20-0309-non-reasoning": [
       6000,
       8000
+    ],
+    "xai/grok-4.20-0309-reasoning": [
+      6000
     ]
   },
   "run_to_run": {
-    "n_games_seen": 300,
+    "n_games_seen": 380,
     "n_games_replicated": 6,
     "models_replicated": [
       "anthropic-claude-opus-5-default",
@@ -170,7 +179,7 @@
     ]
   },
   "account_effect": {
-    "cells_tested": 11,
+    "cells_tested": 12,
     "cells_significant_at_05": 0,
     "significant": [],
     "all": [
@@ -196,12 +205,22 @@
       },
       {
         "model": "anthropic-claude-opus-5-default",
+        "risk": 0.3,
+        "language": "en",
+        "n_accounts": 2,
+        "n_games": 10,
+        "F": 0.4,
+        "p_perm": 1.0,
+        "constant": false
+      },
+      {
+        "model": "anthropic-claude-opus-5-default",
         "risk": 0.5,
         "language": "en",
         "n_accounts": 2,
         "n_games": 10,
         "F": 0.178,
-        "p_perm": 0.8337,
+        "p_perm": 0.8344,
         "constant": false
       },
       {
@@ -211,7 +230,7 @@
         "n_accounts": 4,
         "n_games": 10,
         "F": 0.517,
-        "p_perm": 0.7354,
+        "p_perm": 0.7284,
         "constant": false
       },
       {
@@ -221,7 +240,7 @@
         "n_accounts": 3,
         "n_games": 11,
         "F": 0.118,
-        "p_perm": 0.9168,
+        "p_perm": 0.9152,
         "constant": false
       },
       {
@@ -231,7 +250,7 @@
         "n_accounts": 3,
         "n_games": 10,
         "F": 0.538,
-        "p_perm": 0.6137,
+        "p_perm": 0.6066,
         "constant": false
       },
       {
@@ -271,7 +290,7 @@
         "n_accounts": 2,
         "n_games": 10,
         "F": 0.027,
-        "p_perm": 0.9108,
+        "p_perm": 0.9149,
         "constant": false
       },
       {
