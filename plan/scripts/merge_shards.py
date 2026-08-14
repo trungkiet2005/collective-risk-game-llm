@@ -27,10 +27,12 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+# Luoi MONG DOI cua sweep goc: 3 risk x 2 lang x 10 rep = 60 van/model. Cac dot bo
+# sung quet luoi KHAC (vd Q8 them p=0.3/0.7 chi tieng Anh) nen phai chinh duoc tu CLI,
+# neu khong phep kiem phu cell se bao "thieu" cho nhung cell chua bao gio dinh chay.
 EXPECTED_RISKS = {0.9, 0.5, 0.1}
 EXPECTED_LANGS = {"en", "vn"}
 EXPECTED_REPS = set(range(10))
-EXPECTED_CELLS = len(EXPECTED_RISKS) * len(EXPECTED_LANGS) * len(EXPECTED_REPS)  # 60
 
 
 def find_shards(srcs, exclude=("SMOKE",)):
@@ -69,7 +71,12 @@ def load_shard(games_path, turns_path):
     return games, turns
 
 
-def merge(srcs, out, only=None, dry_run=False, want_experiment="exp_baseline", exclude=None):
+def merge(srcs, out, only=None, dry_run=False, want_experiment="exp_baseline",
+          exclude=None, exp_risks=None, exp_langs=None):
+
+    exp_risks = EXPECTED_RISKS if exp_risks is None else set(exp_risks)
+    exp_langs = EXPECTED_LANGS if exp_langs is None else set(exp_langs)
+    n_expected_cells = len(exp_risks) * len(exp_langs) * len(EXPECTED_REPS)
     shards = find_shards(srcs, tuple(x for x in (exclude or "").split(",") if x) or ("SMOKE",))
     if not shards:
         print(f"KHONG tim thay games.csv nao duoi {srcs}", file=sys.stderr)
@@ -134,12 +141,12 @@ def merge(srcs, out, only=None, dry_run=False, want_experiment="exp_baseline", e
         reps = {int(g["rep"]) for g in games}
         cells = {(round(float(g["risk_probability"]), 2), g["language"], int(g["rep"]))
                  for g in games}
-        missing = {(r, l, p) for r in EXPECTED_RISKS for l in EXPECTED_LANGS
+        missing = {(r, l, p) for r in exp_risks for l in exp_langs
                    for p in EXPECTED_REPS} - cells
         pf = sum(int(t.get("parse_failed", 0)) for t in turns)
 
         print(f"\n=== {tag}")
-        print(f"  van        : {len(games)} / {EXPECTED_CELLS}")
+        print(f"  van        : {len(games)} / {n_expected_cells}")
         print(f"  risk       : {sorted(risks, reverse=True)}")
         print(f"  language   : {sorted(langs)}")
         print(f"  rep        : {min(reps) if reps else '-'}..{max(reps) if reps else '-'}"
@@ -195,8 +202,17 @@ def main():
     ap.add_argument("--exclude", default="SMOKE",
                     help="bo qua shard co duong dan chua tien to nay (phay ngan cach)")
     ap.add_argument("--dry-run", action="store_true", help="chi kiem tra, khong ghi")
+    ap.add_argument("--expect-risks", default=None,
+                    help="luoi risk mong doi, vd 0.1,0.3,0.5,0.7,0.9 "
+                         "(mac dinh 0.1,0.5,0.9 cua sweep goc)")
+    ap.add_argument("--expect-langs", default=None,
+                    help="ngon ngu mong doi, vd en (mac dinh en,vn)")
     args = ap.parse_args()
-    return merge(args.src, args.out, args.only, args.dry_run, args.experiment, args.exclude)
+    risks = ([float(x) for x in args.expect_risks.split(",")]
+             if args.expect_risks else None)
+    langs = args.expect_langs.split(",") if args.expect_langs else None
+    return merge(args.src, args.out, args.only, args.dry_run, args.experiment,
+                 args.exclude, risks, langs)
 
 
 if __name__ == "__main__":

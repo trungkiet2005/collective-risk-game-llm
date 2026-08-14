@@ -139,6 +139,21 @@ GAME_NAME = {0.90: "crsd_milinski_high_risk",
              0.50: "crsd_milinski_medium_risk",
              0.10: "crsd_milinski_low_risk"}
 
+
+def game_name(risk: float) -> str:
+    """Game name used inside game_id.
+
+    The three original levels keep their exact names -- they are the join key against
+    the open-source arm and results/ already holds data under them, so they must not
+    move. Any additional level (the revision sweep adds p=0.3 and p=0.7 for reviewer
+    Q8) gets a generated name like `crsd_milinski_p030_risk`. The open-source arm has
+    no such cell, so there is nothing to collide with and nothing to join.
+    """
+    key = round(float(risk), 2)
+    if key in GAME_NAME:
+        return GAME_NAME[key]
+    return f"crsd_milinski_p{int(round(key * 100)):03d}_risk"
+
 # Proxy models (esp. non-Gemini on staging) intermittently return 429/503. Retry
 # those; if a call STILL fails after retries, raise so the run aborts loudly.
 _TRANSIENT = ("429", "503", "500", "502", "504", "overloaded",
@@ -432,7 +447,7 @@ def play_game(llm, risk, language, rep, model_tag, turns_sink):
     balances = [ENDOWMENT] * N_PLAYERS
     own_totals = [0] * N_PLAYERS
     history = []                                   # completed rounds only (lockstep)
-    game_id = f"{GAME_NAME[risk]}__{model_tag}__{language}__rep{rep}"
+    game_id = f"{game_name(risk)}__{model_tag}__{language}__rep{rep}"
     tok_in = tok_out = cost = 0
     parse_failed = 0
 
