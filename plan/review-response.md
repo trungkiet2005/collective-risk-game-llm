@@ -108,7 +108,31 @@ kẹp: ở p=0.3 EV vẫn nghiêng về bỏ mặc (28 > 20), ở p=0.7 đã ngh
 **Đọc kết quả:** nếu reach nhảy 0%→100% giữa 0.3 và 0.7 mà không có mức trung gian nào ở
 0.5, đó là hàm bậc thang đúng ngưỡng EV — củng cố claim hiện tại. Nếu có ván lưng chừng ở
 0.3 hoặc 0.7 thì ngưỡng bị nhoè, và câu "step function at the expected-value threshold"
-trong paper phải nới lại.
+trong paper phải nới lại. **Bảy chỗ phải sửa nếu vậy:** abstract (dòng 30), intro finding 4
+(dòng 51), §toptier (dòng 189), caption fig10 (dòng 196), §discussion (dòng 293), §next
+steps (dòng 314), conclusion (dòng 318).
+
+**Đã chạy 14-08-2026.** Lệnh:
+```bash
+python plan/scripts/launch_q8.py --phase push     # 26 phut, 8/8 OK
+python plan/scripts/launch_q8.py --phase run
+python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --out results/frontier \
+    --expect-risks 0.1,0.3,0.5,0.7,0.9 --expect-langs en
+python paper/revision/r7_intermediate_risk.py     # so + fig12
+```
+
+⚠️ **Hai cái bẫy đã vấp, đã sửa — đừng vấp lại khi quét ra ngoài lưới risk cũ:**
+
+1. **`crg_task_server.py` có `GAME_NAME` chỉ ánh xạ 0.9/0.5/0.1.** Mức nào khác →
+   `KeyError` ngay ván đầu, **cả 8 shard chết sau 1 phút**. Đã thêm `game_name()` sinh tên
+   cho mức tuỳ ý (`crsd_milinski_p030_risk`). **Tên ba mức cũ KHÔNG được đổi** — chúng là
+   khoá join với nhánh open-weight và `results/` đã có dữ liệu mang tên đó.
+2. **`merge_shards.py` hard-code lưới 3×2×10.** Gộp sweep lưới khác sẽ báo thiếu hàng chục
+   cell chưa bao giờ định chạy rồi trả exit 1. Đã thêm `--expect-risks` / `--expect-langs`.
+
+Bài học chung: **pha push KHÔNG bắt được lỗi này** — push chỉ validate 1 ván trên model mặc
+định của server với lưới mặc định. Muốn bắt sớm thì chạy một shard 1 ván ở mức risk mới
+trước khi phóng cả loạt.
 
 ### 2d. ⚠️ Chạy notebook GPU qua API ≠ chạy qua UI — sự thật đắt tiền
 
