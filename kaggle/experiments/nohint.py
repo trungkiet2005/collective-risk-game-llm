@@ -203,6 +203,38 @@ if _want_vllm:
     # Tắt FlashInfer sampler: trên GPU mới (Blackwell sm_120) nó JIT-compile và ngã.
     os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     print("VLLM_USE_FLASHINFER_SAMPLER=0 (sampler PyTorch-native).")
+    # GPU truoc Ampere (T4 = sm_75) khong co FlashAttention-2; vLLM roi ve FlashInfer,
+    # thu nay JIT-compile kernel va chet o buoc link tren image Kaggle. Backend nao
+    # dung duoc thi phai DO, vi wheel vLLM 0.22.1 duoc build voi mot ban torch khac
+    # ban co san tren image -> mot so module backend import loi ABI:
+    #   TRITON_ATTN  -> ImportError: cannot import name 'is_opaque_value'
+    #                   from torch._library.opaque_object   (do 13-08-2026)
+    # Danh sach thu theo thu tu; cai nao import duoc thi dung. Chi ap dung cho GPU
+    # < sm_80, nen chay UI tren RTX PRO 6000 (sm_120, co FA2) khong bi dong toi.
+    try:
+        import torch as _t
+        if _t.cuda.is_available() and _t.cuda.get_device_capability(0)[0] < 8:
+            import importlib
+            _cands = [("FLEX_ATTENTION", "vllm.v1.attention.backends.flex_attention"),
+                      ("TRITON_ATTN", "vllm.v1.attention.backends.triton_attn")]
+            _picked = None
+            for _name, _mod in _cands:
+                try:
+                    importlib.import_module(_mod)
+                    _picked = _name
+                    break
+                except Exception as _ie:
+                    print(f"  backend {_name} khong import duoc: "
+                          f"{type(_ie).__name__}: {_ie}")
+            if _picked:
+                os.environ["VLLM_ATTENTION_BACKEND"] = _picked
+                print(f"GPU {_t.cuda.get_device_name(0)} < sm_80 -> "
+                      f"VLLM_ATTENTION_BACKEND={_picked} (tranh JIT FlashInfer).")
+            else:
+                print("KHONG backend nao import duoc — giu mac dinh, nhieu kha nang "
+                      "FlashInfer se JIT va chet. Chay tren UI voi RTX PRO 6000.")
+    except Exception as _e:
+        print("Khong do duoc compute capability, giu backend mac dinh:", _e)
 
 _to_install = []
 if _want_vllm and not _have_vllm:

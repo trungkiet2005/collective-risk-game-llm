@@ -141,8 +141,46 @@ Hệ quả, đo thật ngày 13-08-2026:
 ba model mount đủ (`exists=True`), wheels vLLM cài offline OK, config + template nohint
 đầy đủ, kế hoạch in ra đúng "60 games/model, 3 model × 60 = 180 games". Chỉ kẹt ở GPU.
 
-**Nếu T4×2 quá chậm hoặc hết quota:** chạy tay trên UI theo đúng hướng dẫn trong docstring
-`baseline.py` (chọn RTX PRO 6000, TP_SIZE về 1) — nhanh hơn nhiều lần.
+**Ba lần thử qua API đều hỏng, mỗi lần một lý do khác** (13-08-2026):
+
+| Lần | GPU | Chết ở đâu | Nguyên nhân |
+|---|---|---|---|
+| 1 | P100 (sm_60) | khởi tạo EngineCore | torch trong wheels không hỗ trợ sm_60 |
+| 2 | T4×2 (sm_75) | warmup attention | không có FA2 → rơi về FlashInfer → JIT ninja **link lỗi** |
+| 3 | T4×2 | import module backend | ép `TRITON_ATTN` → `ImportError: cannot import name 'is_opaque_value' from torch._library.opaque_object` |
+
+Lỗi lần 3 mới là gốc rễ thật: **wheel vLLM 0.22.1 trong `trungkiet/vllm-wheels` được build với
+một bản torch khác bản có sẵn trên image Kaggle hiện tại** (image chỉ cài thêm `vllm`, torch
+lấy từ image — 2.11.0+cu130). Mismatch đó nằm im cho tới khi có module nào chạm vào API đã
+đổi. Wheels build 09-06-2026, giờ là 13-08 — image đã trôi hai tháng.
+
+Lần 4 (đang chạy) **dò backend thay vì đoán**: thử import `FLEX_ATTENTION` rồi `TRITON_ATTN`,
+cái nào import được thì dùng, không cái nào được thì in cảnh báo rõ ràng.
+
+### 2e. Chạy tay trên UI — đường chắc ăn cho Q1 + Q3
+
+Nếu lần 4 vẫn hỏng thì **đừng thử tiếp qua API**. Mỗi lần thử tốn ~30 phút và một suất
+GPU quota, mà vấn đề nằm ở chỗ không sửa được từ xa (wheels lệch torch của image).
+
+Làm thế này, ~5 phút thao tác:
+
+1. Kaggle → **Create → Notebook**. Settings: **Accelerator = RTX PRO 6000**, **Internet OFF**.
+2. **+ Add Input** ba thứ:
+   - dataset [`trungkiet/crsd-code`](https://www.kaggle.com/datasets/trungkiet/crsd-code) —
+     đã có sẵn `crsd/` + `FAIRGAME/`, **bao gồm cả template nohint và hai config mới**;
+   - dataset wheels vLLM (`trungkiet/vllm-wheels`) — hoặc bỏ qua nếu image đã có vLLM;
+   - ba model: `qwen-lm/qwen2.5/transformers/7b-instruct`,
+     `google/gemma-2/transformers/gemma-2-9b-it`,
+     `metaresearch/llama-3.1/transformers/8b-instruct`.
+3. Dán [`kaggle/experiments/nohint.py`](../kaggle/experiments/nohint.py) vào, chia cell theo
+   dòng `# CELL N`.
+4. **Sửa đúng một dòng: `TP_SIZE = 2` → `TP_SIZE = 1`** (RTX PRO 6000 là một card 96GB).
+   Đoạn dò backend tự bỏ qua vì sm_120 ≥ sm_80.
+5. Run hết. Tải `nohint_results.zip` về bỏ vào `results/raw/`.
+6. Lặp lại với [`evprobe.py`](../kaggle/experiments/evprobe.py) → `evprobe_results.zip`.
+
+**Kiểm nhanh xem có thật sự chạy không:** cuối log phải thấy `Hoàn tất 3 lượt` chứ không
+phải `Hoàn tất 0 lượt`, và zip phải > 0.00 MB. `COMPLETE` không nói lên điều gì.
 
 ### ⚠️ Ẩn danh và tự trích dẫn
 

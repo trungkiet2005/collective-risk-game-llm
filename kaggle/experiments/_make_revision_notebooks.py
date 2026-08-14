@@ -77,6 +77,59 @@ def set_tp2(text: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# Attention backend. Do 13-08-2026 tren T4:
+#   "Cannot use FA version 2 ... FA2 is only supported on devices with compute
+#    capability >= 8"  ->  vLLM tu chon FLASHINFER  ->  no JIT-compile kernel bang
+#   ninja va CHET o buoc link ("collect2: error: ld returned 1 exit status").
+#   Model da nap xong (7.16 GiB, KV cache 5.5 GiB) roi moi chet o kernel warmup.
+# VLLM_USE_FLASHINFER_SAMPLER=0 (da co san) chi tat SAMPLER, khong tat ATTENTION.
+# TRITON_ATTN nam trong danh sach backend kha dung va khong can bien dich C++.
+# Dat co dieu kien theo compute capability nen chay tren RTX PRO 6000 (sm_120,
+# co FA2) van giu duong nhanh.
+# --------------------------------------------------------------------------- #
+ATTN_ANCHOR = '''    os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
+    print("VLLM_USE_FLASHINFER_SAMPLER=0 (sampler PyTorch-native).")'''
+
+ATTN_PATCH = ATTN_ANCHOR + '''
+    # GPU truoc Ampere (T4 = sm_75) khong co FlashAttention-2; vLLM roi ve FlashInfer,
+    # thu nay JIT-compile kernel va chet o buoc link tren image Kaggle. Backend nao
+    # dung duoc thi phai DO, vi wheel vLLM 0.22.1 duoc build voi mot ban torch khac
+    # ban co san tren image -> mot so module backend import loi ABI:
+    #   TRITON_ATTN  -> ImportError: cannot import name 'is_opaque_value'
+    #                   from torch._library.opaque_object   (do 13-08-2026)
+    # Danh sach thu theo thu tu; cai nao import duoc thi dung. Chi ap dung cho GPU
+    # < sm_80, nen chay UI tren RTX PRO 6000 (sm_120, co FA2) khong bi dong toi.
+    try:
+        import torch as _t
+        if _t.cuda.is_available() and _t.cuda.get_device_capability(0)[0] < 8:
+            import importlib
+            _cands = [("FLEX_ATTENTION", "vllm.v1.attention.backends.flex_attention"),
+                      ("TRITON_ATTN", "vllm.v1.attention.backends.triton_attn")]
+            _picked = None
+            for _name, _mod in _cands:
+                try:
+                    importlib.import_module(_mod)
+                    _picked = _name
+                    break
+                except Exception as _ie:
+                    print(f"  backend {_name} khong import duoc: "
+                          f"{type(_ie).__name__}: {_ie}")
+            if _picked:
+                os.environ["VLLM_ATTENTION_BACKEND"] = _picked
+                print(f"GPU {_t.cuda.get_device_name(0)} < sm_80 -> "
+                      f"VLLM_ATTENTION_BACKEND={_picked} (tranh JIT FlashInfer).")
+            else:
+                print("KHONG backend nao import duoc — giu mac dinh, nhieu kha nang "
+                      "FlashInfer se JIT va chet. Chay tren UI voi RTX PRO 6000.")
+    except Exception as _e:
+        print("Khong do duoc compute capability, giu backend mac dinh:", _e)'''
+
+
+def set_attn_backend(text: str) -> str:
+    return sub(text, ATTN_ANCHOR, ATTN_PATCH, "attention backend guard")
+
+
+# --------------------------------------------------------------------------- #
 # 1. nohint.py  — ablation bo mo neo equal-split (reviewer Q1)
 # --------------------------------------------------------------------------- #
 NOHINT_DOC = '''"""
@@ -158,7 +211,7 @@ def build_nohint() -> None:
     n0 = out.index('_need = [REPO_ROOT')
     n1 = out.index(']', out.index('local_vllm_connector.py', n0)) + 1
     out = out[:n0] + NOHINT_NEED + out[n1:]
-    out = set_tp2(out)
+    out = set_attn_backend(set_tp2(out))
     out = sub(out, 'print("OK — crsd/ + FAIRGAME/ + configs/prompts + exp_riskframing đầy đủ.")',
               'print("OK — crsd/ + FAIRGAME/ + template nohint + exp_nohint đầy đủ.")',
               "OK message")
@@ -238,7 +291,7 @@ def build_evprobe() -> None:
     out = sub(out, 'REPO_ROOT / "crsd" / "runner" / "run_comprehension.py"',
               'REPO_ROOT / "crsd" / "runner" / "run_comprehension.py"', "need anchor")
     out = out.replace('"exp_comprehension.json"', '"exp_evprobe.json"')
-    out = set_tp2(out)
+    out = set_attn_backend(set_tp2(out))
     out = sub(out, 'zip_path = Path("/kaggle/working/crsd_results.zip")',
               'zip_path = Path("/kaggle/working/evprobe_results.zip")', "zip name")
     (HERE / "evprobe.py").write_bytes(out.encode("utf-8"))
