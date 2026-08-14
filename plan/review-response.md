@@ -12,6 +12,69 @@ social dilemma: capability enables risk sensitivity but does not confer it"*.
 
 ---
 
+## 0. ĐANG Ở ĐÂU — cập nhật 14-08-2026, 17:35
+
+### 0.1 🔥 Kết quả sơ bộ Q8 đã ĐẢO một claim của paper
+
+**4/8 shard xong.** Số đã có (tiếng Anh, 10 ván/cell):
+
+| Model | p=0.1 | **p=0.3** | p=0.5 | **p=0.7** | p=0.9 |
+|---|---|---|---|---|---|
+| `gpt-5.6-sol` đóng góp | 1.6 | **118.4** | 120.0 | **120.0** | 119.8 |
+| `gpt-5.6-sol` reach | 0% | **70%** | 100% | **100%** | 90% |
+| `claude-opus-5` đóng góp | 120.0 | **120.6** | ~124 | **chờ** | 128.0 |
+| `gemini-3.1-pro` | 0.0 | **chờ** | 120.0 | **chờ** | 120.0 |
+
+**GPT-5.6-sol KHÔNG phải hàm bậc thang ở ngưỡng EV.** Nó đã hợp tác phần lớn ở **p=0.3**,
+nơi EV vẫn bảo bỏ mặc (0.7 × 40 = **28** > 20 chắc chắn). Và cell 0.3 là **cell trung gian
+thật** — reach 70%, tổng đóng góp trải 114/120/122, không phải hằng số.
+
+Nghĩa là: model chuyển sang hợp tác **SỚM HƠN** mức trung tính rủi ro đòi hỏi, tức là nó
+**e ngại rủi ro** chứ không phải trung tính. Đây chính xác là thứ reviewer nghi ngờ khi hỏi
+*"or if small hysteresis/noise exists around the threshold"* — và câu trả lời là **có**.
+
+⚠️ **Câu "step function at the expected-value threshold" trong paper phải sửa** ở **bảy chỗ**
+(số dòng trong `main.tex` tính đến commit `d3a2e28`): abstract 30 · intro finding 4 dòng 51 ·
+§toptier 189 · caption fig10 196 · discussion 293 · next steps 314 · conclusion 318.
+
+**ĐỪNG sửa vội** — còn chờ `gemini-3.1-pro` ở 0.3/0.7. Nếu Gemini nhảy gọn 0→120 đúng giữa
+0.3 và 0.5 thì hai model KHÁC NHAU về vị trí bản lề, và đó lại là một phát hiện khác nữa
+(không phải "hai model cùng chơi EV" mà "hai model cùng phản ứng risk theo hai kiểu").
+
+### 0.2 Đang chạy / đang chờ
+
+| Việc | Trạng thái | Cần ai |
+|---|---|---|
+| Q8 pha run | 4/8 shard xong, còn `acc1`+`acc2` (gemini-pro), `chinguyentran` (opus 0.7), `chisboiz` (grok) | tự chạy |
+| Q1 ablation mỏ neo | ⛔ **chờ người dùng chạy tay trên UI** — xem [§2e](#2e-chạy-tay-trên-ui--đường-chắc-ăn-cho-q1--q3) | **người dùng** |
+| Q3 probe EV | ⛔ **chờ người dùng chạy tay trên UI** | **người dùng** |
+| 9 mục vòng 1 | ✅ xong, đã vào paper, build sạch | — |
+
+### 0.3 Làm gì tiếp, theo thứ tự
+
+```bash
+# 1) Khi cả 8 shard Q8 xong — gộp (CHÚ Ý hai cờ expect, xem §2c)
+python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --out results/frontier \
+    --expect-risks 0.1,0.3,0.5,0.7,0.9 --expect-langs en
+
+# 2) Phân tích + hình 12
+python paper/revision/r7_intermediate_risk.py
+
+# 3) Sửa 7 chỗ "step function" trong main.tex theo số thật, rồi build
+cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
+```
+
+Khi người dùng đưa về `nohint_results.zip` / `evprobe_results.zip`: giải nén vào
+`results/raw/`, rồi so `exp_nohint` với `exp_baseline` (ghép cặp theo risk/lang/rep) và
+chấm trục `value` của `exp_evprobe`. Chưa có script cho hai việc đó — phải viết.
+
+### 0.4 Trạng thái paper
+
+`main.pdf` **23 trang**, `esm.pdf` **6 trang**, build sạch, 0 citation undefined.
+Commit gần nhất: `d3a2e28`. Working tree sạch trước khi vào phiên này.
+
+---
+
 ## 1. Reviewer muốn gì (rút gọn)
 
 Ba việc được nêu tường minh trong đoạn kết:
