@@ -5,7 +5,7 @@ plus results/open_source/crsd_all_models.csv for the open-weight comparison bars
 
   fig10: (a) contribution vs risk, English, six API models
          (b) target-reach vs risk against the human benchmark
-         (c) risk effect across the whole 13-model panel, with the two
+         (c) risk effect across the whole 14-configuration panel, with the two
              controlled contrasts (capability, reasoning) bracketed
 
 Kept separate from make_figures.py / make_figures_expansion.py so that the
@@ -183,7 +183,7 @@ def fig_toptier():
     axC.set_xlim(-14, 152)
     axC.set_xlabel("Risk effect on group contribution, $p=0.1\\to0.9$ "
                    "(points of 240, English)")
-    axC.set_title("(c)  Two configurations of fourteen respond to risk; the rest barely move",
+    axC.set_title("(c)  Two near-maximal responses; most others are small or intermediate",
                   loc="left", fontsize=9.2)
     axC.xaxis.grid(True, alpha=0.6); axC.set_axisbelow(True)
 
