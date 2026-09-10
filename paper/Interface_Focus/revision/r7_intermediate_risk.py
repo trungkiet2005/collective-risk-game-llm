@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _data import FRONTIER_LABELS, OUT, frontier_games, label   # noqa: E402
+from paper.Interface_Focus.revision._data import FRONTIER_LABELS, OUT, frontier_games, label   # noqa: E402
 
 # This is the one analysis that wants the p=0.3/0.7 cells; every other script
 # takes the shared three-level grid so its cross-panel means stay comparable.

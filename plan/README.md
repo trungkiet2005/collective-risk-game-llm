@@ -10,6 +10,8 @@ Thư mục này giữ kế hoạch **đang thực thi**, để một session/cha
 
 | File | Nội dung |
 |---|---|
+| [aamas2027-plan.md](aamas2027-plan.md) | **🎯 NHÁNH MỚI 09-09-2026.** Kế hoạch nộp AAMAS 2027 (deadline 08-10-2026): paper phải KHÁC bản Interface Focus, 11 thí nghiệm, lịch 29 ngày, ~$1.400 |
+| [review-response.md](review-response.md) | Vòng revision Interface Focus — §0 giữ trạng thái sống |
 | [findings-top-tier.md](findings-top-tier.md) | **🔥 KẾT QUẢ.** `gpt-5.6-sol` PHẢN ỨNG với risk (+118.2 điểm) — đảo ngược claim trung tâm của paper |
 | [runbook-top-tier.md](runbook-top-tier.md) | **⚡ ĐANG CHẠY.** Hướng dẫn thực thi bậc đỉnh: phân account, chia shard, gom result, sự cố |
 | [frontier-run-plan.md](frontier-run-plan.md) | Kế hoạch tổng: panel theo lưới nhà cung cấp × bậc, Ngày 1→4 |
@@ -24,7 +26,7 @@ Thư mục này giữ kế hoạch **đang thực thi**, để một session/cha
 | `launch_shard.py` | chạy 1 shard trên 1 account: auth → sinh file shard → push → run → download |
 | `check_runs.py` | xem trạng thái mọi shard (đọc log, không gọi API), `--watch` để tự làm mới |
 | `merge_shards.py` | gom shard thành dataset, kiểm phủ đủ 60 cell + `parse_failed=0` |
-| `probe_all_models.py` | probe liveness song song ở local (staging proxy) |
+| `probe_all_models.py` | probe liveness song song ở local (staging proxy) — **chỉ probe, không sinh data** |
 | `probe_crg_prompt.py` | kiểm model trả lời được 1 lượt CRG thật và parse được |
 
 Kết quả + log của mỗi shard nằm ở `plan/runs/<label>/` (đã gitignore, không commit).
@@ -36,7 +38,12 @@ screen-trước**; muốn đổi thì hỏi.
 
 ## Trạng thái tính đến 13-08-2026
 
-**Data đã có:**
+> ⚠️ **10-09-2026: toàn bộ bảng data dưới đây giờ nằm ở `Lagecy_Results/results/`, không
+> còn ở `results/`.** Đó là ĐỒ CŨ — đóng băng, chỉ đọc. Vòng chạy mới ghi vào `results/`
+> (rỗng lúc bắt đầu). Chỉ đọc/phân tích `Lagecy_Results/` và viết vào paper **khi người
+> dùng yêu cầu rõ ràng**. Xem [CLAUDE.md](../CLAUDE.md#kết-quả-lagecy_resultsresults-là-đồ-cũ-results-là-đồ-đang-chạy).
+
+**Data cũ đã có (nay ở `Lagecy_Results/results/`):**
 
 | Arm | Model | Experiment | Số ván |
 |---|---|---|---|
@@ -108,6 +115,10 @@ frontier hiện không có đại diện lab Trung Quốc — cần probe lại 
 1. **Local và server-side dùng 2 proxy khác nhau.** Local (`.env` → `mp-staging`) chỉ
    phục vụ 6 model. Server-side (`kaggle b t run`) phục vụ 28. Model báo 503 ở local
    hoàn toàn có thể chạy tốt server-side — đừng kết luận nó chết.
+   → **Hệ quả đã thành quy ước: mọi ván sinh ra phải chạy SERVER-SIDE.** Không chạy
+   `crg_task_server.py` ở local để lấy data, kể cả "chạy thử vài ván". Local chỉ dùng cho
+   probe rẻ (`probe_all_models.py`, `probe_crg_prompt.py`) và kết quả probe không được ghi
+   vào `results/`.
 
 2. **503 là lỗi phía Kaggle, không phải hết quota.** Đã kiểm chứng bằng 3 account độc
    lập cho ra đúng cùng một tập 503. Đổi account không cứu được.

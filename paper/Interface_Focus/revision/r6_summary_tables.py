@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _data import (FRONTIER_LABELS, OPEN_LABELS, OUT, RESULTS,  # noqa: E402
+from paper.Interface_Focus.revision._data import (FRONTIER_LABELS, OPEN_LABELS, OUT, RESULTS,  # noqa: E402
                    frontier_games, label, open_games)
 
 TARGET = 120.0

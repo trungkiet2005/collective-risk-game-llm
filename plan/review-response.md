@@ -76,12 +76,32 @@ Chỉ `r7` truyền `all_risks=True`. Đã chạy lại cả r1–r7: **`tab_axe
 |---|---|---|
 | Q8 | ✅ **XONG**, đã vào paper | — |
 | 9 mục vòng 1 | ✅ xong, đã vào paper | — |
-| Q1 ablation mỏ neo | ⛔ chạy tay trên UI Kaggle — [§2e](#2e-chạy-tay-trên-ui--đường-chắc-ăn-cho-q1--q3) | **người dùng** |
-| Q3 probe EV | ⛔ chạy tay trên UI Kaggle | **người dùng** |
+| Q1 ablation mỏ neo | ⛔ chạy tay trên UI Kaggle — [§2e](#2e-chạy-tay-trên-ui--đường-chắc-ăn-cho-q1--q3); script phân tích `r8` đã có | **người dùng** |
+| Q3 probe EV | ⛔ chạy tay trên UI Kaggle; script chấm `r9` đã có | **người dùng** |
 
 Khi người dùng đưa về `nohint_results.zip` / `evprobe_results.zip`: giải nén vào
-`results/raw/`, rồi so `exp_nohint` với `exp_baseline` (ghép cặp theo risk/lang/rep) và
-chấm trục `value` của `exp_evprobe`. **Chưa có script cho hai việc đó — phải viết.**
+`results/raw/` rồi chạy **hai script đã viết sẵn** (không cần sửa gì thêm):
+
+```bash
+python paper/revision/r8_nohint_ablation.py   # exp_nohint vs exp_baseline
+python paper/revision/r9_ev_probe.py          # chấm trục `value` + đối chiếu hành vi
+```
+
+- `r8` ghép cặp theo `(model, language, risk, rep)` — CRN nên ghép được từng ván, kiểm
+  luôn `seed` hai bên có khớp không; báo Δtổng đóng góp (t + Wilcoxon), Δreach (McNemar),
+  phân phối hành động 0/2/4 theo vòng, và **hiệu ứng risk trong TỪNG nhánh + hiệu số** —
+  đây mới là số trả lời "mỏ neo có phải nguyên nhân của null không". Chỉ so những model
+  có mặt ở CẢ HAI nhánh; model lẻ được liệt kê rõ chứ không bị bỏ im.
+- `r9` tính lại ground truth từ config game rồi **đối chiếu với `ground_truth` trong log**,
+  chấm accuracy theo model × risk × ngôn ngữ, in luôn **phân phối câu trả lời** (model trả
+  lời y hệt ở mọi p thì 33% accuracy là ăn may, không phải biết tính), rồi **chéo accuracy
+  với hành vi EV-optimal** theo từng ô (model × risk).
+- Cả hai chạy được NGAY khi chưa có data: chúng in phần đối chứng (baseline + MDE cho `r8`,
+  bảng đáp án đúng + nửa hành vi của bảng chéo cho `r9`) rồi báo "awaiting data".
+- ⚠️ `r9` cũng kiểm hộ cái bẫy ở [§2b](#q3--probe-so-sánh-kỳ-vọng): trục `value` là
+  category MỚI. Mục `category_inventory` trong output nói rõ file tổng hợp cũ
+  (`crsd_comprehension_all_models.csv`, thứ hình 4 và `r5` đọc) đã có thêm nhóm thứ tư
+  hay chưa.
 
 ### 0.5 Trạng thái paper
 

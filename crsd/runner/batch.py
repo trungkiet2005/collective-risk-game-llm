@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Callable, List, Union
 
 from ..engine.round import parse_contribution
+from ..models.routing import call_backend, wants_context
 
 # Đổi seed khi gọi lại: vLLM với CÙNG seed sinh ra output Y HỆT, nên muốn lấy mẫu
 # khác (mong parse được) thì phải đổi seed. Vẫn tất định theo (seed gốc, lần thử)
@@ -51,7 +52,14 @@ def run_games_batched(
     lời gọi ``send_batch`` RIÊNG (sau khi quyết định đã gửi & retry xong, TRƯỚC khi áp
     kết quả) -> KHÔNG ảnh hưởng quyết định (model stateless giữa các lần gọi). Mặc định
     None -> đường chạy hành vi y nguyên (giữ tái lập run cũ).
+
+    Ngữ cảnh theo slot: nếu ``send_batch`` TỰ KHAI BÁO cần (cờ ``wants_context`` — chỉ
+    agent kịch bản và router theo ghế có), mỗi lời gọi được kèm ``contexts`` song song
+    với ``prompts`` (kể cả lô con lúc retry, nên định tuyến theo ghế không lệch). Backend
+    LLM không có cờ đó -> vẫn được gọi ĐÚNG ``send_batch(prompts, seeds)`` như trước.
     """
+    want_ctx = wants_context(send_batch)
+
     while True:
         active = [g for g in games if not g.is_done()]
         if not active:
@@ -60,6 +68,7 @@ def run_games_batched(
         prompts: List[str] = []
         seeds: List[int] = []
         options_per_prompt = []  # tập lựa chọn đóng góp của từng prompt (để parse)
+        contexts = [] if want_ctx else None  # ngữ cảnh từng slot (song song prompts)
         meta = []  # (game, count)
         for g in active:
             ps = g.build_round_prompts()
@@ -67,11 +76,13 @@ def run_games_batched(
             prompts.extend(ps)
             seeds.extend(g.build_round_sampling_seeds())
             options_per_prompt.extend([g.config.contribution_options] * len(ps))
+            if want_ctx:
+                contexts.extend(g.build_round_contexts())
 
         if verbose:
             print(f"[batch] {len(active)} games active, {len(prompts)} prompts")
 
-        responses = send_batch(prompts, seeds)
+        responses = call_backend(send_batch, prompts, seeds, contexts)
         if len(responses) != len(prompts):
             raise RuntimeError(
                 f"send_batch trả về {len(responses)} phản hồi cho {len(prompts)} prompt"
@@ -88,7 +99,10 @@ def run_games_batched(
             retry_prompts = [prompts[i] for i in fail_idx]
             retry_seeds = [(seeds[i] + attempt * _RETRY_SEED_STEP) % _RETRY_SEED_MOD
                            for i in fail_idx]
-            retry_resp = send_batch(retry_prompts, retry_seeds)
+            # Lô con -> phải mang theo ngữ cảnh của ĐÚNG các slot đó, nếu không
+            # router sẽ không biết ghế nào và gán nhầm backend.
+            retry_ctx = [contexts[i] for i in fail_idx] if want_ctx else None
+            retry_resp = call_backend(send_batch, retry_prompts, retry_seeds, retry_ctx)
             if len(retry_resp) != len(retry_prompts):
                 raise RuntimeError(
                     f"send_batch (retry) trả về {len(retry_resp)} cho "
@@ -108,6 +122,7 @@ def run_games_batched(
         if probe_builder is not None:
             probe_prompts: List[str] = []
             probe_seeds: List[int] = []
+            probe_ctx = [] if want_ctx else None
             probe_meta = []  # (game, metas, count)
             for g, _ in meta:
                 pps, pseeds, pmetas = probe_builder(g)
@@ -115,10 +130,17 @@ def run_games_batched(
                     probe_prompts.extend(pps)
                     probe_seeds.extend(pseeds)
                     probe_meta.append((g, pmetas, len(pps)))
+                    if want_ctx:
+                        # Probe hỏi từ góc nhìn một ghế cụ thể (meta['player_index'])
+                        # chứ không phải một prompt/ghế -> lấy ngữ cảnh của ghế đó.
+                        gctx = g.build_round_contexts()
+                        for m in pmetas:
+                            seat = int((m or {}).get("player_index", 0))
+                            probe_ctx.append(dict(gctx[seat], probe=True))
             if probe_prompts:
                 if verbose:
                     print(f"[batch]   probe đọc-hiểu: {len(probe_prompts)} prompt")
-                probe_resp = send_batch(probe_prompts, probe_seeds)
+                probe_resp = call_backend(send_batch, probe_prompts, probe_seeds, probe_ctx)
                 if len(probe_resp) != len(probe_prompts):
                     raise RuntimeError(
                         f"send_batch (probe) trả về {len(probe_resp)} cho {len(probe_prompts)} prompt"

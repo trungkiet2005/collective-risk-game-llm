@@ -1,7 +1,29 @@
-# Kaggle Model Proxy — 38 slug: cái nào sống, sống ở đâu, giá bao nhiêu
+# Kaggle Model Proxy — cái nào sống, sống ở đâu, giá bao nhiêu
 
-**Ngày probe: 12-08-2026.** Danh mục lấy từ `kaggle b t models`.
+**Bảng giá/liveness bên dưới: probe 12-08-2026.** Danh mục lấy từ `kaggle b t models`.
 Probe lại bằng script trong [scripts/](scripts/) nếu cần cập nhật.
+
+## ⚠️ Danh mục đã đổi — kiểm lại 09-09-2026 (account `chisboiz`)
+
+**38 → 42 slug.** Danh mục **trôi khoảng 1 model/tuần**, nên đừng tin bảng cũ quá 2 tuần.
+
+**🔴 BIẾN MẤT — `gpt-5.6-sol`.** Đây là một trong **hai model EV-optimal** của paper
+(hiệu ứng risk +118.2). Dữ liệu 140 ván đã có vẫn dùng được, nhưng **không chạy thêm được
+gì trên nó nữa** — mọi thí nghiệm cần model đó (E3b cặp 3, E6 robustness, staircase E4)
+phải đổi sang model khác. Model EV-optimal duy nhất còn lại là **`gemini-3.1-pro-preview`**.
+
+**🟢 MỚI — 5 slug:**
+
+| Slug | Nhà | Đáng chú ý |
+|---|---|---|
+| `claude-sonnet-5-default` | Anthropic | bậc giữa thế hệ 5, chưa probe |
+| `gemini-3.7-flash` | Google | chưa probe |
+| `gemini-3.8-flash` | Google | chưa probe |
+| `grok-4.5-0708` | xAI | thế hệ mới sau 4.20 |
+| `grok-4.6` | xAI | thế hệ mới nhất của xAI |
+
+Bốn slug Qwen3 + `glm-5` + `deepseek-*` **vẫn còn trong danh mục** (danh mục liệt kê ≠ phục vụ
+được — chúng 503 ở lần probe 12-08). Xem [§Qwen probe 09-09](#qwen-probe-server-side-09-09-2026).
 
 ## Sự thật quan trọng nhất: local và server-side là 2 proxy khác nhau
 
@@ -78,7 +100,140 @@ Tầng: **A** ≤$2 · **B** $2–8 (vừa 1 account) · **C** $14–31 (chia 2�
 
 ---
 
-## Chết hoặc không dùng được — 10 slug
+## Qwen probe server-side 09-09-2026
+
+Probe thật bằng `crg-proxy-probe` trên account `chisboiz`, production proxy:
+
+| Slug | Kết quả | Chi tiết |
+|---|---|---|
+| `qwen3-235b-a22b-instruct-2507` | ✅ **COMPLETED — SỐNG LẠI** | `reply: 'OK'`, 16 in / 2 out, cost $0.000005 → **~$0.019/ván, ~$1.13/60 ván (tầng A)** |
+| `qwen3-coder-480b-a35b-instruct` | ⚠️ **ERRORED — 429** | `RateLimitError: The model is currently experiencing heavy load. Try again later.` |
+
+**Hai kết luận:**
+
+1. **`qwen3-235b` không còn chết.** Ngày 12-08 nó 503 ở cả hai proxy; ngày 09-09 nó trả lời
+   bình thường server-side. Nhánh frontier **giờ có đại diện lab Trung Quốc** — trước đó
+   panel chỉ có 4 nhà phương Tây. Và nó rẻ (tầng A).
+2. **`qwen3-coder-480b` KHÔNG chết, nó quá tải.** 429 ≠ 503: 503 là "model không được phục vụ",
+   429 là "đang phục vụ nhưng hết chỗ". Giống hệt `deepseek-v3.1`. Coi như **không đặt lịch
+   được**, đừng đưa vào kế hoạch cần chạy đúng hạn, nhưng thử lại thì có thể trúng.
+
+**Bài học đắt tiền thứ tư (bổ sung cho ba cái ở [README.md](README.md)): đọc MÃ LỖI, đừng đọc
+"Errored".** Bốn mã lỗi khác hẳn nhau đều hiện ra là **cùng một chữ `Errored`** trong
+`kaggle b t status`, mà cách xử lý thì ngược nhau hoàn toàn:
+
+| Mã | Nghĩa | Xử lý | Ví dụ gặp thật |
+|---|---|---|---|
+| **503** | proxy không phục vụ model này | **bỏ hẳn** | `glm-5`, `deepseek-r1` |
+| **429** | sống nhưng quá tải | **thử lại**, đừng đưa vào kế hoạch có hạn | `qwen3-coder-480b`, `deepseek-v3.1` |
+| **403** | tiền cọc theo `max_output_tokens` vượt quota | **hạ cap**, model vẫn tốt | `claude-opus-4-7-default` |
+| **404** | có trong danh mục nhưng backend không biết | **đợi**, danh mục chạy trước backend | `grok-4.5-0708`, `grok-4.6` |
+
+Phải mở phần `Errors:` của `kaggle b t status` (hoặc `kaggle b t log`) mới phân biệt được.
+`kaggle b t log -m <slug>` của một run ERRORED **không in mã lỗi** — chỉ có dòng header;
+mã lỗi nằm ở `status`.
+
+## Probe đầy đủ 09-09-2026 — 10 model, account `chisboiz`
+
+Giá tính bằng công thức `(probe_cost / probe_tokens) × 45.300`, rồi **×1,5** theo quy tắc
+hiệu chỉnh mới. Cột "60 ván" là chi phí một sweep chuẩn (3 risk × 10 rep, tiếng Anh).
+
+| Slug | Nhà | Kết quả | $/ván | $/60 ván | Tầng |
+|---|---|---|---|---|---|
+| `qwen3-235b-a22b-instruct-2507` | Alibaba | ✅ OK | **0,019** | 1,13 | A |
+| `grok-4.20-0309-non-reasoning` | xAI | ✅ OK | **0,023 đo thật** | 1,36 | A |
+| `gemini-3.5-flash-lite` | Google | ✅ OK | **0,034** | 2,04 | A |
+| `gpt-5.6-luna` | OpenAI | ✅ OK | **0,073** | 4,36 | B |
+| `claude-haiku-4-5-20251001` | Anthropic | ✅ OK | **0,125** | 7,51 | B |
+| `gemini-3.8-flash` 🆕 | Google | ✅ OK | 0,241 ⚠️ | 14,5 | C |
+| `claude-sonnet-5-default` 🆕 | Anthropic | ✅ OK | **0,359** | 21,5 | C |
+| `gemini-3.7-flash` 🆕 | Google | ✅ OK | 0,464 ⚠️ | 27,8 | C |
+| `qwen3-coder-480b-a35b-instruct` | Alibaba | ❌ 429 ×2 lần | — | — | không đặt lịch được |
+| `grok-4.5-0708` 🆕 | xAI | ❌ 404 | — | — | danh mục có, backend chưa có |
+| `grok-4.6` 🆕 | xAI | ❌ 404 | — | — | danh mục có, backend chưa có |
+
+⚠️ **Hai model `gemini-3.x-flash` có giá ĐÁNG NGỜ CAO.** Probe của chúng trả 70 và 127 token
+output cho một câu trả lời một chữ — reasoning token. Theo chính phần
+[phương pháp](#phương-pháp-tính-giá), probe nặng output làm **ước tính lệch CAO**, nên giá
+thật nhiều khả năng thấp hơn con số trên. Muốn dùng thì phải đo thật trước, và nhớ đặt
+`max_completion_tokens` ≥ 6000 nếu không chúng trả về rỗng.
+
+**Phát hiện đáng giá nhất: Anthropic giờ có thang 3 nấc sạch** —
+`claude-haiku-4-5` ($0,125) → `claude-sonnet-5-default` ($0,359) → `claude-opus-5` ($0,682 đo thật),
+cùng nhà, ba bậc năng lực rõ ràng. Đây là **thang thay thế tốt nhất cho thang `gpt-5.6`
+luna/terra/sol đã mất một nấc** khi `gpt-5.6-sol` bị gỡ khỏi danh mục.
+
+## ⚠️ Bẫy `CRG_MAX_OUT`: cổng `parse_failed` KHÔNG bảo vệ được bạn (10-09-2026)
+
+`crg_task_server.py` đặt cap output theo heuristic tên model:
+`MAX_OUT = 6000 nếu tên chứa "reasoning hint", ngược lại 512`.
+
+Đo thật (smoke 2 ván/model, 120 quyết định):
+
+| Model | out_tok / quyết định | Cap được cấp | Sát cap? |
+|---|---|---|---|
+| `claude-haiku-4-5` | **476,4** | **512** | 🚨 **93%** |
+| `gemini-3.5-flash-lite` | 149,4 | 6000 | không |
+| `gpt-5.6-luna` | 71,2 | 6000 | không |
+| `qwen3-235b` | **8,0** | 512 | không |
+
+**Vì sao nguy hiểm:** khi output bị cắt trước dòng `CONTRIBUTION: n`, `parse_contribution`
+rơi xuống nhánh **quét mọi chữ số trong văn bản** rồi lấy số cuối thuộc {0,2,4} — và trả
+`parse_failed=False`. Nên **`parse_fail_rate = 0.0` vẫn xanh trong khi dữ liệu là bịa.**
+Mọi cổng kiểm tra sức khoẻ của repo đều dựa vào chỉ số này.
+
+**Độ lớn thực tế:** so cap 512 với cap 3000 trên cùng seed, out_tok/quyết định chỉ đổi
+471,3 → 476,4. Tính ngược từ độ hụt 5 token ⇒ tỉ lệ bị cắt khoảng **1–3%**, không phải
+hàng chục phần trăm. Nhưng hành vi có đổi (GT 122 → 131 ở n=2).
+
+**Cách xử lý:** nâng cap là **gần như miễn phí** — $0,1765 → $0,178/ván, trong sai số.
+Cứ đặt `--max-out 3000` cho mọi model không có "reasoning hint" mà sinh > ~300 token/quyết
+định. Kiểm bằng `usage_output_tokens / n_decisions` trong summary của mọi run.
+
+## 💰 Cách đo QUOTA CÒN LẠI của từng account (10-09-2026)
+
+Không có API hỏi quota. Nhưng vì proxy **đặt cọc theo `max_output_tokens`**, ta lợi dụng chính
+cơ chế đó: gọi một request rẻ với cap LỚN. Nếu account hết quota, nó trả 403 kèm số tiền cọc.
+
+```python
+# body: {"model":"gemini-3.5-flash-lite","messages":[...],"max_completion_tokens":6000}
+# -> 200 = con quota ; 403 "max estimated cost of operation ($0.015) exceeds your
+#    available quota" = con it hon $0.015
+```
+
+**⚠️ Phải dùng model CÓ TRÊN LOCAL STAGING PROXY** (6 model: `gemini-3.1-flash-lite-preview`,
+`gemini-3.5-flash-lite`, `gemini-3-flash-preview`, `gemini-3.5-flash`, `gemini-3.6-flash`,
+`gpt-5.4-nano`). Probe bằng `gpt-5.6-luna` trả **404 "model not found" cho CẢ 14 account** —
+không phải hết quota, mà là model đó chỉ có server-side. Đây đúng là bẫy "hai proxy khác nhau"
+ở đầu file, rất dễ đọc nhầm 404 thành "account hỏng".
+
+**Kết quả 10-09-2026 sau sweep lưới dày:** 12/14 account "còn quota"; `acc5` và `trungkiet` cạn
+(cả hai chạy shard `gpt-5.6-luna` — shard đắt nhất, $8.60). Quota **KHÔNG reset theo lịch ngày**:
+acc5 vẫn 403 sau 5 tiếng và sau nửa đêm UTC → nhiều khả năng là cửa sổ trượt 24h.
+
+### ⚠️ Probe này chỉ trả lời ĐÚNG/SAI, KHÔNG trả lời CÒN BAO NHIÊU
+
+Bài học trả giá bằng 3 lần shard hỏng (10-09): probe với cap 6000 chỉ đặt cọc **$0.015**, nên
+account còn **$0.02** cũng báo "CÒN QUOTA". Tôi tin nó rồi chuyển shard `gpt-5.6-luna` ($7.80)
+sang `trunkdabest` — account vừa báo còn quota — và nó vẫn 403 sau 12 phút.
+
+Sự thật: sau một sweep tiêu ~$7.7/account, **mọi account chỉ còn ~$2–3**, không cái nào chứa
+nổi một shard $7.8. "Còn quota" ≠ "đủ cho shard của bạn".
+
+**Cách probe đúng khi cần biết ngưỡng:** dò nhị phân trên `max_completion_tokens` — tăng cap
+tới khi 403, tiền cọc ở ngưỡng đó xấp xỉ quota còn lại. Hoặc đơn giản hơn: **ước quota đã tiêu
+bằng chính chi phí shard đã chạy trên account đó** (`usage_total_cost_usd` trong log), rồi lấy
+$10 trừ đi. Rẻ hơn và chính xác hơn probe.
+
+## ⚡ `--concurrency`: đòn bẩy wall-clock miễn phí
+
+`CRG_CONCURRENCY` song song hoá 6 ghế trong MỘT vòng (`ThreadPoolExecutor.map` giữ nguyên
+thứ tự input ⇒ output byte-identical với đường tuần tự). **Không đổi chi phí, chỉ giảm thời
+gian.** Đo thật trên haiku, 2 ván: `concurrency=1` 626,5s → `concurrency=4` **207,5s (3,0×)**.
+
+Trước 10-09 `launch_shard.py` không truyền được biến này; đã thêm cờ `--concurrency`.
+
+## Chết hoặc không dùng được — 10 slug (probe 12-08, xem mục trên để biết cập nhật)
 
 | Slug | Lỗi | Đánh giá |
 |---|---|---|
@@ -121,12 +276,22 @@ Công thức: `$/ván ≈ (probe_cost / probe_tokens) × 45,300`
 45,300 token/ván = **36.8k input + 8.5k output**, đo từ chính run 60 ván của
 `gemini-3.1-flash-lite` (2.21M in / 0.51M out). Input chiếm 81%.
 
-**Sai số ±3×.** Đối chiếu 2 model đã đo end-to-end:
+**Sai số ±3×.** Đối chiếu **7** model nay đã đo end-to-end (cập nhật 09-09-2026, sau khi
+nhánh frontier chạy xong 37 shard / $110.50):
 
-| Model | Ước tính | Đo thật | Lệch |
+| Model | Ước tính $/ván | **Đo thật $/ván** | Ước / thật |
 |---|---|---|---|
-| `gemini-3.1-flash-lite` | $0.0151/ván | $0.0220/ván | thấp 1.5× |
-| `gpt-5.4-nano` | $0.0201/ván | $0.0073/ván | cao 2.8× |
+| `gpt-5.4-nano` | 0.0201 | **0.0073** | 0.36× (ước CAO) |
+| `claude-opus-5-default` | 0.6512 | **0.682** | 1.05× |
+| `gemini-3.1-pro-preview` | 0.5110 | **0.609** | 1.19× |
+| `gpt-5.6-sol` | 0.2422 | **0.348** | 1.44× |
+| `gemini-3.1-flash-lite` | 0.0151 | **0.0220** | 1.46× |
+| `grok-4.20-non-reasoning` | 0.0115 | **0.023** | 2.00× |
+| `grok-4.20-reasoning` | 0.0578 | **0.131** | 2.27× |
+
+**Quy tắc hiệu chỉnh mới: nhân ước tính với ×1.5 để ra giá thực tế** (trung vị 1.44,
+6/7 điểm nằm trong [1.05, 2.27], chỉ `gpt-5.4-nano` ước cao). **Lập ngân sách thì dùng ×2**
+cho an toàn. Bảng ước tính bên trên **chưa** áp hệ số này — tự nhân khi dùng.
 
 Nguyên nhân: mỗi probe chỉ cho **1 phương trình với 2 ẩn** (giá input, giá output).
 Probe nặng output → ước quá cao; probe gần như toàn input → ước quá thấp.

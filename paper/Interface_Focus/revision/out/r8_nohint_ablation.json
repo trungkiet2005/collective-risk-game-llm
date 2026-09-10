@@ -1,0 +1,35 @@
+{
+  "experiment": "exp_nohint vs exp_baseline",
+  "pairing_key": [
+    "model",
+    "language",
+    "risk_probability",
+    "rep"
+  ],
+  "nohint_files_found": [],
+  "readiness": {
+    "Qwen2.5-7B": {
+      "baseline_games": 60,
+      "baseline_mean_total": 232.73,
+      "baseline_reach_rate": 1.0,
+      "within_cell_sd": 6.34,
+      "mde80_paired_conservative": 3.25
+    },
+    "Gemma-2-9B": {
+      "baseline_games": 60,
+      "baseline_mean_total": 128.87,
+      "baseline_reach_rate": 1.0,
+      "within_cell_sd": 6.17,
+      "mde80_paired_conservative": 3.16
+    },
+    "Llama-3.1-8B": {
+      "baseline_games": 60,
+      "baseline_mean_total": 185.4,
+      "baseline_reach_rate": 1.0,
+      "within_cell_sd": 8.56,
+      "mde80_paired_conservative": 4.38
+    }
+  },
+  "status": "awaiting data",
+  "note": "No exp_nohint games.csv anywhere under results/. Unpack nohint_results.zip into results/raw/ and re-run; the loader accepts results/raw/crsd_results/<model>/exp_nohint/ as written by the notebook, and any other layout that keeps the exp_nohint directory."
+}

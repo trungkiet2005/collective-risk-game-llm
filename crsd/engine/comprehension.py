@@ -176,7 +176,7 @@ class QuestionSpec:
     """
 
     id: str
-    category: str          # "rules" | "time" | "state"
+    category: str          # "rules" | "value" | "time" | "state"
     answer_kind: str       # "int" | "int_set" | "yesno"
     render: Callable
     ground_truth: Callable

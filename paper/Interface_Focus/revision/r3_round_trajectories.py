@@ -36,7 +36,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _data import OUT, RESULTS, all_turns, label     # noqa: E402
+from paper.Interface_Focus.revision._data import OUT, RESULTS, all_turns, label     # noqa: E402
 
 FIGDIR = Path(__file__).resolve().parents[1] / "figures"
 TARGET, N_PLAYERS, N_ROUNDS = 120.0, 6, 10

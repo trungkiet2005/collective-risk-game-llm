@@ -37,9 +37,10 @@ def test_checkpoint_round_trip_and_materialized_outputs(tmp_path, monkeypatch):
     assert saved.exists()
     assert not list(checkpoint_dir.glob("*.tmp"))
 
-    games, loaded_turns, stats, completed = task._load_game_checkpoints(
+    games, loaded_turns, stats, completed, records = task._load_game_checkpoints(
         checkpoint_dir, signature)
     assert games == [row]
+    assert [r["game"] for r in records] == [row]
     assert loaded_turns == turns
     assert completed == {task._condition_key(0.9, "en", 0)}
     assert stats == {"parse_failed": 0, "tok_in": 123, "tok_out": 45,
@@ -61,9 +62,10 @@ def test_incompatible_or_partial_checkpoint_is_not_resumed(tmp_path, monkeypatch
     task._save_game_checkpoint(
         checkpoint_dir, signature, row, incomplete_turns, 0, 1, 1, 1)
 
-    games, turns, stats, completed = task._load_game_checkpoints(
+    games, turns, stats, completed, records = task._load_game_checkpoints(
         checkpoint_dir, signature)
     assert games == []
+    assert records == []
     assert turns == []
     assert completed == set()
     assert stats == {"parse_failed": 0, "tok_in": 0, "tok_out": 0, "cost": 0}

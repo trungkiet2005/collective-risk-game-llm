@@ -14,6 +14,8 @@ from __future__ import annotations
 
 from typing import Callable, List, Union
 
+from .scripted import is_scripted_model, make_scripted_send_batch
+
 OFFLINE_MODELS = {"LocalQwen", "LocalLlama", "LocalGemma", "LocalMistral", "LocalModel"}
 
 
@@ -119,7 +121,13 @@ def get_send_batch(
 
     Với offline, hàm gọi ``send_prompts_global`` (một generate cho cả batch).
     Với API, gọi tuần tự từng prompt (đủ cho phase 2).
+    Tên dạng ``"scripted:<policy>"`` -> agent kịch bản tất định, KHÔNG gọi model
+    nào (xem ``crsd.models.scripted``); nhánh này đứng trước nên không đụng vào
+    đường LLM cũ (không model nào trong repo có tiền tố đó).
     """
+    if is_scripted_model(model_name):
+        return make_scripted_send_batch(model_name)
+
     if offline:
         from FAIRGAME.src.llm_connectors.local_vllm_connector import send_prompts_global
 

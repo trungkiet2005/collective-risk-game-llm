@@ -14,6 +14,7 @@ import random
 import re
 from typing import Callable, List, Union
 
+from ..models.routing import call_backend, wants_context
 from . import scoring
 from .comprehension import iter_questions, make_record
 from .prompt import build_prompt
@@ -67,7 +68,7 @@ def _extract_reasoning(text: str) -> str:
 class CrsdGame:
     def __init__(self, config, template, agents, game_id, seed=0,
                  persona_set="personas_default", sampling_seed_base=0,
-                 sampling_seeds_applied=True, rep=0):
+                 sampling_seeds_applied=True, rep=0, seat_models=None):
         self.config = config
         self.template = template
         self.agents = agents  # list[CrsdAgent]
@@ -85,6 +86,17 @@ class CrsdGame:
         self.turns: List[TurnRecord] = []
         self.comprehension_records: List[ComprehensionRecord] = []  # probe đọc-hiểu (in-situ)
         self.current_round = 1
+        # Model/chính sách cầm TỪNG ghế. Mặc định None -> mọi ghế dùng chung model
+        # của ván (đúng hành vi cũ: bàn đồng nhất), chỉ khác là log ghi rõ ra.
+        if seat_models is None:
+            self.seat_models = [config.model] * len(agents)
+        else:
+            self.seat_models = [str(m) for m in seat_models]
+            if len(self.seat_models) != len(agents):
+                raise ValueError(
+                    f"seat_models có {len(self.seat_models)} phần tử nhưng bàn có "
+                    f"{len(agents)} ghế"
+                )
 
     # --- stepwise API (dùng cho cả run tuần tự lẫn batch lockstep) ---
 
@@ -111,6 +123,37 @@ class CrsdGame:
 
     def build_round_sampling_seeds(self) -> List[int]:
         return [self.sampling_seed(i, self.current_round) for i in range(len(self.agents))]
+
+    def seat_context(self, agent_idx: int) -> dict:
+        """Ngữ cảnh MÁY ĐỌC ĐƯỢC của một ghế ở vòng hiện tại.
+
+        Đi KÈM prompt (cùng thứ tự) tới backend nào tự khai báo cần (agent kịch bản,
+        router theo ghế — xem ``crsd.models.routing``). Chứa đúng những gì một chính
+        sách tất định cần để quyết định mà KHÔNG phải bới chữ trong prompt (prompt
+        đổi theo ngôn ngữ/template). Backend LLM KHÔNG nhận cái này -> run cũ không đổi.
+        """
+        cfg = self.config
+        agent = self.agents[agent_idx]
+        return {
+            "game_id": self.game_id,
+            "seat": agent_idx,
+            "player": agent.name,
+            "round": self.current_round,
+            "n_players": len(self.agents),
+            "n_rounds": cfg.n_rounds,
+            "endowment": cfg.endowment,
+            "target": cfg.target,
+            "options": list(cfg.contribution_options),
+            "risk_probability": cfg.risk_probability,
+            "language": cfg.language,
+            "history": [list(r) for r in self.history],
+            "own_total": agent.total_contribution(),
+            "model": self.seat_models[agent_idx],
+        }
+
+    def build_round_contexts(self) -> List[dict]:
+        """Ngữ cảnh từng ghế ở vòng hiện tại — KHỚP THỨ TỰ ``build_round_prompts``."""
+        return [self.seat_context(i) for i in range(len(self.agents))]
 
     # --- probe đọc-hiểu (in-situ): hỏi trên ĐÚNG trạng thái agent đang quyết định ---
 
@@ -155,7 +198,10 @@ class CrsdGame:
                 "answerable_from_prompt": bool(spec.answerable(cfg)),
                 "language": cfg.language,
                 "risk_probability": cfg.risk_probability,
-                "model": cfg.model,
+                # Model THỰC SỰ cầm ghế bị hỏi. Bàn đồng nhất (mặc định) -> đúng
+                # bằng ``cfg.model`` như trước; bàn dị thể -> quy probe về đúng model
+                # trả lời nó, thay vì gộp hết vào model của ván.
+                "model": self.seat_models[player_index],
                 "show_cumulative": bool(getattr(cfg, "show_cumulative", False)),
                 "sampling_seed": seed if self.sampling_seeds_applied else None,
             })
@@ -214,6 +260,7 @@ class CrsdGame:
                     risk_framing=getattr(cfg, "risk_framing", "lottery"),
                     show_computed_totals=bool(getattr(cfg, "show_computed_totals", False)),
                     rep=self.rep,
+                    seat_model=self.seat_models[idx],
                 )
             )
         self.history.append(round_contribs)
@@ -243,6 +290,7 @@ class CrsdGame:
             seed=self.seed,
             dispositions=[getattr(a, "disposition", "neutral") for a in self.agents],
             rep=self.rep,
+            seat_models=list(self.seat_models),
         )
 
     # --- chạy tuần tự một game (batch trong từng vòng = n_players prompt) ---
@@ -251,6 +299,7 @@ class CrsdGame:
         while not self.is_done():
             prompts = self.build_round_prompts()
             seeds = self.build_round_sampling_seeds()
-            responses = send_batch(prompts, seeds)
+            contexts = self.build_round_contexts() if wants_context(send_batch) else None
+            responses = call_backend(send_batch, prompts, seeds, contexts)
             self.apply_round_responses(responses)
         return self.finalize()

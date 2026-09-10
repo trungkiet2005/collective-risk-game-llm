@@ -40,7 +40,7 @@ import pandas as pd
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _data import OUT, baseline_all, label            # noqa: E402
+from paper.Interface_Focus.revision._data import OUT, baseline_all, label            # noqa: E402
 
 ENDOWMENT = 40.0
 N_PLAYERS = 6

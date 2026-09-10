@@ -31,6 +31,10 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 TASK_SRC = REPO / "kaggle" / "benchmarks" / "crg_task_server.py"
+# Cho phep ghim mot ban task DA QUA SMOKE khi file goc dang bi sua song song.
+# Dat CRG_TASK_SRC=<duong dan> hoac dung --task-src. Mac dinh: file goc.
+if os.environ.get("CRG_TASK_SRC"):
+    TASK_SRC = Path(os.environ["CRG_TASK_SRC"])
 CRED_ROOT = Path("D:/AI_PhD/GameTheory/kaggle_for_research")
 WORK = REPO / "plan" / "runs"          # log + file shard
 # Kết quả tải về PHẢI nằm ở đường dẫn ngắn: cây thư mục Kaggle sinh ra đã 174 ký tự,
@@ -111,7 +115,7 @@ TASK_NAME_IN_FILE = "collective-risk-baseline-srv"
 
 
 def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0",
-                    max_out=None):
+                    max_out=None, concurrency=None):
     """Copy task, thay 3 dòng sweep (83-85) bằng giá trị của shard này.
 
     Nếu `task` khác tên khai trong file thì đổi luôn `@kbench.task(name=...)`:
@@ -140,6 +144,14 @@ def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0",
                            f'os.environ.get("CRG_MAX_OUT", "{max_out}")', new)
         if n_m != 1:
             raise SystemExit(f"Thay CRG_MAX_OUT that bai ({n_m} cho).")
+    if concurrency:
+        # Song song hoa 6 ghe trong MOT vong. ThreadPoolExecutor.map giu nguyen thu
+        # tu input -> output byte-identical voi duong tuan tu. Day la don bay wall-clock
+        # duy nhat: chi phi khong doi, chi nhanh len.
+        new, n_c = re.subn(r'os\.environ\.get\("CRG_CONCURRENCY", "[^"]*"\)',
+                           f'os.environ.get("CRG_CONCURRENCY", "{concurrency}")', new)
+        if n_c != 1:
+            raise SystemExit(f"Thay CRG_CONCURRENCY that bai ({n_c} cho).")
     if task and task != TASK_NAME_IN_FILE:
         new, n_t = re.subn(rf'name="{re.escape(TASK_NAME_IN_FILE)}"',
                            f'name="{task}"', new)
@@ -202,6 +214,9 @@ def main():
     ap.add_argument("--reps", default="10")
     ap.add_argument("--rep-start", default="0",
                     help="rep bat dau (chia shard theo rep): REP_START=5 --reps 5 -> rep 5..9")
+    ap.add_argument("--concurrency", default=None,
+                    help="CRG_CONCURRENCY: so ghe goi song song trong 1 vong (mac dinh 1). "
+                         "Khong doi chi phi, chi giam wall-clock.")
     ap.add_argument("--max-out", default=None,
                     help="ghi de max_completion_tokens (mac dinh 512/6000 theo model)")
     ap.add_argument("--task", default="collective-risk-baseline-srv")
@@ -250,7 +265,7 @@ def main():
         if not args.download_only and not args.run_only:
             shard_py = make_shard_file(shard_dir / "shard_task.py",
                                        args.risks, args.langs, args.reps, args.task,
-                                       args.rep_start, args.max_out)
+                                       args.rep_start, args.max_out, args.concurrency)
             log(h, f"da sinh {shard_py}")
 
             # `push` chạy task 1 ván để validate, trên model mặc định của server. Khi

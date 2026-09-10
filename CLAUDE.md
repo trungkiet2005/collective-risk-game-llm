@@ -18,6 +18,76 @@ NHAU — local chỉ 6/38 model, server-side 28/38, nên 503 ở local KHÔNG c�
 503) → đổi account vô ích; (3) proxy đặt cọc tiền trước theo `max_output_tokens` chứ không
 theo token thực tiêu, nên không cap thì model đắt bị 403 dù thực tế tốn vài xu.
 
+## ⛔ Kaggle Benchmarks: CHỈ chạy SERVER-SIDE, KHÔNG chạy local
+
+**Quy ước bắt buộc từ 10-09-2026.** Mọi ván CRSD sinh bằng Kaggle Benchmarks phải chạy
+server-side, tức là qua `kaggle b t push` rồi `kaggle b t run` (bọc sẵn trong
+`plan/scripts/launch_shard.py` và các script `launch_*.py` / `run_dense_grid.py` gọi nó).
+**KHÔNG chạy `python kaggle/benchmarks/crg_task_server.py` trên máy để sinh data**, kể cả
+khi chỉ định "chạy thử vài ván cho nhanh".
+
+Lý do — chính là sự thật số (1) ở trên: local đọc `.env` → `mp-staging` và chỉ phục vụ
+**6/38 model**, server-side phục vụ **28/38**. Chạy local nghĩa là:
+
+- panel bị cắt xuống còn những model nào tình cờ sống ở staging, tức là **không so sánh
+  được** với data server-side đã có;
+- gặp 503 rồi tưởng model chết, kết luận sai về availability;
+- không có log `kaggle b t status` / artifact `.run.json`, nên không truy lại được run
+  nào sinh ra file nào.
+
+**Ngoại lệ duy nhất — probe, KHÔNG phải data.** Được phép gọi proxy local cho việc rẻ và
+dùng một lần: `plan/scripts/probe_all_models.py` (liveness), `probe_crg_prompt.py` (kiểm
+một lượt CRG parse được không), và `crsd/tests/test_kaggle_*.py`. Kết quả của những lệnh
+này **không bao giờ** được ghi vào `results/` hay đưa vào paper.
+
+## Artifact `.task.json` / `.run.json` → `kaggle/benchmarks/artifacts/`
+
+**Mọi file `<task-name>.task.json` và `<task-name>-run_id_*.run.json` phải nằm trong
+[`kaggle/benchmarks/artifacts/`](kaggle/benchmarks/artifacts/)** — không để lăn lóc ở root
+repo. Đây là nơi duy nhất chứa artifact của Kaggle Benchmarks, và nó được commit vào git
+(đó là bản ghi duy nhất truy lại được run nào sinh ra file nào).
+
+**Cái bẫy:** kbench ghi hai file này ra **thư mục đang đứng (CWD)**, chứ không phải cạnh
+file task. Nên `python kaggle/benchmarks/crg_task_server.py` chạy từ root sẽ rải artifact
+ra root. Muốn nó rơi đúng chỗ thì `cd kaggle/benchmarks/artifacts` rồi mới chạy; lỡ rơi ra
+root rồi thì `git mv` vào đây ngay, đừng để tồn.
+
+Trùng tên là chuyện bình thường — cùng một task chạy lại sẽ đè lên `.task.json` cũ. Cứ đè,
+vì bản cũ đã được track trong git nên lấy lại từ history được; đừng đẻ thêm hậu tố
+`_v2`, `_new` để né trùng.
+
+## Kết quả: `Lagecy_Results/results/` là ĐỒ CŨ, `results/` là đồ đang chạy
+
+**Từ 10-09-2026 thư mục `results/` cũ đã được chuyển sang `Lagecy_Results/results/`.**
+
+| Thư mục | Là gì | Được làm gì với nó |
+|---|---|---|
+| `Lagecy_Results/results/` | Toàn bộ data cũ tới 10-09-2026: `open_source/`, `frontier/`, `frontier/dense_grid/`, `scripted_reference/`, `raw/` | **ĐÓNG BĂNG.** Chỉ đọc, không ghi đè, không xoá. |
+| `results/` | Data của vòng chạy MỚI (nhánh `aamas2027-e0`) — mọi run server-side từ nay đổ về đây | Nơi duy nhất script gom shard được phép ghi |
+
+**Đừng tự ý đọc / phân tích `Lagecy_Results/` rồi viết vào paper.** Data cũ chỉ được lôi ra
+khi **người dùng yêu cầu rõ ràng**; lúc đó mới đọc, phân tích, và ghi kết quả vào
+`paper/`. Không có yêu cầu thì coi như thư mục đó không tồn tại — kể cả khi đang thiếu số
+để điền vào một bảng trong paper. Lý do: data cũ trải nhiều panel/prompt khác nhau, trộn
+nhầm vào bảng mới là lỗi âm thầm và rất khó phát hiện lúc review.
+
+⚠️ **Code còn hardcode `results/`** — `plan/scripts/fill_missing.py` và mặc định
+`--out results/frontier` của `merge_shards.py`. Với run MỚI thì hai chỗ này ĐÚNG, không
+cần sửa.
+
+⚠️ **Pipeline phân tích bản Interface Focus hiện ĐANG HỎNG ĐƯỜNG DẪN, và đó là cố ý để
+nguyên.** Hai lần dời thư mục (10-09-2026) làm nó trỏ trượt:
+
+- `paper/Interface_Focus/revision/_data.py` có `ROOT = parents[2]`, tính từ vị trí cũ
+  `paper/revision/`. Sau khi dời sang `paper/Interface_Focus/revision/`, `ROOT` ra `paper/`
+  nên `RESULTS` thành `paper/results` — không tồn tại.
+- `make_figures*.py` glob `../results/open_source/` và `../results/frontier/*/...`, cũng lệch
+  một cấp.
+
+Cả hai sẽ **ra kết quả rỗng thay vì báo lỗi**. Đừng sửa và đừng chạy chúng cho tới khi người
+dùng yêu cầu dựng lại figure bản IF; lúc đó mới trỏ sang `Lagecy_Results/results/` (data của
+bản IF nằm ở đó, không phải ở `results/` mới).
+
 ## Notebook Kaggle (`kaggle/experiments/*.py`)
 
 - **Tên file zip output = `<tên file notebook>_results.zip`**, đặt ở
@@ -48,11 +118,15 @@ theo token thực tiêu, nên không cap thì model đắt bị 403 dù thực t
 - `kaggle*.json` (root) — 5 cặp `username/key` kiểu cũ (foundnotkiet, kit567, hunhtrungkit,
   tnkiet, trungkiet).
 
-**Tổng 17 account. Test 2026-08-12: 16 gọi inference OK, 1 hỏng.**
-- ❌ **BỎ QUA `trnnguynchis`** (kaggle-api\trnnguynchis.txt): login + xem model list được
-  nhưng xin Model Proxy key bị **403 "missing phone/identity verification"**. Chỉ dùng lại
-  sau khi verify SĐT/danh tính trên Kaggle.
-- 16 account còn lại: đăng nhập OK, thấy đủ 38 model, chạy inference thật OK.
+**Tổng 17 account. Probe lại 2026-09-10: chỉ còn 14 sống.**
+- ❌ **BỎ QUA 3 account** — cùng một lỗi `403 "missing phone/identity verification"` khi xin
+  Model Proxy key (login và xem model list vẫn được, nên đừng tưởng là còn dùng được):
+  `trnnguynchis` (từ 12-08), **`chiboiz`** và **`chinguyentran`** (mới hỏng, phát hiện 10-09).
+- ✅ **14 account sống:** acc1–acc5, chisboiz, chunaiu, foundnotkiet, hunhtrungkit, kit567,
+  tnkiet, trungkiet, trunkdabest, vinhdinhthien.
+- **Sức khoẻ account TRÔI theo thời gian** — mất 2 account trong 4 tuần. Probe lại trước mỗi
+  đợt chạy lớn; đừng tin danh sách cũ. Probe rẻ và nhanh: `kaggle b auth -y --env-file <tmp>`
+  cho từng account, chạy song song 8 luồng, xong trong ~1 phút.
 
 **Cách nạp credential (2 kiểu, chọn 1 theo nguồn):**
 ```bash

@@ -30,9 +30,10 @@ from ..dataio.recorder import (
     write_turns_jsonl,
 )
 from ..models.factory import get_send_batch, init_offline_backend
+from ..models.scripted import is_scripted_model
 from ..paths import CONFIGS_DIR, RESULTS_DIR
 from .batch import run_games_batched
-from .run_experiment import build_games_for_model, load_template
+from .run_experiment import build_games_for_model, load_template, make_seat_send_batch
 
 
 def make_probe_builder(comp_templates, probe_players, max_seats, max_past_rounds,
@@ -63,6 +64,30 @@ def make_probe_builder(comp_templates, probe_players, max_seats, max_past_rounds
         return prompts, seeds, metas
 
     return builder
+
+
+def llm_probe_players(exp, probe_players):
+    """Lọc bỏ các ghế do agent KỊCH BẢN cầm khỏi danh sách ghế bị hỏi đọc-hiểu.
+
+    Chính sách kịch bản chỉ biết trả về dòng ``CONTRIBUTION:`` — ném câu hỏi đọc-hiểu
+    cho nó thì probe nào cũng parse-fail và bị chấm SAI, rồi quy nhầm cho model của
+    ván (``comprehension.jsonl`` không phân biệt được đó là ghế kịch bản). Bỏ hẳn
+    những ghế đó ra còn trung thực hơn là ghi vào một đống 'sai' giả tạo.
+
+    KHÔNG có ``modelsPerSeat`` (mặc định) -> trả nguyên danh sách, không đổi gì.
+    """
+    spec = exp.get("modelsPerSeat")
+    if not spec:
+        return list(probe_players)
+
+    def is_scripted_seat(i):
+        return 0 <= i < len(spec) and is_scripted_model(spec[i])
+
+    kept = [i for i in probe_players if not is_scripted_seat(i)]
+    dropped = [i for i in probe_players if is_scripted_seat(i)]
+    if dropped:
+        print(f"[probe] bỏ ghế kịch bản khỏi probe đọc-hiểu: {dropped}")
+    return kept
 
 
 def make_mock_send(strategy="fair", seed=0):
@@ -116,7 +141,7 @@ def main(argv):
     comp_templates = {lang: load_template(comp_template_name, lang) for lang in languages}
     probe_builder = make_probe_builder(
         comp_templates,
-        comp_cfg.get("probePlayers", [0]),
+        llm_probe_players(exp, comp_cfg.get("probePlayers", [0])),
         comp_cfg.get("maxSeats", 4),
         comp_cfg.get("maxPastRounds", None),
         comp_cfg.get("rulesCheckpoints", None),
@@ -149,6 +174,16 @@ def main(argv):
             )
         else:
             send_batch = get_send_batch(model, offline=False)
+
+        # Bàn DỊ THỂ: phải bọc router GIỐNG run_experiment, nếu không game sẽ ghi
+        # seat_model dị thể trong khi thực tế một model chơi hết mọi ghế.
+        send_batch = make_seat_send_batch(
+            exp, model, send_batch,
+            mock_send_factory=(
+                (lambda: make_mock_send(mock_strategy, seed=int(exp.get("seed", 0))))
+                if mock_strategy else None
+            ),
+        )
 
         games = build_games_for_model(
             exp, model, agents_cfg, agents_name,

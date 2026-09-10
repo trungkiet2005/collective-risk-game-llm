@@ -1,0 +1,529 @@
+{
+  "experiment": "exp_evprobe (probe axis `value`)",
+  "game_parameters": {
+    "endowment": 40.0,
+    "target": 120.0,
+    "n_players": 6,
+    "n_rounds": 10,
+    "source": "crsd_milinski_low_risk.json, crsd_milinski_medium_risk.json, crsd_milinski_high_risk.json",
+    "configs_agree_apart_from_risk": true,
+    "risk_levels_in_configs": [
+      0.1,
+      0.5,
+      0.9
+    ]
+  },
+  "expected_value_truth_table": {
+    "0.1": {
+      "value_defect_ev": 36,
+      "value_compare": 2,
+      "keep_if_cooperate": 20.0,
+      "ev_if_defect": 36.0,
+      "ev_action": 0.0,
+      "ev_group_total": 0.0
+    },
+    "0.5": {
+      "value_defect_ev": 20,
+      "value_compare": 0,
+      "keep_if_cooperate": 20.0,
+      "ev_if_defect": 20.0,
+      "ev_action": null,
+      "ev_group_total": null
+    },
+    "0.9": {
+      "value_defect_ev": 4,
+      "value_compare": 1,
+      "keep_if_cooperate": 20.0,
+      "ev_if_defect": 3.999999999999999,
+      "ev_action": 2.0,
+      "ev_group_total": 120.0
+    }
+  },
+  "category_inventory": {
+    "raw_logs": {
+      "exp_comprehension": {
+        "categories": {
+          "rules": 20160,
+          "state": 163800,
+          "time": 197400
+        },
+        "models": [
+          "gemma2-27b-it",
+          "gemma2-9b-it",
+          "llama-3-1-8b",
+          "llama33-70b-instruct-awq",
+          "qwen25-32b-instruct",
+          "qwen25-72b-instruct-awq",
+          "qwen25-7b-instruct"
+        ],
+        "has_value_axis": false
+      }
+    },
+    "legacy_aggregate": {
+      "path": "results/open_source/crsd_comprehension_all_models.csv",
+      "categories": [
+        "rules",
+        "state",
+        "time"
+      ],
+      "has_value_axis": false,
+      "verdict": "three axes only, so the by-category figures and tables that read this file are unaffected by the new probe"
+    }
+  },
+  "evprobe_files_found": [],
+  "status": "awaiting data",
+  "note": "No comprehension row carries category='value' anywhere under results/. Unpack evprobe_results.zip into results/raw/ and re-run; the loader accepts results/raw/crsd_results/<model>/exp_evprobe/ as written by the notebook, and any other layout that keeps the exp_evprobe directory.",
+  "behaviour_ready": {
+    "source": "exp_baseline (stand-in until the probe run lands)",
+    "by_model_risk": {
+      "Claude-Opus-5": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.03,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.04,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.093,
+          "ev_action": null,
+          "ev_aligned_rate": 0.9067,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.107,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.8383,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "GPT-5.4-nano": {
+        "0.1": {
+          "n_turns": 600,
+          "mean_contribution": 2.223,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.305,
+          "ev_outcome_aligned_rate": 0.5,
+          "reach_rate": 0.5,
+          "tie": false,
+          "n_games": 10
+        },
+        "0.5": {
+          "n_turns": 600,
+          "mean_contribution": 2.347,
+          "ev_action": null,
+          "ev_aligned_rate": 0.5317,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 0.5,
+          "tie": true,
+          "n_games": 10
+        },
+        "0.9": {
+          "n_turns": 600,
+          "mean_contribution": 2.247,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.2233,
+          "ev_outcome_aligned_rate": 0.5,
+          "reach_rate": 0.5,
+          "tie": false,
+          "n_games": 10
+        }
+      },
+      "GPT-5.6-sol": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 0.395,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.8417,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 0.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.0,
+          "ev_action": null,
+          "ev_aligned_rate": 1.0,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 1.998,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.9975,
+          "ev_outcome_aligned_rate": 0.95,
+          "reach_rate": 0.95,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Gemini-3.1-Flash-Lite": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.017,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0017,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.02,
+          "ev_action": null,
+          "ev_aligned_rate": 0.9892,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.005,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.9958,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Gemini-3.1-Pro": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 0.003,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.9983,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 0.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.0,
+          "ev_action": null,
+          "ev_aligned_rate": 1.0,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.0,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 1.0,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Gemma-2-27B": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.087,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0017,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.11,
+          "ev_action": null,
+          "ev_aligned_rate": 0.945,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.118,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.9408,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Gemma-2-9B": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.065,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.167,
+          "ev_action": null,
+          "ev_aligned_rate": 0.9167,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.212,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.8942,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Grok-4.20 (no reasoning)": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 3.638,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0025,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 3.783,
+          "ev_action": null,
+          "ev_aligned_rate": 0.1058,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 3.835,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.0742,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Grok-4.20 (reasoning)": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.0,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.0,
+          "ev_action": null,
+          "ev_aligned_rate": 1.0,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.002,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.9992,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Llama-3.1-70B": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.007,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0525,
+          "ev_outcome_aligned_rate": 0.5,
+          "reach_rate": 0.5,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.028,
+          "ev_action": null,
+          "ev_aligned_rate": 0.9225,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 0.5,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.013,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.8467,
+          "ev_outcome_aligned_rate": 0.5,
+          "reach_rate": 0.5,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Llama-3.1-8B": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 3.063,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0908,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 3.11,
+          "ev_action": null,
+          "ev_aligned_rate": 0.3608,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 3.097,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.2833,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Qwen2.5-32B": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.118,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0275,
+          "ev_outcome_aligned_rate": 0.05,
+          "reach_rate": 0.95,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.142,
+          "ev_action": null,
+          "ev_aligned_rate": 0.9033,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.122,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.8758,
+          "ev_outcome_aligned_rate": 0.95,
+          "reach_rate": 0.95,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Qwen2.5-72B": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 2.188,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 2.193,
+          "ev_action": null,
+          "ev_aligned_rate": 0.9033,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 2.242,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.8792,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      },
+      "Qwen2.5-7B": {
+        "0.1": {
+          "n_turns": 1200,
+          "mean_contribution": 3.873,
+          "ev_action": 0.0,
+          "ev_aligned_rate": 0.0033,
+          "ev_outcome_aligned_rate": 0.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        },
+        "0.5": {
+          "n_turns": 1200,
+          "mean_contribution": 3.882,
+          "ev_action": null,
+          "ev_aligned_rate": 0.0575,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": true,
+          "n_games": 20
+        },
+        "0.9": {
+          "n_turns": 1200,
+          "mean_contribution": 3.882,
+          "ev_action": 2.0,
+          "ev_aligned_rate": 0.0508,
+          "ev_outcome_aligned_rate": 1.0,
+          "reach_rate": 1.0,
+          "tie": false,
+          "n_games": 20
+        }
+      }
+    }
+  }
+}

@@ -44,7 +44,7 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _data import OUT, RESULTS, label                 # noqa: E402
+from paper.Interface_Focus.revision._data import OUT, RESULTS, label                 # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 PROMPTS = ROOT / "crsd" / "prompts"

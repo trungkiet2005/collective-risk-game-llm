@@ -17,14 +17,21 @@ import sys
 import zlib
 from pathlib import Path
 
-from ..dataio.config_loader import load_json, validate_game
+from ..dataio.config_loader import ConfigError, load_json, validate_game
 from ..dataio.recorder import write_games_csv, write_turns_jsonl
 from ..engine.agent import CrsdAgent
 from ..engine.game import CrsdGame
 from ..engine.state import GameConfig
 from ..models.factory import get_send_batch, init_offline_backend
+from ..models.routing import make_seat_router
+from ..models.scripted import is_scripted_model
 from ..paths import CONFIGS_DIR, PROMPTS_DIR, RESULTS_DIR
 from .batch import run_games_batched
+
+# Giá trị thay thế trong ``modelsPerSeat`` nghĩa là "chính model đang chạy" (biến
+# lặp trong vòng `for model in models`) -> một file config dùng lại được cho cả
+# panel model mà không phải viết lại tên model ở từng ghế.
+SELF_MODEL = "self"
 
 
 def _disposition_of(persona_text):
@@ -45,6 +52,58 @@ def _seat_perm(n, cond_name, seed_val):
     perm = list(range(n))
     random.Random(seed_val * 1_000_003 + zlib.crc32(cond_name.encode("utf-8"))).shuffle(perm)
     return perm
+
+
+def resolve_seat_models(exp, model, n_seats=None):
+    """Model/chính sách cầm TỪNG ghế, suy từ ``exp["modelsPerSeat"]``.
+
+    KHÔNG có khoá đó (mặc định) -> trả None = mọi ghế dùng chung ``model`` (đúng
+    hành vi cũ, bàn đồng nhất). Có -> danh sách dài đúng số ghế, mỗi phần tử là
+    tên model LLM, ``"scripted:<policy>"`` (agent kịch bản), hoặc ``"self"``/rỗng
+    nghĩa là chính ``model`` đang chạy.
+    """
+    spec = exp.get("modelsPerSeat")
+    if not spec:
+        return None
+    if n_seats is not None and len(spec) != n_seats:
+        raise ConfigError(
+            f"modelsPerSeat có {len(spec)} phần tử nhưng bàn có {n_seats} ghế"
+        )
+    return [model if (m is None or m == "" or m == SELF_MODEL) else str(m) for m in spec]
+
+
+def make_seat_send_batch(exp, model, send_batch, mock_send_factory=None, verbose=True):
+    """Bọc ``send_batch`` bằng router theo ghế NẾU experiment khai ``modelsPerSeat``.
+
+    KHÔNG có khoá đó (mặc định) -> trả về CHÍNH ``send_batch`` truyền vào, không đụng
+    gì: backend vẫn được gọi đúng ``send_batch(prompts, seeds)`` như trước.
+
+    Có -> mỗi ghế đi đúng backend của nó. Ghế mang ĐÚNG tên model đang chạy dùng LẠI
+    backend vừa dựng (không nạp lại GPU, không mở thêm phiên API); ghế khác (agent
+    kịch bản, hoặc model API khác) dựng qua factory. ``mock_send_factory`` (nếu có)
+    là hàm 0 tham số sinh backend GIẢ LẬP cho các ghế LLM khác khi đang smoke-test —
+    nhờ nó ``--mock`` chạy được bàn dị thể mà không cần API key nào.
+
+    Dùng CHUNG cho mọi runner (``run_experiment``, ``run_comprehension``): runner nào
+    dựng game bằng ``build_games_for_model`` cũng phải bọc router ở đây, nếu không log
+    sẽ GHI seat_model dị thể trong khi thực tế chỉ một model chơi hết mọi ghế.
+    """
+    seat_models = resolve_seat_models(exp, model)
+    if seat_models is None:
+        return send_batch                     # đường mặc định: giữ nguyên tuyệt đối
+    base = send_batch
+
+    def backend_for(name):
+        if name == model:
+            return base                       # dùng lại backend vừa dựng
+        if mock_send_factory is not None and not is_scripted_model(name):
+            return mock_send_factory()        # smoke-test: ghế LLM khác cũng giả lập
+        return get_send_batch(name, offline=False)
+
+    router = make_seat_router(seat_models, backend_for)
+    if verbose:
+        print(f"[seats] {model}: " + " | ".join(seat_models))
+    return router
 
 
 def build_agents(agents_cfg, language, perm=None):
@@ -74,6 +133,10 @@ def build_games_for_model(exp, model, agents_cfg=None, agents_name="personas_def
 
     Tách riêng để cả ``main()`` lẫn notebook Kaggle dùng CHUNG một code path (cùng
     quy tắc seed/CRN), tránh lệch logic. ``exp`` là dict experiment đã load.
+
+    Ghế dị thể: nếu ``exp["modelsPerSeat"]`` có mặt (list dài bằng số ghế), mỗi ghế
+    được gắn một model/chính sách riêng và ghi vào log (``seat_model``). Không có ->
+    mọi ghế dùng chung ``model`` như trước.
 
     Persona: nếu ``exp["agentsConditions"]`` (list tên persona-set) có mặt -> lặp
     qua TỪNG điều kiện (kiểu FairGame: mỗi điều kiện = một nhóm 6 agent đồng nhất),
@@ -106,6 +169,7 @@ def build_games_for_model(exp, model, agents_cfg=None, agents_name="personas_def
                     perm = (_seat_perm(len(cond_cfg["names"]), cond_name, base_seed + rep)
                             if shuffle_personas else None)
                     agents = build_agents(cond_cfg, language, perm=perm)
+                    seat_models = resolve_seat_models(exp, model, len(agents))
                     gid = (f"{game_name}__{model}__{cond_name}__{language}__rep{rep}"
                            if tag_persona else
                            f"{game_name}__{model}__{language}__rep{rep}")
@@ -116,6 +180,7 @@ def build_games_for_model(exp, model, agents_cfg=None, agents_name="personas_def
                             sampling_seed_base=sampling_seed_base,
                             sampling_seeds_applied=sampling_seeds_applied,
                             rep=rep,
+                            seat_models=seat_models,
                         )
                     )
     return games
@@ -203,6 +268,14 @@ def main(argv):
             )
         else:
             send_batch = get_send_batch(model, offline=False)
+
+        send_batch = make_seat_send_batch(
+            exp, model, send_batch,
+            mock_send_factory=(
+                (lambda: make_mock_send_batch(mock_strategy, seed=int(exp.get("seed", 0))))
+                if mock_strategy else None
+            ),
+        )
 
         games = build_games_for_model(
             exp, model, agents_cfg, agents_name,

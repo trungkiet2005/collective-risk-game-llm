@@ -15,10 +15,22 @@ venv/
 # Ignore toàn bộ results/ NHƯNG giữ track: code phân tích + output frontier (proxy).
 # (data nặng: data/ raw/ extracted_*/ figures/ *.zip vẫn bị ignore)
 /results/**
+!/results/README.md
 !/results/frontier/
 !/results/frontier/**
 !/results/scripts/
 !/results/scripts/*.py
+# dense_grid = lưới risk dày, ~400MB — quá nặng cho git, giữ local
+/results/frontier/dense_grid/
+
+# Lagecy_Results/ = thư mục results/ CŨ, đóng băng 10-09-2026. Giữ đúng chính sách như
+# results/ ở trên: track output frontier (nhẹ), bỏ open_source/raw/dense_grid (nặng).
+/Lagecy_Results/**
+!/Lagecy_Results/README.md
+!/Lagecy_Results/results/
+!/Lagecy_Results/results/frontier/
+!/Lagecy_Results/results/frontier/**
+/Lagecy_Results/results/frontier/dense_grid/
 /crsd_results/
 /models/
 # Output CSV (3.4MB) của FAIRGAME — vendored, không cần public

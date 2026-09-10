@@ -105,6 +105,10 @@ def summarize_game(result) -> dict:
         "mean_payoff": (sum(payoffs) / n) if n else 0.0,
         "rep": getattr(result, "rep", None),   # khoá join trực tiếp với đối chứng baseline
         "seed": result.seed,
+        # Model/chính sách cầm từng ghế, theo đúng thứ tự ghế, ngăn bằng "|" (vd
+        # "gpt|scripted:always_4|..."). Bàn đồng nhất -> lặp lại cùng một tên; bàn dị
+        # thể -> games.csv tự mô tả thành phần đối thủ mà không phải mở turns.jsonl.
+        "seat_models": "|".join(getattr(result, "seat_models", None) or []),
     }
 
 

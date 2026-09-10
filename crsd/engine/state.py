@@ -121,6 +121,10 @@ class TurnRecord:
     risk_framing: Optional[str] = None    # "lottery" (gốc) | "plain" (nêu xác suất trực tiếp)
     show_computed_totals: Optional[bool] = None  # có đưa sẵn tổng tính trước vào prompt?
     rep: Optional[int] = None
+    # Model/chính sách THỰC SỰ cầm ghế này ở lượt này. Bàn đồng nhất (mặc định) ->
+    # bằng ``model`` của cả ván; bàn dị thể (modelsPerSeat) -> tên riêng từng ghế,
+    # vd "gpt-5.4-nano" hay "scripted:always_4" -> quy hành vi đúng về từng agent.
+    seat_model: Optional[str] = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -147,6 +151,9 @@ class GameResult:
     seed: int
     dispositions: List[str] = field(default_factory=list)  # tính cách theo ghế (thứ tự player_names)
     rep: int = -1                                          # lần lặp — khoá join với đối chứng baseline
+    # Model/chính sách cầm từng ghế (thứ tự player_names). Bàn đồng nhất -> lặp lại
+    # ``model``; bàn dị thể -> danh sách hỗn hợp LLM + "scripted:...".
+    seat_models: List[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return asdict(self)
