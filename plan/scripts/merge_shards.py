@@ -31,7 +31,7 @@ from pathlib import Path
 # sung quet luoi KHAC (vd Q8 them p=0.3/0.7 chi tieng Anh) nen phai chinh duoc tu CLI,
 # neu khong phep kiem phu cell se bao "thieu" cho nhung cell chua bao gio dinh chay.
 EXPECTED_RISKS = {0.9, 0.5, 0.1}
-EXPECTED_LANGS = {"en", "vn"}
+EXPECTED_LANGS = {"en"}
 EXPECTED_REPS = set(range(10))
 
 

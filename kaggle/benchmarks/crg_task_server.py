@@ -153,10 +153,13 @@ SAMPLING_SEED_STRIDE = 100_000
 SAMPLING_SEED_MOD = 2_147_483_647    # 2**31 - 1
 RETRY_SEED_STEP = 1_000_003
 MAX_PARSE_RETRIES = 3
+# Tran khi NANG cap luc retry vi bi cat output. Cao hon nua thi tien coc cua proxy
+# (dat truoc theo max_output_tokens) bat dau doa 403 tren account gan het quota.
+MAX_RETRY_CAP = 8000
 
 # Swept conditions (env-overridable so a smoke test doesn't need code edits).
 RISKS = [float(x) for x in os.environ.get("CRG_RISKS", "0.9,0.5,0.1").split(",")]
-LANGS = [s.strip() for s in os.environ.get("CRG_LANGS", "en,vn").split(",")]
+LANGS = [s.strip() for s in os.environ.get("CRG_LANGS", "en").split(",")]
 REPS = int(os.environ.get("CRG_REPS", "10"))
 # Chia shard theo rep khi chia theo risk×lang vẫn còn quá đắt cho trần $10/account.
 # An toàn về seed: sampling_seed(rep, agent, round) và xổ số thảm hoạ Random(BASE+rep)
@@ -1566,7 +1569,8 @@ def _reauth():
           % (rebuilt or MODEL, len(_SEAT_CLIENTS)), flush=True)
 
 
-def _call_llm(model_slug, prompt, seed, ctx=None, max_attempts=None):
+def _call_llm(model_slug, prompt, seed, ctx=None, max_attempts=None,
+               cap_override=None):
     """One free-text generation on ONE seat's model. Returns (text, usage).
 
     `model_slug` is None (or the run-selected MODEL) for every call a default run
@@ -1582,8 +1586,10 @@ def _call_llm(model_slug, prompt, seed, ctx=None, max_attempts=None):
     if max_attempts is None:
         max_attempts = MAX_CALL_ATTEMPTS
     # The cap follows the MODEL, not the run: see _max_out_for. Equal to MAX_OUT for
-    # every call a default run makes.
-    cap = _max_out_for(model_slug)
+    # every call a default run makes. `cap_override` is used by decide() to ESCALATE
+    # the cap after a truncated reply -- retrying a cut-off answer at the same cap
+    # just cuts it off again.
+    cap = int(cap_override) if cap_override else _max_out_for(model_slug)
     if ctx is not None and model_slug is not None and (SEAT_MODELS
                                                        or model_slug != MODEL):
         # In a mixed group every [CRG_ERROR] record must name the seat's model, or a
@@ -1684,6 +1690,21 @@ def _call_llm(model_slug, prompt, seed, ctx=None, max_attempts=None):
             time.sleep(sleep_s)
 
 
+# Reply that ran INTO the output cap. This is the signal `parse_failed` cannot give:
+# when a model reasons past the cap it is cut off BEFORE the `CONTRIBUTION:` line, and
+# parse_contribution then falls through to its prose-scan rule (documented step 2) and
+# happily returns a digit lifted out of the reasoning -- with parse_failed=False.
+# Measured 10-09-2026 on qwen3-235b: 0.88% of turns, which is 39.5% of GAMES, every one
+# of them recorded green. The average-token check cannot see it either (qwen averages
+# 8 tokens against a 512 cap) because only the tail of the distribution overruns.
+_CAP_TOLERANCE = 2          # providers occasionally report cap-1
+
+
+def _hit_output_cap(usage, cap):
+    out = getattr(usage, "output_tokens", None)
+    return out is not None and cap and out >= cap - _CAP_TOLERANCE
+
+
 def decide(model_slug, prompt, base_seed, ctx=None):
     """Free-text + `CONTRIBUTION:` parse + retry-on-parse-fail (fresh seed each retry),
     mirroring crsd/runner/batch. Returns (text, value, failed, tok_in, tok_out, cost).
@@ -1693,29 +1714,50 @@ def decide(model_slug, prompt, base_seed, ctx=None):
     another seat's model.
     """
     tok_in = tok_out = cost = 0
+    cap = _max_out_for(model_slug)
     text, usage = _call_llm(model_slug, prompt, base_seed, ctx=ctx)
     tok_in += usage.input_tokens or 0
     tok_out += usage.output_tokens or 0
     cost += usage.total_cost_nanodollars or 0
     value, failed = parse_contribution(text)
+    truncated = _hit_output_cap(usage, cap)
     attempt = 0
-    while failed and attempt < MAX_PARSE_RETRIES:
+    # Retry on EITHER condition. `truncated` is the one that matters in practice:
+    # `failed` alone almost never fires, because a reply cut off mid-reasoning still
+    # contains a 0/2/4 somewhere for the prose-scan rule to pick up.
+    while (failed or truncated) and attempt < MAX_PARSE_RETRIES:
         attempt += 1
-        _emit_error("parse_retry", "no legal CONTRIBUTION line in the reply",
-                    http=200, fatal=False, ctx=ctx, attempt=attempt,
-                    max_attempts=MAX_PARSE_RETRIES, reply=_clip(text, 200))
+        if truncated:
+            # Escalate, or the retry is cut off at exactly the same place.
+            cap = min(cap * 4, MAX_RETRY_CAP)
+            _emit_error("truncated_retry",
+                        "reply hit the output cap before the CONTRIBUTION line",
+                        http=200, fatal=False, ctx=ctx, attempt=attempt,
+                        max_attempts=MAX_PARSE_RETRIES, cap=cap,
+                        reply=_clip(text, 200))
+        else:
+            _emit_error("parse_retry", "no legal CONTRIBUTION line in the reply",
+                        http=200, fatal=False, ctx=ctx, attempt=attempt,
+                        max_attempts=MAX_PARSE_RETRIES, reply=_clip(text, 200))
         seed = (base_seed + attempt * RETRY_SEED_STEP) % SAMPLING_SEED_MOD
-        text, usage = _call_llm(model_slug, prompt, seed, ctx=ctx)
+        text, usage = _call_llm(model_slug, prompt, seed, ctx=ctx, cap_override=cap)
         tok_in += usage.input_tokens or 0
         tok_out += usage.output_tokens or 0
         cost += usage.total_cost_nanodollars or 0
         value, failed = parse_contribution(text)
+        truncated = _hit_output_cap(usage, cap)
+    if truncated and not failed:
+        # The prose-scan rule produced a value, but from a reply we KNOW was cut off
+        # -- that number came out of the reasoning, not out of a decision. Force the
+        # failure flag so the end-of-sweep assertion refuses the run instead of
+        # shipping a fabricated contribution.
+        failed = True
     if failed:
         # Recorded as parse_failed=1 (never silently dropped) and asserted on at the
         # end of the sweep: a run with parse failures is not a valid measurement.
-        _emit_error("parse_failed", "no legal CONTRIBUTION after %d retries"
-                    % MAX_PARSE_RETRIES, http=200, fatal=False, ctx=ctx,
-                    reply=_clip(text, 200))
+        _emit_error("parse_failed", "no usable CONTRIBUTION after %d retries "
+                    "(last cap=%d)" % (MAX_PARSE_RETRIES, cap), http=200,
+                    fatal=False, ctx=ctx, reply=_clip(text, 200))
     return text, value, failed, tok_in, tok_out, cost
 
 

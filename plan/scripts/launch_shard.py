@@ -41,14 +41,23 @@ WORK = REPO / "plan" / "runs"          # log + file shard
 # đặt trong plan/runs/<label>/ là vượt giới hạn 260 của Windows và download chết.
 DL_ROOT = Path("D:/tmp/crgdl")
 
-# account -> (kiểu, đường dẫn credential). BỎ trnnguynchis: xin proxy key bị 403
-# thiếu xác minh SĐT (xem CLAUDE.md).
+# account -> (kiểu, đường dẫn credential).
+#
+# Bảng này chỉ ánh xạ TÊN -> CREDENTIAL, nó KHÔNG nói account còn sống hay không. Sức
+# khoẻ account trôi theo thời gian (mất 2 account trong 4 tuần, cùng lỗi 403 "missing
+# phone/identity verification"), nên đừng hardcode danh sách sống ở đây — chạy
+# `plan/scripts/probe_accounts.py` trước mỗi đợt lớn, nó là nguồn đúng duy nhất.
+# Các account từng hỏng VẪN nằm trong bảng để probe kiểm lại được: một account bị 403
+# vì chưa xác minh SĐT có thể sống lại sau khi người dùng xác minh.
 ACCOUNTS = {
     **{n: ("token_txt", CRED_ROOT / "kaggle-api" / f"{n}.txt") for n in (
-        "chiboiz", "chinguyentran", "chisboiz", "chunaiu", "trunkdabest",
-        "vinhdinhthien")},
+        "chiboiz", "chinguyentran", "chisboiz", "chunaiu", "trnnguynchis",
+        "trunkdabest", "vinhdinhthien")},
     **{n: ("token_md", CRED_ROOT / "kaggle-api-2" / f"{n}.md") for n in (
         "acc1", "acc2", "acc3", "acc4", "acc5")},
+    # Lô bổ sung 10-09-2026 (kaggle-api-3/): cùng định dạng token thô như kaggle-api/.
+    **{n: ("token_txt", CRED_ROOT / "kaggle-api-3" / f"{n}.txt") for n in (
+        "acc06", "acc07", "acc08", "acc09", "acc10", "acc11")},
     "trungkiet":    ("json", CRED_ROOT / "kaggle.json"),
     "foundnotkiet": ("json", CRED_ROOT / "kaggle (1).json"),
     "kit567":       ("json", CRED_ROOT / "kaggle (2).json"),
@@ -115,7 +124,7 @@ TASK_NAME_IN_FILE = "collective-risk-baseline-srv"
 
 
 def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0",
-                    max_out=None, concurrency=None):
+                    max_out=None, concurrency=None, overrides=None):
     """Copy task, thay 3 dòng sweep (83-85) bằng giá trị của shard này.
 
     Nếu `task` khác tên khai trong file thì đổi luôn `@kbench.task(name=...)`:
@@ -152,6 +161,16 @@ def make_shard_file(dest, risks, langs, reps, task=None, rep_start="0",
                            f'os.environ.get("CRG_CONCURRENCY", "{concurrency}")', new)
         if n_c != 1:
             raise SystemExit(f"Thay CRG_CONCURRENCY that bai ({n_c} cho).")
+    # Bien CRG_* khac (CRG_TEMPLATE cho E1, CRG_PROBE cho E2, CRG_SEAT_MODELS cho
+    # E3a/E3b). Cung ly do voi CRG_MAX_OUT: server KHONG nhan bien moi truong tu
+    # shell, nen phai nuong thang mac dinh vao file shard.
+    for name, value in (overrides or {}).items():
+        new, n_o = re.subn(rf'os\.environ\.get\("{re.escape(name)}", "[^"]*"\)',
+                           f'os.environ.get("{name}", "{value}")', new)
+        if n_o != 1:
+            raise SystemExit(f"Thay {name} that bai ({n_o} cho) - "
+                             f"crg_task_server.py co doc bien nay voi mac dinh chuoi khong?")
+
     if task and task != TASK_NAME_IN_FILE:
         new, n_t = re.subn(rf'name="{re.escape(TASK_NAME_IN_FILE)}"',
                            f'name="{task}"', new)
@@ -210,10 +229,17 @@ def main():
     ap.add_argument("--model", action="append", required=True,
                     help="slug model (lap lai duoc, toi da 7 - qua 7 API tra 400)")
     ap.add_argument("--risks", default="0.9,0.5,0.1")
-    ap.add_argument("--langs", default="en,vn")
+    ap.add_argument("--langs", default="en")
     ap.add_argument("--reps", default="10")
     ap.add_argument("--rep-start", default="0",
                     help="rep bat dau (chia shard theo rep): REP_START=5 --reps 5 -> rep 5..9")
+    ap.add_argument("--template", default=None,
+                    help="CRG_TEMPLATE: 'baseline' (mac dinh) hoac 'nohint' (E1)")
+    ap.add_argument("--probe", default=None,
+                    help="CRG_PROBE cho E2, vd 'rules,value'")
+    ap.add_argument("--seat-models", default=None,
+                    help="CRG_SEAT_MODELS cho E3a/E3b: dung 6 muc, ghe P1 truoc, "
+                         "vd 'self,scripted:always_4,...'")
     ap.add_argument("--concurrency", default=None,
                     help="CRG_CONCURRENCY: so ghe goi song song trong 1 vong (mac dinh 1). "
                          "Khong doi chi phi, chi giam wall-clock.")
@@ -253,6 +279,16 @@ def main():
         log(h, f"so van moi model = {n_games} (rep {args.rep_start}.."
                f"{int(args.rep_start) + int(args.reps) - 1})")
 
+        overrides = {}
+        if args.template:
+            overrides["CRG_TEMPLATE"] = args.template
+        if args.probe:
+            overrides["CRG_PROBE"] = args.probe
+        if args.seat_models:
+            overrides["CRG_SEAT_MODELS"] = args.seat_models
+        if overrides:
+            log(h, f"overrides={overrides}")
+
         env = build_env(args.account, WORK / "_kcfg")
 
         # Xác nhận account sống + lấy proxy key trước khi làm gì khác.
@@ -265,7 +301,8 @@ def main():
         if not args.download_only and not args.run_only:
             shard_py = make_shard_file(shard_dir / "shard_task.py",
                                        args.risks, args.langs, args.reps, args.task,
-                                       args.rep_start, args.max_out, args.concurrency)
+                                       args.rep_start, args.max_out, args.concurrency,
+                                       overrides)
             log(h, f"da sinh {shard_py}")
 
             # `push` chạy task 1 ván để validate, trên model mặc định của server. Khi
