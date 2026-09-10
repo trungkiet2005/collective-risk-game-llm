@@ -10,11 +10,7 @@ Thư mục này giữ kế hoạch **đang thực thi**, để một session/cha
 
 | File | Nội dung |
 |---|---|
-| [aamas2027-plan.md](aamas2027-plan.md) | **🎯 NHÁNH MỚI 09-09-2026.** Kế hoạch nộp AAMAS 2027 (deadline 08-10-2026): paper phải KHÁC bản Interface Focus, 11 thí nghiệm, lịch 29 ngày, ~$1.400 |
-| [review-response.md](review-response.md) | Vòng revision Interface Focus — §0 giữ trạng thái sống |
-| [findings-top-tier.md](findings-top-tier.md) | **🔥 KẾT QUẢ.** `gpt-5.6-sol` PHẢN ỨNG với risk (+118.2 điểm) — đảo ngược claim trung tâm của paper |
-| [runbook-top-tier.md](runbook-top-tier.md) | **⚡ ĐANG CHẠY.** Hướng dẫn thực thi bậc đỉnh: phân account, chia shard, gom result, sự cố |
-| [frontier-run-plan.md](frontier-run-plan.md) | Kế hoạch tổng: panel theo lưới nhà cung cấp × bậc, Ngày 1→4 |
+| [aamas2027-plan.md](aamas2027-plan.md) | **⚡ FILE KẾ HOẠCH DUY NHẤT của nhánh AAMAS (gộp 10-09-2026).** Phần I = paper (venue, ràng buộc trùng nộp với Interface Focus, câu chuyện, bố cục 8 trang) · Phần II = chạy (panel, luật cân bằng, chỉ tiếng Anh, 8 thí nghiệm, **schema CSV wide 82 cột**, lịch từng ngày tới 08/10) · Phần III = checklist trước khi nộp. **Đọc trước khi phóng bất cứ shard nào.** |
 | [model-availability.md](model-availability.md) | 38 slug trên Kaggle Model Proxy: cái nào sống, sống ở đâu, giá bao nhiêu |
 | [scripts/](scripts/) | xem bảng script dưới |
 
@@ -38,12 +34,12 @@ screen-trước**; muốn đổi thì hỏi.
 
 ## Trạng thái tính đến 13-08-2026
 
-> ⚠️ **10-09-2026: toàn bộ bảng data dưới đây giờ nằm ở `Lagecy_Results/results/`, không
+> ⚠️ **10-09-2026: toàn bộ bảng data dưới đây giờ nằm ở `Legacy_Results/results/`, không
 > còn ở `results/`.** Đó là ĐỒ CŨ — đóng băng, chỉ đọc. Vòng chạy mới ghi vào `results/`
-> (rỗng lúc bắt đầu). Chỉ đọc/phân tích `Lagecy_Results/` và viết vào paper **khi người
+> (rỗng lúc bắt đầu). Chỉ đọc/phân tích `Legacy_Results/` và viết vào paper **khi người
 > dùng yêu cầu rõ ràng**. Xem [CLAUDE.md](../CLAUDE.md#kết-quả-lagecy_resultsresults-là-đồ-cũ-results-là-đồ-đang-chạy).
 
-**Data cũ đã có (nay ở `Lagecy_Results/results/`):**
+**Data cũ đã có (nay ở `Legacy_Results/results/`):**
 
 | Arm | Model | Experiment | Số ván |
 |---|---|---|---|
@@ -75,7 +71,7 @@ python plan/scripts/merge_shards.py --src plan/runs D:/tmp/crgdl --out results/f
 tự** — run thành công, đã tốn tiền, nhưng data không xuống máy. Data VẪN CÒN trên server,
 `redownload_all.py` lấy về. Đừng chạy lại run.
 
-Kết quả đã có: xem [findings-top-tier.md](findings-top-tier.md).
+Kết quả đã có: nhánh bậc đỉnh đã ngừng, không còn tài liệu sống.
 `gpt-5.6-sol` và `grok-4.20-reasoning` đã đủ 60 ván và nằm trong `results/frontier/`.
 Còn 2 shard `gemini-3.1-pro` risk 0.1 (`hunhtrungkit`, `tnkiet`) — nếu chúng lỗi thì chạy
 lại bằng `launch_shard.py` với account dự phòng `chiboiz`.
@@ -125,12 +121,12 @@ frontier hiện không có đại diện lab Trung Quốc — cần probe lại 
 
 3. **Proxy đặt cọc tiền trước theo `max_output_tokens`, không theo token thực tiêu.**
    Không set cap tường minh thì model đắt bị 403 dù thực tế chỉ tốn vài xu. Xem chi
-   tiết trong [frontier-run-plan.md](frontier-run-plan.md#ngày-1).
+   tiết ở `plan/aamas2027-plan.md` §12.
 
 ## Quy ước cập nhật thư mục này
 
-- Chạy xong một bước thì **tick checkbox** trong `frontier-run-plan.md` và ghi số thật
-  (chi phí, số ván, reach) vào cột kết quả — số ước tính trong plan sai tới ±3×.
+- Chạy xong một bước thì **tick checkbox** trong `aamas2027-plan.md` §11 và ghi số THẬT
+  (chi phí, số ván, reach) vào cột kết quả — số ước tính sai tới ±3×.
 - Availability thay đổi (model sống lại / chết đi) thì cập nhật `model-availability.md`
   kèm ngày probe.
 - Kế hoạch đổi hướng thì sửa thẳng file, đừng tạo file `-v2`.

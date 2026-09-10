@@ -297,7 +297,7 @@ Nguyên nhân: mỗi probe chỉ cho **1 phương trình với 2 ẩn** (giá in
 Probe nặng output → ước quá cao; probe gần như toàn input → ước quá thấp.
 
 **Cách xoá sai số:** gọi mỗi model 2 lần với tỉ lệ in/out khác nhau → giải hệ 2 ẩn ra giá
-thật. Đây là bước hiệu chuẩn ở Ngày 1 của [frontier-run-plan.md](frontier-run-plan.md).
+thật. Đây là bước hiệu chuẩn phải làm trước mỗi đợt chạy lớn.
 
 Bảng này dùng để **phân tầng**, không dùng để chốt ngân sách.
 

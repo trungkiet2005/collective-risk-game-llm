@@ -14,17 +14,24 @@ venv/
 # package con như crsd/models/ hay crsd/.../results/.
 # Ignore toàn bộ results/ NHƯNG giữ track: code phân tích + output frontier (proxy).
 # (data nặng: data/ raw/ extracted_*/ figures/ *.zip vẫn bị ignore)
-/results/**
-!/results/README.md
-!/results/frontier/
-!/results/frontier/**
-!/results/scripts/
-!/results/scripts/*.py
-# dense_grid = lưới risk dày, ~400MB — quá nặng cho git, giữ local
-/results/frontier/dense_grid/
+# Layout results/ (chốt 10-09-2026): CHỈ còn wide CSV, KHÔNG còn results/raw/.
+#   results/<experiment>/<p>/<model_tag>/p<p>_<lang>_<model_tag>.csv   (~1.4KB/ván)
+# Cả cây chỉ ~1.5KB/ván nên track TOÀN BỘ — đây là bản ghi kết quả đi vào paper.
+# Long-format (games.csv + turns.jsonl, mang prompt + reasoning) KHÔNG vào results/ nữa;
+# nó nằm ở thư mục shard tải về (plan/runs/) và bị ignore vì nặng. Muốn giữ reasoning thì
+# backup plan/runs/ ra ngoài git — results/ KHÔNG dựng lại được nó.
+!/results/
+!/results/**
 
-# Lagecy_Results/ = thư mục results/ CŨ, đóng băng 10-09-2026. Giữ đúng chính sách như
-# results/ ở trên: track output frontier (nhẹ), bỏ open_source/raw/dense_grid (nặng).
+# Legacy_Results/ = thư mục results/ CŨ, đóng băng 10-09-2026 (đổi tên từ "Lagecy_" sai
+# chính tả). 1.4GB — giữ đúng chính sách cũ: track output frontier (nhẹ), bỏ
+# open_source/raw/dense_grid (nặng). Luật cho tên CŨ giữ lại phòng khi có bản checkout cũ.
+/Legacy_Results/**
+!/Legacy_Results/README.md
+!/Legacy_Results/results/
+!/Legacy_Results/results/frontier/
+!/Legacy_Results/results/frontier/**
+/Legacy_Results/results/frontier/dense_grid/
 /Lagecy_Results/**
 !/Lagecy_Results/README.md
 !/Lagecy_Results/results/

@@ -6,7 +6,7 @@ collective-risk social dilemma, in the **Royal Society Interface** template, **s
 **Title:** *Large language model agents in a collective-risk social dilemma: cooperation tracks prompt salience, not catastrophe risk.*
 
 > **Under revision.** Reviewer report received 2026-08-13; the working plan, the item-by-item
-> status and the full reviewer text are in [../plan/review-response.md](../plan/review-response.md).
+> status and the full reviewer text are no longer tracked as a live document.
 > Read that before editing `main.tex`.
 
 ## Files

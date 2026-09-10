@@ -1,22 +1,39 @@
 # Kế hoạch nộp AAMAS 2027 — CRSD-LLM
 
-**Viết 09-09-2026.** Mục tiêu: nộp main track AAMAS 2027 (Hà Nội, 3–7/05/2027).
-Đây là kế hoạch **song song** với vòng revision Interface Focus, không thay thế nó.
-Đọc [review-response.md](review-response.md) để biết trạng thái paper tạp chí.
+**Viết 09-09-2026, gộp một mối 10-09-2026.** Đây là **file kế hoạch DUY NHẤT** của nhánh
+AAMAS: vừa "viết paper gì" (Phần I) vừa "chạy cái gì, ngày nào" (Phần II) vừa "kiểm gì
+trước khi nộp" (Phần III). Trước đó nội dung nằm ở hai file và **số liệu mâu thuẫn nhau**
+(ngân sách $1.400 vs $457, panel 6–12 model vs 5 model, hai cái lịch khác nhau) — đã gộp
+để mỗi con số chỉ sống ở đúng một chỗ.
+
+- Deadline: **abstract 01-10-2026**, **full paper 08-10-2026** (23:59 AoE), đăng ký tác
+  giả **17-09-2026**. Hôm nay 10-09 → còn **28 ngày**.
+- Data cũ ở `Legacy_Results/` = **đóng băng**, không đọc, không trộn. Vòng này chạy lại
+  toàn bộ vào `results/`.
 
 ---
 
-## 0. TL;DR — ba điều phải quyết trước khi làm bất cứ gì
+## 0. TL;DR — sáu điều phải đọc
 
-| # | Vấn đề | Khuyến nghị của tôi |
+| # | Điều | Chi tiết |
 |---|---|---|
-| 1 | **Trùng nộp với Interface Focus.** AAMAS cấm nộp công trình "substantially similar" với venue archival khác. Paper IF đang *accept with revisions* → coi như archival. | Paper AAMAS phải là **paper khác**: câu hỏi mới, thí nghiệm mới, ≥70% kết quả chưa từng có trong bản IF; trích bản IF như prior work ở ngôi thứ ba. Chi tiết §2. |
-| 2 | **Còn 29 ngày** (abstract 01/10, paper 08/10). Không đủ để làm tất cả. | Chốt đúng **một** trục đóng góp mới (tôi đề xuất: *best-response + quần thể hỗn hợp*), rồi cắt thẳng tay phần còn lại. Chi tiết §4. |
-| 3 | **Ngân sách $170/ngày × ~20 ngày ≈ $3.400 trần**, nhưng wall-clock và orchestration mới là thứ giới hạn. | Chương trình thí nghiệm đề xuất tốn **~$1.000** (kể cả 40% dự phòng chạy lại) và ~20 giờ wall-clock. Tiền KHÔNG phải nút thắt. Chi tiết §8. |
+| 1 | **Paper AAMAS phải KHÁC paper Interface Focus.** Câu hỏi mới, ≥70% kết quả chưa từng có ở bản IF, trích bản IF ở ngôi thứ ba. Vi phạm = desk reject. | §2 |
+| 2 | **Hướng đã chốt:** best-response + quần thể hỗn hợp. Biến điểm yếu "monoculture self-play" thành đóng góp. | §4 |
+| 3 | **Bạn KHÔNG tiêu hết được $160/ngày với panel này.** Cả chương trình tốn ~$210, trải 28 ngày = ~$8/ngày, đỉnh $49. Nút thắt là wall-clock và orchestration, không phải tiền. | §6 |
+| 4 | ⚖️ **Luật cân bằng:** cả 5 model chạy **đúng cùng số ván** ở mọi thí nghiệm. Giá chỉ được quyết định *cách chia shard*, không bao giờ quyết định *n*. Có cổng QA chặn. | §7 |
+| 5 | 🇬🇧 **Chỉ tiếng Anh.** Ba chỗ mặc định `en,vn` trong code đã lật về `en` ngày 10/09 — quên một cờ là ra data tiếng Việt. | §5.1 |
+| 6 | **Đường găng là E0 (engineering), không phải tiền.** Model-theo-ghế + agent scripted + writer CSV chặn mọi thí nghiệm phía sau. | §8 |
 
-**Nếu chỉ đọc một mục:** §4 (paper nào) và §5 (chạy gì).
+**Nếu chỉ đọc một mục:** §11 (lịch theo ngày) và §7 (chạy thí nghiệm gì).
+
+> 📖 **Quy ước ký hiệu.** `§N` = mục **của file kế hoạch này**. `P-N` = mục **của bài
+> paper** (bố cục 8 trang ở §4.4) — ví dụ `P-5` là mục "Best-response profiling" của paper,
+> không phải §5 của file này. Hai hệ thống số này từng bị lẫn khi gộp file; tách ký hiệu ra
+> để đừng lẫn nữa.
 
 ---
+
+# PHẦN I — PAPER
 
 ## 1. Sự thật về venue
 
@@ -76,14 +93,14 @@ Giả định làm việc: `paper/main.tex` rồi sẽ được nộp Interface 
 - **KHÔNG được** dùng lại claim trung tâm ("capability enables risk sensitivity but does not confer it")
   làm claim trung tâm của bản AAMAS.
 - Bản IF sẽ được trích như prior work. Vì AAMAS double-blind mà bản IF cũng đang ẩn danh,
-  trích **ngôi thứ ba**, giống cách đang xử lý `2512.07462` (xem review-response §2e).
+  trích **ngôi thứ ba**, giống cách đang xử lý `2512.07462`.
 
 **Đường an toàn — ba lớp:**
 
 1. **Câu hỏi nghiên cứu khác.** IF hỏi *"LLM có tái tạo độ nhạy risk của người không?"* (machine behaviour).
    AAMAS hỏi *"LLM agent phản ứng thế nào với **agent khác** trong dilemma có rủi ro, và điều đó
    có ý nghĩa gì khi triển khai quần thể agent hỗn hợp?"* (multiagent systems).
-2. **Dữ liệu chủ yếu là mới.** Kết quả trục chính của bản AAMAS (§5: E3a/E3b/E5) **chưa tồn tại**.
+2. **Dữ liệu chủ yếu là mới.** Kết quả trục chính của bản AAMAS (§7: E3a/E3b/E5) **chưa tồn tại**.
    Baseline null 13 model chỉ xuất hiện như **một đoạn setup + một bảng nhỏ**, có trích IF.
 3. **Nói thẳng trong Related Work.** Một đoạn: *"Concurrent work [ref IF] establishes the
    single-model baseline used here; the present paper asks a different question."*
@@ -189,6 +206,8 @@ Khuyến nghị: viết theo A, đổi sang B nếu E3b cho ngưỡng sụp rõ 
 
 ### 4.4 Bố cục 8 trang
 
+Cột "Mục" dưới đây chính là các `P-N` được nhắc tới ở §11 (lịch viết) và §14 (checklist).
+
 | Mục | Trang | Nội dung |
 |---|---|---|
 | 1. Introduction | 1.0 | Vấn đề, gap MAS, 3 bullet đóng góp |
@@ -201,235 +220,393 @@ Khuyến nghị: viết theo A, đổi sang B nếu E3b cho ngưỡng sụp rõ 
 | 8. Discussion, limitations, ethics | 0.6 | Hệ quả triển khai; giới hạn; ẩn danh; reproducibility |
 | Refs | ∞ | không tính trang |
 
-Nếu §7 không kịp → giãn §5/§6 ra và ghi §7 vào future work. **Cắt §7 trước, luôn luôn.**
+Nếu **P-7** không kịp → giãn **P-5**/**P-6** ra và ghi P-7 vào future work. **Cắt P-7 trước, luôn luôn.**
 
 ---
 
-## 5. Chương trình thí nghiệm
+---
 
-> 🇬🇧 **QUY TẮC CHỐT 09-09-2026: mọi thí nghiệm chỉ chạy TIẾNG ANH.**
-> Không chạy tiếng Việt hay ngôn ngữ nào khác trừ khi người dùng yêu cầu đích danh.
-> Hệ quả: bỏ hệ số ×1.45 của tiếng Việt khỏi mọi dự toán, và **trục ngôn ngữ không xuất hiện
-> trong paper AAMAS** — nó ở lại hẳn bên bản Interface Focus. Đây cũng là một cách tách hai
-> paper tốt: kết quả đa ngôn ngữ (146.8 điểm, lật reach 100%→0%) là đóng góp đặc trưng của
-> bản IF, để nguyên bên đó thì overlap giữa hai bản càng mỏng.
+# PHẦN II — CHẠY
 
-Ký hiệu ưu tiên: **P0** = không có thì không nộp · **P1** = nên có, reviewer sẽ hỏi ·
-**P2** = tốt thì có, cắt được.
+## 5. Phạm vi chạy — panel khoá 5 model, chỉ tiếng Anh
 
-Đơn giá thật đo được (EN, p = 0.9, 60 lượt/ván): `gemini-3.1-pro` $0.61 · `claude-opus-5` $0.68 ·
-`gpt-5.6-sol` $0.35 · `grok-4.20-reasoning` $0.13 · `grok-nr` ~$0.02 · `flash-lite` $0.022 ·
-`gpt-5.4-nano` $0.007. **Hệ số:** cell p=0.1 ×1.7 · tiếng Việt ×1.45 · cả hai ×2.4.
-
-| ID | Thí nghiệm | Trả lời điểm yếu | Quy mô | $ | Ưu tiên |
-|---|---|---|---|---|---|
-| **E0** | *Engineering* — model theo ghế + agent scripted + probe pledge | W1, W2, W3 | 0 ván | $0 | **P0** |
-| **E1** | Ablation bỏ mỏ neo equal-split (`exp_nohint`) **trên proxy**, không dùng GPU | W4 | 6 model × 3 risk × EN × 10 rep = 180 ván | ~$75 | **P0** |
-| **E2** | Probe so sánh EV (`exp_evprobe`) | W5 | 8 model × 3 risk × 10 rep = 240 ván | ~$95 | **P0** |
-| **E-ctrl** | **p = 0 và p = 1.0** | W9 | 6 model × 2 risk × 10 rep = 120 ván | ~$66 | **P0** |
-| **E3a** | **Best-response profiling**: 1 LLM + 5 scripted | W1, W3 | 6 model × 4 profile đối thủ × 5 risk × 10 rep = 1.200 ván (chỉ 10 lượt/ván) | ~$85 | **P0** |
-| **E3b** | **Quần thể model hỗn hợp**, quét k = 0…6 | W1 | 3 cặp × 7 k × 3 risk × 10 rep = 630 ván | ~$290 | **P0** |
-| **E4** | Staircase thích nghi định vị `p*` + CRRA | đóng góp 1 | 10 model × ~20 ván = 200 ván | ~$100 | **P1** |
-| **E6** | Robustness: 2 paraphrase + temp 0 | W6, W7 | 4 model × 2 risk × 3 điều kiện × 10 rep = 240 ván | ~$147 | **P1** |
-| **E8** | Thang capability trong-họ | W10 | 12 model × 3 risk × 10 rep = 360 ván | ~$120 | **P2** |
-| **E5** | Thể chế: pledge / hiển thị tổng | W2, đóng góp 3 | 2 model × 3 thể chế × 3 risk × 10 rep = 180 ván | ~$130 | **P2 (stretch)** |
-| **E7** | Baseline scripted + phân tích cân bằng | W3 | 0 ván (chạy offline) | **$0** | **P0** |
-
-**Tổng: ~3.200 ván, ~$1.008.** Cộng 40% dự phòng chạy lại → **~$1.400**.
-
-> ⚠️ **Bảng trên là dự toán CŨ, viết cho panel rộng 6–12 model. KHÔNG còn hiệu lực.**
-> Panel đã khoá ở **5 model** (§5.0), nên mọi cột "Quy mô" phải quy về 5 model đó và tổng
-> thật là **$83**, không phải $1.400. Giữ bảng này lại chỉ để tham chiếu khi nào người dùng
-> duyệt mở rộng panel. **Đừng lấy nó làm kế hoạch chạy.**
-
-### 5.0 Panel — KHOÁ ở 5 model, CHỐT 09-09-2026
-
-> 🔒 **QUY TẮC KHOÁ PANEL.** Chỉ chạy đúng 5 model trong bảng dưới. **Muốn thêm bất kỳ model
-> nào — kể cả `gemini-3.1-pro` mà tôi khuyến nghị ở §5.0.2, kể cả để "kiểm tra nhanh" — phải
-> HỎI người dùng trước.** Không tự ý mở rộng panel, không tự ý thay model đã chết bằng model
-> khác. Mọi con số quy mô ở bảng §5 bên trên (viết cho panel 6/8/12 model) **đều phải quy về
-> panel 5 model này** cho tới khi người dùng duyệt mở rộng.
-
-Người dùng chọn chạy **một model mỗi nhà cung cấp**, tất cả ở bậc rẻ:
-
-**Cả 5 đã probe server-side 09-09-2026 — SỐNG HẾT.**
-
-| Slug | Nhà | Probe 09-09 | $/ván | Đã có data? |
+| Tag thư mục (`model_tag`) | Slug gọi proxy | Nhà | $/ván | `--max-out` |
 |---|---|---|---|---|
-| `qwen3-235b-a22b-instruct-2507` | Alibaba | ✅ OK | 0,019 | ❌ chưa |
-| `grok-4.20-0309-non-reasoning` | xAI | ✅ OK | **0,023 đo thật** | ✅ 60 ván baseline |
-| `gemini-3.5-flash-lite` | Google | ✅ OK | 0,034 | ❌ chưa |
-| `gpt-5.6-luna` | OpenAI | ✅ OK | 0,073 | ❌ chưa |
-| `claude-haiku-4-5-20251001` | Anthropic | ✅ OK | 0,125 | ❌ chỉ 1 ván smoke |
+| `anthropic-claude-haiku-4-5` | `claude-haiku-4-5-20251001` | Anthropic | 0,125 | **3000** 🚨 |
+| `openai-gpt-5.6-luna` | `gpt-5.6-luna` | OpenAI | 0,073 | 6000 |
+| `google-gemini-3.5-flash-lite` | `gemini-3.5-flash-lite` | Google | 0,034 | 6000 |
+| `xai-grok-4.20-0309-non-reasoning` | `grok-4.20-0309-non-reasoning` | xAI | 0,023 | 3000 |
+| `qwen-qwen3-235b-a22b-instruct-2507` | `qwen3-235b-a22b-instruct-2507` | Alibaba | 0,019 | 3000 |
 
-Tổng **$0,274 cho một ván chạy trên cả 5 model.**
+🚨 **`claude-haiku-4-5` sinh 476/512 token mỗi quyết định — 93% cap mặc định.** Khi output
+bị cắt trước dòng `CONTRIBUTION: n`, parser rơi xuống nhánh "quét mọi chữ số trong văn bản
+rồi lấy số cuối thuộc {0,2,4}" và trả `parse_failed=False`. Nghĩa là **`parse_fail_rate =
+0.0` vẫn xanh trong khi dữ liệu là bịa.** Mọi cổng kiểm tra sức khoẻ của repo đều dựa vào
+chỉ số này → **nâng cap là việc P0 của ngày 10/09**, và nó gần như miễn phí
+($0,1765 → $0,178/ván, nằm trong sai số).
 
-**`qwen3-235b` sống lại là tin tốt thật:** ngày 12-08 nó 503 cả hai proxy, ngày 09-09 chạy
-bình thường. Panel giờ có **5 nhà cung cấp gồm cả một lab Trung Quốc** — trước đó nhánh
-frontier chỉ có 4 nhà phương Tây, và đó là một lỗ hổng coverage mà reviewer hay chỉ ra.
+**Kiểm sau mỗi run:** `usage_output_tokens / n_decisions` phải < 60% cap. Ghi số này vào
+log QA hằng ngày.
 
-#### 5.0.1 Chi phí — panel này rẻ gấp 4 lần dự toán ban đầu
+> ⚠️ `gpt-5.6-luna` trả **404 "model not found" trên local staging proxy cho cả 14
+> account**. Đó **không** phải model chết — nó chỉ có server-side. Đừng đọc nhầm 404 này
+> thành "account hỏng" rồi đi đổi account.
 
-**Chỉ tiếng Anh** (quy tắc đầu §5) — bỏ hết cột tiếng Việt khỏi mọi bước.
+### 5.1 🇬🇧 CHỈ TIẾNG ANH — và ba chỗ code từng làm rò
 
-| Bước | Quy mô (EN only) | $ |
+**Mọi ván trong vòng chạy này chỉ chạy `en`.** Không tiếng Việt, không fr/zh/ar, cho tới
+khi người dùng yêu cầu đích danh. Hệ quả: **trục ngôn ngữ không xuất hiện trong paper
+AAMAS** — nó ở lại hẳn bên bản Interface Focus. Đây cũng là cách tách hai paper tốt: kết
+quả đa ngôn ngữ (146,8 điểm, lật reach 100% → 0%) là đóng góp đặc trưng của bản IF, để
+nguyên bên đó thì overlap giữa hai bản càng mỏng.
+
+Ngoài lý do khoa học còn lý do vận hành: **mỗi ngôn ngữ thêm vào nhân đôi số shard phải
+push, run, download và merge** — mà orchestration mới là nút thắt thật của dự án này
+(§6.2), không phải tiền.
+
+#### Ba chỗ mặc định từng là `en,vn` — đã lật về `en` ngày 10-09-2026
+
+Đây là bẫy im lặng: không cần làm gì sai, chỉ cần **quên một cờ** là ván tiếng Việt tự
+sinh ra, và nó nhân đôi chi phí lẫn số shard mà không báo gì.
+
+| File | Trước | Sau |
 |---|---|---|
-| Baseline sweep (khoá join với mọi thứ khác) | 3 risk × 10 rep = 30 ván/model, **chỉ 4 model** — `grok-nr` đã có sẵn 30 ván EN (§5.0.3) | 10 |
-| E1 ablation mỏ neo | 30 ván/model | 11 |
-| E-ctrl p = 0 | 10 ván/model | 5 |
-| E2 probe EV (5 rep) | 15 ván/model | 7 |
-| E3a best-response | 200 ván/model (chỉ 1/6 ghế gọi API) | 13 |
-| E3b một cặp trong panel | 210 ván | 13 |
-| E7 baseline scripted + equilibrium | offline | 0 |
-| | **Cộng** | **59** |
-| | +40% dự phòng | 24 |
-| | **Tổng Core** | **~$83** |
+| `kaggle/benchmarks/crg_task_server.py:159` | `CRG_LANGS` mặc định `"en,vn"` | `"en"` |
+| `plan/scripts/launch_shard.py:213` | `--langs` mặc định `"en,vn"` | `"en"` |
+| `plan/scripts/merge_shards.py:34` | `EXPECTED_LANGS = {"en","vn"}` | `{"en"}` |
 
-**$83 thay vì $450**, tính trên giá probe thật ngày 09-09 chứ không phải ước tính cũ.
-Chỉ tiếng Anh vừa rẻ hơn vừa **cắt một nửa số shard phải điều phối** — wall-clock mới là
-nút thắt thật. Toàn bộ Core gọn trong **nửa ngày credit**, còn thừa $87 trong ngày để thêm
-`gemini-3.1-pro` ngay lập tức.
+Chỗ thứ ba là chỗ nguy hiểm nhất theo kiểu khác: nó không sinh data thừa mà **báo động
+giả** — cổng phủ-cell sẽ liệt kê hàng loạt cell `vn` "còn thiếu" cho một sweep vốn không
+định chạy `vn`, và người đọc log rất dễ đi "vá" cho đủ. Giờ nó im.
 
-#### 5.0.2 ⚠️ Một cảnh báo phải nói trước khi chạy
+⚠️ **`crsd/configs/experiment/*.json` vẫn ghi `"languages": ["en","vn","fr","zh","ar"]` —
+CỐ Ý ĐỂ NGUYÊN.** Đó là bản ghi lịch sử của những gì đã chạy cho bản Interface Focus, sửa
+đi là mất provenance của `Legacy_Results/`. Chúng **không ảnh hưởng** tới vòng chạy này vì
+đường server-side đọc `CRG_LANGS` chứ không đọc file JSON đó. Nhưng **đừng chạy
+`run_experiment.py` thẳng từ các config này** mà không set `CRG_LANGS=en`.
 
-**Cả 5 model đều ở bậc rẻ, mà bậc rẻ CHƯA BAO GIỜ nhạy với risk** trong toàn bộ dữ liệu
-đã có: `gemini-3.1-flash-lite` −1,8 · `gpt-5.4-nano` +7,5 · `grok-4.20-non-reasoning` +23,6
-(và cái +23,6 này là nới biên an toàn, không phải quyết định). Dự đoán: **trục risk sẽ null
-sạch trên cả panel.**
+**Cổng kiểm:** `verify_wide.py` assert `set(df.language) == {"en"}` cho mọi file trong
+`results/`. Một dòng khác `en` là exit 1.
 
-Với **E3a thì không sao** — thậm chí còn tốt: *"model bậc rẻ không best-respond ngay cả khi
-best response là hiển nhiên (profile `carry`)"* là một claim sạch và mạnh.
+---
 
-Nhưng **E3b thì hỏng**: nó cần tương phản giữa **một loại EV-optimal** và **một loại hợp tác
-vô điều kiện**. Panel này không có loại nào EV-optimal → đường invasion sẽ phẳng, không có
-ngưỡng sụp, mất luôn kết quả headline.
+## 6. Số học của $160/ngày — sự thật khó chịu
 
-> ❓ **CÂU HỎI MỞ, CHỜ NGƯỜI DÙNG DUYỆT — đừng tự chạy.**
-> Đề xuất thêm đúng một model đắt làm đối cực: **`gemini-3.1-pro-preview`**, model
-> EV-optimal **duy nhất còn lại** sau khi `gpt-5.6-sol` bị gỡ khỏi catalog 09-09
-> (xem [model-availability.md](model-availability.md)). Chi phí: E3a $28 + một cặp E3b $97.
-> **Nếu không có nó, §6 (quần thể hỗn hợp) mất kết quả headline** và paper phải dựa hoàn
-> toàn vào §5 (best-response).
+### 6.1 Credit là 19 hũ $10, không phải một hũ $190
+
+Trần là **$10/account/24h**, và **một `kaggle b t run` không chia được qua nhiều account**.
+**19 account sống × $10 = ~$190/ngày** (cập nhật 10-09-2026: người dùng thêm 6 account,
+5 trong đó sống — xem CLAUDE.md). Hệ quả cứng:
+
+- **Mỗi shard phải ≤ $5** (nhắm một nửa trần, chừa chỗ cho một cú đắt bất ngờ). Đã từng
+  mất 3 shard vì tin probe "còn quota" rồi đẩy shard $7.80 vào — nó vẫn 403.
+- **Muốn tiêu $190 thì phải chạy ≥ 19 shard/ngày trên ≥ 19 account.** Chạy sâu trên ít
+  account là cách chắc chắn nhất để **không** tiêu được credit.
+- Quota là **cửa sổ trượt 24h, không reset lúc nửa đêm** (`acc5` vẫn 403 sau nửa đêm UTC).
+  "Dùng không hết thì mất" đúng theo nghĩa *không tích luỹ được*, chứ không phải *mất lúc 0h*.
+  Account chạy shard $7 lúc 22:00 thì tới 22:00 hôm sau mới dùng lại được.
+
+### 6.2 Panel 5 model không đủ "đói" để ăn hết $10/account
+
+Giá đo thật ngày 09–10/09, một ván = 6 ghế × 10 vòng = 60 lượt gọi:
+
+| Model | $/ván | Số ván để tiêu hết $10 của MỘT account | Khả thi trong 1 ngày? |
+|---|---|---|---|
+| `claude-haiku-4-5-20251001` | **0,125** | 80 | ⚠️ vừa đủ căng |
+| `gpt-5.6-luna` | 0,073 | 137 | ❌ không |
+| `gemini-3.5-flash-lite` | 0,034 | 294 | ❌ không |
+| `grok-4.20-0309-non-reasoning` | 0,023 | 435 | ❌ không |
+| `qwen3-235b-a22b-instruct-2507` | 0,019 | 526 | ❌ không |
+| | **Tổng 0,274/ván-panel** (1 ván chạy trên cả 5 model) | | |
+
+Để tiêu $160 trong một ngày cần **~584 ván-panel = 2.920 ván-model = ~175.000 lượt gọi
+LLM**. Với `--concurrency 4` (đo thật: nhanh 3,0×) một ván haiku mất ~104 giây, và push bị
+giới hạn ~3 shard đồng thời. Throughput thật khoảng **1.000–1.200 ván-model/ngày** →
+**$40–70/ngày là trần thực tế**, không phải $160.
+
+### 6.3 Vậy nên làm gì với phần credit thừa
+
+**Đừng cố tiêu cho hết** — tiêu bừa tạo thêm shard phải điều phối, mà orchestration mới là
+thứ giết deadline. Thay vào đó, credit thừa được dùng đúng ba việc, tất cả đều **miễn phí
+về mặt quyết định** vì tiền không còn là ràng buộc:
+
+1. **~~n = 20~~ → n = 10** (người dùng chốt 10-09-2026). Trước đó tôi đề xuất n=20 vì
+   reviewer AAMAS hay hỏi "n=10 có đủ không"; người dùng chọn 10. Hệ quả: câu hỏi đó
+   **phải trả lời bằng thống kê chứ không bằng cỡ mẫu** — permutation/exact test thay cho
+   t-test, khai báo cluster theo ván, báo khoảng tin cậy bootstrap (W8 ở §3.2).
+2. **Lưới risk 7 điểm thay vì staircase thích nghi.** Kết quả Q8 cho thấy độ nhạy rủi ro
+   là **đặc trưng của từng model**, và hai model "EV-optimal" bản lề ở **hai chỗ khác
+   nhau** — nên quét thẳng lưới dày còn sạch hơn staircase, và rẻ hơn công code.
+3. **Chạy lại là miễn phí.** Shard hỏng thì phóng lại, không phải cân nhắc.
+
+Muốn thật sự dùng hết credit thì phải **mở panel** → xem §15, cần bạn duyệt.
+
+---
+
+## 7. Chương trình thí nghiệm (n = 10)
+
+> ### ⚖️ LUẬT CÂN BẰNG — chốt 10-09-2026
 >
-> Đây là quyết định của người dùng, không phải của tôi. Panel vẫn khoá ở 5 model cho tới
-> khi có câu trả lời. Hạn nên chốt: **cùng lúc với kết quả E3a**, vì lúc đó mới biết §5
-> mạnh tới đâu và §6 có thật sự cần thiết không.
+> **Số ván của một model do THIẾT KẾ quyết định, không bao giờ do GIÁ quyết định.**
+> Trong mọi thí nghiệm, cả 5 model chạy **đúng cùng một số ván, cùng một lưới cell,
+> cùng số rep**. `claude-haiku-4-5` đắt gấp 6,6 lần `qwen3-235b` — điều đó **chỉ được
+> phép ảnh hưởng tới cách chia shard** (§10), tuyệt đối không ảnh hưởng tới n.
+>
+> Vì sao đây là luật chứ không phải sở thích: nếu model đắt chạy ít ván hơn, mọi so sánh
+> giữa các model đều **lẫn hiệu ứng thật với sai số lấy mẫu khác nhau**. Model đắt sẽ có
+> khoảng tin cậy rộng hơn, và bất kỳ kết luận "model X ít nhạy rủi ro hơn model Y" nào
+> cũng có thể chỉ là do X có ít ván hơn. Đây là loại lỗi reviewer bắt được ngay và
+> **không sửa được sau khi đã chạy** — phải cân bằng từ lúc thiết kế.
+>
+> Cột **"ván/model"** dưới đây là cột phải kiểm: **trong mỗi hàng nó là MỘT con số duy
+> nhất áp cho cả 5 model.** `verify_wide.py` kiểm bất biến này (§9.5).
 
-Chạy panel 5 model rẻ trước vẫn đúng dù quyết thế nào — nó thông đường ống, kiểm engine trộn
-model, và chỉ tốn $83. Kết quả E3a của nó là dữ liệu để quyết có cần model thứ 6 hay không.
+| ID | Thí nghiệm | Thiết kế | **Ván/model** | Tổng ván-model | $ | Ưu tiên |
+|---|---|---|---|---|---|---|
+| **E0** | Engineering: model-theo-ghế, agent scripted, writer CSV mới, fix `--max-out` | smoke 1 ván/model | **1** | 5 | 3 | **P0** |
+| **B** | **Lưới risk dày 11 điểm** p = 0.0 → 1.0 bước 0.1 — **440/550 ván tái dùng từ data cũ**, chỉ chạy lại qwen (§7.0) | 11 risk × 10 rep | **110** | 550 (chỉ 110 phải chạy) | **2** | **P0** |
+| **E1** | Ablation bỏ mỏ neo equal-split (`exp_nohint`) | 3 risk × 10 rep | **30** | 150 | 8 | **P0** |
+| **E2** | Probe so sánh EV (`exp_evprobe`) | 3 risk × 10 rep | **30** | 150 | 11 | **P0** |
+| **E3a** | **Best-response**: 1 LLM + 5 scripted | 4 profile × 5 risk × 10 rep | **200** | 1.000 | 9 | **P0** |
+| **E3b** | **Quần thể hỗn hợp, round-robin đủ 10 cặp** (§7.4) | 4 cặp/model × 5 k × 3 risk × 10 rep | **600** | 1.500 | 82 | **P0** |
+| **E6** | Robustness: 2 paraphrase + temp 0 | 2 risk × 3 điều kiện × 10 rep | **60** | 300 | 16 | **P1** |
+| **E5** | Thể chế: pledge / hiển thị tổng *(stretch)* | 3 thể chế × 3 risk × 10 rep | **90** | 450 | 49 | **P2** |
+| **E7** | Baseline scripted + đặc trưng hoá cân bằng | offline | — | 0 | **0** | **P0** |
+| | | | | **4.105** | **$181** | |
+| | +40% dự phòng chạy lại | | | | **$254** | |
 
-#### 5.0.3 Dữ liệu cũ: cái gì dùng lại được, cái gì không
+**$254 trên 28 ngày = $9/ngày trung bình**, đỉnh ~$28 vào ngày E3b. So với trần
+$190/ngày: dùng **~5%**.
 
-Kiểm kê thật ngày 10-09-2026. **Kế hoạch KHÔNG chạy lại bất cứ thứ gì đã có** — nhưng cũng
-phủ được rất ít, vì panel mới gần như không giao với panel cũ.
+### 7.0 ♻️ Tái sử dụng data cũ — kiểm kê 10-09-2026
 
-**✅ Dùng lại được ngay, miễn phí:**
+Người dùng yêu cầu kiểm `Legacy_Results/results/` xem có gì dùng lại được. **Kết quả: thí
+nghiệm B gần như đã xong sẵn, và tốt hơn cả kế hoạch.**
 
-| Tài sản | Quy mô | Dùng vào đâu |
+`Legacy_Results/results/frontier/dense_grid/` chứa **lưới risk 11 điểm (0.0 → 1.0, bước
+0.1), tiếng Anh, đúng config baseline** (`framing=0`, `memory=full_history`,
+`persona=personas_default`) cho **cả 5 model trong panel**. Lưới 11 điểm này là **tập cha**
+của lưới 7 điểm mà §7 định chạy.
+
+| Model | Rep sạch ở CẢ 11 mức | Dùng được? |
 |---|---|---|
-| `grok-4.20-non-reasoning` baseline **tiếng Anh** | **30 ván** (3 risk × 10 rep) | **Đúng bằng toàn bộ bước "Baseline sweep" của model này.** 1/5 bước đó đã xong — **đừng chạy lại** |
-| 13 model × 1.150+ ván (7 open-weight + 6 frontier) | toàn bộ `results/` | Bảng tham chiếu trong paper; cơ sở phân loại "type" biện minh cho thiết kế E3b |
-| `exp_persona` 420 ván × 3 model + 210 ván nano | 1.470 ván | **Phương án C dự phòng cho E3b** nếu engine trộn model hỏng |
-| Script phân tích `paper/revision/r1`–`r7` | — | Chạy lại được trên data mới, không phải viết lại |
-| E7 (baseline scripted + equilibrium) | — | Offline, không cần data nào |
+| `google-gemini-3.5-flash-lite` | **44** | ✅ dùng thẳng (dư 34) |
+| `xai-grok-4.20-0309-non-reasoning` | **31** | ✅ dùng thẳng (dư 21) |
+| `openai-gpt-5.6-luna` | **27** | ✅ dùng thẳng (dư 17) |
+| `anthropic-claude-haiku-4-5-20251001` | **24** | ✅ dùng thẳng (dư 14) |
+| `qwen-qwen3-235b-a22b-instruct-2507` | **0** | ❌ **phải chạy lại** — xem dưới |
 
-**❌ Không phủ được, phải chạy lần đầu (không phải "chạy lại"):**
+**Kết luận:** ở **n = 10** (chốt 10-09-2026), cả 4 model đều **thừa rep** — model ít nhất
+(haiku, 24) vẫn dư 14. → **11 risk × 10 rep × 5 model = 550 ván**, trong đó **440 ván đã
+có sẵn miễn phí**, chỉ phải chạy lại **110 ván qwen ≈ $2**.
 
-- **4/5 model trong panel chưa có một ván nào**: `qwen3-235b`, `gemini-3.5-flash-lite`,
-  `gpt-5.6-luna`, `claude-haiku-4-5`.
-- **E3a, E3b, E1, E2, E-ctrl chưa từng chạy trên bất kỳ model nào.** Đây là thí nghiệm mới
-  hoàn toàn, không có gì để tái sử dụng.
-- **Một nửa dữ liệu cũ là tiếng Việt** → đóng băng, để nguyên cho bản Interface Focus.
-- **7 model open-weight không chạy thêm được nữa** (đường GPU chết 4 lần) → chỉ còn giá trị
-  lịch sử, không mở rộng được.
-- **`gpt-5.6-sol` 80 ván**: dữ liệu vẫn tốt, nhưng model đã bị gỡ khỏi catalog → không thêm
-  được ván nào.
+Vì n=10 nằm xa dưới trần của cả 4 model, **không model nào ghim thiết kế** và data cũ còn
+dư nhiều để bù nếu sau này có ván trượt cổng QA. Nếu muốn nâng n về sau: 24 là mức cao
+nhất dùng được data cũ mà không phải chạy thêm gì (trừ qwen).
 
-> ⚠️ **Sửa vào bước Baseline sweep ở §5.0.1:** chỉ chạy **4 model**, không phải 5.
-> `grok-4.20-non-reasoning` đã có đủ 30 ván EN. Chạy lại là đốt tiền và tạo ra hai tập số
-> hơi khác nhau cho cùng một cell — phiền hơn là tốn. Nên chạy **1 ván đối chiếu** để xác
-> nhận engine/prompt chưa trôi, rồi dùng lại 30 ván cũ.
+#### 🚨 Vì sao qwen phải chạy lại — và vì sao cổng QA của §9.5 KHÔNG bắt được
 
-**Câu trả lời ngắn cho "có chạy lại từ đầu không":** không. Nhưng dữ liệu cũ đắt tiền ($110
-cho panel bậc đỉnh) **hầu như không đỡ được gì cho panel mới**, vì panel mới toàn model khác.
-Bù lại, panel mới rẻ tới mức chạy mới toàn bộ cũng chỉ **$83** — rẻ hơn số tiền đã tiêu cho
-dữ liệu cũ. Nên đây không phải mất mát, chỉ là hai tập dữ liệu phục vụ hai paper khác nhau.
+`qwen3-235b` bình thường trả lời cực ngắn (~15 ký tự, `CONTRIBUTION: 4`), trung bình **8
+token/quyết định** trên cap 512. Nhìn số trung bình thì tuyệt đối an toàn. **Nhưng đuôi
+phân bố thì không:** ở **0,88% số lượt**, model đột nhiên tính nhẩm dài 1.100–2.200 ký tự,
+**vượt cap và bị cắt trước khi kịp viết dòng `CONTRIBUTION:`**. Bằng chứng — các lượt đó
+đứt giữa câu:
 
-### 5.1 E3a là thí nghiệm quan trọng nhất — và nó rẻ bất ngờ
+> `...al failure if others don't compensate.
 
-Đặt **1 agent LLM giữa 5 đối thủ scripted**. Bốn profile đối thủ:
+But you are the last to decide`
+> `...ntribute at least 2, then 5×2 = 10 → target met.
 
-| Profile | Chính sách | Best response của LLM (nếu duy lý) |
+Is it safe to assume`
+
+Lúc đó parser rơi xuống nhánh quét chữ số và **nhặt một con số ra từ chính phép tính trong
+đoạn suy luận** — rồi trả `parse_failed=False`. Phân bố đóng góp bịa ra được: 2 (252 lượt),
+0 (154), 4 (114). Nhìn hoàn toàn hợp lý.
+
+**Mức lây lan không phải 0,88% mà là 39,5%:** một ván có 60 quyết định, nên chỉ cần một
+lượt hỏng là cả quỹ đạo ván đó sai. **391/990 ván dính.** Và vì lỗi rải đều khắp 11 mức
+risk, **không còn một rep nào sạch ở cả 11 mức** — nên không cứu được bằng cách lọc.
+
+> ⚠️ **Sửa cổng QA — hai cổng ở §9.5 và §5 đều thủng.**
+> `usage_output_tokens / n_decisions < 0.6 × cap` là **trung bình**, mà qwen có trung bình
+> 8/512 = 1,6% — xanh rực trong khi 39,5% số ván đã hỏng. Cổng đúng phải là **kiểm TỪNG
+> LƯỢT**: mọi `raw_response` phải chứa `CONTRIBUTION:`. Đây là cổng bắt buộc, không thể
+> thay bằng thống kê tổng hợp.
+> ```python
+> assert all(re.search(r"CONTRIBUTION\s*:", t["raw_response"], re.I) for t in turns)
+> ```
+> Cũng vì lý do này mà `--max-out 3000` (§5) phải đặt cho **mọi** model, kể cả model có
+> trung bình token bé xíu như qwen — cap phải phủ **đuôi**, không phủ trung bình.
+
+#### Cái gì KHÔNG tái sử dụng được
+
+- **E1, E2, E3a, E3b, E6, E5: không có một ván nào.** `Legacy_Results/` chỉ có
+  `exp_baseline`, `exp_persona` và `scripted_reference` — không có `exp_nohint`,
+  `exp_evprobe`, hay bất cứ thí nghiệm dị thể nào. Đây là thí nghiệm **mới hoàn toàn**,
+  chiếm $388/$393 của ngân sách.
+- **7 model open-weight và `exp_persona` (gpt-5-nano):** ngoài panel → không dùng.
+- **Toàn bộ data tiếng Việt:** ngoài phạm vi (§5.1).
+- **`scripted_reference`** (1.680 ván) có sẵn nhưng lưới risk là {0, 0.01, 0.05, 0.1, 0.5,
+  0.9, 1.0}, lệch với lưới mới. E7 chạy offline nên sinh lại còn rẻ hơn là đi khớp.
+
+#### Liên quan tới quyết định mở panel (§15)
+
+Nếu duyệt thêm model, một phần lưới B của chúng **đã có sẵn** (tiếng Anh, 5 mức risk
+{0.1, 0.3, 0.5, 0.7, 0.9}, 10 rep): `gemini-3.1-pro-preview` 50 ván · `claude-opus-5` 50 ván ·
+`grok-4.20-reasoning` 50 ván · `gpt-5.6-sol` 50 ván. Không đủ n=24 và không phủ 11 mức,
+nhưng đủ để **giảm chi phí mục 1 của §15** và để pilot trước khi cam kết.
+
+### 7.1 Bảng kiểm cân bằng — số đã verify bằng script, không phải ước lượng
+
+Mỗi ô dưới đây là **số ván của MỘT model**. Trong mỗi hàng, cả 5 cột phải giống hệt nhau.
+
+| Thí nghiệm | haiku | luna | flash-lite | grok-nr | qwen3-235b | Cân? |
+|---|---|---|---|---|---|---|
+| **B** — lưới risk 11 điểm | 110 | 110 | 110 | 110 | 110 | ✅ |
+| **E1** — nohint | 30 | 30 | 30 | 30 | 30 | ✅ |
+| **E2** — EV probe | 30 | 30 | 30 | 30 | 30 | ✅ |
+| **E3a** — best-response (ghế LLM) | 200 | 200 | 200 | 200 | 200 | ✅ |
+| **E3b** — ván có mặt ≥1 ghế | 600 | 600 | 600 | 600 | 600 | ✅ |
+| **E3b** — ghế-ván (agent-games) | 1.800 | 1.800 | 1.800 | 1.800 | 1.800 | ✅ |
+| **E6** — robustness | 60 | 60 | 60 | 60 | 60 | ✅ |
+| **E5** — thể chế *(stretch)* | 90 | 90 | 90 | 90 | 90 | ✅ |
+| **Tổng ván có mặt** | **1.120** | **1.120** | **1.120** | **1.120** | **1.120** | ✅ |
+| **Chi phí thực tế** | $70 | $41 | $19 | $13 | $10 | ⬅ chênh 6,6× |
+
+**Hàng cuối là điểm mấu chốt:** `claude-haiku-4-5` tốn gấp **6,6 lần** `qwen3-235b` cho
+**đúng cùng 1.120 ván**. Đó là kết quả đúng — chênh lệch nằm hết ở cột tiền, **không có
+một ván nào chênh ở cột dữ liệu**. Nếu một ngày nào đó bảng này lệch, nghĩa là có shard
+model đắt chết mà chưa chạy lại, chứ không phải "thiết kế cho phép".
+
+Với E3b, cân bằng đến từ **đối xứng của thiết kế chứ không phải canh tay**: đồ thị đầy đủ
+K₅ cho mỗi model đúng 4 cặp, và tổng k trên lưới k = 1…5 bằng tổng (6−k) = 15, nên trong
+mỗi cặp hai model chiếm đúng cùng số ghế. Không có cách nào lệch mà không phải do shard hỏng.
+
+**Ba chỗ đã sửa để tuân luật cân bằng** (so với bản đầu tiên viết sáng 10/09):
+
+| Chỗ | Trước — lệch | Sau — cân |
 |---|---|---|
-| `all_defect` | luôn 0 | không thể đạt target một mình → **bỏ mặc** ở mọi `p` |
-| `all_coop` | luôn 2 (nhóm đạt 100 mà không có mình) | góp đúng 20 ở `p` cao, **free-ride** ở `p` thấp |
+| **E3b** | chỉ 3 cặp → 2 model xuất hiện nhiều, 3 model xuất hiện ít hoặc không có | **round-robin đủ 10 cặp**, mỗi model có mặt ở đúng 4 cặp → 1.200 ván/model như nhau |
+| **E5** | chỉ 2 model (chọn theo giá rẻ) | **cả 5 model**, 180 ván/model |
+| **E2** | 10 rep, trong khi mọi exp khác 20 rep | **10 rep** — n toàn chương trình nay thống nhất ở 10 |
+
+Tăng thêm $146 — và đó chính là chỗ nên tiêu phần credit đang bỏ phí (§6.3).
+
+### 7.2 Vì sao B thay thế E4 (staircase) và E-ctrl
+
+Kế hoạch cũ đề xuất staircase thích nghi để định vị điểm bản lề `p*`. Với credit dồi dào,
+**quét thẳng lưới 7 điểm rẻ hơn công sức code staircase và cho kết quả sạch hơn**: bạn có
+cả đường cong chứ không chỉ một điểm, và không phải bảo vệ tính đúng đắn của thủ tục thích
+nghi trước reviewer. `p*` và chỉ số e ngại rủi ro (CRRA) vẫn suy ra được từ lưới bằng nội
+suy — chỉ là hậu xử lý offline, $0.
+
+Lưới 7 điểm đã bao luôn **E-ctrl** (p = 0 và p = 1.0) của kế hoạch cũ → hai thí nghiệm gộp
+làm một.
+
+⚠️ **Bẫy đã vấp ở Q8:** thêm mức risk mới làm **chết cả loạt shard** ở pha `run` (KeyError
+trên mức chưa đăng ký), mà pha `push` KHÔNG bắt được lỗi này. → **Chạy 1 shard 1 ván ở mỗi
+mức p mới trước khi phóng cả wave.** Đã đưa vào lịch ngày 12/09.
+
+### 7.3 E3a — thí nghiệm quan trọng nhất, và rẻ nhất
+
+Đặt **1 agent LLM giữa 5 đối thủ scripted**. Chỉ **1/6 ghế gọi API** → 10 lượt/ván thay vì
+60 → rẻ và nhanh gấp 6 lần.
+
+| Profile | Chính sách 5 ghế scripted | Best response của LLM nếu duy lý |
+|---|---|---|
+| `all_defect` | luôn 0 | không thể một mình đạt target → **bỏ mặc** ở mọi p |
+| `all_coop` | luôn 2 (nhóm đạt 100 mà không cần mình) | góp đúng 20 ở p cao, **free-ride** ở p thấp |
 | `carry` | luôn 4 (nhóm đạt 200 không cần mình) | **luôn góp 0** — target đã chắc chắn đạt |
-| `conditional` | khớp trung bình vòng trước | có ảnh hưởng, đáng để đầu tư |
+| `conditional` | khớp trung bình vòng trước | có ảnh hưởng, đáng đầu tư |
 
-**Vì sao thí nghiệm này mạnh:**
+Nó biến câu "LLM có duy lý không" thành câu hỏi **kiểm chứng được từng ô**: ta biết chính
+xác best response ở mỗi ô, nên đo được **khoảng cách tới best response** thành một con số.
 
-- Nó biến "LLM có duy lý không" thành câu hỏi **kiểm chứng được từng ô**: ta biết chính xác
-  best response ở mỗi ô, nên đo được **khoảng cách tới best response** thành một con số.
-- Profile `carry` là bẫy sắc nhất trong cả thiết kế: nhóm đã đạt 200 mà không cần mình,
-  **góp thêm một xu nào cũng là lỗ thuần**. Model nào vẫn góp 2 mỗi vòng ở đây là **không hề
-  chơi game** — nó đang tuân theo hướng dẫn trong prompt. Đây là bằng chứng cho W4 mạnh hơn cả
-  ablation E1, và nó tách hẳn "hợp tác" khỏi "tuân lệnh".
-- **Chỉ 1/6 số ghế gọi API** → 10 lượt/ván thay vì 60 → **rẻ gấp 6 lần**. 1.200 ván mà chỉ ~$85.
-- Không cần multi-client → **không phụ thuộc rủi ro kỹ thuật của E3b** (xem §9).
+Profile `carry` là bẫy sắc nhất trong cả thiết kế: nhóm đã chắc chắn đạt target,
+**góp thêm một xu nào cũng là lỗ thuần**. Model nào vẫn góp 2 mỗi vòng ở đây **không hề
+đang chơi game** — nó đang tuân theo hướng dẫn trong prompt. Đây là bằng chứng cho câu hỏi
+"hợp tác hay chỉ tuân lệnh?" mạnh hơn cả ablation E1, và nó **tách hẳn hai thứ đó ra**.
 
-### 5.2 E3b — rủi ro kỹ thuật phải pilot trong 48h đầu
+E3a không dính rủi ro kỹ thuật multi-slug của E3b → **phải chạy trước**.
 
-Task server hiện dùng `load_default_model()`, tức **một model cho cả run**, chọn bằng
-`kaggle b t run -m <slug>`. Nhóm hỗn hợp cần **mỗi ghế một slug khác nhau trong cùng một run**.
+### 7.4 E3b — round-robin đủ 10 cặp, không chọn cặp theo giá
 
-Về nguyên tắc làm được: proxy là OpenAI-compatible, slug nằm trong **body** (`{"model": "..."}`),
-nên POST thẳng tới `<MODEL_PROXY_URL>/openapi/chat/completions` với slug tuỳ ý là đủ.
-**Nhưng chưa ai kiểm proxy production có chấp nhận slug ≠ model đã chọn hay không.**
+Thiết kế: nhóm 6 ghế gồm **k agent model A + (6−k) agent model B**, quét k = 1…5
+(hai đầu mút k = 0 và k = 6 là nhóm đồng nhất, lấy sẵn từ lưới B — xem bên dưới).
 
-> **Việc đầu tiên phải làm, ngày 1:** một shard 1 ván, 6 ghế 2 slug khác nhau. Nếu proxy từ chối
-> → chuyển ngay sang phương án B, đừng đốt thời gian sửa.
+Bản đầu chỉ chạy **3 cặp** "chọn sau khi có kết quả E3a" — nghe hợp lý nhưng **vi phạm
+luật cân bằng**: model nào lọt vào cặp thì có mấy nghìn ván, model không lọt thì có 0 ván,
+và tiêu chí chọn cặp gần như chắc chắn sẽ trượt về phía model rẻ. Đã đổi thành
+**round-robin đầy đủ**:
 
-**~~Phương án B~~ — ĐÃ BỎ (10-09-2026).** Trước đây định dùng **local staging proxy** (nhận slug
-trong body chắc chắn, phục vụ 6 model, trộn được `gemini-3.1-flash-lite` × `gpt-5.4-nano` ×
-`gemini-3.6-flash`). Nhưng quy ước mới là **chỉ chạy server-side, không sinh data ở local**
-(xem [CLAUDE.md](../CLAUDE.md#-kaggle-benchmarks-chỉ-chạy-server-side-không-chạy-local)) — data
-local chỉ có 6/38 model nên không so sánh được với phần còn lại của panel. Nếu proxy chặn thì
-nhảy thẳng sang phương án C, hoặc hỏi người dùng trước khi mở lại đường local.
+| | Số cặp | Mỗi model có mặt ở | Ván/model | Ghế-ván/model | Tổng ván |
+|---|---|---|---|---|---|
+| C(5,2) = **10 cặp**, k = 1…5 | 10 | **4 cặp** (như nhau cho cả 5) | **600** | **1.800** | 1.500 |
 
-**Phương án C:** thay "loại model" bằng **"loại persona"** — đã chạy rồi, đã có 420 ván/model.
-Yếu nhất vì trùng với bản IF. Chỉ dùng làm phao.
+Mỗi model xuất hiện ở đúng 4 trong 10 cặp — tính chất của đồ thị đầy đủ K₅, nên
+**cân bằng là tự động, không phải canh bằng tay**.
 
-**E3a không dính rủi ro này** → đó là lý do E3a phải chạy trước E3b.
+**Quét k = 1…5, KHÔNG quét k = 0…6.** Hai đầu mút là **nhóm đồng nhất** (k=0 là 6 ghế
+model B, k=6 là 6 ghế model A) — chúng không phụ thuộc model đối tác, nên chạy chúng theo
+từng cặp là **lặp lại đúng một ô 4 lần cho mỗi model** (20 ô thừa, đã kiểm bằng script).
+Tệ hơn: các ô đó **đã có sẵn trong lưới B** ở đúng p ∈ {0.1, 0.5, 0.9}. Nên hai đầu mút
+lấy thẳng từ B — **miễn phí**, và đường invasion vẫn đủ 7 điểm khi vẽ.
 
-### 5.3 E4 — staircase, thủ tục cụ thể
+Bỏ hai đầu mút tiết kiệm **$33** và 600 ván trùng lặp, mà **không mất một điểm dữ liệu
+nào** — cân bằng vẫn tuyệt đối (600 ván và 1.800 ghế-ván cho mỗi model, verify ở §7.1).
 
-```
-Input: model M, khoảng [0, 1], n_probe = 5 ván/điểm
-1. Đo tại p ∈ {0.0, 0.5, 1.0}. Nếu reach không đổi trên cả ba → báo "không có bản lề", dừng.
-2. Xác định khoảng [lo, hi] mà reach đổi từ 0% sang 100%.
-3. Lặp 3 lần: p_mid = (lo+hi)/2; đo n_probe ván; thu hẹp khoảng.
-4. Trả về p* = trung điểm khoảng cuối, độ rộng khoảng = độ bất định.
-5. Quy ra CRRA: giải u(20) = (1-p*)·u(40), u(x) = x^(1-γ)/(1-γ).
-```
+**Lợi ích ngoài dự tính:** cái ta thu được không còn là 3 đường invasion rời rạc mà là
+**ma trận tương tác 5×5 đầy đủ** — *model nào bóc lột model nào*. Đây là kết quả mạnh hơn
+hẳn và là thứ chỉ paper MAS mới làm được; nó biến **P-6** từ "ba ca nghiên cứu" thành "một
+phép đo có hệ thống".
 
-~20 ván/model, độ phân giải cuối ~0.06. **Đây là thứ biến quan sát thành phép đo**, và là
-đóng góp dễ bảo vệ nhất trước câu hỏi *"cái này khác gì một bài benchmark?"*
+**Chi phí $82** — gấp 1,9 lần bản 3 cặp, nhưng vẫn chỉ là **nửa ngày credit**. Đây đúng
+là chỗ đáng tiêu phần tiền đang bỏ phí ở §6.3.
 
-### 5.4 E7 — miễn phí, nhưng làm tăng điểm soundness nhiều nhất
+Chi phí một cặp = 2,5 × ($/ván của A + $/ván của B) cho mỗi (risk, rep), vì tổng k trên
+lưới k = 1…5 bằng 15 ghế mỗi loại, chia cho 6 ghế/ván. Cặp đắt nhất
+(`haiku` × `luna`) = $0,248/bộ-k; cặp rẻ nhất (`qwen` × `grok`) = $0,053/bộ-k —
+chênh 4,7×. **Chênh lệch giá này chỉ dùng để chia shard, KHÔNG dùng để chọn cặp:
+cả 10 cặp đều chạy, kể cả cặp đắt nhất.**
+
+### 7.5 E3b — rủi ro kỹ thuật, pilot trong 48h đầu
+
+Task server hiện dùng một model cho cả run (`kaggle b t run -m <slug>`). Nhóm hỗn hợp cần
+**mỗi ghế một slug khác nhau trong cùng một run**. Về nguyên tắc làm được (proxy là
+OpenAI-compatible, slug nằm trong **body**), nhưng **chưa ai kiểm proxy production có chấp
+nhận slug ≠ model đã chọn hay không**.
+
+→ **Pilot ngày 11/09: 1 ván, 6 ghế, 2 slug khác nhau.** Nếu proxy từ chối thì nhảy thẳng
+sang phương án C (thay "loại model" bằng "loại persona" — đã có sẵn config), **đừng đốt
+thời gian sửa**. Phương án B cũ (local staging proxy) **đã bỏ** theo quy ước
+chỉ-chạy-server-side.
+
+⚠️ **Cảnh báo khoa học phải nói trước khi chạy:** cả 5 model trong panel đều ở bậc rẻ, và
+bậc rẻ **chưa bao giờ nhạy với risk** trong toàn bộ dữ liệu đã có. E3b cần tương phản giữa
+một loại **EV-optimal** và một loại **hợp tác vô điều kiện**; panel này có thể **không có
+loại EV-optimal nào** → đường invasion phẳng, không có ngưỡng sụp, mất kết quả headline của
+**P-6**. Xem §15 mục 1.
+
+Với **E3a thì ngược lại — null cũng là kết quả tốt**: *"model không best-respond ngay cả khi
+best response là hiển nhiên (profile `carry`)"* là một claim sạch và mạnh với reviewer AAMAS.
+
+---
+
+### 7.6 E7 — miễn phí, nhưng làm tăng điểm soundness nhiều nhất
 
 Chạy hoàn toàn offline, không gọi API:
 
 - Cài 5 chính sách scripted (`always_0`, `always_2`, `always_4`, `ev_maximiser`, `conditional`)
   chạy qua **đúng engine đó** → đường tham chiếu cho mọi hình.
 - Chính sách "người": lấy phân phối đóng góp từ Milinski 2008 (đã có trong paper) → đường "human-like".
-- Mục §3: đặc trưng hoá tập cân bằng của trò chơi ngưỡng 10 vòng có rủi ro `p`.
+- **P-3**: đặc trưng hoá tập cân bằng của trò chơi ngưỡng 10 vòng có rủi ro `p`.
   Ít nhất phải nói được: (i) mọi profile đạt đúng target là Nash khi `p` đủ lớn,
   (ii) "tất cả bỏ mặc" là Nash với mọi `p` (không ai một mình cứu được nhóm),
   (iii) nghiệm EV không phải cân bằng mà là **mốc chuẩn tắc** — đúng như bản IF đã nói.
 
 ---
 
-## 6. Việc engineering (E0) — làm trước, chặn mọi thứ khác
+## 8. Việc engineering (E0) — làm trước, chặn mọi thứ khác
 
 | # | Việc | File | Ước lượng |
 |---|---|---|---|
@@ -437,7 +614,7 @@ Chạy hoàn toàn offline, không gọi API:
 | 2 | **Agent scripted.** Backend giả trả contribution theo chính sách, dùng chung interface `send_batch` → không phải sửa engine. | `crsd/models/scripted.py` (mới) | 0.5 ngày |
 | 3 | **Task server hỗ trợ nhóm hỗn hợp.** Dựng nhiều client, mỗi client một slug, POST thẳng với slug trong body. | `kaggle/benchmarks/crg_task_server.py` | 0.5 ngày |
 | 4 | **Pledge round (chỉ nếu làm E5).** Cài `agentsCommunicate`: mỗi vòng thêm 1 lượt gọi sinh 1 câu cam kết công khai, chèn vào prompt vòng sau. | `crsd/engine/round.py`, `crsd/engine/prompt.py` | 1 ngày |
-| 5 | **Script phân tích cho E1/E2.** review-response §0.4 ghi rõ: *"Chưa có script cho hai việc đó — phải viết."* | `paper/revision/` hoặc `analysis/` | 0.5 ngày |
+| 5 | **Script phân tích cho E1/E2.** Ghi chú vòng revision trước đã nêu rõ: *"Chưa có script cho hai việc đó — phải viết."* | `paper/revision/` hoặc `analysis/` | 0.5 ngày |
 | 6 | Unit test cho 1–4 | `crsd/tests/` | 0.5 ngày |
 
 **Tổng ~4 ngày công.** Đây là đường găng — bắt đầu ngay hôm nay.
@@ -448,127 +625,366 @@ chúng là khoá join với nhánh open-weight và `results/` đã có dữ li�
 
 ---
 
-## 7. Lịch 29 ngày
+## 9. Định dạng CSV mới — học theo `data_fairgame_frontier_llm`
 
-| Ngày | Việc | Đầu ra |
-|---|---|---|
-| **09–11/09** | E0 mục 1–3 + 6. **Pilot E3b 1 ván** (chốt rủi ro multi-slug). Probe lại 38 slug (`probe_all_models.py`) → chốt panel. | Engine trộn model chạy được, panel chốt |
-| **12–13/09** | E7 (baseline scripted + mục equilibrium — viết luôn §3 của paper). Phóng **E1 + E-ctrl** (batch 1). | §3 xong, 300 ván |
-| **14–16/09** | Phóng **E3a** (batch 2, 1.200 ván nhưng rẻ và nhanh). Viết §4 methods. **Đăng ký tác giả 17/09.** | Dữ liệu best-response |
-| **17–19/09** | Phân tích E3a → hình heatmap best-response. Phóng **E2 + E4** (batch 3). | §5 có hình |
-| **20–23/09** | Phóng **E3b** (batch 4, đắt nhất). Viết §5. | Dữ liệu quần thể hỗn hợp |
-| **24–26/09** | Phân tích E3b → đường invasion + ngưỡng sụp. Viết §6. **Chốt title.** | §6 có hình |
-| **27–30/09** | Phóng **E6** (batch 5). Viết §1, §2, §8. **Viết abstract.** | Draft đủ 8 trang |
-| **01/10** | ⚠️ **Nộp abstract (100–300 từ).** | |
-| **01–04/10** | E5 nếu còn thời gian, nếu không thì E8. Siết 8 trang, làm supplementary zip. | |
-| **05–07/10** | Đọc soát toàn bộ, kiểm ẩn danh, kiểm reference, kiểm mọi con số trong text khớp bảng. | |
-| **08/10** | ⚠️ **Nộp paper.** Nộp sớm 12h, đừng chờ AoE. | |
+Học cách lưu của corpus prisoner's-dilemma (`agent1_strategies`, `agent1_scores`, …) nhưng
+**fit với CRSD 6 agent**. Mục đích: dùng lại được code phân tích đã viết cho corpus PD, và
+có một data card tự mô tả để bỏ vào supplementary.
 
-**Điểm quyết định (go/no-go) 26/09:** nếu E3b không cho kết quả dùng được, chuyển sang paper
-chỉ dựa trên E3a + E4 + E1/E2 (vẫn đủ 8 trang, vẫn là paper AAMAS hợp lệ), và ghi E3b vào future work.
+### 9.1 Cây thư mục — CHỐT 10-09-2026
 
----
+```
+results/
+├── DATA_CARD.md                     <- tài liệu tự mô tả + loader chạy được
+├── PROVENANCE.json                  <- ván nào từ đâu ra
+└── <experiment>/                    <- exp_baseline, exp_nohint, exp_bestresponse, …
+    └── <p>/                         <- 0, 0.1, 0.2, … 1   (tên thư mục = con số)
+        └── <model_tag>/
+            └── p<p>_<lang>_<model_tag>.csv
+```
 
-## 8. Ngân sách
+Đường dẫn thật:
 
-Trần $170/ngày = 16 account sống × $10/account/ngày (bỏ `trnnguynchis`, chưa verify SĐT).
+```
+results/exp_baseline/0.9/anthropic-claude-haiku-4-5-20251001/p0.9_en_anthropic-claude-haiku-4-5-20251001.csv
+results/exp_bestresponse/0.5/openai-gpt-5.6-luna/p0.5_en_openai-gpt-5.6-luna.csv
+```
 
-### 8.1 $1.400 đó là tiền gì — bóc từng đồng
+**Một định dạng duy nhất: wide CSV.** Bản đầu của mục này có thêm `results/raw/` (chép
+long-format `games.csv` + `turns.jsonl`) và một tầng `results/wide/`; **cả hai đã bỏ**.
 
-Cách tính: **giá một ván = tổng giá/ván của các model trong panel × hệ số cell.**
-Panel 6 model bậc đỉnh, giá/ván đo thật ở cell EN/p=0.9:
+> ⚠️ **Đánh đổi phải biết: `results/` KHÔNG chứa reasoning và prompt.** Chúng chỉ nằm
+> trong `turns.jsonl` của thư mục shard tải về (`plan/runs/…`), và `results/` **không dựng
+> lại được** chúng. Muốn giữ corpus reasoning cho phân tích XAI về sau thì phải **backup
+> `plan/runs/` ra ngoài git**. Đổi lại: `results/` chỉ ~1,5 KB/ván nên **track trọn vào
+> git được** — 440 ván hiện tại chỉ 640 KB, so với 84 MB của bản có `raw/`.
 
-`gemini-3.1-pro` $0.61 + `claude-opus-5` $0.68 + `gpt-5.6-sol` $0.35 + `grok-r` $0.13 +
-`grok-nr` $0.02 + `flash-lite` $0.02 = **$1.81 cho một ván chạy trên cả 6 model**.
+Sinh và kiểm:
 
-Hệ số cell (đo thật trên opus-5): p=0.1 ×1.7 · p=0 ước ×1.8 · tiếng Việt ×1.45.
+```bash
+python plan/scripts/to_wide_csv.py --src plan/runs       # shard -> results/
+python plan/scripts/verify_wide.py --expect-reps 10      # exit 1 neu hong
+```
 
-| ID | Phép tính | $ | % |
-|---|---|---|---|
-| **E3b** quần thể hỗn hợp | 210 ô (k,risk,rep) × $1.20 (tổng 3 cặp) × 1.25 | **315** | 30% |
-| **E6** robustness | 60 ván/model × $1.77 (4 model) × 1.35 | **143** | 14% |
-| **E5** thể chế *(stretch)* | 90 ô × $0.74 (2 model) × **2** (pledge nhân đôi lượt gọi) × 1.25 | **150** | 14% |
-| **E2** probe EV | 30 ván/model × $1.84 (8 model) × 1.3 risk × **1.3 probe** | **93** | 9% |
-| **E3a** best-response | 200 ván/model × **$1.81 ÷ 6** × 1.4 | **85** | 8% |
-| **E1** ablation mỏ neo | 30 ván/model × $1.81 × 1.3 | **71** | 7% |
-| **E-ctrl** p = 0 và p = 1.0 | 20 ván/model × $1.81 × 1.8 | **65** | 6% |
-| **E4** staircase | 20 ván/model × $2.08 (10 model) × 1.5 | **65** | 6% |
-| **E8** thang capability | 30 ván/model × $0.70 (12 model rẻ) × 1.3 | **50** | 5% |
-| **E7** baseline scripted + equilibrium | chạy offline, 0 lượt gọi API | **0** | 0% |
-| | **Cộng** | **1.037** | |
-| | Dự phòng chạy lại 40% | 415 | |
-| | **Tổng** | **~1.450** | |
+**Quy ước bắt buộc (chép từ bài học của corpus PD):**
 
-**Vì sao gấp 10 lần cái $110 đã tiêu cho panel bậc đỉnh?** Không phải vì model đắt hơn —
-mà vì **số ván**. Panel bậc đỉnh cũ = 360 ván. Chương trình này = **~3.200 ván**, gấp 9 lần.
-Đơn giá/ván gần như y hệt. Nói cách khác: $1.400 mua **9× lượng dữ liệu**, không mua gì sang hơn.
+- Dưới `results/<experiment>/` **chỉ được có thư mục tên là số**. Loader sắp xếp bằng
+  `float(p.name)`; một file `README.md` lạc vào đó làm **vỡ cả ingest** chứ không bị bỏ
+  qua. Đó là lý do `DATA_CARD.md` và `PROVENANCE.json` nằm ở gốc `results/`.
+- `<p>` trong tên thư mục và trong tên file là **cùng một chuỗi literal** — `0.9` chứ không
+  phải `0.90`, `1` chứ không phải `1.0`, `0` chứ không phải `0.0`.
+- `<model_tag>` **lặp lại nguyên văn** trong tên file, và với thí nghiệm đồng nhất thì
+  **bằng đúng giá trị trong ô `agent1_llm`**. `verify_wide.py` kiểm bất biến này.
+- Thí nghiệm **dị thể** (E3a, E3b) không có một model duy nhất → `<model_tag>` thành
+  `mix__<tagA>__<tagB>__k<k>` (E3b) hoặc chính là model đang được đo (E3a — các ghế
+  scripted ghi rõ trong `agent{i}_llm`, vd `scripted:always_4`).
 
-**Độ tin của con số:** giá của 4 model đắt (chiếm ~85% chi phí) là **đo thật** trên 37 shard
-đã chạy. Giá của model rẻ lấy từ [model-availability.md](model-availability.md), file đó tự
-khai sai số **±3×** — nhưng chúng chỉ chiếm ~5% nên không lệch tổng. Sai số thực tế của
-tổng: khoảng **±30%**.
+### 9.2 Schema — 82 cột
 
-### 8.2 Ba mức ngân sách — chọn một
+**Khối A — định danh ván & thiết kế (12 cột)**
 
-Không bắt buộc tiêu hết. Paper AAMAS hợp lệ chỉ cần **mức Core**:
-
-| Mức | Gồm | Base | +40% dự phòng | Được gì |
+| # | cột | dtype | miền | nghĩa |
 |---|---|---|---|---|
-| **Core** | E7 + E3a + E1 + E-ctrl(chỉ p=0) + E2(5 rep) + E3b **1 cặp** | **$320** | **$450** | Đủ 8 trang, đủ 3 đóng góp, bịt hết 5 lỗ chí mạng ở §3.1 |
-| **Strong** ⭐ | Core + E3b đủ 3 cặp + E4 + E6 | **$700** | **$980** | Thêm phép đo `p*`/CRRA và chống được câu "artifact của prompt" |
-| **Full** | Strong + E8 + E5 | **$1.037** | **$1.450** | Thêm thang capability và nhánh thể chế |
+| 1 | `game_id` | str | duy nhất trong file | định danh ván; ở data nhập lại nó mã hoá cả game config/model/lang/rep |
+| 2 | `experiment` | str | `exp_baseline`, `exp_nohint`, `exp_bestresponse`, `exp_mixed`, … | tên thí nghiệm |
+| 3 | `language` | str | `en` | bằng token `<lang>` trong tên file |
+| 4 | `rep` | int | 0 … 19 | lần lặp — **khoá join với ô đối chứng baseline** |
+| 5 | `seed` | int | | seed tái lập |
+| 6 | `persona_set` | str | `personas_default`, … | file persona đã dùng |
+| 7 | `persona_seats` | str | 6 ký tự, vd `NNNNNN`, `SSCCCC` | tính cách theo **ghế thực tế** sau khi hoán vị |
+| 8 | `memory_mode` | str | `full_history` | |
+| 9 | `opponent_profile` | str | `all_defect`/`all_coop`/`carry`/`conditional`/`""` | chỉ E3a |
+| 10 | `framing` | 0/1 | | có framing khí hậu không |
+| 11 | `risk_framing` | str | `lottery` / `plain` | cách nêu rủi ro |
+| 12 | `show_computed_totals` | 0/1 | | prompt có đưa sẵn tổng tính trước không |
 
-**Khuyến nghị: chạy Core trước (tuần 1–2), xem kết quả, rồi mới quyết lên Strong.**
-E3a và E1 xong là biết paper có đứng được không. Nếu E3a ra kết quả mạnh thì nâng lên Strong
-là đáng; nếu yếu thì $980 kia không cứu được gì, và nên dừng ở Core rồi dồn thời gian vào viết.
+**Khối B — luật chơi (9 cột).** Giữ nguyên tên slot của FAIRGAME để schema tương thích.
 
-Cần **≥ 3 ngày chạy đầy tải cho Core**, ≥ 6 ngày cho Strong. Kế hoạch có 12 ngày chạy → dư
-rộng ở mọi mức. **Tiền không phải nút thắt; thời gian viết mới là.**
+| # | cột | dtype | miền | nghĩa |
+|---|---|---|---|---|
+| 13 | `n_players` | int | 6 | |
+| 14 | `endowment` | int | 40 | |
+| 15 | `contribution_options` | str | `"[0, 2, 4]"` | |
+| 16 | `target` | int | 120 | |
+| 17 | `risk_probability` | float | 0 … 1 | bằng `<p>` trong đường dẫn |
+| 18 | `n_rounds_is_known` | bool | `True` | prompt có nói trước số vòng |
+| 19 | `max_rounds` | int | 10 | |
+| 20 | `played_rounds` | int | 10 | phải bằng `max_rounds`; khác đi = ván đứt |
+| 21 | `agents_communicate` | bool | `False` (`True` ở E5) | có vòng pledge không |
 
-**Nút thắt thật là orchestration:**
-- `kaggle b t push` bị **từ chối im lặng** (rc=1, output rỗng, 3 giây) nếu version trước còn
-  đang validate → **tối đa 3 push đồng thời**, phải chờ + retry. Dùng mô hình 2 pha của
-  `stage_day_b.py`, đừng phóng kiểu Ngày A.
-- Push mất ~26 phút cho 8 shard; run 8 shard × 10 ván mất ~105 phút.
-- Ước tính: 5 batch × (0.5h push + 2–3h run) ≈ **20 giờ wall-clock**, chạy đêm được.
+**Khối C — kết cục nhóm (7 cột).** Phần này **không có trong corpus PD** — đặc thù CRSD.
 
-**Ba sự thật đắt tiền** (chép lại từ [README.md](README.md), đừng phát hiện lại):
-1. Local (`mp-staging`) phục vụ 6/38 model, server-side phục vụ 28/38 → **503 ở local không có
-   nghĩa model chết**. Hệ quả: **mọi ván phải chạy server-side**, local chỉ để probe.
-2. **503 là lỗi phía Kaggle, không phải hết quota** — đã kiểm bằng 3 account cho ra cùng tập 503.
-   Đổi account vô ích.
-3. **Proxy đặt cọc theo `max_output_tokens`**, không theo token thực tiêu → không cap thì model
-   đắt bị 403 dù thực tế tốn vài xu.
+| # | cột | dtype | miền | nghĩa |
+|---|---|---|---|---|
+| 22 | `group_contributions` | str→list | dài đúng 10 | tổng đóng góp cả nhóm **từng vòng** |
+| 23 | `pot_cumulative` | str→list | dài đúng 10, không giảm | quỹ chung tích luỹ sau mỗi vòng |
+| 24 | `group_total` | float | | `pot_cumulative[-1]` |
+| 25 | `target_reached` | 0/1 | | `group_total >= target` |
+| 26 | `catastrophe` | 0/1 | | kết quả xổ số cấp nhóm (chỉ xổ khi trượt target) |
+| 27 | `mean_payoff` | float | | trung bình payoff 6 ghế |
+| 28 | `n_parse_failures` | int | | tổng số lượt parse hỏng cả ván — **cổng QA** |
 
----
+**Khối D — mỗi agent i = 1…6, 9 cột × 6 = 54 cột**
 
-## 9. Sổ rủi ro
-
-| Rủi ro | Xác suất | Ảnh hưởng | Xử lý |
+| cột | dtype | miền | nghĩa |
 |---|---|---|---|
-| **Proxy từ chối slug ≠ model đã chọn** → E3b bất khả thi | Trung bình | Cao | Pilot ngày 1. Phương án C (persona) — phương án B (local proxy) đã bỏ vì quy ước chỉ-chạy-server-side. Paper vẫn đứng được nhờ E3a. |
-| **Bị nghi trùng nộp với bản IF** | Thấp nếu làm đúng §2 | **Desk reject** | ≥70% kết quả mới; khai báo overlap trong Related Work; không dùng lại claim trung tâm |
-| **Model chết giữa chừng** (3 lab Trung Quốc đã 503 sạch) | Cao | Trung bình | Probe lại ngày 1, **chốt panel trước 20/09**, không đổi panel sau đó |
-| **Không kịp 8 trang** | Trung bình | Cao | Cắt §7 (E5) trước; sau đó dồn ngôn ngữ + comprehension xuống supplementary |
-| **E3a ra kết quả null** (LLM không phản ứng với đối thủ) | Thấp | Trung bình | Null **cũng là kết quả tốt** ở đây: *"LLM agent không best-respond ngay cả khi best response là hiển nhiên"* — mạnh hơn cả kết quả dương với reviewer AAMAS |
-| **Đường dẫn Windows 260 ký tự làm hỏng download** | Đã từng xảy ra | Trung bình | Dùng `redownload_all.py`; **đừng chạy lại run**, data vẫn còn trên server |
-| **Tiến trình mồ côi** — TaskStop/Ctrl-C chỉ giết shell cha | Đã từng xảy ra | Trung bình | Quét `Get-CimInstance Win32_Process` trước mỗi lần phóng (lệnh ở README.md) |
-| **Lưới risk mới làm chết cả loạt shard** | Đã từng xảy ra ở Q8 | Cao | E-ctrl có p = 0 và 1.0 → **chạy 1 shard 1 ván ở mức mới trước**. Pha push KHÔNG bắt được lỗi này. |
+| `agent{i}_name` | str | `Player_1` … `Player_6` | định danh trong prompt |
+| `agent{i}_llm` | str | slug model, hoặc `scripted:always_4` | **model/chính sách thật cầm ghế này** |
+| `agent{i}_personality` | str | `neutral` / `cooperative` / `selfish` | tính cách của ghế (lấy từ `disposition`) |
+| `agent{i}_knows_opponent_with_prob` | int | 0 | slot FAIRGAME, giữ để tương thích |
+| `agent{i}_strategies` | str→list | dài đúng 10, phần tử ∈ {0,2,4} | **đóng góp từng vòng** ← tương ứng `agent1_strategies` của PD |
+| `agent{i}_scores` | str→list | dài đúng 10, không tăng | **tài khoản riêng còn lại sau mỗi vòng** = `endowment − cumsum(strategies)` |
+| `agent{i}_messages` | str→list | `[]` (câu pledge ở E5) | |
+| `agent{i}_payoff` | float | | payoff cuối **sau xổ số**: `0` nếu `catastrophe`, ngược lại `scores[-1]` |
+| `agent{i}_parse_failures` | int | | số vòng parse hỏng của riêng ghế này |
+
+### 9.3 Ghi chú quan trọng về `agent{i}_scores`
+
+Trong corpus PD, `agent1_scores[t]` là **penalty vòng t**, và nó phụ thuộc nước đi của đối
+thủ nên **không** suy ra được từ `agent1_strategies`. Trong CRSD **không tồn tại payoff
+theo vòng**: tiền chỉ kết toán một lần ở cuối, sau xổ số cấp nhóm.
+
+Nên `agent{i}_scores` ở đây được định nghĩa là **tài khoản riêng còn lại sau mỗi vòng**
+(`endowment − cumsum(contributions)`). Nó **là hàm tất định của `strategies`** — cố ý như
+vậy, để **code loader dùng chung được với corpus PD**: cùng `ast.literal_eval`, cùng ra
+list 10 số cùng đơn vị tiền, cùng vẽ được đường quỹ đạo. Phần "phụ thuộc người khác" — thứ
+mà cột `scores` của PD mang — ở CRSD nằm ở **cấp nhóm**, trong `pot_cumulative`.
+
+### 9.4 Parse các cột list
+
+Giống PD: **Python literal dấu nháy đơn, KHÔNG phải JSON.**
+
+```python
+import ast
+contribs = ast.literal_eval(row["agent1_strategies"])   # [4, 2, 0, ...]
+account  = ast.literal_eval(row["agent1_scores"])       # [36, 34, 34, ...]
+pot      = ast.literal_eval(row["pot_cumulative"])      # [12, 22, ...]
+```
+
+### 9.5 Bất biến phải kiểm trong QA (`verify_wide.py`)
+
+- Mọi cột list dài **đúng 10**.
+- `sum(agent{i}_strategies for i in 1..6)` từng vòng **bằng** `group_contributions`.
+- `pot_cumulative == cumsum(group_contributions)`.
+- `group_total == pot_cumulative[-1]`; `target_reached == (group_total >= target)`.
+- `catastrophe == 0` bất cứ khi nào `target_reached == 1` (xổ số chỉ diễn ra khi trượt).
+- `agent{i}_payoff == 0 if catastrophe else agent{i}_scores[-1]`.
+- `n_parse_failures == 0` **và** `usage_output_tokens / n_decisions < 0.6 × max_out`
+  — cổng thứ hai bắt được lỗi cắt-output mà cổng thứ nhất bỏ lọt (xem §5).
+- `model_tag` trong đường dẫn khớp `agent1_llm` (chỉ với thí nghiệm đồng nhất).
+- Phủ đủ cell: mọi (p, model, rep) trong thiết kế đều có đúng 1 dòng.
+- 🚨 **CỔNG CẮT-OUTPUT (§7.0) — kiểm TỪNG LƯỢT, không phải trung bình:** mọi
+  `raw_response` trong `turns.jsonl` phải chứa `CONTRIBUTION:`. Thiếu = quyết định
+  bịa do output bị cắt, và `parse_failed` KHÔNG bắt được. Đã làm hỏng 39,5% số ván
+  qwen trong data cũ. Chỉ số trung bình `usage_output_tokens / n_decisions` là cổng
+  **phụ**, không thay thế được cổng này.
+- 🚨 **CỔNG NGÔN NGỮ (§5.1):** `set(df.language) == {"en"}`. Một dòng khác `en` là
+  exit 1 — bắt trường hợp quên `--langs` khi phóng shard.
+- 🚨 **CỔNG CÂN BẰNG (§7):** trong mỗi experiment, `groupby(model).size()` phải cho ra
+  **đúng một giá trị duy nhất** cho cả 5 model. Với E3b thì đếm theo số ván model đó có
+  mặt (`agent{i}_llm` chứa model đó ở ít nhất một ghế) — cũng phải bằng nhau cả 5.
+  Lệch một ván cũng exit 1: đây là cổng bắt việc "shard model đắt chết mà quên chạy lại",
+  loại lỗi âm thầm biến chênh lệch ngân sách thành chênh lệch kết quả.
+
+### 9.6 Việc phải code (thuộc §8)
+
+| File | Việc |
+|---|---|
+| ✅ `crsd/dataio/wide_csv.py` | `game_to_wide_row()` → dict 82 cột. **Xong 10-09-2026** |
+| ✅ `plan/scripts/to_wide_csv.py` | shard (`--src plan/runs`) → thẳng `results/<exp>/<p>/<model>/`. **Xong**, gộp nhiều shard, báo lỗi nếu hai run tranh cùng khoá `rep` |
+| ✅ `plan/scripts/verify_wide.py` | Kiểm bất biến §9.5, exit 1 nếu hỏng. **Xong** — đã test âm tính (gài 5 lỗi, bắt cả 5) |
+| ✅ `results/DATA_CARD.md` | Data card tự mô tả + loader chạy được. **Xong** |
+| ✅ **Bẫy parse cắt-output** | `crg_task_server.py`: `_hit_output_cap()` + retry khi bị cắt + nâng cap ×4 (trần 8000) + ép `parse_failed` nếu không cứu được. **Xong 10-09-2026**, 5 test hồi quy. Đây là lỗi đã huỷ 39,5% ván qwen (§7.0) |
+| ✅ `plan/scripts/import_legacy_b.py` | Nhập lưới risk B từ `Legacy_Results/` (§7.0). **Xong** — 440 ván (640 KB) đã vào `results/`, qua hết cổng kiểm |
+| ⚠️ `plan/scripts/merge_shards.py` | **Đã bị thay thế** bởi `to_wide_csv.py` — nó ghi layout CŨ (`results/frontier/<model>/<exp>/games.csv`). Đừng dùng cho vòng chạy này |
+
+**Không sửa** `crsd/dataio/recorder.py`, không đổi schema `games.csv` / `turns.jsonl` —
+engine vẫn ghi long-format như cũ vào thư mục shard. `results/` là **phép chiếu** của
+chúng, sinh lại được bất cứ lúc nào miễn là còn giữ thư mục shard.
 
 ---
 
-## 10. Checklist chống reviewer
+## 10. Hình dạng shard chuẩn
+
+**1 shard = 1 model × 1 cell × N ván**, luôn ≤ $5.
+
+> ⚠️ **Bảng dưới đây KHÔNG phải số ván của model.** Nó là **kích thước gói**: model đắt
+> đóng gói nhỏ hơn để mỗi shard vẫn ≤ $5. Tổng số ván thì **y hệt nhau cho cả 5 model**
+> (§7) — `claude-haiku-4-5` chỉ đơn giản là cần **nhiều shard hơn** để chạy hết đúng
+> chừng ấy ván. Đừng đọc "30" ở hàng haiku thành "haiku chạy ít hơn".
+
+| Model | N ván / shard | $/shard | Số shard cho 140 ván của lưới B | Shard/account/ngày |
+|---|---|---|---|---|
+| `claude-haiku-4-5` | 30 | 3,75 | **5** | 2 |
+| `gpt-5.6-luna` | 40 | 2,92 | **4** | 3 |
+| `gemini-3.5-flash-lite` | 40 | 1,36 | **4** | 5+ |
+| `grok-4.20-non-reasoning` | 40 | 0,92 | **4** | 5+ |
+| `qwen3-235b` | 40 | 0,76 | **4** | 5+ |
+| | | | **cùng 140 ván** | |
+
+Cờ bắt buộc mỗi lần phóng:
+
+```bash
+python plan/scripts/launch_shard.py \
+  --account <tên account> --model <slug> \
+  --risk 0.9 --lang en --reps 20 \
+  --max-out 3000 --concurrency 4
+```
+
+- `--concurrency 4` là **đòn bẩy wall-clock miễn phí**: song song hoá 6 ghế trong một
+  vòng, output **byte-identical** với đường tuần tự, **không đổi chi phí**. Đo thật:
+  626,5s → 207,5s (3,0×).
+- `--max-out 3000` cho mọi model không có "reasoning hint" — xem §5.
+
+---
+
+## 11. Lịch theo ngày
+
+Nhịp mỗi ngày: **sáng phóng (có người trông, vì push hay hỏng im lặng) → ngày chạy →
+tối tải + merge + QA → đêm phân tích/viết.**
+
+### Tuần 0 — Engineering (10–12/09) · ~$4
+
+| Ngày | Chạy | $ | Viết / phân tích | Đầu ra |
+|---|---|---|---|---|
+| **10/09** | ✅ Probe 23 account (`probe_accounts.py`) → **19 sống**. ✅ Sửa bẫy parse cắt-output (§8). ✅ Nhập lưới B 440 ván. ✅ Phóng 4 shard qwen. | 2 | — | 19 account sống; `--max-out 3000` + retry-khi-bị-cắt đã vào code |
+| **11/09** | **Pilot multi-slug: 1 ván, 6 ghế, 2 slug.** Đây là go/no-go của E3b. | 0,5 | — | Biết E3b khả thi hay phải sang phương án C |
+| **12/09** | **Wave B-qwen**: chạy lại `qwen3-235b` trên **cả 11 mức risk × 10 rep** = 110 ván, ~3 shard, **`--max-out 3000`**. Bốn model kia lấy thẳng từ data cũ (§7.0) | 2 | **E7 offline**: 5 chính sách scripted + đặc trưng hoá cân bằng → **viết luôn §7 của paper** | `wide_csv.py`, `to_wide_csv.py`, `verify_wide.py`, `DATA_CARD.md`; §7 xong |
+
+> E0 phần còn lại (`modelsPerSeat`, `crsd/models/scripted.py`, unit test) chạy song song cả
+> 3 ngày. Đây là **đường găng** — mọi thứ khác chờ nó.
+
+### Tuần 1 — Đo (13–19/09) · ~$44
+
+| Ngày | Chạy | $ | Viết / phân tích | Đầu ra |
+|---|---|---|---|---|
+| **13/09** | *(trống — B đã xong)* Dùng ngày này chạy sớm **Wave E1** = 3 risk × 5 model × 10 rep | 8 | Gom 110 ván qwen mới vào `results/` (440 ván kia đã nhập 10/09), chạy `verify_wide.py` | Lưới risk đủ **550 ván** |
+| **14/09** | **Wave E2** (EV probe) = 3 risk × 5 model × 10 rep | 11 | Phân tích B → **Fig 1: đường phản ứng rủi ro 11 điểm** cho 5 model | Fig 1 |
+| **15/09** | Fill cell thiếu + đệm | 3 | Phân tích E1 → mỏ neo equal-split có thật là mỏ neo không | Bảng ablation |
+| **16/09** | **Wave E3a-1**: profile `all_defect` + `all_coop`, 10 shard × 100 ván | 5 | Viết **P-4** (methods) | |
+| **17/09** | ⚠️ **ĐĂNG KÝ TÁC GIẢ — HẠN HÔM NAY.** **Wave E3a-2**: `carry` + `conditional`, 10 shard × 100 ván | 4 | | Đã đăng ký (không ràng buộc phải nộp) |
+| **18/09** | Fill cell thiếu | 3 | **Phân tích E3a → Fig 2 heatmap best-response, Fig 3 khoảng cách tới best response** | Fig 2, 3 |
+| **19/09** | **Wave E3b-pilot**: 1 cặp × 1 risk × k ∈ {1…5} × 5 rep — kiểm engine trộn model chạy đúng ở mọi k | 4 | Chốt thứ tự chạy 10 cặp (chỉ là thứ tự — **cả 10 cặp đều chạy**, không chọn lọc) | Pilot xanh |
+
+> ⚠️ **Điểm quyết định 18/09:** kết quả E3a cho biết **P-5** mạnh tới đâu, và do đó **P-6** có thật
+> sự cần model đối cực EV-optimal hay không. Đây là lúc trả lời §15 mục 1.
+
+### Tuần 2 — Quần thể hỗn hợp (20–26/09) · ~$110
+
+E3b round-robin **đủ 10 cặp** (§7.4), mỗi cặp 5 k × 3 risk × 10 rep = 150 ván.
+Chia 3 ngày, ~$28/ngày ≈ $2/account — ngày tiêu nhiều nhất của cả kế hoạch.
+**Chạy đủ cả 10 cặp** — không cắt cặp đắt để tiết kiệm, đó chính là bias theo giá.
+
+| Ngày | Chạy | $ | Viết / phân tích | Đầu ra |
+|---|---|---|---|---|
+| **20/09** | **Wave E3b-1**: cặp 1–4 (600 ván) — chia shard theo giá cặp, ≤$5/shard | 28 | Viết **P-5** (best-response) | P-5 nháp |
+| **21/09** | **Wave E3b-2**: cặp 5–7 (450 ván) | 28 | Viết P-5 tiếp; QA wave 1 | |
+| **22/09** | **Wave E3b-3**: cặp 8–10 (450 ván) | 26 | Merge + QA wave 2 | |
+| **23/09** | Fill cell thiếu E3b — **chạy tới khi cổng cân bằng §9.5 xanh**, không dừng sớm vì tiếc tiền | 12 | Viết **P-3**, **P-4** hoàn chỉnh | Ma trận 5×5 đủ ô; P-3, P-4 xong |
+| **24/09** | — | 0 | **Phân tích E3b → Fig 4 ma trận bóc lột 5×5, Fig 5 đường invasion + ngưỡng sụp + welfare nhóm** | Fig 4, 5 |
+| **25/09** | — | 0 | Viết **P-6**. **Chốt title.** | P-6 nháp |
+| **26/09** | ⚠️ **GO/NO-GO:** nếu E3b không cho kết quả dùng được → **cắt P-6**, dồn vào P-5 + B, ghi E3b vào future work. **Wave E6**: 2 risk × 3 điều kiện × 10 rep | 16 | | Quyết định ghi vào plan |
+
+### Tuần 3 — Viết (27/09–03/10) · ~$60
+
+| Ngày | Chạy | $ | Viết / phân tích | Đầu ra |
+|---|---|---|---|---|
+| **27/09** | — | 0 | Phân tích E6 → bảng robustness. Viết **P-1**, **P-2** | P-1, P-2 nháp |
+| **28/09** | **Wave E5 (stretch)** — cả 5 model, 90 ván/model. Chỉ chạy nếu **P-6** đã chắc và còn thời gian; nếu không thì **bỏ HẲN cả thí nghiệm** — không chạy phiên bản rút gọn 2 model | 49 | Viết **P-7**, **P-8** | |
+| **29/09** | — | 0 | **Ráp full draft 8 trang.** Kiểm tràn trang | Draft v1 |
+| **30/09** | — | 0 | Viết abstract (100–300 từ). Đọc soát toàn văn | Abstract |
+| **01/10** | ⚠️ **NỘP ABSTRACT** | 0 | | Đã nộp |
+| **02/10** | Fill mọi cell còn thiếu, rerun shard hỏng | 8 | Siết bảng/hình | |
+| **03/10** | Dự phòng chạy | 3 | Sinh lại toàn bộ bảng bằng script `\input` | |
+
+### Tuần 4 — Nộp (04–08/10) · $0
+
+| Ngày | Việc |
+|---|---|
+| **04/10** | Supplementary zip ≤ 25MB: cả cây `results/` (640 KB, thừa sức) + prompt + config + seed. Repo ẩn danh |
+| **05/10** | Soát **ẩn danh**: không tên tác giả, không tên account Kaggle, không link lộ danh tính; trích bản Interface Focus ở **ngôi thứ ba** |
+| **06/10** | Soát reference; **kiểm mọi con số trong text khớp bảng** (sinh bảng bằng script, không gõ tay) |
+| **07/10** | Dự phòng — giả định sẽ cần |
+| **08/10** | ⚠️ **NỘP PAPER.** Nộp sớm ≥ 12 tiếng, đừng chờ AoE |
+
+**Tổng chi tiêu dự kiến: ~$210** trên 28 ngày — bằng $181 của bảng §7 cộng ~$29
+đã cấp sẵn cho các ngày fill/rerun (18/09, 19/09, 23/09, 02–03/10).
+Trần cấp phát trong cùng kỳ: ~$4.200. **Dùng ~12–15%.**
+
+Ngày tiêu nhiều nhất là 28/09 (E5, $49) và 20–22/09 (E3b, ~$28/ngày ≈ $2/account) — xa trần
+$10/account. **Không ngày nào bị ngân sách chặn, nên không ngày nào có cớ cắt bớt ván
+của model đắt.**
+
+---
+
+## 12. Luật orchestration — chép ra dán lên tường
+
+1. **Quét tiến trình mồ côi TRƯỚC mỗi lần phóng.** `TaskStop`/Ctrl-C chỉ giết shell cha;
+   `launch_shard.py` con vẫn sống và vẫn push → xung đột version.
+   ```powershell
+   Get-CimInstance Win32_Process -Filter "Name like '%python%'" |
+     Where-Object { $_.CommandLine -match 'launch_shard|launch_day|stage_day' } |
+     ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+   ```
+2. **Push tối đa 3 shard đồng thời, và phải chờ `status` idle.** `kaggle b t push` bị
+   **từ chối im lặng** (rc=1, output RỖNG, ~3 giây) nếu version trước còn validate. Không
+   có thông báo lỗi nào — rất dễ chẩn đoán nhầm thành 429/quota. Dấu hiệu phân biệt:
+   **fail sau đúng ~3 giây** = bị từ chối ngay (validate thật mất vài phút).
+   Bước `run` thì phóng song song thoải mái.
+3. **Trần TỔNG số request đồng thời vào MỘT model: ~8.** Đo thật 10-09-2026 trên
+   `qwen3-235b-a22b-instruct-2507`: 4 shard × `--concurrency 4` = **16 request đồng thời
+   → bão 429 "model is currently experiencing heavy load"**, 2/4 shard chết sau 72 giây
+   (6 lần backoff 2/4/8/16/30s đều 429). Ngay khi 2 shard chết, 2 shard còn lại (8 đồng
+   thời) chạy sạch **0 lần 429**. Con số cần canh là **shard song song × concurrency**,
+   không phải riêng từng cái. Thiệt hại **$0** — 429 xảy ra trước khi tính tiền, nên đây
+   là lỗi rẻ, chỉ tốn wall-clock.
+4. **1 shard / account / lần.** Tiền cọc **cộng dồn** khi chạy song song trên cùng account
+   → 403 dù thực tế chưa tiêu gì.
+5. **"Còn quota" ≠ "đủ cho shard của bạn".** Probe cap-6000 chỉ đặt cọc $0,015 nên account
+   còn $0,02 vẫn báo xanh — đã mất 3 shard vì tin nó. **Cách đúng: cộng
+   `usage_total_cost_usd` của các shard đã chạy trên account đó rồi lấy $10 trừ đi.**
+6. **503 là lỗi phía Kaggle, không phải hết quota** — đã kiểm bằng 3 account cho ra đúng
+   cùng tập 503. **Đổi account vô ích**, chờ rồi thử lại.
+7. **Đường dẫn Windows 260 ký tự làm hỏng download** — run vẫn thành công, tiền đã tốn,
+   data vẫn nằm trên server. Dùng `redownload_all.py`, **đừng chạy lại run**.
+8. **Artifact `.task.json` / `.run.json`**: `cd kaggle/benchmarks/artifacts` rồi mới chạy —
+   kbench ghi ra CWD chứ không ghi cạnh file task.
+9. **Mọi ván phải chạy server-side.** Local chỉ để probe, và kết quả probe **không bao giờ**
+   được ghi vào `results/`.
+
+---
+
+---
+
+# PHẦN III — TRƯỚC KHI NỘP
+
+## 13. Sổ rủi ro + cổng kiểm
+
+| Rủi ro | Cổng bắt nó | Xử lý |
+|---|---|---|
+| **Output haiku bị cắt → dữ liệu bịa mà `parse_failed=0`** | `usage_output_tokens / n_decisions < 0.6 × cap`, kiểm sau **mỗi** run | Nâng `--max-out 3000`, gần như miễn phí |
+| **Proxy từ chối slug ≠ model đã chọn → E3b bất khả thi** | Pilot 11/09 | Phương án C (loại persona thay loại model). **P-5** vẫn đứng nhờ E3a |
+| **Mức risk mới giết cả loạt shard ở pha `run`** (đã xảy ra ở Q8; pha `push` KHÔNG bắt được) | 1 shard 1 ván ở mỗi p mới, 12/09 | Sửa mapping rồi mới phóng wave |
+| **Panel toàn bậc rẻ → trục risk null sạch, E3b mất headline** | Kết quả B ngày 14/09 + E3a ngày 18/09 | §15 mục 1 — cần bạn duyệt |
+| **Model chết giữa chừng** (3 lab Trung Quốc đã 503 sạch một lần) | Probe đầu mỗi ngày chạy lớn | **Chốt panel trước 20/09**, sau đó không đổi |
+| **Sức khoẻ account trôi** (mất 2/17 trong 4 tuần) | Probe đầu ngày | Bỏ `trnnguynchis`, `chiboiz`, `chinguyentran` |
+| **Bị nghi trùng nộp với bản Interface Focus** | Checklist trước khi nộp | ≥70% kết quả mới; khai báo overlap trong Related Work; **trục ngôn ngữ ở lại hẳn bên bản IF** |
+| **Không kịp 8 trang** | Ráp draft 29/09 | Cắt **P-7** (E5) trước, luôn luôn |
+
+---
+
+## 14. Checklist chống reviewer
 
 Trước khi nộp, mỗi dòng phải trả lời được bằng một chỗ cụ thể trong paper:
 
-- [ ] *"Đây có phải multiagent system không, hay chỉ là một model tự nói chuyện với chính nó?"* → §5, §6
-- [ ] *"Cân bằng của trò chơi là gì?"* → §3
+- [ ] *"Đây có phải multiagent system không, hay chỉ là một model tự nói chuyện với chính nó?"* → **P-5**, **P-6**
+- [ ] *"Cân bằng của trò chơi là gì?"* → **P-3**
 - [ ] *"So với baseline nào?"* → E7, 5 chính sách scripted trên mọi hình
 - [ ] *"Hợp tác hay chỉ là tuân theo focal point prompt đã cho?"* → E1 + profile `carry` của E3a
 - [ ] *"Model có thật sự tính EV không?"* → E2
 - [ ] *"Có phải artifact của prompt/decoding không?"* → E6
-- [ ] *"n = 10 ván có đủ không?"* → nâng lên 20 ở cell trục chính, permutation test, khai báo cluster
-- [ ] *"Có tái lập được không?"* → repo ẩn danh + prompt + seed + config trong supplementary
+- [ ] *"n = 10 ván có đủ không?"* → **n = 10 là lựa chọn đã chốt**; trả lời bằng permutation/exact test, khai báo cluster theo ván, CI bootstrap — **không** bằng cỡ mẫu
+- [ ] *"Có tái lập được không?"* → repo ẩn danh + prompt + seed + config trong supplementary. ⚠️ **Nói cho đúng:** seed tái lập được RNG cấp game (xổ số, hoán vị), **KHÔNG** tái lập được văn bản model — đo thật 57% ô cho kết quả khác khi chạy lại (CLAUDE.md). Đừng hứa quá.
 - [ ] *"Khác gì paper [ref IF]?"* → một đoạn tường minh trong Related Work
 - [ ] Kiểm ẩn danh: không tên tác giả, không tên account Kaggle, không link repo lộ danh tính,
       trích `2512.07462` và bản IF ở **ngôi thứ ba**
@@ -576,32 +992,56 @@ Trước khi nộp, mỗi dòng phải trả lời được bằng một chỗ c
 
 ---
 
-## 11. Cần bạn quyết
+## 15. Cần bạn quyết — ba cách dùng phần credit đang bỏ phí
 
-1. ✅ **Hướng paper — CHỐT 09-09-2026:** best-response + quần thể hỗn hợp (§4).
-2. ✅ **Bản Interface Focus CHƯA nộp** (09-09-2026) → mở ra quyền chia lại vật liệu, xem [§2.1](#21-vì-chưa-nộp-if-ta-được-quyền-chia-lại-vật-liệu).
-   **Còn phải quyết:** Q8 để ở bản IF hay chuyển sang AAMAS. Hạn chốt 20/09.
-3. ✅ **Panel KHOÁ ở 5 model** (09-09-2026), chỉ tiếng Anh, **Core $83**. Mọi mở rộng phải hỏi.
-   Ba mức ngân sách cũ ở [§8.2](#82-ba-mức-ngân-sách--chọn-một) chỉ còn giá trị tham chiếu.
-   **Còn phải quyết:** có thêm `gemini-3.1-pro` làm đối cực EV-optimal không ([§5.0.2](#502--một-cảnh-báo-phải-nói-trước-khi-chạy)) — nên quyết cùng lúc với kết quả E3a.
-4. **E5 (pledge/thể chế) có làm không?** Thêm ~1 ngày code + $130. Tôi khuyên: **để stretch**,
-   quyết lại vào 01/10.
-5. **Ai viết?** Nếu tôi viết draft thì cần bạn chốt title + abstract trước 25/09 để còn kịp
+Chương trình ở §7 dùng ~7% credit được cấp. Ba cách tiêu phần còn lại, xếp theo **giá trị
+khoa học trên mỗi đô**. **Tôi không chạy cái nào cho tới khi bạn duyệt.**
+
+| # | Đề xuất | $ thêm | Được gì | Rủi ro nếu KHÔNG làm |
+|---|---|---|---|---|
+| **1** | **Thêm `gemini-3.1-pro-preview` làm đối cực EV-optimal** ($0,61/ván). Chạy B + E3a + 1 cặp E3b trên nó | **+273** | Đây là model EV-optimal **duy nhất còn lại** trong catalog sau khi `gpt-5.6-sol` bị gỡ. Không có nó, E3b không có tương phản "duy lý vs hợp tác vô điều kiện" → **đường invasion phẳng, §11 mất kết quả headline** | Paper phải dựa hoàn toàn vào §10 (best-response). Vẫn hợp lệ, nhưng yếu hơn hẳn |
+| **2** | **Thang năng lực cùng nhà Anthropic**: thêm `claude-sonnet-5-default` ($0,359) + `claude-opus-5` ($0,682), chạy lưới B | **+146** | Trả lời "độ nhạy rủi ro có tăng theo năng lực không, trong cùng một họ model" — câu reviewer hay hỏi. Đây là thang 3 nấc **sạch nhất** còn lại | Không có trục capability; §13 chỉ nói được "chúng tôi chưa kiểm" |
+| **3** | **Nâng n từ 10 lên 24** ở lưới B và E3b | **+95** | Khoảng tin cậy hẹp ~35%; B thì **miễn phí** vì data cũ đã có sẵn tới 24 rep (§7.0) | Ở n=10 câu "cỡ mẫu có đủ không" phải trả lời hoàn toàn bằng permutation test |
+
+> ⚖️ **Mọi mở rộng ở đây đều phải tuân luật cân bằng (§7).** Model thêm vào chạy
+> **đúng cùng lưới, cùng n** với 5 model hiện có — không có chuyện "chạy ít ván hơn
+> vì nó đắt". Con số $ trong bảng đã tính theo n đầy đủ. Nếu ngân sách không kham
+> nổi n đầy đủ cho một model, thì **không thêm model đó**, chứ không hạ n của nó.
+>
+> Riêng mục 1: thêm `gemini-3.1-pro-preview` làm model thứ 6 thì E3b thành
+> C(6,2) = **15 cặp**, mỗi model có mặt ở 5 cặp — vẫn tự động cân bằng, nhưng chi phí
+> E3b nhảy lên ~$663 (+$499). Con số +$273 trong bảng là phương án gọn hơn: chạy nó ở B, E3a,
+> và **4 cặp E3b có mặt của nó**, ghi rõ trong paper rằng ma trận E3b đầy đủ 5×5 còn
+> model thứ 6 chỉ có hàng/cột của riêng nó.
+
+**Khuyến nghị: mục 1, quyết vào 18/09** — đúng lúc có kết quả E3a, vì lúc đó mới biết **P-5**
+mạnh tới đâu và **P-6** có thật sự cần thiết không. Mục 2 đáng làm nếu sau 26/09 còn dư thời
+gian viết. Mục 3 làm sau cùng, nếu vẫn còn ngày.
+
+**Ba câu hỏi khác cần bạn:**
+
+4. **Q8 (lưới risk dày ở bản Interface Focus) để bên nào?** Chuyển sang AAMAS thì **P-4** mạnh
+   hơn nhưng bản IF mỏng đi. Hạn chốt **20/09**.
+5. **E5 (pledge / thể chế) có làm không?** Thêm ~1 ngày code + $40. Tôi khuyên **để
+   stretch**, quyết lại 28/09.
+6. **Ai viết draft?** Nếu tôi viết thì cần bạn chốt **title + abstract trước 25/09** để kịp
    nộp abstract 01/10.
 
 ---
 
-## 12. Việc làm ngay hôm nay
+## 16. Việc làm ngay hôm nay (10/09)
 
 ```bash
-# 1) Panel còn sống không — probe lại 38 slug
+# 1) Quét tiến trình mồ côi TRƯỚC mọi thứ (lệnh PowerShell ở §12 mục 1)
+
+# 2) Account nào còn sống hôm nay
 python plan/scripts/probe_all_models.py
 
-# 2) Quét tiến trình mồ côi trước khi phóng bất cứ gì
-#    (PowerShell — lệnh đầy đủ ở plan/README.md)
+# 3) Sửa cap output — P0, chặn mọi dữ liệu sinh ra từ nay
+#    kaggle/benchmarks/crg_task_server.py: MAX_OUT theo model, bỏ số chung 512
 
-# 3) Tải template AAMAS 2027, dựng skeleton 8 trang trong paper/aamas/
+# 4) Smoke server-side 1 ván/model, kiểm usage_output_tokens / n_decisions
+cd kaggle/benchmarks/artifacts   # để artifact rơi đúng chỗ
 ```
 
-Và ba việc không cần chạy gì: tải template, đăng ký tác giả (hạn 17/09), viết §3 (formalisation
-+ equilibrium) — mục này **không phụ thuộc dữ liệu nào cả** nên viết được ngay.
+Sau đó bắt đầu E0: `crsd/models/scripted.py`, `modelsPerSeat`, `crsd/dataio/wide_csv.py`.

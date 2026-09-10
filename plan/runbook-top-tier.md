@@ -1,7 +1,7 @@
 # RUNBOOK — chạy bậc đỉnh (top tier) trước
 
 Đây là **hướng dẫn thực thi**, viết để một Claude session sau mở ra là chạy được ngay
-không cần hỏi lại. Đọc [README.md](README.md) và [frontier-run-plan.md](frontier-run-plan.md)
+không cần hỏi lại. Đọc [README.md](README.md) và [aamas2027-plan.md](aamas2027-plan.md)
 trước để biết ngữ cảnh; file này chỉ nói **làm thế nào**.
 
 Quyết định của người dùng (13-08-2026): chạy **bậc đỉnh trước**, không screen trước.
@@ -382,7 +382,7 @@ for p in glob.glob('results/frontier/*/exp_baseline/games.csv'):
   mạnh nhất cũng cán trần"). Có cell nào `group_total` quanh 120 với reach giữa 0 và 100% →
   **đó là cell uncensored**, chính là thứ cần tìm.
 
-- [ ] Cập nhật [frontier-run-plan.md](frontier-run-plan.md) — panel đã có thêm 4 ô bậc đỉnh,
+- [ ] Cập nhật [aamas2027-plan.md](aamas2027-plan.md) — panel đã có thêm 4 ô bậc đỉnh,
       quyết định tiếp bậc rẻ/giữa dựa trên kết quả này.
 
 ---
@@ -398,7 +398,7 @@ for p in glob.glob('results/frontier/*/exp_baseline/games.csv'):
 | Tiến trình cũ vẫn push dù đã "stop" | `TaskStop` chỉ giết shell cha, **không giết `launch_shard.py` con**. Hai tiến trình push cùng task cùng account → xung đột | Kiểm bằng `Get-CimInstance Win32_Process ... CommandLine -match 'launch_shard'` rồi `Stop-Process -Force` trước khi phóng lại |
 | `!! push validate THAT BAI` kèm 429, nhiều shard cùng lúc | **Phóng song song quá dày.** `push` chạy 1 ván validate trên model mặc định của server; N lệnh push đồng thời đập vào CÙNG model đó → 429 → validate Errored → push hủy. Gặp thật: **7/15 shard Ngày B chết** với `--stagger 20` | `launch_shard.py` giờ tự retry push 3 lần (chờ 120s, 240s). Khi phóng >8 shard, dùng `--stagger 150` trở lên. Shard đã chạy được KHÔNG bị ảnh hưởng — chỉ phóng lại đúng shard chết |
 | `400 BatchScheduleBenchmarkTaskRuns` | quá 7 `-m` trong một lệnh | chia lệnh, tối đa 7 model |
-| Run báo `Completed` nhưng `reply` rỗng | model dồn token vào reasoning channel, content trống | phải fail to tiếng, không được ghi thành ván đóng góp 0 — xem Ngày 1 của [frontier-run-plan.md](frontier-run-plan.md) |
+| Run báo `Completed` nhưng `reply` rỗng | model dồn token vào reasoning channel, content trống | phải fail to tiếng, không được ghi thành ván đóng góp 0 |
 | `KERNEL_WITHOUT_RUN` khi push | `.run()` bị bọc trong `if __name__=="__main__"`, hoặc dict result có key kiểu float | bản `crg_task_server.py` đã sửa cả hai — đừng copy lại từ `crg_task.py` |
 | `kaggle b t log` trả rỗng, không báo lỗi | fetch song song > 3 luồng bị rate-limit **im lặng** | giữ concurrency ≤ 3, thử lại |
 | Kết quả `charmap codec can't encode` | thiếu `PYTHONIOENCODING=utf-8` | set biến đó |
