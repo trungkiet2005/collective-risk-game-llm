@@ -1,0 +1,128 @@
+{
+  "generated_by": "plan/scripts/import_legacy_b.py",
+  "date": "2026-09-10",
+  "experiment": "exp_baseline",
+  "note": "Luoi risk B (plan §7.0). Da loai van co luot bi cat output; reps chon theo giao tren ca 11 muc de giu common random numbers. Hai cot risk_framing / show_computed_totals KHONG co trong schema cu -> dien mac dinh lottery/0 (dung cau hinh baseline goc, nhung la SUY RA chu khong doc tu file).",
+  "models": {
+    "anthropic-claude-haiku-4-5-20251001": {
+      "imported_from": "Legacy_Results/results/frontier/dense_grid/anthropic-claude-haiku-4-5-20251001/exp_baseline",
+      "risk_levels": [
+        "0.0",
+        "0.1",
+        "0.2",
+        "0.3",
+        "0.4",
+        "0.5",
+        "0.6",
+        "0.7",
+        "0.8",
+        "0.9",
+        "1.0"
+      ],
+      "reps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "n_games": 110,
+      "games_dropped_truncated": 0
+    },
+    "google-gemini-3.5-flash-lite": {
+      "imported_from": "Legacy_Results/results/frontier/dense_grid/google-gemini-3.5-flash-lite/exp_baseline",
+      "risk_levels": [
+        "0.0",
+        "0.1",
+        "0.2",
+        "0.3",
+        "0.4",
+        "0.5",
+        "0.6",
+        "0.7",
+        "0.8",
+        "0.9",
+        "1.0"
+      ],
+      "reps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "n_games": 110,
+      "games_dropped_truncated": 0
+    },
+    "openai-gpt-5.6-luna": {
+      "imported_from": "Legacy_Results/results/frontier/dense_grid/openai-gpt-5.6-luna/exp_baseline",
+      "risk_levels": [
+        "0.0",
+        "0.1",
+        "0.2",
+        "0.3",
+        "0.4",
+        "0.5",
+        "0.6",
+        "0.7",
+        "0.8",
+        "0.9",
+        "1.0"
+      ],
+      "reps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "n_games": 110,
+      "games_dropped_truncated": 0
+    },
+    "xai-grok-4.20-0309-non-reasoning": {
+      "imported_from": "Legacy_Results/results/frontier/dense_grid/xai-grok-4.20-0309-non-reasoning/exp_baseline",
+      "risk_levels": [
+        "0.0",
+        "0.1",
+        "0.2",
+        "0.3",
+        "0.4",
+        "0.5",
+        "0.6",
+        "0.7",
+        "0.8",
+        "0.9",
+        "1.0"
+      ],
+      "reps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "n_games": 110,
+      "games_dropped_truncated": 0
+    }
+  }
+}
