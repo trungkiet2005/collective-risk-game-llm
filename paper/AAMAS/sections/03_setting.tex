@@ -1,0 +1,107 @@
+%% =====================================================================================
+%% P-3 — Setting, formalisation, panel, protocol.  Muc LaTeX DOC LAP.
+%% Nhan `sec:methods` LA CHO DUA CUA MUC §6 (`\ref{sec:methods}` trong 06_bestresponse.tex).
+%% Doi nhan nay thi phai sua ca o do.
+%%
+%% MENH DE 1 DA DUOC KIEM BANG VET CAN, khong phai chi chung minh tren giay:
+%%     python -m pytest crsd/tests/test_paper_equilibrium.py
+%% Test do duyet moi profile doi xung + 6.000 profile bat doi xung tai 11 muc p va doi
+%% chieu voi dac trung phat bieu o day. SUA MENH DE THI PHAI SUA TEST.
+%%
+%% ⚠️ p = 1 LA NGOAI LE THAT, DA KIEM: khi p = 1, moi profile truot target deu la can bang
+%% (yeu) vi payoff bang 0 du lam gi. Vi the menh de phat bieu cho p < 1. Bo chu "p<1" di
+%% la sai, va la thu reviewer kiem duoc bang mot dong code.
+%%
+%% NGAN SACH TRANG: 1,7 cot / 16 cot. Khong float.
+%% =====================================================================================
+
+\section{The game, its equilibria, and the panel}
+\label{sec:methods}
+
+\subsection{The game}
+
+The \PanelNplayersWord{} players each hold an endowment of $e=\PanelEndowment$ units. Over
+$R=\PanelNrounds$ rounds every player privately chooses a contribution
+$a_i^t\in\{0,2,4\}$, and after each round every player sees what all six chose in every
+round so far. Writing $x_i=\sum_t a_i^t$ for a player's total and $X=\sum_i x_i$ for the
+group's, the group succeeds if $X\ge T=\PanelTarget$. A player's cash is then what it kept:
+\begin{equation}
+u_i(x) \;=\;
+\begin{cases}
+e-x_i, & X\ge T,\\[2pt]
+0 \text{ w.p.\ } p,\quad e-x_i \text{ w.p.\ } 1-p, & X<T .
+\end{cases}
+\label{eq:payoff}
+\end{equation}
+Contributions are never refunded, the round count is stated in the prompt, and
+$R\cdot\max A=e$, so no player can contribute more than it holds. The risk $p$ is the only
+quantity we vary in Section~\ref{sec:riskgrid}. Since \eqref{eq:payoff} depends on the
+action profile only through the totals $x$, the Nash equilibrium \emph{outcomes} of the
+$R$-round game are those of the reduced game in which each player picks
+$x_i\in\{0,2,\dots,e\}$, and we characterise them there.
+
+\begin{proposition}
+\label{prop:eq}
+Fix $p<1$. A profile $x$ is a Nash equilibrium if and only if either $x=0$, or $\sum_i
+x_i=T$ and $x_i\le p\,e$ for every $i$. Hence an equilibrium that reaches the target exists
+if and only if $p\ge p^{*}$ with $p^{*}=T/(Ne)=\PanelPstar$, and at $p=p^{*}$ the only such
+equilibrium is the equal split $x_i=T/N=\PanelFairTotal$. The welfare-maximising outcome is
+$x=0$ for $p<p^{*}$ and $\sum_i x_i=T$ for $p>p^{*}$, so the per-capita payoff of the best
+outcome is $\max\{(1-p)e,\;T/N\}$.
+\end{proposition}
+
+\noindent\emph{Proof sketch.} If $X<T$ and $x_i>0$, then moving to $x_i=0$ leaves the
+target missed and raises the expectation from $(1-p)(e-x_i)$ to $(1-p)e$, strictly for
+$p<1$; so an equilibrium that misses the target has $x=0$, and $x=0$ is one because a lone
+player can contribute at most $e<T$. If $X>T$ then $X\ge T+2$, and any $i$ with $x_i\ge2$
+sheds $2$, still reaches the target and gains $2$; so an equilibrium that reaches it has
+$X=T$ exactly. Given $X=T$, every profitable-looking deviation reduces $x_i$ and therefore
+misses the target, and the best of them is $x_i=0$, worth $(1-p)e$ against $e-x_i$ for
+staying; the two compare as $x_i\le p\,e$. Summing that bound over $N$ players against
+$\sum_i x_i=T$ gives $p\ge T/(Ne)$, with equality forcing $x_i=T/N$ for all $i$. For
+welfare, $\sum_i u_i$ equals $Ne-X$ when $X\ge T$ and $(1-p)(Ne-X)$ otherwise, so it is
+maximised at $X=T$ or at $X=0$, and $Ne-T\ge(1-p)Ne$ reduces to $p\ge T/(Ne)$
+again.\hfill\crgqed
+
+Three consequences carry the rest of the paper. Welfare-optimal play and best-equilibrium
+play switch at the \emph{same} threshold, so the benchmark
+$\mathrm{opt}(p)=\max\{(1-p)e,T/N\}$ used throughout needs no choice between the two.
+Below $p^{*}$ no equilibrium reaches the target, which is to say that a group that reaches
+it there is not merely being generous but is playing an outcome no player should sustain.
+And at $p=0$ the two branches of \eqref{eq:payoff} coincide, so $u_i=e-x_i$ whatever the
+group does and contributing is strictly dominated --- under \emph{any} increasing utility,
+not only under the risk-neutral one that $\mathrm{opt}$ assumes. The $p=0$ column is
+therefore the one place in the paper where no assumption about risk attitude is doing any
+work, and we lean on it accordingly.
+
+\subsection{Panel and protocol}
+
+%% CHO DUY NHAT trong bai in slug day du. Moi cho khac dung ten ngan trong ngoac o day —
+%% xem `FULL` trong panel_analysis.py, no lay thang tu `MODELS` cua e3a_analysis.py nen ca
+%% hai muc ket qua goi model bang cung mot ten.
+We run \PanelNmodelsWord{} production models, one per provider and each at the inexpensive
+tier of its family, so that no result is an artefact of a single vendor's post-training:
+\textsc{claude-haiku-4.5} (Haiku), \textsc{gemini-3.5-flash-lite} (Flash-Lite),
+\textsc{gpt-5.6-luna} (Luna), \textsc{qwen3-235b-a22b-instruct} (Qwen) and
+\textsc{grok-4.20-non-rea\-son\-ing} (Grok), named by their short forms from here on. Every
+experiment runs every model on exactly the same number of games; price never determines
+sample size. All games are in English, at temperature $0.7$, with every seat holding a
+neutral persona.
+
+Each round a seat receives the rules, the complete per-seat history in fixed positions, and
+a request for one contribution. The running group total is \emph{not} printed, so a seat
+that wants it must add the history up; we keep it that way because printing it changes
+behaviour, and because Section~\ref{sec:bestresponse} needs a measure that uses only what
+the prompt displays. A reply is parsed from a \texttt{CONTRIBUTION:}\ line. Replies that
+reach the output cap before that line are retried at a quadrupled cap rather than parsed,
+because a truncated chain of arithmetic otherwise yields a plausible number that was never
+a decision; every game reported here has zero parse failures and zero truncations across
+$\PanelNdecisionsAll$ decisions.
+
+Cells hold $\PanelNpercell$ games each, indexed by a repetition number that also seeds the
+catastrophe lottery, so the same repetition faces the same draw at every risk level ---
+common random numbers, which is what makes the paired comparisons across $p$ in
+Section~\ref{sec:riskgrid} worth making. The unit of analysis is the game, never the seat:
+six seats in one game read each other's history and are not independent. Every interval is
+a percentile bootstrap over games with $\PanelNboot$ resamples and every $P$-value a
+permutation test with $\PanelNpermTex$ resamples, both under a fixed seed.

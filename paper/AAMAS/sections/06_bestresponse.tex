@@ -132,10 +132,12 @@ all replay exactly, which is what licenses treating the opponents as known.
 With deterministic opponents the LLM faces a decision problem, solved by exhaustive search
 over all $3^{10}$ trajectories under the game's own scoring rule.
 
-\noindent\textbf{Proposition 1.} \emph{Against \textsc{all-defect} and
-\textsc{all-contribute} the best response is to contribute $\EthreeaBRDefect$ at every
-$p$. Against \textsc{fair-share} and \textsc{cond.\ coop.} it is \EthreeaBRCoop, switching
-at $p^{*}=\EthreeaPstar$, where both are optimal.}
+\begin{proposition}
+\label{prop:br}
+Against \textsc{all-defect} and \textsc{all-contribute} the best response is to contribute
+$\EthreeaBRDefect$ at every $p$. Against \textsc{fair-share} and \textsc{cond.\ coop.} it
+is \EthreeaBRCoop, switching at $p^{*}=\EthreeaPstar$, where both are optimal.
+\end{proposition}
 
 \noindent\emph{Proof sketch.} The scripted seats bank $0$, $200$ and $100$ in the first
 three profiles. Against \textsc{all-defect} the group total cannot exceed the LLM's own
@@ -320,7 +322,7 @@ does switch at $p^{*}$ (Figure~\ref{fig:e3a-risk}).
 \caption{Total contributed by the LLM seat over the ten rounds, of the
 $\EthreeaEndowment$-unit endowment, against catastrophe risk; one panel per opponent
 profile, $n=\EthreeaxCellN$ games per point, with percentile bootstrap $95\%$ intervals.
-The thick grey dashed line is the best response of Proposition~1, drawn beneath the model
+The thick grey dashed line is the best response of Proposition~\ref{prop:br}, drawn beneath the model
 lines so that models sitting exactly on it stay visible; under \textsc{fair-share} and
 \textsc{cond.\ coop.} it steps from $\EthreeaBRTotCoopPthree$ to $\EthreeaBRTotCoopPseven$
 at $p^{*}=\EthreeaPstar$, and the two open circles mark the tied pair there, either of

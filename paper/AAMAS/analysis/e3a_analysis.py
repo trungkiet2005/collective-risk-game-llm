@@ -94,6 +94,21 @@ MODELS: Dict[str, Tuple[str, str]] = {
 }
 MODEL_ORDER = list(MODELS)
 
+# --------------------------------------------------------------------------------------
+# Tên model DÙNG TRONG VĂN XUÔI, tách khỏi khoá dùng để đặt tên macro.
+#
+# Khoá "Flash" phải giữ nguyên vì nó ghép thành tên macro (`\EthreeaMeanCarryFlash`) và
+# tên macro LaTeX không nhận dấu gạch nối. Nhưng in "Flash" ra giữa một câu thì mơ hồ —
+# panel có `gemini-3.5-flash-lite`, không phải `gemini-3.5-flash`. Nên mọi chuỗi ĐI VÀO
+# VĂN XUÔI đi qua hàm này, còn tên macro thì không. Đừng hợp nhất hai thứ đó lại.
+# --------------------------------------------------------------------------------------
+PROSE_NAME = {"Flash": "Flash-Lite"}
+
+
+def pname(m: str) -> str:
+    return PROSE_NAME.get(m, m)
+
+
 # Chính sách scripted mà mỗi profile PHẢI có ở 5 ghế còn lại. Dùng để chốt lại rằng thư
 # mục `exp_bestresponse_<prof>` đúng là profile nó tự xưng (cột `opponent_profile` trong
 # wide CSV đang rỗng ở lô này, nên tên thư mục là thứ duy nhất còn mang thông tin đó).
@@ -1230,7 +1245,7 @@ def main() -> int:
         raise ValueError(f"nhom mo neo khong cung mot ty le: {sorted(anchored_share)}")
     mac.num("RoundOneAnchoredShare", anchored_share.pop(), 0)
     mac.add("RoundOneAnchoredN", str(len(anchored)))
-    mac.add("RoundOneAnchoredModels", ", ".join(MODELS[t][1] for t in anchored))
+    mac.add("RoundOneAnchoredModels", ", ".join(pname(MODELS[t][1]) for t in anchored))
     mac.num("RoundOneFairShare", FAIR_SHARE)
 
     # --- độ dốc theo risk ---

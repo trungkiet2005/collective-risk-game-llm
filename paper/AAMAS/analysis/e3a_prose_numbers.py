@@ -83,6 +83,21 @@ MODELS: Dict[str, str] = {
     "xai-grok-4.20-0309-non-reasoning":    "Grok",
 }
 MODEL_ORDER = list(MODELS.values())
+
+# --------------------------------------------------------------------------------------
+# Tên model DÙNG TRONG VĂN XUÔI, tách khỏi khoá dùng để đặt tên macro.
+#
+# Khoá "Flash" phải giữ nguyên vì nó ghép thành tên macro (`\EthreeaMeanCarryFlash`) và
+# tên macro LaTeX không nhận dấu gạch nối. Nhưng in "Flash" ra giữa một câu thì mơ hồ —
+# panel có `gemini-3.5-flash-lite`, không phải `gemini-3.5-flash`. Nên mọi chuỗi ĐI VÀO
+# VĂN XUÔI đi qua hàm này, còn tên macro thì không. Đừng hợp nhất hai thứ đó lại.
+# --------------------------------------------------------------------------------------
+PROSE_NAME = {"Flash": "Flash-Lite"}
+
+
+def pname(m: str) -> str:
+    return PROSE_NAME.get(m, m)
+
 PROFILES = ("defect", "carry", "coop", "cond")
 PROFILE_MACRO = {"defect": "Defect", "carry": "Carry", "coop": "Coop", "cond": "Cond"}
 ROUND_WORD = ["Rone", "Rtwo", "Rthree", "Rfour", "Rfive",
@@ -242,7 +257,8 @@ def emit_e3a(mac: Macros, e3a: pd.DataFrame) -> None:
         names = [m for m in MODEL_ORDER if carry_quit.get(m) == late]
         mac.add("QuitCarryLate", str(late))
         mac.add("QuitCarryLateModels",
-                (", ".join(names[:-1]) + " and " + names[-1]) if len(names) > 1 else names[0])
+                (", ".join(map(pname, names[:-1])) + " and " + pname(names[-1]))
+                if len(names) > 1 else pname(names[0]))
         mac.add("QuitCarryLateN", str(len(names)))
 
     # --- lãng phí sau khi chứng minh được (chỉ `carry` có chứng minh) -------------------
@@ -283,7 +299,7 @@ def emit_e3a(mac: Macros, e3a: pd.DataFrame) -> None:
         if all(v >= 95.0 for v in shares):
             uncond.append(m)
     mac.add("LastZeroUncondN", str(len(uncond)))
-    mac.add("LastZeroUncondModels", ", ".join(uncond))
+    mac.add("LastZeroUncondModels", ", ".join(map(pname, uncond)))
     # Mat kia cua cung mot phat hien: model nao RUT LUI KHI RUT LUI LA MIEN PHI, tuc la
     # choi 0 o vong chot trong 100% van cua CA HAI profile ma dong gop bi troi chat. Van
     # xuoi truoc day go tay "100%" cho nhom nay — con so do la ket qua do duoc, phai la
@@ -295,7 +311,8 @@ def emit_e3a(mac: Macros, e3a: pd.DataFrame) -> None:
         raise SystemExit("khong model nao rut lui 100% o ca defect lan carry -- sua van xuoi")
     mac.add("LastZeroFreeN", str(len(free)))
     mac.add("LastZeroFreeModels",
-            (", ".join(free[:-1]) + " and " + free[-1]) if len(free) > 1 else free[0])
+            (", ".join(map(pname, free[:-1])) + " and " + pname(free[-1]))
+            if len(free) > 1 else pname(free[0]))
     mac.num("LastZeroFreeShare", 100.0, 0)
 
     # --- kiểm chứng lại cách diễn giải "bị bóc lột" -------------------------------------
@@ -385,11 +402,12 @@ def emit_anchor(mac: Macros) -> None:
     mac.add("AnchorPStayedMin", pfmt(min(stayed_p)) if stayed_p else "--")
     mac.add("AnchorMovedN", str(len(moved)))
     mac.add("AnchorMovedModels",
-            " and ".join(moved) if len(moved) <= 2 else ", ".join(moved))
+            " and ".join(map(pname, moved)) if len(moved) <= 2
+            else ", ".join(map(pname, moved)))
     mac.add("AnchorStayedN", str(len(stayed)))
     mac.add("AnchorStayedModels",
-            (", ".join(stayed[:-1]) + " and " + stayed[-1]) if len(stayed) > 1
-            else "".join(stayed))
+            (", ".join(map(pname, stayed[:-1])) + " and " + pname(stayed[-1]))
+            if len(stayed) > 1 else "".join(map(pname, stayed)))
 
 
 # ======================================================================================

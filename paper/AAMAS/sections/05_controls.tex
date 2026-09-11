@@ -1,0 +1,106 @@
+%% =====================================================================================
+%% P-5 — Hai doi chung: xoa mo neo (E1) va hoi thang (E2).  Muc LaTeX DOC LAP.
+%%
+%% HAI NHAN `sec:nohint` VA `sec:evprobe` LA CHO DUA CUA MUC §6 — 06_bestresponse.tex
+%% \ref toi ca hai. Doi ten nhan thi phai sua ca o do.
+%%
+%% VI SAO HAI THI NGHIEM NAY NAM CHUNG MOT MUC. Moi cai mot minh chi loai duoc mot cach
+%% giai thich; nguoi doc con lai cach kia. Chi khi doc cung nhau thi khong con cach giai
+%% thich re tien nao: khong phai lam theo prompt (E1), khong phai khong hieu (E2). Tach
+%% lam hai muc la moi nguoi doc bo qua mot cai.
+%%
+%% ⚠️ CAI BAY CUA §5.2 — DA SUYT VIET SAI. Qwen dat 100% o p=0,1 NHUNG no tra loi Y HET
+%% MOT DAP AN o ca ba muc risk (\PanelProbeModalShareQwen\%), nen "dung" o do la TRUNG,
+%% khong phai tinh duoc. Grok cung vay. Vi the claim tach doi chi duoc dat tren BA model
+%% tra loi khac nhau o tung muc va dung ca ba. Go 94% ra roi noi "ca panel deu biet" la
+%% loi reviewer kiem duoc bang mot dong groupby.
+%%
+%% ⚠️ CAU HOI VALUE THU HAI (`value_defect_ev`, \PanelProbeEvPointAcc\%) CO Y KHONG DUNG
+%% DE DAT CLAIM: hoi giua van thi "contribute 0 in every round" doc duoc thanh "moi vong
+%% CON LAI", va nhieu cau sai la model tinh dung nghia thu hai. Da khai o §7. Dung dem no
+%% vao bang tru khi sua lai cach hoi.
+%%
+%% NGAN SACH TRANG: 2,0 cot / 16 cot, GOM Bang 2.
+%% =====================================================================================
+
+\section{Two things the cooperation is not}
+\label{sec:controls}
+
+Section~\ref{sec:riskgrid} leaves two cheap explanations standing. The models may be
+repeating a solution the prompt handed them, since a dilemma stated with a target, a group
+size and a round count also states its own equal split; or they may not understand the game
+well enough for the risk to mean anything. We test both on the same panel, at
+$p\in\{\PanelNohintRisks\}$, and Table~\ref{tab:controls} reports them side by side.
+
+\input{tables/panel_table_controls.tex}
+
+\subsection{Deleting the focal point}
+\label{sec:nohint}
+
+The prompt states the equal split twice: once as a gloss on the target (``an average of
+$\PanelFairShare$ per player per round'') and once as a worked example on the payoff line
+(``contributing $\PanelFairShare$ every round leaves you $\PanelFairTotal$ at the end'').
+We delete both spans and change nothing else, which leaves the target, the group size and
+the round count in place, so the split remains derivable by one division. Each model plays
+$\PanelNohintGames$ games with the spans deleted against the $\PanelNohintGames$ baseline
+games at the same risk levels.
+
+Contribution never falls. \PanelNohintUpWordCap{} models rise significantly
+(\PanelNohintUpModels{}) and \PanelNohintFlatWord{} do not move at all
+(\PanelNohintFlatModels{}); \PanelNohintDownWord{} contributes less. The two largest
+moves are the ones that matter, because both go the wrong way for the
+instruction-following account. Qwen goes from $\PanelNohintBaseQwen$
+units to $\PanelNohintAfterQwen$ ($P~\PanelNohintPQwen$) and its target rate from
+$\PanelNohintReachBaseQwen\%$ to $\PanelNohintReachAfterQwen\%$, yet its final cash falls
+from $\PanelNohintPayBaseQwen$ to $\PanelNohintPayAfterQwen$: it reaches the goal by
+spending most of its endowment on it. Grok goes from
+$\PanelNohintBaseGrok$ to $\PanelNohintAfterGrok$ of $\PanelEndowment$
+($P~\PanelNohintPGrok$), the share of its seats contributing the maximum in every round
+rising from $\PanelNohintBaseExactFourGrok\%$ to $\PanelNohintExactFourGrok\%$, and its
+cash falls to $\PanelNohintPayAfterGrok$. Removing the sentence that names a moderate
+contribution does not remove the cooperation; it removes the ceiling on it.
+
+The models that do not move show where the split actually comes from.
+Flash-Lite plays exactly $\PanelFairShare$ in every round of
+$\PanelNohintExactTwoFlash\%$ of its seats without the gloss, against
+$\PanelNohintBaseExactTwoFlash\%$ with it, and Luna moves by
+$\PanelNohintDeltaLuna$ units ($P=\PanelNohintPLuna$). They reconstruct the split rather
+than reciting it, which they can: $\PanelTarget$ over six players over ten rounds is one
+division. The equal split is therefore a focal point of the \emph{game}, not a phrase in
+the prompt, and deleting the phrase leaves the behaviour it was supposed to explain intact
+while making two models worse off.
+
+\subsection{Asking the agent what it knows}
+\label{sec:evprobe}
+
+Between rounds we put questions to the same agent that is playing, in a separate call whose
+answer never enters the game history, so a probe cannot steer the play it measures. Each
+game carries $\PanelProbePerGame$ questions at rounds $\PanelProbeRounds$, giving
+$\PanelProbeN$ in total: $\PanelProbeRulesN$ on the mechanics --- the endowment, the target,
+the legal contributions, the round count, the stated risk, the payoff after a disaster ---
+and the rest on value. The value question we rely on names both strategies in words and
+asks which pays more on average: contributing $\PanelFairShare$ every round and finishing
+with a certain $\PanelFairTotal$, or contributing nothing and keeping $\PanelEndowment$
+unless the disaster strikes.
+
+Comprehension is not the obstacle. The panel answers all $\PanelProbeRulesN$ rule
+questions correctly, $\PanelProbeRulesAcc\%$, with no model below it. On the value
+comparison the panel scores $\PanelProbeCompareAcc\%$ overall and
+$\PanelProbeCompareLowAcc\%$ at $p=\PanelProbeLowRisk$, where the right answer is that
+contributing nothing pays more --- $\PanelProbeLowOptCash$ against $\PanelFairTotal$. The
+aggregate hides a distinction the same data settles. \PanelProbeConstantModels{} return the
+same answer at every risk level (Qwen gives one value in
+$\PanelProbeModalShareQwen\%$ of its answers), so their score at
+$p=\PanelProbeLowRisk$ is a coincidence and not a computation. The other
+\PanelProbeCompareLowPerfectWord{} models change their
+answer with $p$ and are right each time: $\PanelProbeCompareHaiku\%$ for
+Haiku across all three levels, $\PanelProbeCompareFlash\%$ for
+Flash-Lite and $\PanelProbeCompareLuna\%$ for Luna.
+
+Those three then play against their own answer. In the very games in which they state that
+contributing nothing pays more, they contribute $\PanelProbeLowContribHaiku$,
+$\PanelProbeLowContribFlash$ and $\PanelProbeLowContribLuna$ units respectively, which is
+the equal split to within a rounding error in all three cases. The comparison is
+within-agent and within-game rather than across conditions, so no difference in prompt,
+sampling or model version can absorb it. Whatever produces the contribution, it is not
+reached by evaluating the two strategies the agent has just evaluated correctly.

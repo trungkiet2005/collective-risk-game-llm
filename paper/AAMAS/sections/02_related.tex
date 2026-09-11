@@ -1,0 +1,67 @@
+%% =====================================================================================
+%% P-2 — Related work. Muc LaTeX DOC LAP.
+%%
+%% BON DOAN, moi doan MOT nhanh, va moi doan ket bang mot cau noi ro bai nay KHAC cho nao.
+%% Khong co doan "X has attracted increasing attention" nao. Khong che bai nao — tac gia
+%% cua chung rat co the la reviewer cua minh (quy tac 10 cua skill).
+%%
+%% ⛔ DOAN 4 LA BAT BUOC, KHONG DUOC CAT DE TIET KIEM CHO. Plan §2: khai bao overlap voi
+%% ban Interface Focus la dieu kien de khong bi desk reject vi trung nop. Reviewer ghet bi
+%% giau, khong ghet overlap duoc khai bao. Neu phai cat cot thi cat doan 1 hoac 2.
+%%
+%% ⚠️ DOUBLE-BLIND: \cite{anon-if} trich NGOI THU BA. Dung viet "our earlier paper",
+%% "we previously showed", hay bat cu thu gi gan hai ban voi nhau.
+%%
+%% NGAN SACH TRANG: 1,2 cot / 16 cot. Khong float.
+%% =====================================================================================
+
+\section{Related work}
+\label{sec:related}
+
+\paragraph{Collective-risk dilemmas.}
+The game we use was introduced to study why groups fail to avert a shared
+catastrophe~\cite{milinski2008collective}: \PanelNplayersWord{} players contribute from private endowments
+towards a threshold, and missing it triggers a loss with a probability the experimenter
+sets. Human groups reach the target reliably only when the probability is high, and
+inequality between players and the ability to communicate both shift the
+outcome~\cite{tavoni2011inequality}. Evolutionary treatments explain the pattern by the
+same threshold structure we exploit here: risk of collective loss turns a defection
+equilibrium into a coordination problem with multiple equilibria, and which one a
+population reaches depends on the risk~\cite{santos2011risk}. That literature establishes
+the game as a place where behaviour \emph{should} move with $p$, which is what makes a
+flat response diagnostic rather than merely disappointing. Our contribution is not a new
+account of human play but a measurement instrument applied to artificial players.
+
+\paragraph{Social dilemmas in multiagent systems.}
+Sequential social dilemmas gave multiagent reinforcement learning a setting in which
+cooperation is a policy property rather than a matrix
+entry~\cite{leibo2017multi,perolat2017multi}, and subsequent work showed that changing the
+learner's objective --- inequity aversion, for instance --- changes which equilibrium a
+population settles into~\cite{hughes2018inequity}. The programme of cooperative AI states
+the design question directly: build agents that can cooperate with agents unlike
+themselves~\cite{dafoe2020open}. Language-model agents enter that programme with a
+property no learned policy has, in that their behaviour is fixed at deployment rather than
+shaped by the population they meet, and the present paper measures what that fixed
+behaviour is.
+
+\paragraph{Language-model agents in games.}
+Language models have been placed in canonical games and read as economic
+subjects~\cite{horton2023large}, played against each other and against scripted strategies
+in two-player repeated games~\cite{akata2023playing,fontana2024nicer}, and embedded in
+societies that manage a shared resource~\cite{piatti2024cooperate} or an open-ended social
+world~\cite{park2023generative}. Two design choices recur. Beyond two players the seats
+usually hold copies of one model, which leaves the agent's response to a \emph{different}
+policy unmeasured; and the reported quantity is usually an outcome, such as whether the
+resource survived, rather than a distance from a computed optimum. We keep the game and
+change both choices: opponents are fixed policies chosen so that the best response can be
+enumerated, and every result is reported against that best response.
+
+\paragraph{Overlap with concurrent work.}
+A concurrent manuscript uses the same game and an overlapping panel to ask whether
+language models reproduce the risk sensitivity of human subjects, and reports the
+single-model baseline that Section~\ref{sec:riskgrid} re-runs and extends~\cite{anon-if}.
+The questions differ: that work asks whether a model is risk-sensitive, and treats the
+answer as a statement about machine behaviour; the present paper asks what a model does
+when the other agents are not copies of itself, and treats the answer as a statement about
+deploying agent populations. The results in Sections~\ref{sec:controls}
+and~\ref{sec:bestresponse}, which carry this paper, have no counterpart there.

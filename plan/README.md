@@ -72,6 +72,67 @@ không thể đạt target — **cả hai trường hợp góp thêm một xu n�
 model vẫn góp. Đây là bằng chứng cho "hợp tác hay chỉ tuân lệnh?" mạnh hơn ablation E1, và
 nó tách hẳn hai thứ đó ra (§7.3).
 
+### 📄 Bản nháp paper AAMAS — ĐÃ ĐỦ MỘT BÀI HOÀN CHỈNH KHÔNG CẦN E3b (11-09-2026)
+
+`paper/AAMAS/main.tex` compile ra **8 trang, references bắt đầu ở trang 8, 0 undefined
+reference, 0 Overfull \hbox**. Bảy mục, viết trọn trên B + E1 + E2 + E3a:
+
+| Mục | File | Dựa trên |
+|---|---|---|
+| 1 Introduction (+ Hình 1, hình trang đầu) | `sections/01_intro.tex` | — |
+| 2 Related work (**có đoạn khai báo overlap với bản IF**) | `sections/02_related.tex` | — |
+| 3 The game, its equilibria, and the panel | `sections/03_setting.tex` | Mệnh đề 1 |
+| 4 Cooperation that does not depend on the risk | `sections/04_riskgrid.tex` | B (550 ván) |
+| 5 Two things the cooperation is not | `sections/05_controls.tex` | E1 + E2 |
+| 6 Best-response profiling | `sections/06_bestresponse.tex` | E3a (1.000 ván) |
+| 7 Discussion, limitations, ethics | `sections/07_discussion.tex` | — |
+
+**Câu chuyện đã xoay khỏi "quần thể hỗn hợp" vì E3b chưa có**, và đây là chỗ phải hiểu cho
+đúng trước khi sửa: đóng góp trung tâm bây giờ là **tách biệt giữa BIẾT và LÀM** — cùng một
+agent, trong cùng một ván, trả lời đúng phép so sánh kỳ vọng rồi chơi ngược lại câu trả lời
+của chính nó. Ba đối chứng của §4/§5/§6 mỗi cái loại một cách giải thích rẻ tiền. E3b khi
+xong sẽ vào **§6 hoặc một §7 mới**, không thay câu chuyện.
+
+**Ba con số chở cả bài** (đều sinh bằng script, không gõ tay):
+
+- **p = 0 là cột không cần giả định.** Ở đó đóng góp bị **trội hẳn** (payoff = 40 − c với
+  mọi kết cục), vậy mà **240/300 ghế vẫn đóng**. Mọi claim khác đều tựa vào cột này khi bị
+  hỏi "hay là model chỉ e ngại rủi ro?".
+- **Tách biệt biết/làm.** Panel trả lời **3.600/3.600** câu luật đúng, và ở p = 0,1 thì
+  **94%** nói đúng rằng không đóng gì mới lời hơn — rồi đóng **22,2** đơn vị trong đúng
+  những ván ấy. ⚠️ Nhưng Qwen và Grok trả lời **y hệt một đáp án ở cả ba mức risk**, nên
+  "đúng" của chúng là TRÙNG chứ không phải tính được → claim chỉ đặt trên 3 model còn lại.
+- **Bỏ mỏ neo equal-split KHÔNG làm giảm đóng góp** ở model nào; 3 model tăng, Qwen
+  18,5 → 34,8. Nó là **trần**, không phải động cơ.
+
+**Sinh lại số + dựng lại bài** (chạy đủ ba script rồi mới latexmk):
+
+```bash
+python paper/AAMAS/analysis/panel_analysis.py      # \Panel...   §4, §5  (254 macro)
+python paper/AAMAS/analysis/e3a_analysis.py        # \Ethreea...  §6
+python paper/AAMAS/analysis/e3a_prose_numbers.py   # \Ethreeax... §6
+cd paper/AAMAS && latexmk -pdf main.tex
+python -m pytest crsd/tests/test_paper_equilibrium.py   # cong chan Menh de 1
+```
+
+**Ba luật của thư mục paper, vi phạm là lệch số âm thầm:**
+
+1. **Không gõ tay một con số nào vào `sections/`.** Mọi con số là macro; đổi data → chạy
+   lại ba script → text và bảng cùng đổi. Ngoại lệ duy nhất là hằng số luật chơi.
+2. **Một hệ tên model duy nhất**, lấy từ `MODELS` của `e3a_analysis.py`: bảng dùng
+   "Flash-Lite 3.5", văn xuôi dùng "Flash-Lite" (qua `pname()`), slug đầy đủ chỉ xuất hiện
+   **đúng một lần** ở §3.
+3. **Số đếm nhỏ xuất ba dạng**: `\PanelNFlat` (chữ số, cho bảng), `...Word` (chữ, giữa
+   câu — **đừng bọc `$...$`**, math mode in ra chữ nghiêng), `...WordCap` (đầu câu).
+
+**Còn phải làm trước khi nộp** (không cái nào chặn E3b):
+
+- [ ] **Kiểm từng mục `refs.bib`** — viết từ trí nhớ, volume/page/năm chưa đối chiếu DOI.
+- [ ] Tải `aamas_2027_template.zip`, đổi `\documentclass` + khối `\acmConference`, dựng
+      lại và kiểm lại số trang + Overfull (hiện dùng `acmart` của MiKTeX).
+- [ ] Đăng ký tác giả trước **17-09**, nộp abstract **01-10**, full paper **08-10**.
+- [ ] Chốt việc chuyển Q8 sang bản AAMAS hay giữ ở IF (plan §2.1, hạn 20/09).
+
 ### Việc tiếp theo
 
 **E3b — quần thể hỗn hợp round-robin đủ 10 cặp** (§7.4), 600 ván/model, ~$82. Trước đó

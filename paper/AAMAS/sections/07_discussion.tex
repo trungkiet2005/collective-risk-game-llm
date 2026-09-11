@@ -1,0 +1,79 @@
+%% =====================================================================================
+%% P-7 — Discussion, limitations, ethics.  Muc LaTeX DOC LAP.
+%%
+%% BA VIEC, DUNG THU TU: (1) ba doi chung cong lai NOI GI, (2) no doi gi o nguoi trien
+%% khai, (3) gioi han — KHAI THANG, khong giau xuong phu luc.
+%%
+%% ⛔ KHONG DUOC BO DOAN "monoculture" TRONG LIMITATIONS. §4 va §5 van la self-play, va do
+%% dung la dieu dau tien reviewer AAMAS hoi. Chung ta tra loi bang §6 (doi thu scripted)
+%% chu KHONG bang quan the hon hop that — noi thang ra, dung de reviewer tu phat hien.
+%%
+%% ⛔ KHONG DUOC HUA TAI LAP THEO SEED. Do duoc: chay lai cung o voi cung seed cho ket qua
+%% khac o 57% so o. Chi hua tai lap ve THIET KE. Xem CLAUDE.md.
+%%
+%% KHONG CO "Conclusion" RIENG. Mot ket luan viet lai intro o thi qua khu la muc bi cat
+%% dau tien trong moi bai 8 trang; doan cuoi cua muc nay lam dung viec do trong ba cau.
+%%
+%% NGAN SACH TRANG: 1,2 cot / 16 cot. Khong float.
+%% =====================================================================================
+
+\section{Discussion}
+\label{sec:discussion}
+
+Three controls, each removing a different explanation, converge on one description. Moving
+the catastrophe risk across its whole range leaves the contribution schedule of
+\PanelNFlatWord{} of \PanelNmodelsWord{} models unchanged, and the one model that does
+react reacts once, at the point where the risk disappears entirely. Deleting the sentences that supply
+the equal split does not reduce contribution in any model and raises two of them to their
+endowment cap, so the schedule is not obedience to the prompt. Asking the agents outright
+establishes that the arithmetic is available to them and unused. Replacing their opponents
+with policies that make the best response computable shows that the schedule does not bend
+to the opponent either, not in any of $\EthreeaNgames$ games and not in the
+$\EthreeaDominatedGames$ where every alternative is strictly dominated. What these agents
+bring to a collective-risk setting is a fixed contribution schedule, close to the focal
+split, that is insensitive to the risk, to the prompt's framing and to what the other
+agents do.
+
+For a system designer the consequence is asymmetric, and it is the reason we report a gap
+to the optimum rather than a success rate. As collaborators these agents are excellent:
+they reach the group target in most populations, they do not defect opportunistically, and
+they never hold the group hostage. As stakeholders they are unsafe, because they will not
+protect the resources entrusted to them --- a scripted free-rider out-earns every model in
+the panel (\S\ref{sec:bestresponse}), and a group-level metric records that outcome as a
+success. The two failure modes we observe are invisible to such a metric from opposite
+sides: \textsc{grok-4.20-non-rea\-son\-ing} reaches the target in
+$\PanelReachGrok\%$ of games while finishing with $\PanelPayGrok$ of
+$\PanelEndowment$ units, and Qwen pays $\PanelOwnQwen$ units into pots
+that never reach the target at all. A deployment that reads only whether the shared goal
+was met will rank both as it should not.
+
+\paragraph{Limitations.}
+Sections~\ref{sec:riskgrid} and~\ref{sec:controls} are self-play: all \PanelNplayersWord{} seats hold one
+model. That design is the object of our criticism, and we answer it in
+Section~\ref{sec:bestresponse} with fixed opponents rather than with a genuinely mixed
+population. Fixed opponents buy exactness --- the best response is enumerable --- at the
+cost of realism, since a scripted seat cannot respond to the model as a second model would.
+A round-robin over mixed pairs is the natural next measurement and is not reported here.
+The panel is \PanelNmodelsWord{} models, one per provider and all at the inexpensive tier, so a
+capability effect within a family is outside what we can see; cells hold
+$\PanelNpercell$ games, which is why every interval is a bootstrap and every test a
+permutation test on games rather than on seats. We run one prompt template at one
+temperature, and although the focal-point deletion of Section~\ref{sec:nohint} is a
+paraphrase of a kind, it is not a systematic sensitivity analysis. Pricing a gap in
+expected payoff assumes risk neutrality; we therefore rest the conclusions on the $p=0$
+column and on the strictly dominated profiles, where contributing loses under every
+increasing utility and no such assumption is in play. One of the two value probes asks for
+a point estimate mid-game and is ambiguous between ``every round'' and ``every remaining
+round'' --- several wrong answers are correct readings of the second --- so we report its
+$\PanelProbeEvPointAcc\%$ for completeness and rest nothing on it. Finally, the game-level
+randomisation is seeded and reproduces, but the model text does not: replaying identical
+cells at identical seed and temperature returns different play. We release prompts,
+configurations, seeds and code, and promise reproducibility of the design rather than of
+the transcripts.
+
+\paragraph{Ethics.}
+The study runs no human subjects and collects no personal data. Its result is a negative
+one about deployed systems, and we report it in the direction that is useful: agents that
+cooperate unconditionally are safe to place in a group and unsafe to place in charge of
+something, and the distance between those two sentences is what a measurement against the
+best response makes visible.

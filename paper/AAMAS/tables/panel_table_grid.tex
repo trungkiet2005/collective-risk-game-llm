@@ -1,0 +1,21 @@
+% SINH TỰ ĐỘNG bởi paper/AAMAS/analysis/panel_analysis.py — ĐỪNG SỬA TAY.
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+ & \multicolumn{2}{c}{$p=0$} & \multicolumn{4}{c}{all \PanelNrisks{} risk levels} & \multicolumn{2}{c}{slope in $p$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-7}\cmidrule(lr){8-9}
+model & giv. & cash & giv. & hit\% & cash & lost\% & $\hat\beta$ & $P$ \\
+\midrule
+Qwen3-235B & 18.0 & 22.0 & 18.3 & 2 & 6.3 & 75 & $-0.20$ & $0.104$ \\
+Flash-Lite 3.5 & 20.0 & 20.0 & 20.0 & 100 & 20.0 & 21 & $0.00$ & $0.911$ \\
+GPT-5.6 Luna & 0.0 & 40.0 & 18.1 & 70 & 18.5 & 27 & $8.88$ & ${<}0.001$ \\
+Haiku 4.5 & 20.9 & 19.1 & 21.1 & 98 & 18.9 & 26 & $0.44$ & $0.064$ \\
+Grok-4.20 NR & 37.4 & 2.6 & 35.0 & 100 & 5.0 & 80 & $6.32$ & ${<}0.001$ \\
+\bottomrule
+\end{tabular}
+\caption{Self-play on the eleven-point risk grid, $\PanelNgamesBaseline$ games. ``giv.'' is the mean total a seat contributes of its $\PanelEndowment$-unit endowment, ``cash'' its mean final payoff, ``hit\%'' the share of games reaching the target. ``lost\%'' is the share of the attainable payoff forfeited, measured against $\max\{(1-p)\PanelEndowment,\PanelFairTotal\}$, which is both the welfare-optimal outcome and the best Nash equilibrium (Proposition~\ref{prop:eq}). The two $p=0$ columns need no such benchmark: there contributing is strictly dominated, so every unit given is lost under any increasing utility. $\hat\beta$ is the OLS slope of ``giv.'' on $p$, with $P$ from a $\PanelNpermTex$-resample permutation test over risk labels; the unit of analysis is the game.}
+\label{tab:grid}
+\end{table}

@@ -73,6 +73,9 @@ paper/**/*.toc
 paper/**/*.fls
 paper/**/*.fdb_latexmk
 paper/**/*.synctex.gz
+# .blg là log của bibtex — bỏ. Nhưng .bbl thì TRACK, cố ý: nó là danh mục tài liệu đã dựng
+# sẵn, và arXiv nhận bản nộp không chạy bibtex nên thiếu nó là hỏng lúc nộp.
+paper/**/*.blg
 # Bản dựng thử của paper/AAMAS/ — file này TỰ KHAI trong header là "không phải bản nộp",
 # nó chỉ để kiểm mục section có compile không. 221 KB và đổi HOÀN TOÀN mỗi lần chạy
 # pdflatex, nên mỗi lần dựng thử là một blob mới nằm vĩnh viễn trong history.

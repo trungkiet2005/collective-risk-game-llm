@@ -1,0 +1,121 @@
+%% =====================================================================================
+%% main.tex — AAMAS 2027 submission.
+%%
+%% ⚠️ DUNG `acmart` CUA MIKTEX, KHONG PHAI `aamas_2027_template.zip`.
+%%    Plan §1 cam sua style file, va ban template chinh thuc chua tai ve. Khi tai ve roi
+%%    thi CHI doi dong \documentclass + khoi \acmConference ben duoi; khong mot dong nao
+%%    trong sections/ phai sua, vi moi muc deu doc lap va khong dung goi nao ngoai
+%%    booktabs/graphicx/amsmath/amssymb.
+%%    Sau khi doi PHAI kiem lai: (a) khong Overfull \hbox nao o hai bang, (b) so trang
+%%    khong ke references <= 8.
+%%
+%% BIEN DICH:
+%%     cd paper/AAMAS && latexmk -pdf main.tex
+%%     (hoac pdflatex -> bibtex -> pdflatex x2)
+%%
+%% MOI CON SO TRONG VAN XUOI LA MOT MACRO sinh tu `results/`. Hai script sinh chung:
+%%     python paper/AAMAS/analysis/panel_analysis.py   -> \Panel...   (§4, §5)
+%%     python paper/AAMAS/analysis/e3a_analysis.py     -> \Ethreea... (§6)
+%%     python paper/AAMAS/analysis/e3a_prose_numbers.py-> \Ethreeax...(§6)
+%% Doi data -> chay lai ba script -> text va bang cung doi. Thay minh dinh go tay mot con
+%% so vao section nao thi DUNG LAI va di them mot macro vao script.
+%% =====================================================================================
+\documentclass[sigconf,anonymous,review]{acmart}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+%% KHONG nap amssymb: acmart dung newtxmath, va hai goi cung dinh nghia \Bbbk nen bao
+%% "Command \Bbbk already defined" roi dung han. Khong muc nao can ky hieu cua amssymb —
+%% dau het chung minh ve bang \rule (\crgqed), khong dung \square.
+\usepackage{amsmath}
+
+%% acmart dinh nghia san moi truong `proposition`; guard nay de ban template AAMAS that
+%% (neu no khong nap amsthm) van compile duoc thay vi hong o cho khong ai ngo.
+\makeatletter
+\@ifundefined{proposition}{\theoremstyle{plain}\newtheorem{proposition}{Proposition}}{}
+\makeatother
+
+%% Dau het chung minh. Ve bang \rule chu khong \square/\Box: hai cai do doi amssymb hoac
+%% latexsym, va moi muc phai compile duoc ma khong bat template nap them goi nao.
+%% §6 cung \providecommand cai nay, nen no van chay doc lap trong main_preview.tex.
+\providecommand{\crgqed}{\rule{0.5em}{0.5em}}
+
+%% Xoa toan bo khoi ban quyen/DOI. Ban nop review khong co cai nao that ca, va de mac dinh
+%% thi acmart in mot dai "Permission to make digital or hard copies..." an mat nua cot.
+\setcopyright{none}
+\settopmatter{printacmref=false, printfolios=true}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\acmConference[AAMAS '27]{Proc.\ of the 26th International Conference on Autonomous Agents
+  and Multiagent Systems (AAMAS 2027)}{May 3--7, 2027}{Hanoi, Vietnam}
+\acmBooktitle{Proc.\ of the 26th International Conference on Autonomous Agents and
+  Multiagent Systems (AAMAS 2027), Hanoi, Vietnam, May 3--7, 2027}
+
+%% Con so cua cac muc. Ca ba file CHI chua \newcommand nen input o preamble duoc.
+\input{tables/panel_numbers.tex}
+\input{tables/e3a_numbers.tex}
+\input{tables/e3a_prose_numbers.tex}
+
+\begin{document}
+
+\title{Best-responding to whom? Risk attitudes and opponent-conditioning of LLM agents in
+collective-risk dilemmas}
+
+\author{Anonymous Author(s)}
+\affiliation{\institution{Anonymous Institution}\country{}}
+
+\begin{abstract}
+Language-model agents are being deployed into settings where their choices impose risk on
+a group, yet most of the evidence about how they behave there comes from self-play, in
+which one model faces copies of itself. Self-play cannot separate an agent reasoning about
+its opponents from an agent executing a fixed script, because the two produce the same
+transcript. We run $\PanelNgames$ games of the collective-risk social dilemma across
+\PanelNmodelsWord{} production models and break that symmetry three ways. On an
+\PanelNrisksWord{}-point grid of
+catastrophe risk, \PanelNFlatWord{} of \PanelNmodelsWord{} models contribute the same
+amount at every level, and a fourth changes only at the control at $p=0$. There
+contributing is strictly dominated, yet $\PanelZeroSeatsPaying$ of $\PanelZeroSeats$ seats
+still pay, and the panel forfeits $\PanelForfeitPanelPct\%$ of the payoff attainable at
+the welfare-optimal outcome. Deleting the prompt's equal-split gloss
+never lowers contribution and raises it to the endowment cap in two models, so the
+cooperation is not compliance with a supplied focal point. Nor is it a failure of
+comprehension: asked in the middle of their own games, the agents answer
+$\PanelProbeRulesN$ questions about the rules at $\PanelProbeRulesAcc\%$ and identify the
+higher-paying strategy at $p=\PanelProbeLowRisk$ at $\PanelProbeCompareLowAcc\%$, then
+contribute $\PanelProbeLowContrib$ units against their own stated answer. Finally, seating
+one model against $\EthreeaxSeatsScripted$ scripted opponents makes the best response computable: no model
+plays it in any of $\EthreeaNgames$ games, including $\EthreeaDominatedGames$ in which
+every alternative is strictly dominated, and a trivial free-rider out-earns every model in
+the panel. Cooperation from these agents is a fixed schedule rather than a choice, which
+makes them safe collaborators and unsafe stakeholders.
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+<concept><concept_id>10010147.10010178.10010199</concept_id>
+<concept_desc>Computing methodologies~Multi-agent systems</concept_desc>
+<concept_significance>500</concept_significance></concept>
+<concept><concept_id>10010147.10010178.10010179</concept_id>
+<concept_desc>Computing methodologies~Natural language processing</concept_desc>
+<concept_significance>300</concept_significance></concept>
+</ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Computing methodologies~Multi-agent systems}
+\ccsdesc[300]{Computing methodologies~Natural language processing}
+
+\keywords{Large language model agents; social dilemmas; collective risk; best response;
+empirical game theory}
+
+\maketitle
+
+\input{sections/01_intro.tex}
+\input{sections/02_related.tex}
+\input{sections/03_setting.tex}
+\input{sections/04_riskgrid.tex}
+\input{sections/05_controls.tex}
+\input{sections/06_bestresponse.tex}
+\input{sections/07_discussion.tex}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+\end{document}

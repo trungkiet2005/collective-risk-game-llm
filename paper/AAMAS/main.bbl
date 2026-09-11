@@ -1,0 +1,208 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{13}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter does
+%%% not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+\makeatletter
+\@ifundefined{NAT@parse@date}{}{\let\NAT@parse@date@orig\NAT@parse@date}
+\@ifundefined{NAT@parse@date}{}{\def\NAT@parse@date#1#2#3#4#5#6@@{\NAT@parse@date@orig#1#2#3#4#5#6@@\def\NAT@tempyear{0000}\def\NAT@tempexlab{{?}}\ifx\NAT@year\NAT@tempyear\ifx\NAT@exlab\NAT@tempexlab\def\NAT@date{[n.\,d.]}\else\edef\NAT@date{[n.\,d.]\NAT@exlab}\fi\fi}}
+\makeatother
+
+\bibitem[Akata et~al\mbox{.}(2023)]%
+        {akata2023playing}
+\bibfield{author}{\bibinfo{person}{Elif Akata}, \bibinfo{person}{Lion Schulz},
+  \bibinfo{person}{Julian Coda-Forno}, \bibinfo{person}{Seong~Joon Oh},
+  \bibinfo{person}{Matthias Bethge}, {and} \bibinfo{person}{Eric Schulz}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Playing repeated games with Large Language Models}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2305.16867}}
+  (\bibinfo{year}{2023}).
+\newblock
+
+
+\bibitem[{Anonymous}(2026)]%
+        {anon-if}
+\bibfield{author}{\bibinfo{person}{{Anonymous}}.}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \showarticletitle{Capability enables but does not confer risk
+  sensitivity in {LLM} agents}.
+\newblock \bibinfo{journal}{\emph{Manuscript under review}}
+  (\bibinfo{year}{2026}).
+\newblock
+\newblock
+\shownote{Citation withheld for double-blind reviewing; the overlap with the
+  present paper is declared in Section~\ref{sec:related}}.
+
+
+\bibitem[Dafoe et~al\mbox{.}(2020)]%
+        {dafoe2020open}
+\bibfield{author}{\bibinfo{person}{Allan Dafoe}, \bibinfo{person}{Edward
+  Hughes}, \bibinfo{person}{Yoram Bachrach}, \bibinfo{person}{Tantum Collins},
+  \bibinfo{person}{Kevin~R. McKee}, \bibinfo{person}{Joel~Z. Leibo},
+  \bibinfo{person}{Kate Larson}, {and} \bibinfo{person}{Thore Graepel}.}
+  \bibinfo{year}{2020}\natexlab{}.
+\newblock \showarticletitle{Open Problems in Cooperative {AI}}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2012.08630}}
+  (\bibinfo{year}{2020}).
+\newblock
+
+
+\bibitem[Fontana et~al\mbox{.}(2024)]%
+        {fontana2024nicer}
+\bibfield{author}{\bibinfo{person}{Nicol{\'o} Fontana},
+  \bibinfo{person}{Francesco Pierri}, {and} \bibinfo{person}{Luca~Maria
+  Aiello}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Nicer than Humans: How do Large Language Models
+  Behave in the Prisoner's Dilemma?}
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2406.13605}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Horton(2023)]%
+        {horton2023large}
+\bibfield{author}{\bibinfo{person}{John~J. Horton}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Large Language Models as Simulated Economic
+  Agents: What Can We Learn from Homo Silicus?}}
+\newblock \bibinfo{type}{{T}echnical {R}eport} 31122.
+  \bibinfo{institution}{National Bureau of Economic Research}.
+\newblock
+
+
+\bibitem[Hughes et~al\mbox{.}(2018)]%
+        {hughes2018inequity}
+\bibfield{author}{\bibinfo{person}{Edward Hughes}, \bibinfo{person}{Joel~Z.
+  Leibo}, \bibinfo{person}{Matthew Phillips}, \bibinfo{person}{Karl Tuyls},
+  \bibinfo{person}{Edgar Due{\~n}ez-Guzman},
+  \bibinfo{person}{Antonio~Garc{\'\i}a Casta{\~n}eda}, \bibinfo{person}{Iain
+  Dunning}, \bibinfo{person}{Tina Zhu}, \bibinfo{person}{Kevin McKee},
+  \bibinfo{person}{Raphael Koster}, {et~al\mbox{.}}}
+  \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{Inequity aversion improves cooperation in
+  intertemporal social dilemmas}. In \bibinfo{booktitle}{\emph{Advances in
+  Neural Information Processing Systems (NeurIPS)}}.
+\newblock
+
+
+\bibitem[Leibo et~al\mbox{.}(2017)]%
+        {leibo2017multi}
+\bibfield{author}{\bibinfo{person}{Joel~Z. Leibo}, \bibinfo{person}{Vinicius
+  Zambaldi}, \bibinfo{person}{Marc Lanctot}, \bibinfo{person}{Janusz Marecki},
+  {and} \bibinfo{person}{Thore Graepel}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Multi-agent Reinforcement Learning in Sequential
+  Social Dilemmas}. In \bibinfo{booktitle}{\emph{Proceedings of the 16th
+  International Conference on Autonomous Agents and MultiAgent Systems
+  (AAMAS)}}. \bibinfo{pages}{464--473}.
+\newblock
+
+
+\bibitem[Milinski et~al\mbox{.}(2008)]%
+        {milinski2008collective}
+\bibfield{author}{\bibinfo{person}{Manfred Milinski}, \bibinfo{person}{Ralf~D.
+  Sommerfeld}, \bibinfo{person}{Hans-J{\"u}rgen Krambeck},
+  \bibinfo{person}{Floyd~A. Reed}, {and} \bibinfo{person}{Jochem Marotzke}.}
+  \bibinfo{year}{2008}\natexlab{}.
+\newblock \showarticletitle{The collective-risk social dilemma and the
+  prevention of simulated dangerous climate change}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
+  Sciences}} \bibinfo{volume}{105}, \bibinfo{number}{7} (\bibinfo{year}{2008}),
+  \bibinfo{pages}{2291--2294}.
+\newblock
+
+
+\bibitem[Park et~al\mbox{.}(2023)]%
+        {park2023generative}
+\bibfield{author}{\bibinfo{person}{Joon~Sung Park}, \bibinfo{person}{Joseph~C.
+  O'Brien}, \bibinfo{person}{Carrie~J. Cai}, \bibinfo{person}{Meredith~Ringel
+  Morris}, \bibinfo{person}{Percy Liang}, {and} \bibinfo{person}{Michael~S.
+  Bernstein}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Generative Agents: Interactive Simulacra of Human
+  Behavior}. In \bibinfo{booktitle}{\emph{Proceedings of the 36th Annual ACM
+  Symposium on User Interface Software and Technology (UIST)}}.
+\newblock
+
+
+\bibitem[Perolat et~al\mbox{.}(2017)]%
+        {perolat2017multi}
+\bibfield{author}{\bibinfo{person}{Julien Perolat}, \bibinfo{person}{Joel~Z.
+  Leibo}, \bibinfo{person}{Vinicius Zambaldi}, \bibinfo{person}{Charles
+  Beattie}, \bibinfo{person}{Karl Tuyls}, {and} \bibinfo{person}{Thore
+  Graepel}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{A multi-agent reinforcement learning model of
+  common-pool resource appropriation}. In \bibinfo{booktitle}{\emph{Advances in
+  Neural Information Processing Systems (NeurIPS)}}.
+\newblock
+
+
+\bibitem[Piatti et~al\mbox{.}(2024)]%
+        {piatti2024cooperate}
+\bibfield{author}{\bibinfo{person}{Giorgio Piatti}, \bibinfo{person}{Zhijing
+  Jin}, \bibinfo{person}{Max Kleiman-Weiner}, \bibinfo{person}{Bernhard
+  Sch{\"o}lkopf}, \bibinfo{person}{Mrinmaya Sachan}, {and}
+  \bibinfo{person}{Rada Mihalcea}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Cooperate or Collapse: Emergence of Sustainable
+  Cooperation in a Society of {LLM} Agents}. In
+  \bibinfo{booktitle}{\emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}}.
+\newblock
+
+
+\bibitem[Santos and Pacheco(2011)]%
+        {santos2011risk}
+\bibfield{author}{\bibinfo{person}{Francisco~C. Santos} {and}
+  \bibinfo{person}{Jorge~M. Pacheco}.} \bibinfo{year}{2011}\natexlab{}.
+\newblock \showarticletitle{Risk of collective failure provides an escape from
+  the tragedy of the commons}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
+  Sciences}} \bibinfo{volume}{108}, \bibinfo{number}{26}
+  (\bibinfo{year}{2011}), \bibinfo{pages}{10421--10425}.
+\newblock
+
+
+\bibitem[Tavoni et~al\mbox{.}(2011)]%
+        {tavoni2011inequality}
+\bibfield{author}{\bibinfo{person}{Alessandro Tavoni}, \bibinfo{person}{Astrid
+  Dannenberg}, \bibinfo{person}{Giorgos Kallis}, {and} \bibinfo{person}{Andreas
+  L{\"o}schel}.} \bibinfo{year}{2011}\natexlab{}.
+\newblock \showarticletitle{Inequality, communication, and the avoidance of
+  disastrous climate change in a public goods game}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
+  Sciences}} \bibinfo{volume}{108}, \bibinfo{number}{29}
+  (\bibinfo{year}{2011}), \bibinfo{pages}{11825--11829}.
+\newblock
+
+
+\end{thebibliography}

@@ -1,0 +1,108 @@
+%% =====================================================================================
+%% P-1 — Introduction.  Muc LaTeX DOC LAP: bat dau bang \section, khong preamble.
+%%
+%% BON NUOC DI (Nowozin/Jarosz): (1) van de va vi sao no quan trong voi nguoi xay he MAS,
+%% (2) VI SAO CHUA GIAI QUYET — tu choi self-play, khong phai "chua ai lam", (3) chung toi
+%% lam gi, (4) ba gach dau dong dong gop. Khong co mini-TOC o cuoi; muc 2 tu noi tiep.
+%%
+%% ⛔ DUNG SUA CAU CHOT o cuoi doan 1 ("safe collaborators, unsafe stakeholders") ma khong
+%% sua luon cau cuoi cua abstract va cua §7 — ba cho do co y noi CUNG MOT CAU, vi do la
+%% thu duy nhat nguoi doc luot se mang di.
+%%
+%% NGAN SACH TRANG: 2,0 cot / 16 cot. Khong co float trong muc nay.
+%% =====================================================================================
+
+\section{Introduction}
+\label{sec:intro}
+
+A language-model agent that manages a budget, a shared queue or a resource allocation is a
+player in a social dilemma whether or not its designer framed it as one. Its choices carry
+a cost to itself and a benefit to a group, and the group may fail. What a designer needs to
+know before deploying such an agent is narrow and practical: does it defend the resources
+it was given, and does what it does depend on what the other agents do? An agent that
+contributes whatever the situation is not a cooperator but a liability, since a single
+opportunistic counterpart converts its generosity into a transfer.
+
+%% HINH DAU BAI. Dat o §1 chu khong o §4 LA CO Y: float `[t]` roi vao trang dau, va day la
+%% hinh phai den TRUOC khi nguoi doc quyet dinh co doc tiep khong. §4 chi \ref toi no.
+%% Doi cho thi phai doi ca hai file (01_intro.tex va 04_riskgrid.tex).
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/panel_risk_response.pdf}
+\caption{Self-play across the whole range of catastrophe risk, $\PanelNgamesBaseline$
+games, $\PanelNpercell$ per cell, with percentile bootstrap $95\%$ intervals. The thick
+grey line is the optimum of Proposition~\ref{prop:eq}, which is simultaneously the
+welfare-maximising outcome and the best Nash equilibrium: contribute nothing below
+$p^{*}=\PanelPstar$ (dotted vertical), contribute exactly the share of $\PanelFairTotal$
+above it. It is drawn beneath the model lines so that a model sitting on it stays visible.
+Top, what a seat contributes of its $\PanelEndowment$-unit endowment; bottom, what it
+finishes with. No line bends at the step. The two panels
+together separate the failure modes: \textsc{grok-4.20-non-reasoning} above the optimum
+and \textsc{qwen3-235b-a22b} below it arrive at the same floor in the lower panel, one by
+buying a target it did not need and one by paying for a target it never reaches.}
+\label{fig:grid}
+\end{figure}
+
+Answering either question is exactly what the standard experimental design cannot do.
+Studies of language-model agents in social dilemmas commonly seat copies of a single
+model at every position~\cite{piatti2024cooperate,park2023generative}, and where the design
+does vary the opponent it is usually a two-player repeated game~\cite{akata2023playing,%
+fontana2024nicer}. Self-play with more than two seats produces a transcript that a model
+reasoning about its opponents and a model executing a fixed contribution schedule generate
+alike, so the observation ``the agents cooperated'' is compatible with both, and only one
+of them survives contact with an opponent who defects. The prompt compounds the problem: a
+dilemma stated with a group target and a round count states its own equal split, and an
+agent that repeats that split scores as a cooperator on every aggregate measure.
+
+We break the symmetry of self-play in a collective-risk social
+dilemma~\cite{milinski2008collective}, where \PanelNplayersWord{} players contribute from private
+endowments towards a group target and a catastrophe lottery fires with probability $p$ if
+they miss it. The game suits the question because $p$ is a dial the experimenter owns. It moves the
+optimum from ``contribute nothing'' to ``contribute exactly your share'' at a threshold we
+derive in closed form, so an agent that is choosing and an agent that is repeating are
+told apart by whether anything changes when the optimum does. We run $\PanelNgames$ games on \PanelNmodelsWord{} production models --- one per provider,
+all at the cheap tier of their family --- and apply three controls, each of which removes
+one explanation for the cooperation the models display.
+
+The first control varies the risk itself over an \PanelNrisksWord{}-point grid whose endpoint,
+$p=0$, removes the catastrophe altogether and thereby makes contributing strictly
+dominated: no belief and no attitude to risk can justify a single unit. The second deletes
+the two spans of the prompt that state the equal split, which tests whether the models are
+solving the dilemma or reciting the instructions. The third seats one model against $\EthreeaxSeatsScripted$
+opponents whose policies we fix in advance, which makes the best response an arithmetic
+fact rather than an estimate. Alongside all three we ask the playing agent, in the middle
+of its own game, what the rules are and which of two named strategies pays more, so that a
+shortfall in play can be attributed to knowledge or denied it.
+
+Our contributions are the following.
+
+\begin{itemize}
+\item \textbf{A risk-response measurement with a control that needs no assumptions
+  (\S\ref{sec:riskgrid}).} We characterise the equilibria of the game as a function of $p$
+  and show that welfare-optimal and equilibrium play switch at the same threshold,
+  $p^{*}=\PanelPstar$. Against that benchmark \PanelNFlatWord{} of \PanelNmodelsWord{} models
+  contribute a constant across all $\PanelNrisks$ risk levels, the fourth changes only at
+  $p=0$, and $\PanelZeroSeatsPaying$ of $\PanelZeroSeats$ seats pay at $p=0$, where paying
+  is strictly dominated. The panel forfeits $\PanelForfeitPanelPct\%$ of attainable payoff
+  (Figure~\ref{fig:grid}).
+
+\item \textbf{Two controls that rule out the cheap explanations (\S\ref{sec:controls}).}
+  Deleting the prompt's equal-split gloss never lowers contribution and raises it to the
+  endowment cap in two models, so the behaviour is not compliance with a supplied focal
+  point. The agents answer $\PanelProbeRulesN$ in-situ questions about the rules at
+  $\PanelProbeRulesAcc\%$ and, at $p=\PanelProbeLowRisk$, identify contributing nothing as
+  the higher-paying strategy at $\PanelProbeCompareLowAcc\%$ --- then contribute
+  $\PanelProbeLowContrib$ units in the same games. Knowing the answer and acting on it come
+  apart.
+
+\item \textbf{A best-response profile against known opponents
+  (\S\ref{sec:bestresponse}).} With $\EthreeaxSeatsScripted$ scripted seats the best response is computable
+  exactly. No model plays it in any of $\EthreeaNgames$ games, including the
+  $\EthreeaDominatedGames$ in which contributing is strictly dominated, and a free-rider
+  that contributes nothing out-earns every model in the panel.
+\end{itemize}
+
+Read together, the three controls say the same thing from three directions: the cooperation
+these agents display is a schedule rather than a choice. A schedule makes them safe
+collaborators and unsafe stakeholders, and that distinction is one a deployment can design
+around only once it is measured.
