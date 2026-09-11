@@ -455,7 +455,10 @@ def main():
                 else:
                     log(h, f"download {m} OK -> {dest} ({len(got)} games.csv)")
 
-        # Cong kiem THEO BAO CAO CUA SERVER, dat TRUOC cong download.
+        # Cong kiem THEO BAO CAO CUA SERVER. Dat SAU buoc download (dong ~435) va
+        # truoc phep kiem `dl_failed`: download van phai chay truoc, vi mot sweep
+        # hong mot phan (CRG_ON_GAME_ERROR=skip) VAN commit nhung van da xong va
+        # chung phai ve dia. Cong nay chi quyet dinh co ghi XONG hay khong.
         # Do that 12-09-2026: mot task chua NHIEU run (moi gia tri k cua cung mot
         # cap la mot run rieng), nen dem games.csv theo thu muc task van thay data
         # cua run TRUOC do va cho qua mot run hong toan bo. acc08/crg-e3b-flash-grok:
