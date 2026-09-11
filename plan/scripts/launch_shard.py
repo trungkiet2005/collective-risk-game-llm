@@ -255,8 +255,20 @@ def main():
                     help="rep bat dau (chia shard theo rep): REP_START=5 --reps 5 -> rep 5..9")
     ap.add_argument("--template", default=None,
                     help="CRG_TEMPLATE: 'baseline' (mac dinh) hoac 'nohint' (E1)")
+    ap.add_argument("--temperature", default=None,
+                    help="CRG_TEMPERATURE: mac dinh 0.7 (moi van da co deu o 0.7). "
+                         "E6 dung 0 cho nhanh doi chung giai ma. Dat khac 0.7 se "
+                         "them hau to _temp<x> vao ten experiment, nen no KHONG "
+                         "roi vao thu muc baseline.")
     ap.add_argument("--probe", default=None,
                     help="CRG_PROBE cho E2, vd 'rules,value'")
+    ap.add_argument("--on-game-error", default=None, choices=("abort", "skip"),
+                    help="CRG_ON_GAME_ERROR. 'abort' (mac dinh cua task) dung ca shard khi "
+                         "MOT o hong; 'skip' bo o do roi quet tiep. Do that 11-09-2026: mot "
+                         "cu 429 thoang qua o van thu 4 lam mat 27/30 van cua shard duoi "
+                         "'abort'. Duoi 'skip' thi assertion cuoi van danh dau run la hong "
+                         "(co y - de shard mat o khong doc thanh sweep sach), nhung cac van "
+                         "da xong VAN duoc commit va tai ve duoc.")
     ap.add_argument("--seat-models", default=None,
                     help="CRG_SEAT_MODELS cho E3a/E3b: dung 6 muc, ghe P1 truoc, "
                          "vd 'self,scripted:always_4,...'")
@@ -306,6 +318,10 @@ def main():
             overrides["CRG_PROBE"] = args.probe
         if args.seat_models:
             overrides["CRG_SEAT_MODELS"] = args.seat_models
+        if args.temperature:
+            overrides["CRG_TEMPERATURE"] = args.temperature
+        if args.on_game_error:
+            overrides["CRG_ON_GAME_ERROR"] = args.on_game_error
         if overrides:
             log(h, f"overrides={overrides}")
 
@@ -359,8 +375,17 @@ def main():
             for m in args.model:
                 cmd += ["-m", m]
             cmd += ["--wait", str(args.wait)]
-            rc, out = run_cmd(h, env, cmd, timeout=int(args.wait) + 900)
-            log(h, f"run ket thuc rc={rc}")
+            run_rc, out = run_cmd(h, env, cmd, timeout=int(args.wait) + 900)
+            log(h, f"run ket thuc rc={run_rc}")
+            if run_rc != 0:
+                # Đo thật 11-09-2026: `kaggle b t run` trả 503 ngay lúc submit (lỗi phía
+                # Kaggle - sự thật số 2 trong CLAUDE.md, đổi account vô ích) nên run KHÔNG
+                # HỀ khởi động. Trước đây rc này chỉ được ghi log rồi bỏ đó, và cổng
+                # download bên dưới lại đếm games.csv của task KHÁC nên shard báo XONG
+                # trong khi không có ván nào. Vẫn đi tiếp để tải phần data đã có (run có
+                # thể chết GIỮA đường và để lại data một phần), nhưng phải kêu to.
+                log(h, "!! `kaggle b t run` LOI - run co the CHUA HE khoi dong. "
+                       "Cong download ben duoi se quyet dinh shard co XONG hay khong.")
             for line in out.splitlines():
                 if re.search(r"(COMPLETED|ERRORED|Error code|quota|parse_fail)", line):
                     log(h, f"   >> {line.strip()}")
@@ -396,10 +421,21 @@ def main():
                 dest.mkdir(parents=True, exist_ok=True)
                 rc, out = run_cmd(h, env, ["kaggle", "b", "t", "download", args.task,
                                            "-m", m, "-o", str(dest), "-f"], timeout=1800)
-                got = list(dest.rglob("games.csv"))
-                if rc != 0 or not got:
+                # PHẢI đếm trong ĐÚNG thư mục task. `dest` là gốc của ACCOUNT, nên
+                # rglob ở đây vét cả games.csv của mọi task khác account này từng tải
+                # (E1/E2/E3a). Đo thật 11-09-2026 trên e3b_flashxqwen_k4: download in ra
+                # "Done: 0 runs downloaded" nhưng 5 games.csv cũ của task khác làm `got`
+                # khác rỗng -> shard báo XONG dù KHÔNG tải về ván nào.
+                got = list((dest / args.task).rglob("games.csv"))
+                # Hai chuỗi này là tín hiệu KHÔNG THỂ nhầm của kaggle CLI: không có run
+                # nào để tải. Kiểm chuỗi thay vì chỉ kiểm rc vì `download` trả rc=0 kể cả
+                # khi nó chẳng tải gì.
+                empty = ("Done: 0 runs downloaded" in out
+                         or "No runs found for task" in out)
+                if rc != 0 or empty or not got:
                     dl_failed.append(m)
-                    log(h, f"!! download {m} THAT BAI rc={rc}, games.csv={len(got)}")
+                    log(h, f"!! download {m} THAT BAI rc={rc}, games.csv={len(got)}, "
+                           f"khong-co-run-nao={empty}")
                     if "No such file or directory" in out:
                         log(h, "   -> gan nhu chac chan do do dai duong dan Windows (260). "
                                "Data VAN CON tren server: tai lai bang duong dan ngan hon.")

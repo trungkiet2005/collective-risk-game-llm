@@ -249,6 +249,11 @@ def one(sh, account: str, phase: str, wait: str, conc: str = "4") -> int:
     cmd = [sys.executable, str(LAUNCH), "--account", account, "--model", BARE[a],
            "--risks", p, "--langs", "en", "--reps", str(n), "--rep-start", str(start),
            "--max-out", "3000", "--concurrency", conc, "--task", task_of(a, b),
+           # Mot cu 429 thoang qua khong duoc lam mat ca shard. Do that trong chinh wave
+           # nay: e3b_qwenxgrok_k2 dinh 429 o van thu 4 va 'abort' vut luon 27 van chua
+           # chay. Proxy co the qua tai vi nguoi khac chu khong chi vi minh, nen tran
+           # tai/model o take_batch giam xac suat chu khong loai tru duoc.
+           "--on-game-error", "skip",
            "--seat-models", seat_spec(a, b, k, leads_a(idx, k)),
            "--label", lab, f"--{phase}-only"]
     if phase == "run":
@@ -327,6 +332,42 @@ def smoke(accounts, wait, dry):
         return 0
     print("SMOKE xanh: moi tien to nha deu duoc chap nhan o ghe la.")
     return 0
+
+
+# Dau hieu de quy ket mot cu push hong. Doc tu log cua chinh shard do, vi `launch_shard.py`
+# tra ve CUNG MOT ma loi cho moi nguyen nhan.
+# Thu tu kiem co y nghia: mot lan push co the chua ca 429 lan 403 (ba lan thu, moi lan mot
+# kieu), va khi do thu pham DANG KE la quota -- 429 chi lam cham, 403 lam account vo dung.
+_QUOTA_SIGNS = ("exceeds your available quota", "permission_error", "Error code: 403",
+                "missing phone", "identity verification")
+_BUSY_SIGNS = ("Error code: 429", "rate_limit_error", "experiencing heavy load",
+               "Failed to resolve", "Max retries exceeded", "Connection aborted",
+               "Read timed out", "Temporary failure in name resolution",
+               "502 Server Error", "503 Server Error", "504 Server Error")
+_SHARD_SIGNS = ("not found in", "Unknown model", "invalid model", "Invalid model")
+
+
+def classify_push_fail(lab):
+    """-> "quota" | "busy" | "shard" | "khong-ro".
+
+    "busy" nghia la KHONG duoc loai account: 429/503/DNS deu la trang thai thoang qua o
+    phia proxy hoac phia Kaggle, khong lien quan toi so du cua account. Do that 12-09:
+    quy ket mu quang lam mat 2 account khoe trong mot dot.
+    """
+    txt = ""
+    for p in (REPO / "plan" / "runs" / (lab + ".push.log"),
+              REPO / "plan" / "runs" / lab / "shard.log"):
+        try:
+            txt += p.read_text(encoding="utf-8", errors="replace")[-40000:]
+        except OSError:
+            pass
+    if any(s in txt for s in _SHARD_SIGNS):
+        return "shard"
+    if any(s in txt for s in _QUOTA_SIGNS):
+        return "quota"
+    if any(s in txt for s in _BUSY_SIGNS):
+        return "busy"
+    return "khong-ro"
 
 
 def main():
@@ -433,13 +474,22 @@ def main():
                 continue
             sh, acc = b
             lab = label(sh)
+            cause = classify_push_fail(lab)
+            # 429/503/DNS: trang thai thoang qua o phia proxy hoac Kaggle. Account van
+            # con tien. Tra shard ve hang doi, GIU account, va KHONG tinh vao bo dem
+            # park -- neu tinh thi hai cu 429 lien tiep se park mot shard hoan toan lanh.
+            if cause == "busy":
+                print(f"  proxy/ha tang ban ({lab} tren {acc}) -> giu account, "
+                      f"shard tra ve hang doi")
+                retry.append(sh)
+                continue
             fails[lab] += 1
-            if fails[lab] >= 2:
-                print(f"  !! {lab} hong tren {fails[lab]} account khac nhau "
-                      f"-> LOI O SHARD, park lai")
+            if cause == "shard" or fails[lab] >= 2:
+                print(f"  !! {lab} hong ({cause}, lan {fails[lab]}) -> LOI O SHARD, "
+                      f"park lai")
                 parked.append(sh)
             else:
-                print(f"  het quota? loai {acc} (shard {lab} tra ve hang doi)")
+                print(f"  {cause}: loai {acc} (shard {lab} tra ve hang doi)")
                 accounts = [a for a in accounts if a != acc]
                 retry.append(sh)
         todo = retry + todo
