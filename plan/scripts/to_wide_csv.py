@@ -13,6 +13,26 @@ backup thư mục shard, vì `results/` không dựng lại được chúng.
 Gộp shard: nhiều shard cùng đóng góp vào một file đích (sweep hay chia theo risk/rep).
 Script gộp hết rồi sắp theo `rep`.
 
+`<model_tag>` suy ra từ **cấu hình ghế của từng ván** (`crsd.dataio.wide_csv.seat_model_tag`)
+chứ không phải từ tên thư mục shard. Bàn đồng nhất và bàn E3a (1 ghế LLM + 5 ghế scripted)
+ra đúng cái tên như trước; bàn hỗn hợp E3b ra `mix__<tagA>__<tagB>__k<k>`. Lý do: `-m` chỉ
+chọn được MỘT model nên server ghi mọi cặp vào thư mục của model A — lấy tên thư mục thì
+cả 4 cặp có model A đè lên nhau và mất luôn thông tin "đối thủ là ai, mấy ghế". Hệ quả:
+một shard trộn nhiều cấu hình ghế tự động TÁCH thành nhiều file, không cần cờ nào.
+
+## ⛔ Shard E3b PHẢI gom bằng `--experiment exp_mixed`
+
+Tên thư mục mặc định của shard E3b là `exp_baseline_seats-LLLMMM-<hash>` — **34 ký tự**.
+Cộng với tên `mix__<tagA>__<tagB>__k<k>` (tới 80 ký tự) **lặp lại hai lần** (thư mục và
+tên file), đường dẫn tuyệt đối của cặp dài nhất (haiku + qwen) ra **261 ký tự**, vượt
+trần 260 của Windows. Cái bẫy là nó hỏng MUỘN: `mkdir` qua được (thư mục ngắn hơn file),
+rồi bước ghi file mới nổ — sau khi đã đọc và dựng xong toàn bộ dữ liệu.
+
+Nên script kiểm độ dài **trước khi ghi bất cứ gì** và dừng ngay kèm cách chữa. Cách chữa
+là ép tên experiment ngắn lại::
+
+    python plan/scripts/to_wide_csv.py --src <shard E3b> --experiment exp_mixed
+
 **Trùng `rep` trong cùng một ô là LỖI theo mặc định**, và đây không phải chuyện hiếm: chạy
 lại một shard bị 429 sẽ chơi lại đúng những ô nó đã kịp xong. Đo thật 10-09-2026 trên
 `qwen3-235b`: **31/54 ô chạy lại cho kết quả KHÁC nhau (57%)** dù cùng `seed` và cùng
@@ -40,8 +60,30 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 from crsd.dataio.wide_csv import (  # noqa: E402
-    game_to_wide_row, group_turns, infer_endowment, wide_fieldnames,
+    N_PLAYERS, game_to_wide_row, group_turns, infer_endowment, seat_model_tag,
+    wide_fieldnames,
 )
+
+
+# Trần MAX_PATH của Windows là 260 ký tự KỂ CẢ ký tự kết chuỗi, nên đường dẫn dùng được
+# dài tối đa 259. Kiểm cả trên Linux chứ không khoanh vùng theo `os.name`: cây `results/`
+# được commit vào git và sẽ có người checkout trên Windows, nên một file gom trên Linux mà
+# vượt trần là quả bom hẹn giờ — nổ ở máy khác, lúc chỉ đang `git clone`.
+WIN_MAX_PATH = 259
+
+
+def over_long_paths(dests, limit: int = WIN_MAX_PATH):
+    """Những đường dẫn đích vượt trần, kèm độ dài thật. Đo trên đường dẫn TUYỆT ĐỐI.
+
+    Phải là tuyệt đối vì Windows tính trần trên đường dẫn đầy đủ; đo tương đối thì
+    `results/...` luôn xanh trong khi bản thật dài hơn cả trăm ký tự.
+    """
+    out = []
+    for d in dests:
+        n = len(str(pathlib.Path(d).resolve()))
+        if n > limit:
+            out.append((d, n))
+    return out
 
 
 def risk_token(v) -> str:
@@ -73,9 +115,13 @@ def main() -> int:
     ap.add_argument("--src", nargs="+", required=True, help="thu muc chua shard da tai ve")
     ap.add_argument("--out", default="results")
     ap.add_argument("--experiment", default=None,
-                    help="ep ten experiment; mac dinh lay ten thu muc cha cua games.csv")
+                    help="ep ten experiment; mac dinh lay ten thu muc cha cua games.csv. "
+                         "Shard E3b BAT BUOC dat --experiment exp_mixed: ten mac dinh "
+                         "exp_baseline_seats-LLLMMM-<hash> day duong dan vuot tran 260 "
+                         "ky tu cua Windows")
     ap.add_argument("--only-model", nargs="*", default=None,
-                    help="chi gom nhung model_tag nay (thu muc shard hay lan nhieu model)")
+                    help="chi gom nhung model_tag nay — loc theo tag SUY RA tu cau hinh "
+                         "ghe, nen ban hon hop phai viet du ten mix__A__B__kN")
     ap.add_argument("--allow-shrink", action="store_true",
                     help="cho phep ghi de file dang co bang ban IT van hon")
     ap.add_argument("--on-conflict", choices=("error", "newest"), default="error",
@@ -95,12 +141,17 @@ def main() -> int:
 
     for games_p, turns_p in shards:
         experiment = args.experiment or games_p.parent.name
-        model_tag = games_p.parent.parent.name
-        if args.only_model and model_tag not in args.only_model:
-            continue
         games = list(csv.DictReader(games_p.open(encoding="utf-8")))
         if not games:
             continue
+        # BO QUA RE cho --only-model. Tag that chi biet duoc sau khi dung xong dong wide,
+        # nhung khi shard KHONG bat CRG_SEAT_MODELS thi ca 6 ghe deu la model `-m`, nen
+        # cot `model` cua games.csv (chinh la tag server ghi ra) da du de loai tru. Chi bo
+        # khi CHAC CHAN khong dong nao khop — nho vay --only-model khong con phai doc
+        # turns.jsonl cua nhung shard vo can, tuc khong cham hon truoc.
+        if args.only_model and not any(g.get("seat_models") for g in games):
+            if not {g.get("model") for g in games} & set(args.only_model):
+                continue
         turns = [json.loads(l) for l in turns_p.open(encoding="utf-8")]
         endowment = infer_endowment(games)
         seats_by_game = group_turns(turns)
@@ -112,6 +163,15 @@ def main() -> int:
                 print(f"  LOI {games_p}: khong co luot cho risk={key[0]} rep={key[1]}", file=sys.stderr)
                 return 1
             row = game_to_wide_row(g, seats, endowment, experiment)
+            # Ten thu muc/file suy tu CHINH cau hinh ghe cua van nay, khong lay ten thu
+            # muc shard nua: `kaggle b t run -m <slug>` chi chon duoc mot model, nen ban
+            # hon hop (E3b) bi server ghi vao thu muc cua model A va ca 4 cap co model A
+            # se de len nhau. Suy sau khi co `row` la sach nhat — `game_to_wide_row` da
+            # chuan hoa slug thanh tag trong cac o `agent{i}_llm`.
+            model_tag = seat_model_tag([row[f"agent{i}_llm"]
+                                        for i in range(1, N_PLAYERS + 1)])
+            if args.only_model and model_tag not in args.only_model:
+                continue
             cell = (experiment, risk_token(g["risk_probability"]), model_tag, g["language"])
             store = buckets.setdefault(cell, {})
             prev = store.get(row["rep"])
@@ -132,14 +192,40 @@ def main() -> int:
             n_games += 1
 
     out_root = pathlib.Path(args.out)
+
+    # CONG DO DAI DUONG DAN — chay TRUOC moi thao tac ghi, ke ca truoc mkdir.
+    # Ten `mix__<tagA>__<tagB>__k<k>` lap lai HAI lan (thu muc + ten file), nen cong voi
+    # ten thu muc mac dinh cua shard E3b (`exp_baseline_seats-LLLMMM-<hash>`, 34 ky tu)
+    # thi cap dai nhat (haiku + qwen) ra 261 ky tu > tran 260 cua Windows. Neu de no chay
+    # tiep thi `mkdir` QUA DUOC (thu muc ngan hon file) roi buoc ghi moi hong — tuc hong
+    # muon, sau khi da doc va dung xong toan bo du lieu, va mot phan file da nam tren dia.
+    dests = {}
+    for experiment, ptok, model_tag, lang in buckets:
+        dests[(experiment, ptok, model_tag, lang)] = (
+            out_root / experiment / ptok / model_tag / f"p{ptok}_{lang}_{model_tag}.csv")
+    too_long = over_long_paths(dests.values())
+    if too_long:
+        err = sys.stderr
+        print("", file=err)
+        print(f"!! DUNG: {len(too_long)} duong dan dich vuot tran {WIN_MAX_PATH + 1} ky tu "
+              f"cua Windows (chua ghi gi ca).", file=err)
+        for d, n in sorted(too_long, key=lambda x: -x[1])[:5]:
+            print(f"   {n} ky tu: {pathlib.Path(d).resolve()}", file=err)
+        print("   CACH CHUA: ep ten experiment ngan lai —", file=err)
+        print("     python plan/scripts/to_wide_csv.py --src ... --experiment exp_mixed", file=err)
+        print("   (ten mac dinh cua shard E3b la exp_baseline_seats-LLLMMM-<hash>, 34 ky", file=err)
+        print("    tu; ten `mix__A__B__kN` con lap lai hai lan nen khong con cho.)", file=err)
+        print(f"   Hoac chon --out nong hon: hien tai la {out_root.resolve()}", file=err)
+        return 1
+
     # CHOT AN TOAN. Mot lan gom hep pham vi (vd chi mot model) van tro toi cung cay
     # `results/`, va ghi de la ghi de TOAN BO file. File moi it van hon file dang co gan
     # nhu chac chan la mat data am tham -> chan lai. Bat duoc dung ca nay 10-09-2026: gom
     # rieng qwen nhung --src quet trung ca haiku/luna trong cung thu muc account, suyt ghi
     # de file 10 van bang ban 8-9 van.
     shrink = []
-    for (experiment, ptok, model_tag, lang), by_rep in sorted(buckets.items()):
-        dest = out_root / experiment / ptok / model_tag / f"p{ptok}_{lang}_{model_tag}.csv"
+    for cell, by_rep in sorted(buckets.items()):
+        dest = dests[cell]
         if dest.is_file():
             have = sum(1 for _ in dest.open(encoding="utf-8")) - 1
             if have > len(by_rep):
@@ -154,17 +240,16 @@ def main() -> int:
         print("   hoac --allow-shrink neu that su co y giam so van.", file=err)
         return 1
     n_files = n_rows = 0
-    for (experiment, p, model_tag, lang), by_rep in sorted(buckets.items()):
+    for cell, by_rep in sorted(buckets.items()):
         rows = [by_rep[r][0] for r in sorted(by_rep)]
-        dest = out_root / experiment / p / model_tag
-        fname = f"p{p}_{lang}_{model_tag}.csv"
+        dest = dests[cell]
         n_files += 1
         n_rows += len(rows)
         if args.dry_run:
-            print(f"  [dry] {dest / fname}  ({len(rows)} van)")
+            print(f"  [dry] {dest}  ({len(rows)} van)")
             continue
-        dest.mkdir(parents=True, exist_ok=True)
-        with (dest / fname).open("w", newline="", encoding="utf-8") as f:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with dest.open("w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=fields)
             w.writeheader()
             w.writerows(rows)
