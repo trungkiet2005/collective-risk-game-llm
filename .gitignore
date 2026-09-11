@@ -73,6 +73,11 @@ paper/**/*.toc
 paper/**/*.fls
 paper/**/*.fdb_latexmk
 paper/**/*.synctex.gz
+# Bản dựng thử của paper/AAMAS/ — file này TỰ KHAI trong header là "không phải bản nộp",
+# nó chỉ để kiểm mục section có compile không. 221 KB và đổi HOÀN TOÀN mỗi lần chạy
+# pdflatex, nên mỗi lần dựng thử là một blob mới nằm vĩnh viễn trong history.
+# Hình trong figures/ thì VẪN track: chúng chỉ đổi khi phân tích đổi, và là thứ paper cần.
+paper/AAMAS/main_preview.pdf
 
 # LaTeX build artifacts (slides/) — giữ .tex/.pdf/figs, bỏ file trung gian
 slides/*.aux
