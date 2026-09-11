@@ -36,13 +36,39 @@ xem `plan/aamas2027-plan.md` §7.
 
 ```
 results/
-├── DATA_CARD.md          <- file này
-├── PROVENANCE.json       <- ván nào từ đâu ra
-└── <experiment>/         <- exp_baseline, exp_nohint, exp_bestresponse, …
+├── DATA_CARD.md                <- file này
+├── PROVENANCE.json             <- ván nào từ đâu ra
+├── exp_evprobe_probes.jsonl    <- câu trả lời probe của E2 (xem dưới)
+├── exp_evprobe_probes.csv      <- cùng nội dung, dạng bảng phẳng
+└── <experiment>/         <- exp_baseline, exp_nohint, exp_evprobe, …
     └── <p>/              <- 0, 0.1, 0.2, … 1   (tên thư mục = con số)
         └── <model_tag>/
             └── p<p>_<lang>_<model_tag>.csv
 ```
+
+### ⚠️ `exp_evprobe`: kết quả nằm NGOÀI wide CSV
+
+Với mọi experiment khác, wide CSV là toàn bộ dữ liệu. **E2 thì không.** Wide CSV mô tả
+ván chơi, còn phép đo của E2 là *model có hiểu luật và so sánh được kỳ vọng không* — thứ
+đó nằm ở **`exp_evprobe_probes.jsonl`** (4.500 bản ghi: 150 ván × 30 câu), một dòng một
+câu hỏi, kèm `question_text`, `raw_response`, `parsed_answer`, `ground_truth`, `correct`.
+
+Hai file đó nằm ở **gốc `results/`** chứ không nằm dưới `results/exp_evprobe/`, vì luật
+đường dẫn chỉ cho phép thư mục **tên là số** dưới `<experiment>/` — một file lạc vào đó
+làm `float(p.name)` ném `ValueError` và giết cả lần đọc. Cùng lý do với `DATA_CARD.md`.
+
+Đọc nhanh:
+
+```python
+import pandas as pd
+pr = pd.read_json("results/exp_evprobe_probes.jsonl", lines=True)
+pr.groupby("category").correct.mean()   # rules 1.000 · value 0.772
+pr.groupby("model").correct.mean()
+```
+
+Câu hỏi probe là **lệnh gọi riêng, không chèn vào lịch sử ván**, nên ván trong
+`exp_evprobe/` vẫn đúng điều kiện baseline; chênh lệch so với `exp_baseline` là nhiễu lấy
+mẫu chứ không phải hiệu ứng của probe.
 
 Ví dụ: `results/exp_baseline/0.9/openai-gpt-5.6-luna/p0.9_en_openai-gpt-5.6-luna.csv`
 
