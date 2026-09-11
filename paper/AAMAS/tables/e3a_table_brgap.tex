@@ -1,0 +1,53 @@
+%% SINH TỰ ĐỘNG bởi paper/AAMAS/analysis/e3a_analysis.py — ĐỪNG SỬA TAY.
+%% Mọi con số gọi qua macro của e3a_numbers.tex nên bảng và text không lệch nhau.
+%% Cần: \usepackage{booktabs}
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{2.5pt}%  <- ban 6 cot truoc day tran cot acmart 29.4pt; bo cot
+%  `Share` (= Gap/40, xem docstring generator). Ha them 4 -> 2.5pt vi dagger tren nhan hai
+%  khoi an ~13pt be ngang: khung xem thu (article 10pt) bao Overfull o 4pt va 3pt, het han
+%  o 2.5pt; khung acmart 9pt thi khong tran o bat ky muc nao trong ba. Dat trong table env
+%  nen khong ro ri ra ngoai.
+\caption{Distance to best response. \emph{Gap} is the distance from the realised total
+contribution to the nearest best response, in contribution units; \emph{Forfeited} prices
+that gap as expected payoff under the best response minus expected payoff under what was
+played, in units of the $40$-unit endowment, hence a risk-neutral valuation;
+\emph{Optimal} is the percentage of games played at zero cost. Expectations are taken over
+the catastrophe lottery, so the numbers do not inherit its variance. \textsuperscript{\dag}These two
+blocks hold fewer independent numbers than columns and should be read as a single
+measurement: the best response there is $0$ at every $p$, so \emph{Gap} is by construction
+the mean total contribution, and under \textsc{all-contribute} \emph{Forfeited} equals
+\emph{Gap} to the cent, the target being secured whatever the seat does. Only the
+\textsc{fair-share} and \textsc{cond.\ coop.} blocks carry two independent numbers.}
+\label{tab:e3a-gap}
+\begin{tabular}{llrrr}
+\toprule
+Opponents & Model & Gap & Forfeited & Optimal \\
+\midrule
+All-defect\textsuperscript{\dag} & Haiku 4.5 & \EthreeaGapDefectHaiku & \EthreeaLossDefectHaiku & \EthreeaIsBRDefectHaiku\% \\
+ & Flash-Lite 3.5 & \EthreeaGapDefectFlash & \EthreeaLossDefectFlash & \EthreeaIsBRDefectFlash\% \\
+ & GPT-5.6 Luna & \EthreeaGapDefectLuna & \EthreeaLossDefectLuna & \EthreeaIsBRDefectLuna\% \\
+ & Qwen3-235B & \EthreeaGapDefectQwen & \EthreeaLossDefectQwen & \EthreeaIsBRDefectQwen\% \\
+ & Grok-4.20 NR & \EthreeaGapDefectGrok & \EthreeaLossDefectGrok & \EthreeaIsBRDefectGrok\% \\
+\addlinespace
+All-contribute\textsuperscript{\dag} & Haiku 4.5 & \EthreeaGapCarryHaiku & \EthreeaLossCarryHaiku & \EthreeaIsBRCarryHaiku\% \\
+ & Flash-Lite 3.5 & \EthreeaGapCarryFlash & \EthreeaLossCarryFlash & \EthreeaIsBRCarryFlash\% \\
+ & GPT-5.6 Luna & \EthreeaGapCarryLuna & \EthreeaLossCarryLuna & \EthreeaIsBRCarryLuna\% \\
+ & Qwen3-235B & \EthreeaGapCarryQwen & \EthreeaLossCarryQwen & \EthreeaIsBRCarryQwen\% \\
+ & Grok-4.20 NR & \EthreeaGapCarryGrok & \EthreeaLossCarryGrok & \EthreeaIsBRCarryGrok\% \\
+\addlinespace
+Fair-share & Haiku 4.5 & \EthreeaGapCoopHaiku & \EthreeaLossCoopHaiku & \EthreeaIsBRCoopHaiku\% \\
+ & Flash-Lite 3.5 & \EthreeaGapCoopFlash & \EthreeaLossCoopFlash & \EthreeaIsBRCoopFlash\% \\
+ & GPT-5.6 Luna & \EthreeaGapCoopLuna & \EthreeaLossCoopLuna & \EthreeaIsBRCoopLuna\% \\
+ & Qwen3-235B & \EthreeaGapCoopQwen & \EthreeaLossCoopQwen & \EthreeaIsBRCoopQwen\% \\
+ & Grok-4.20 NR & \EthreeaGapCoopGrok & \EthreeaLossCoopGrok & \EthreeaIsBRCoopGrok\% \\
+\addlinespace
+Cond.\ coop. & Haiku 4.5 & \EthreeaGapCondHaiku & \EthreeaLossCondHaiku & \EthreeaIsBRCondHaiku\% \\
+ & Flash-Lite 3.5 & \EthreeaGapCondFlash & \EthreeaLossCondFlash & \EthreeaIsBRCondFlash\% \\
+ & GPT-5.6 Luna & \EthreeaGapCondLuna & \EthreeaLossCondLuna & \EthreeaIsBRCondLuna\% \\
+ & Qwen3-235B & \EthreeaGapCondQwen & \EthreeaLossCondQwen & \EthreeaIsBRCondQwen\% \\
+ & Grok-4.20 NR & \EthreeaGapCondGrok & \EthreeaLossCondGrok & \EthreeaIsBRCondGrok\% \\
+\bottomrule
+\end{tabular}
+\end{table}

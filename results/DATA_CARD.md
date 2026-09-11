@@ -168,12 +168,45 @@ kể cả `p = 0`, nơi không có thảm hoạ nào để tránh, nên đó kh�
 
 ### Khối B — luật chơi (9)
 
-`n_players` (6) · `endowment` (40.0) · `contribution_options` (`"[0, 2, 4]"`) · `target`
-(120.0) · `risk_probability` (float, = `<p>` trong đường dẫn) · `n_rounds_is_known` (True) ·
-`max_rounds` (10) · `played_rounds` (10) · `agents_communicate` (False)
+`n_players` (6) · `endowment` (40.0) · `contribution_options` (**KHÔNG phải hằng số —
+xem cảnh báo ngay dưới**) · `target` (120.0) · `risk_probability` (float, = `<p>` trong
+đường dẫn) · `n_rounds_is_known` (True) · `max_rounds` (10) · `played_rounds` (10) ·
+`agents_communicate` (False)
 
-Giữ nguyên tên slot của FAIRGAME để tương thích với corpus prisoner's-dilemma; chúng không
-đổi trong bộ hiện tại nên **đừng dùng làm biến phân tích**.
+Giữ nguyên tên slot của FAIRGAME để tương thích với corpus prisoner's-dilemma; **trừ
+`contribution_options`**, chúng không đổi trong bộ hiện tại nên **đừng dùng làm biến
+phân tích**.
+
+#### ⚠️ `contribution_options` ghi tập nước đi QUAN SÁT ĐƯỢC, không ghi luật chơi
+
+Tài liệu này trước đây ghi ô đó là hằng số `"[0, 2, 4]"`. **Sai.**
+[`crsd/dataio/wide_csv.py`](../crsd/dataio/wide_csv.py) tính nó bằng
+`sorted({int(x) for c in contribs.values() for x in c})` — tức tập các mức đóng góp mà
+**sáu ghế thực sự chơi trong đúng ván đó**. Ván nào cả bàn cùng chơi 2 suốt mười vòng thì
+ô này ghi `"[2]"`. Luật chơi vẫn luôn là `{0, 2, 4}`; nó nằm trong prompt và trong
+`crsd/engine/state.py`, không nằm ở cột này.
+
+Phân bố đo được trên 1.850 ván hiện có:
+
+| giá trị | số ván | % |
+|---|---:|---:|
+| `[0, 2, 4]` | 728 | 39,4 |
+| `[2]` | 545 | 29,5 |
+| `[0, 2]` | 236 | 12,8 |
+| `[2, 4]` | 236 | 12,8 |
+| `[4]` | 65 | 3,5 |
+| `[0, 4]` | 30 | 1,6 |
+| `[0]` | 10 | 0,5 |
+
+Riêng 1.000 ván E3a (`exp_bestresponse_*`): `[0, 2, 4]` 409 · `[2]` 284 · `[0, 2]` 159
+· `[2, 4]` 96 · `[0, 4]` 26 · `[4]` 26 — chỉ 40,9% số dòng mang đủ ba nước đi.
+
+**Hệ quả bắt buộc.** Đừng đọc cột này ra config. Dựng lại tập nước đi hợp lệ từ nó để tính
+best response là suy luật chơi ra từ hành vi, và với ván mà cả bàn chơi 2 thì bạn sẽ kết
+luận trò chơi chỉ có một nước đi — best response trở thành vô nghĩa.
+`paper/AAMAS/analysis/e3a_analysis.py` hardcode `OPTIONS = (0, 2, 4)` đúng vì lý do này.
+Ngược lại cột này **dùng được** như một thống kê mô tả rẻ tiền: nó chính là câu trả lời cho
+"ván này có ai từng chạm 0 / chạm 4 không".
 
 ### Khối C — kết cục nhóm (7)
 

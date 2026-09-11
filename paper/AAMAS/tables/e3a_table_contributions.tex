@@ -1,0 +1,45 @@
+%% SINH TỰ ĐỘNG bởi paper/AAMAS/analysis/e3a_analysis.py — ĐỪNG SỬA TAY.
+%% Mọi con số gọi qua macro của e3a_numbers.tex nên bảng và text không lệch nhau.
+%% Cần: \usepackage{booktabs}
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}%  <- do duoc 249.9pt o tabcolsep mac dinh 6pt, tran
+%  cot 241.15pt cua acmart sigconf. Dat trong table env nen khong ro ri ra ngoai.
+\caption{Total contribution by the single LLM seat over the ten rounds (endowment $40$),
+pooled over the five risk levels; $n=\EthreeaNpercell$ games per cell. \textsc{ci} is a percentile
+bootstrap ($10{,}000$ resamples, fixed seed). The last column is the exact best response,
+computed by exhaustive search over the reachable outcomes; at $p=0.5$ the
+\textsc{fair-share} and \textsc{cond.\ coop.} profiles admit two tied optima
+($0$ and $20$).}
+\label{tab:e3a-contrib}
+\begin{tabular}{llrlrr}
+\toprule
+Opponents & Model & Mean & \textsc{sd} & 95\% \textsc{ci} & Best resp. \\
+\midrule
+All-defect & Haiku 4.5 & \EthreeaMeanDefectHaiku & $\pm$\EthreeaSdDefectHaiku & [\EthreeaCIloDefectHaiku, \EthreeaCIhiDefectHaiku] & \EthreeaBRDefect \\
+ & Flash-Lite 3.5 & \EthreeaMeanDefectFlash & $\pm$\EthreeaSdDefectFlash & [\EthreeaCIloDefectFlash, \EthreeaCIhiDefectFlash] & \EthreeaBRDefect \\
+ & GPT-5.6 Luna & \EthreeaMeanDefectLuna & $\pm$\EthreeaSdDefectLuna & [\EthreeaCIloDefectLuna, \EthreeaCIhiDefectLuna] & \EthreeaBRDefect \\
+ & Qwen3-235B & \EthreeaMeanDefectQwen & $\pm$\EthreeaSdDefectQwen & [\EthreeaCIloDefectQwen, \EthreeaCIhiDefectQwen] & \EthreeaBRDefect \\
+ & Grok-4.20 NR & \EthreeaMeanDefectGrok & $\pm$\EthreeaSdDefectGrok & [\EthreeaCIloDefectGrok, \EthreeaCIhiDefectGrok] & \EthreeaBRDefect \\
+\addlinespace
+All-contribute & Haiku 4.5 & \EthreeaMeanCarryHaiku & $\pm$\EthreeaSdCarryHaiku & [\EthreeaCIloCarryHaiku, \EthreeaCIhiCarryHaiku] & \EthreeaBRCarry \\
+ & Flash-Lite 3.5 & \EthreeaMeanCarryFlash & $\pm$\EthreeaSdCarryFlash & [\EthreeaCIloCarryFlash, \EthreeaCIhiCarryFlash] & \EthreeaBRCarry \\
+ & GPT-5.6 Luna & \EthreeaMeanCarryLuna & $\pm$\EthreeaSdCarryLuna & [\EthreeaCIloCarryLuna, \EthreeaCIhiCarryLuna] & \EthreeaBRCarry \\
+ & Qwen3-235B & \EthreeaMeanCarryQwen & $\pm$\EthreeaSdCarryQwen & [\EthreeaCIloCarryQwen, \EthreeaCIhiCarryQwen] & \EthreeaBRCarry \\
+ & Grok-4.20 NR & \EthreeaMeanCarryGrok & $\pm$\EthreeaSdCarryGrok & [\EthreeaCIloCarryGrok, \EthreeaCIhiCarryGrok] & \EthreeaBRCarry \\
+\addlinespace
+Fair-share & Haiku 4.5 & \EthreeaMeanCoopHaiku & $\pm$\EthreeaSdCoopHaiku & [\EthreeaCIloCoopHaiku, \EthreeaCIhiCoopHaiku] & \EthreeaBRCoop \\
+ & Flash-Lite 3.5 & \EthreeaMeanCoopFlash & $\pm$\EthreeaSdCoopFlash & [\EthreeaCIloCoopFlash, \EthreeaCIhiCoopFlash] & \EthreeaBRCoop \\
+ & GPT-5.6 Luna & \EthreeaMeanCoopLuna & $\pm$\EthreeaSdCoopLuna & [\EthreeaCIloCoopLuna, \EthreeaCIhiCoopLuna] & \EthreeaBRCoop \\
+ & Qwen3-235B & \EthreeaMeanCoopQwen & $\pm$\EthreeaSdCoopQwen & [\EthreeaCIloCoopQwen, \EthreeaCIhiCoopQwen] & \EthreeaBRCoop \\
+ & Grok-4.20 NR & \EthreeaMeanCoopGrok & $\pm$\EthreeaSdCoopGrok & [\EthreeaCIloCoopGrok, \EthreeaCIhiCoopGrok] & \EthreeaBRCoop \\
+\addlinespace
+Cond.\ coop. & Haiku 4.5 & \EthreeaMeanCondHaiku & $\pm$\EthreeaSdCondHaiku & [\EthreeaCIloCondHaiku, \EthreeaCIhiCondHaiku] & \EthreeaBRCond \\
+ & Flash-Lite 3.5 & \EthreeaMeanCondFlash & $\pm$\EthreeaSdCondFlash & [\EthreeaCIloCondFlash, \EthreeaCIhiCondFlash] & \EthreeaBRCond \\
+ & GPT-5.6 Luna & \EthreeaMeanCondLuna & $\pm$\EthreeaSdCondLuna & [\EthreeaCIloCondLuna, \EthreeaCIhiCondLuna] & \EthreeaBRCond \\
+ & Qwen3-235B & \EthreeaMeanCondQwen & $\pm$\EthreeaSdCondQwen & [\EthreeaCIloCondQwen, \EthreeaCIhiCondQwen] & \EthreeaBRCond \\
+ & Grok-4.20 NR & \EthreeaMeanCondGrok & $\pm$\EthreeaSdCondGrok & [\EthreeaCIloCondGrok, \EthreeaCIhiCondGrok] & \EthreeaBRCond \\
+\bottomrule
+\end{tabular}
+\end{table}

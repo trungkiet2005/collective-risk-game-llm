@@ -56,6 +56,17 @@ strategy_recognizer/saved_models/rf_fine.pkl
 /papers/
 docs/papers/*.pdf
 
+# LaTeX build artifacts (paper/) — cùng quy ước với slides/ ngay dưới: giữ .tex/.pdf/figs,
+# bỏ file trung gian. Bản dựng thử của paper/AAMAS/ sinh ra .aux/.log mỗi lần chạy
+# pdflatex; chúng đổi theo từng lần dựng nên commit vào chỉ tạo nhiễu diff.
+paper/**/*.aux
+paper/**/*.log
+paper/**/*.out
+paper/**/*.toc
+paper/**/*.fls
+paper/**/*.fdb_latexmk
+paper/**/*.synctex.gz
+
 # LaTeX build artifacts (slides/) — giữ .tex/.pdf/figs, bỏ file trung gian
 slides/*.aux
 slides/*.fdb_latexmk
