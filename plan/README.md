@@ -20,6 +20,13 @@ Thư mục này giữ kế hoạch **đang thực thi**, để một session/cha
 |---|---|
 | `launch_day_a.py` | phóng cả 12 shard Ngày A song song (`--dry-run` để xem trước) |
 | `launch_shard.py` | chạy 1 shard trên 1 account: auth → sinh file shard → push → run → download |
+| `launch_wave_e12.py` | **wave E1 (`--template nohint`) + E2 (`--probe rules,value`)**, 2 pha push/run, có cổng cân bằng ở `--dry-run` |
+| `fill_wave_e12.py` | đọc data đã tải, tính ĐÚNG (risk, rep) còn thiếu của E1/E2 rồi sinh lệnh chạy bù |
+| `probe_quota.py` | đo quota CÒN LẠI của từng account (dò nhị phân trên `max_output_tokens`) — `probe_accounts.py` chỉ nói còn/hết |
+| `run_fill.py` | chạy bù theo ĐỢT trên account còn quota; account 403 lúc push bị loại, shard quay lại hàng đợi |
+| `launch_e3a.py` | E3a best-response: 4 profile × 5 model, ghế scripted; `--smoke` chạy 1 ván kiểm thiết bị trước |
+| `collect_probes.py` | gom `probes.jsonl` của E2 vào `results/` — không chạy thì kết quả E2 mất theo thư mục gitignore |
+| `write_provenance.py` | dựng lại `results/PROVENANCE.json` (`to_wide_csv.py` KHÔNG ghi file này) |
 | `check_runs.py` | xem trạng thái mọi shard (đọc log, không gọi API), `--watch` để tự làm mới |
 | `merge_shards.py` | gom shard thành dataset, kiểm phủ đủ 60 cell + `parse_failed=0` |
 | `probe_all_models.py` | probe liveness song song ở local (staging proxy) — **chỉ probe, không sinh data** |
@@ -31,6 +38,84 @@ Kết quả + log của mỗi shard nằm ở `plan/runs/<label>/` (đã gitigno
 `claude-opus-5` · `gemini-3.1-pro-preview` · `gpt-5.6-sol` · `grok-4.20-reasoning`, ~$88.
 Rủi ro (cả 4 có thể cán trần) đã được nêu và người dùng vẫn chọn. **Đừng tự ý đổi sang
 screen-trước**; muốn đổi thì hỏi.
+
+## ✅ Trạng thái 11-09-2026 — B, E1, E2, E3a XONG
+
+`verify_wide.py --expect-reps 10` **xanh trên 1.850 ván / 185 file**, cân bằng OK cả bảy
+experiment. Bộ test: **284 pass** (trừ 2 file Interface Focus cố ý để hỏng).
+
+| Experiment | Ván | Ghi chú |
+|---|---|---|
+| `exp_baseline` (lưới B) | 550 = 5 × 110 | 11 mức risk × 10 rep |
+| `exp_nohint` (E1) | 150 = 5 × 30 | bỏ mỏ neo equal-split |
+| `exp_evprobe` (E2) | 150 = 5 × 30 | + 4.500 câu probe |
+| `exp_bestresponse_{defect,coop,carry,cond}` (E3a) | 4 × 250 = **1.000** | 1 ghế LLM + 5 ghế scripted |
+
+### Kết quả đọc được ngay
+
+**E2 — hiểu luật ≠ tính được kỳ vọng.** `rules` **100,0%** (3600/3600) · `value` **77,2%**
+(695/900). Theo model: flash-lite 99,9% · haiku 97,2% · luna 96,8% · grok 93,3% · qwen 90,0%.
+
+**E3a — KHÔNG model nào chơi best response, một ván cũng không.** Hai profile có best
+response hằng số (góp 0 mọi vòng) cho kết quả phẳng lì:
+
+| Model | `carry` tổng góp TB/ván | `defect` tổng góp TB/ván | % ván đúng BR |
+|---|---|---|---|
+| luna | 4,5 | 8,5 | **0%** |
+| flash-lite | 10,9 | 13,9 | **0%** |
+| haiku | 15,3 | 7,8 | **0%** |
+| qwen | 20,4 | 29,9 | **0%** |
+| grok-nr | 32,9 | 30,7 | **0%** |
+
+Ở `carry` nhóm đã chắc chắn đạt target mà không cần ghế LLM, ở `defect` ghế LLM một mình
+không thể đạt target — **cả hai trường hợp góp thêm một xu nào cũng là lỗ thuần**. Cả 5
+model vẫn góp. Đây là bằng chứng cho "hợp tác hay chỉ tuân lệnh?" mạnh hơn ablation E1, và
+nó tách hẳn hai thứ đó ra (§7.3).
+
+### Việc tiếp theo
+
+**E3b — quần thể hỗn hợp round-robin đủ 10 cặp** (§7.4), 600 ván/model, ~$82. Trước đó
+**BẮT BUỘC pilot multi-slug** (~$0,5): chưa ai kiểm proxy production có phục vụ slug KHÁC
+cái `-m` chọn hay không. E3a không dính rủi ro này nên đã chạy trước, đúng thứ tự §7.3.
+
+```bash
+python plan/scripts/launch_shard.py --account <acc> --model <slug>   --seat-models "self,<slug khac>,<slug khac>,self,self,self"   --risks 0.9 --langs en --reps 1 --task crg-e3b-pilot --label e3b_pilot
+```
+
+Hỏng thì hiện ra `[CRG_ERROR]` có `seat_model` kèm mã http; phương án lui là giữ đúng 1
+ghế LLM + 5 ghế scripted (tức là E3a, không cần client thứ hai).
+
+### Bài học vận hành — đọc trước khi phóng wave tiếp
+
+**Quota là cửa sổ trượt 24h.** Wave E1+E2 phóng 12 shard một lượt thì 9 shard chết 403 ở
+mức chi chỉ $0,24–$1,37, vì lưới dense grid đã đốt hết hạn mức của chính những account đó
+vài giờ trước. E3a chạy hôm sau, cùng 18 account: **19/19 push OK, 0 lỗi quota**.
+
+Cách đúng, đã dùng cho cả E1, E2 lẫn E3a:
+
+```bash
+python plan/scripts/probe_quota.py                        # loai account can (< ~$0,03)
+python plan/scripts/run_fill.py --wave <w> --accounts <...>    # E1/E2
+python plan/scripts/launch_e3a.py --accounts <...>             # E3a
+```
+
+Cả ba launcher chạy **theo đợt, rẻ trước**: account 403 lúc push bị loại khỏi đợt sau,
+shard của nó quay lại hàng đợi (push hỏng không tốn tiền). Thứ tự rẻ-trước là thứ tạo khác
+biệt — nó đóng xong các model rẻ trước khi quota cạn, để lại đúng model đắt cho đợt sau.
+
+⚠️ **`probe_accounts.py` KHÔNG đủ để lập kế hoạch** — nó chỉ nói còn/hết key, và báo 19/23
+xanh ngay trước khi 9/12 shard chết. `probe_quota.py` đo được tiền nhưng **trần đo chỉ
+~$0,03** (proxy kẹp `max_output_tokens` xuống trần model trước khi tính cọc), nên chỉ phân
+biệt "cạn" với "chưa cạn". Phép đo chính xác duy nhất vẫn là bước `push` (cọc $0,009).
+
+⚠️ **429 "model đang quá tải" KHÁC 403 hết quota.** 429 là lỗi phía Kaggle, đổi account vô
+ích — chỉ chạy lại sau. E3a gặp đúng một lần (grok `coop`), chạy lại là xong.
+
+⚠️ **Gom xong PHẢI chạy `write_provenance.py`** — `to_wide_csv.py` không ghi
+`PROVENANCE.json`. Với E2 còn phải chạy `collect_probes.py`, nếu không kết quả E2 mất theo
+thư mục đã gitignore dù `results/` vẫn xanh cổng.
+
+---
 
 ## Trạng thái tính đến 13-08-2026
 
