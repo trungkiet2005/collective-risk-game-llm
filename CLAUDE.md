@@ -112,9 +112,21 @@ repo. Đây là nơi duy nhất chứa artifact của Kaggle Benchmarks, và nó
 (đó là bản ghi duy nhất truy lại được run nào sinh ra file nào).
 
 **Cái bẫy:** kbench ghi hai file này ra **thư mục đang đứng (CWD)**, chứ không phải cạnh
-file task. Nên `python kaggle/benchmarks/crg_task_server.py` chạy từ root sẽ rải artifact
-ra root. Muốn nó rơi đúng chỗ thì `cd kaggle/benchmarks/artifacts` rồi mới chạy; lỡ rơi ra
-root rồi thì `git mv` vào đây ngay, đừng để tồn.
+file task. Tệ hơn: `.task.json` được ghi ngay lúc **IMPORT**, vì `@kbench.task(...)` là
+decorator — không cần chạy sweep, chỉ cần `import` module là file đã rơi ra.
+
+**Đã bịt ở gốc 11-09-2026, có test hồi quy. Đừng sửa bằng cách dặn nhau `cd` trước khi
+chạy — cách đó đã thất bại hai lần.** Có đúng HAI nguồn sinh ra file lạc, và cả hai đã bịt:
+
+| Nguồn | Bịt bằng |
+|---|---|
+| `launch_shard.py` gọi `kaggle b t push` / `run`. Các launcher (`run_fill.py`, `launch_e3a.py`, `stage_day_b.py`) đều chạy nó với `cwd=REPO` → artifact rơi ra root | `run_cmd()` ghim `cwd=ARTIFACTS` cho mọi lệnh kbench. An toàn vì mọi đường dẫn truyền cho kbench đều TUYỆT ĐỐI (`-f`, `-o`, `--env-file`) |
+| **`pytest` chạy từ root.** Nhiều test `import` `crg_task_server.py` → decorator ghi `.task.json` ra root mỗi lần chạy test | [`crsd/tests/conftest.py`](crsd/tests/conftest.py): fixture autouse `monkeypatch.chdir(tmp_path)`. Tiện thể chặn luôn bẫy `CRG_OUT` mặc định là đường dẫn TƯƠNG ĐỐI `results/frontier/...` — test quên đặt `CRG_OUT` sẽ ghi thẳng vào `results/` thật |
+
+Hồi quy: [`crsd/tests/test_launch_shard_artifacts.py`](crsd/tests/test_launch_shard_artifacts.py) —
+kiểm `run_cmd` chạy trong `artifacts/`, và có một cổng chặn quét gốc repo không còn
+`*.task.json` / `*.run.json` nào. Lỡ rơi ra root thì `git mv` vào đây ngay, nhưng nếu nó
+rơi ra được thì nghĩa là một trong hai chỗ trên đã hở — sửa chỗ hở, đừng chỉ dọn file.
 
 Trùng tên là chuyện bình thường — cùng một task chạy lại sẽ đè lên `.task.json` cũ. Cứ đè,
 vì bản cũ đã được track trong git nên lấy lại từ history được; đừng đẻ thêm hậu tố

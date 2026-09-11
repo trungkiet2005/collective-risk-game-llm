@@ -35,6 +35,8 @@ TASK_SRC = REPO / "kaggle" / "benchmarks" / "crg_task_server.py"
 # Dat CRG_TASK_SRC=<duong dan> hoac dung --task-src. Mac dinh: file goc.
 if os.environ.get("CRG_TASK_SRC"):
     TASK_SRC = Path(os.environ["CRG_TASK_SRC"])
+# kbench ghi .task.json/.run.json ra CWD -> ghim CWD vao day (xem run_cmd).
+ARTIFACTS = REPO / "kaggle" / "benchmarks" / "artifacts"
 CRED_ROOT = Path("D:/AI_PhD/GameTheory/kaggle_for_research")
 WORK = REPO / "plan" / "runs"          # log + file shard
 # Kết quả tải về PHẢI nằm ở đường dẫn ngắn: cây thư mục Kaggle sinh ra đã 174 ký tự,
@@ -106,11 +108,25 @@ def build_env(account, config_root):
 
 
 def run_cmd(handle, env, args, timeout=None):
-    """Chạy lệnh, ghi TOÀN BỘ output ra log. Trả về (returncode, output)."""
+    """Chạy lệnh, ghi TOÀN BỘ output ra log. Trả về (returncode, output).
+
+    Chạy trong `kaggle/benchmarks/artifacts/` chứ KHÔNG phải CWD của tiến trình cha.
+    Lý do: `kaggle b t push` / `run` ghi `<task>.task.json` và
+    `<task>-run_id_*.run.json` ra **thư mục đang đứng**, không phải cạnh file task. Mà
+    các launcher (`run_fill.py`, `launch_e3a.py`, `stage_day_b.py`) đều gọi script này
+    với `cwd=REPO`, nên artifact rơi thẳng ra gốc repo — đúng cái bẫy CLAUDE.md đã mô
+    tả, và nó vẫn tái diễn chừng nào còn phải nhớ `cd` bằng tay. Ghim CWD ở đây là chỗ
+    DUY NHẤT sửa được một lần cho mọi launcher.
+
+    An toàn vì mọi đường dẫn truyền cho kbench đều TUYỆT ĐỐI (`-f <shard_py>`,
+    `-o <dest>`, `--env-file <...>`), nên không lệnh nào phụ thuộc CWD.
+    """
     log(handle, f"$ {' '.join(args)}")
+    ARTIFACTS.mkdir(parents=True, exist_ok=True)
     try:
         p = subprocess.run(args, env=env, capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", timeout=timeout)
+                           encoding="utf-8", errors="replace", timeout=timeout,
+                           cwd=str(ARTIFACTS))
     except subprocess.TimeoutExpired:
         log(handle, f"!! TIMEOUT sau {timeout}s")
         return 124, ""
