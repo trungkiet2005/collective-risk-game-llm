@@ -41,7 +41,12 @@ def main() -> int:
     args = ap.parse_args()
 
     root = pathlib.Path(args.wide)
-    files = sorted(root.rglob("*.csv"))
+    # CHI file dung o do sau <experiment>/<p>/<model_tag>/x.csv moi la CSV van. File
+    # phu o GOC results/ (vi du exp_evprobe_probes.csv - cau tra loi probe cua E2, la
+    # phep do rieng chu khong phai van choi) khong duoc coi la van: doc no vao day se
+    # bao "thu muc muc risk '' khong phai so", tuc la cong bao dong sai cho.
+    files = sorted(p for p in root.rglob("*.csv")
+                   if len(p.relative_to(root).parts) == 4)
     if not files:
         print(f"KHONG tim thay file .csv nao duoi {root}", file=sys.stderr)
         return 1

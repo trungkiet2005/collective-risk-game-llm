@@ -72,6 +72,26 @@ def group_turns(turns):
     return out
 
 
+def _seat_llm(seat_model: str | None, fallback: str) -> str:
+    """Tên model của một ghế, CÙNG DẠNG với ``<model_tag>`` trong đường dẫn.
+
+    Task server ghi ``seat_model`` là **slug thô** ("qwen/qwen3-235b-…") trong khi thư
+    mục và cột ``model`` dùng tag đã chuẩn hoá ("qwen-qwen3-235b-…", sinh bằng
+    ``re.sub(r"[^A-Za-z0-9._-]+", "-", slug)``). Để nguyên slug thì ``agent1_llm``
+    không join được với đường dẫn, và ``verify_wide.py`` báo lỗi trên **từng dòng** —
+    đúng cái đã xảy ra khi gom E3a lần đầu.
+
+    Ghế scripted giữ nguyên ("scripted:always_4"): nó không phải model proxy, không bao
+    giờ phải join với tên thư mục, và đổi thành "scripted-always_4" chỉ làm mất dấu
+    hiệu đây là ghế tất định.
+    """
+    if not seat_model:
+        return fallback
+    if seat_model.startswith("scripted:"):
+        return seat_model
+    return re.sub(r"[^A-Za-z0-9._-]+", "-", seat_model)
+
+
 def game_to_wide_row(game: dict, seats: dict, endowment: float, experiment: str) -> dict:
     """Một ván -> một dict 82 cột. ``seats`` = {player_name: {round: turn}}."""
     names = sorted(seats, key=lambda p: int(p.rsplit("_", 1)[-1]))
@@ -100,7 +120,8 @@ def game_to_wide_row(game: dict, seats: dict, endowment: float, experiment: str)
         contribs[i] = c
         per_seat[i] = {
             f"agent{i}_name": p,
-            f"agent{i}_llm": by_round[rounds[0]].get("seat_model") or game["model"],
+            f"agent{i}_llm": _seat_llm(by_round[rounds[0]].get("seat_model"),
+                                       game["model"]),
             f"agent{i}_personality": by_round[rounds[0]].get("disposition") or "",
             f"agent{i}_knows_opponent_with_prob": 0,
             f"agent{i}_strategies": _pylist(c),
