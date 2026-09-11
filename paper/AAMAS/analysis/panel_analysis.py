@@ -368,12 +368,14 @@ def table_controls(nohint: Dict[str, Dict[str, float]], probe: Dict[str, Dict[st
         "model & with & w/o & $\\Delta$ & $P$ & rules & EV & "
         "EV$_{.1}$ & giv.$_{.1}$ \\\\\n"
         "\\midrule\n" + body + "\n\\bottomrule\n\\end{tabular}\n"
+        # Chú thích KHÔNG được chứa em/en dash (luật nhà của người dùng, áp cho mọi văn
+        # bản người đọc thấy). Dùng hai chấm, dấu phẩy hoặc ngoặc đơn thay cho `---`.
         "\\caption{Two controls, on the same panel. Left: mean total contributed per seat "
         "with the prompt's equal-split gloss present (``with'') and deleted (``w/o''), at "
         "$p\\in\\{0.1,0.5,0.9\\}$, $\\PanelNohintGames$ games each; $P$ from a "
         "$\\PanelNpermTex$-resample permutation test on games. Deleting the focal point "
         "never lowers contribution. Right: accuracy (\\%) on in-situ questions asked of the "
-        "playing agent --- ``rules'' over $\\PanelProbeRulesN$ questions on the mechanics, "
+        "playing agent: ``rules'' over $\\PanelProbeRulesN$ questions on the mechanics, "
         "``EV'' on the expected-value comparison between contributing one's share and "
         "contributing nothing. ``EV$_{.1}$'' restricts that comparison to $p=0.1$, where "
         "the correct answer is that contributing nothing pays more, and ``giv.$_{.1}$'' is "

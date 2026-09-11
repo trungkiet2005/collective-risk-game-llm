@@ -76,9 +76,9 @@ while making two models worse off.
 Between rounds we put questions to the same agent that is playing, in a separate call whose
 answer never enters the game history, so a probe cannot steer the play it measures. Each
 game carries $\PanelProbePerGame$ questions at rounds $\PanelProbeRounds$, giving
-$\PanelProbeN$ in total: $\PanelProbeRulesN$ on the mechanics --- the endowment, the target,
-the legal contributions, the round count, the stated risk, the payoff after a disaster ---
-and the rest on value. The value question we rely on names both strategies in words and
+$\PanelProbeN$ in total. $\PanelProbeRulesN$ of them cover the mechanics (the endowment,
+the target, the legal contributions, the round count, the stated risk, the payoff after a
+disaster) and the rest cover value. The value question we rely on names both strategies in words and
 asks which pays more on average: contributing $\PanelFairShare$ every round and finishing
 with a certain $\PanelFairTotal$, or contributing nothing and keeping $\PanelEndowment$
 unless the disaster strikes.
@@ -87,7 +87,7 @@ Comprehension is not the obstacle. The panel answers all $\PanelProbeRulesN$ rul
 questions correctly, $\PanelProbeRulesAcc\%$, with no model below it. On the value
 comparison the panel scores $\PanelProbeCompareAcc\%$ overall and
 $\PanelProbeCompareLowAcc\%$ at $p=\PanelProbeLowRisk$, where the right answer is that
-contributing nothing pays more --- $\PanelProbeLowOptCash$ against $\PanelFairTotal$. The
+contributing nothing pays more, $\PanelProbeLowOptCash$ against $\PanelFairTotal$. The
 aggregate hides a distinction the same data settles. \PanelProbeConstantModels{} return the
 same answer at every risk level (Qwen gives one value in
 $\PanelProbeModalShareQwen\%$ of its answers), so their score at

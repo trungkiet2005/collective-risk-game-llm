@@ -102,7 +102,7 @@ and ``does the model best-respond?'' becomes arithmetic.
 \label{sec:e3a-design}
 
 Seat~$1$ is an LLM; the other $\EthreeaxSeatsScripted$ run one deterministic policy,
-identical across seats and constant within a game --- \textsc{all-defect} contributes $0$
+identical across seats and constant within a game. \textsc{All-defect} contributes $0$
 every round, \textsc{all-contribute} $4$, \textsc{fair-share} $2$ (the per-round equal
 split of the target, which the prompt names), and \textsc{cond.\ coop.} the round-average
 of the other five seats, rounded to a legal amount. Crossing these with $\EthreeaNrisks$
@@ -119,7 +119,7 @@ is what keeps the omission from being decisive: under \textsc{all-defect} and
 \textsc{all-contribute} the five scripted seats return the same five numbers every round,
 so a player entering round $\EthreeaInferRound$ has seen $\EthreeaInferHistory$ identical
 rounds and the opponents' policy is an induction from the transcript rather than a fact we
-withheld --- and one the models demonstrably perform
+withheld, and one the models demonstrably perform
 (Figure~\ref{fig:e3a-rounds}). We therefore separate round~$1$, where no history exists and
 nothing can be inferred, from rounds~\EthreeaLateRounds{}, and rest the claim on the
 latter. And before computing anything we replayed all five scripted seats of all
@@ -174,8 +174,9 @@ consistency check, not a replication.
 
 \paragraph{No model best-responds where the answer is forced.}
 We state the result on the $\EthreeaDominatedGames$ games in which contributing is
-\emph{strictly dominated} --- \textsc{all-defect}, where the target cannot be reached, and
-\textsc{all-contribute}, where it is already secured --- because there keeping a unit beats
+\emph{strictly dominated}, meaning \textsc{all-defect}, where the target cannot be reached,
+and \textsc{all-contribute}, where it is already secured. We state it there because keeping
+a unit beats
 spending it under \emph{every} increasing utility, so no assumption about risk attitude is
 doing any work, and because the opponents' policy is legible in the transcript. Not one of
 those $\EthreeaDominatedGames$ games, and not one of the $\EthreeaNgames$ overall, has the
@@ -226,8 +227,8 @@ panel still pays $\EthreeaLateTotalDom$ units per game and only $\EthreeaLateCle
 games end clean. The shape is what the tables cannot show: some models descend to the best
 response and stay there, whereas Qwen climbs as the evidence accumulates and Grok never
 adjusts downwards. Nested line widths and unfilled markers keep models playing identical
-values visible --- \EthreeaRoundOneAnchoredN{} of $\EthreeaNmodels$ open at exactly
-$\EthreeaRoundOneFairShare$ --- without displacing any series.}
+values visible, and \EthreeaRoundOneAnchoredN{} of $\EthreeaNmodels$ open at exactly
+$\EthreeaRoundOneFairShare$, without displacing any series.}
 \label{fig:e3a-rounds}
 \end{figure}
 
@@ -242,7 +243,7 @@ of the $\EthreeaxProofGames$ games the pool shown in the prompt's own history re
 $\EthreeaTarget$ by the end of round $\EthreeaxProofRoundModal$, and earlier in the rest;
 from the next round on, no belief about the opponents can justify a contribution. Counting
 only what is paid after that point, the waste is $\EthreeaxPostProofAll$ per game, or
-$\EthreeaxPostProofAllPct\%$ of everything contributed here --- and it is concentrated.
+$\EthreeaxPostProofAllPct\%$ of everything contributed here, and it is concentrated.
 Luna and Flash-Lite pay nothing at all after the outcome is settled, in
 $\EthreeaxPostProofCleanLuna\%$ and $\EthreeaxPostProofCleanFlash\%$ of games; Haiku wastes
 $\EthreeaxPostProofHaiku$; Qwen wastes $\EthreeaxPostProofQwen$ and Grok
@@ -287,7 +288,7 @@ $\EthreeaxLastZeroCoopLuna\%$). The cost surfaces only in the population that ex
 under \textsc{fair-share} the group needs exactly $20$ from the LLM seat, and Qwen
 contributes $2$ for nine rounds then nothing in $\EthreeaCoopModalNQwen$ of
 $\EthreeaNpercell$ games, leaving the group exactly $\EthreeaQwenCoopShort$ units short in
-each --- $\EthreeaQwenCoopGroupTotal$ against $\EthreeaTarget$ on average --- and reaching
+each ($\EthreeaQwenCoopGroupTotal$ against $\EthreeaTarget$ on average), and reaching
 the target in $\EthreeaHitCoopQwen\%$ of games against $\EthreeaHitCoopFlash\%$ for
 Flash-Lite.
 A heuristic that costs nothing in two populations destroys the public good in a third, and
@@ -327,8 +328,8 @@ lines so that models sitting exactly on it stay visible; under \textsc{fair-shar
 \textsc{cond.\ coop.} it steps from $\EthreeaBRTotCoopPthree$ to $\EthreeaBRTotCoopPseven$
 at $p^{*}=\EthreeaPstar$, and the two open circles mark the tied pair there, either of
 which scores a zero gap. Flash-Lite's intervals vanish under \textsc{fair-share} because
-all $\EthreeaCoopModalNFlash$ of its games are identical --- no variation to express,
-rather than none existing. Every marker sits at its true risk level; where models play the
+all $\EthreeaCoopModalNFlash$ of its games are identical. There is no variation to
+express, rather than none existing. Every marker sits at its true risk level; where models play the
 same value, nested line widths and unfilled markers keep both visible.}
 \label{fig:e3a-risk}
 \end{figure}
@@ -345,8 +346,8 @@ from $p^{*}=\EthreeaPstarCoopGammaZero$ at $\gamma=\EthreeaGammaZeroVal$ to
 $\EthreeaPstarCoopGammaHalf$ at $\gamma=\EthreeaGammaHalfVal$ and
 $\EthreeaPstarCoopGammaNine$ at $\gamma=\EthreeaGammaNineVal$, and identical play is scored
 a best response in $\EthreeaIsBRCrraGammaZero$, $\EthreeaIsBRCrraGammaHalf$ and
-$\EthreeaIsBRCrraGammaNine$ of $\EthreeaNgames$ games respectively --- the pooled figure is
-in that range a statement about $\gamma$, not about the models. We therefore declare the
+$\EthreeaIsBRCrraGammaNine$ of $\EthreeaNgames$ games respectively. In that range the
+pooled figure is a statement about $\gamma$, not about the models. We therefore declare the
 coefficient we assume, zero, treat the pooled forfeiture of $\EthreeaLossAll$ as an upper
 bound, and rest the claim on the $\EthreeaDominatedGames$ dominated games, where the count
 of best responses stays at $\EthreeaIsBRDomCrraGammaNine$ for every $\gamma$ we tried.
@@ -357,17 +358,17 @@ coincides with the focal point. The gap is also computed with information the mo
 never given, since it is told neither that its opponents are scripts nor which; that is why
 the claim rests on rounds~\EthreeaLateRounds{}, where the transcript has by then repeated
 the opponents' policy $\EthreeaInferHistory$ times, and on the post-proof measure, which
-uses only what the prompt displays. Where neither device applies --- round~$1$, and the
-\textsc{fair-share} and \textsc{cond.\ coop.} profiles, whose opponents must be extrapolated
-rather than merely read --- we report the gap but do not lean on it. The shortfall is not mere misreading: the panel answers in-situ rule
+uses only what the prompt displays. Neither device applies to round~$1$, or to the
+\textsc{fair-share} and \textsc{cond.\ coop.} profiles, whose opponents must be
+extrapolated rather than merely read; there we report the gap but do not lean on it. The shortfall is not mere misreading: the panel answers in-situ rule
 probes at $\EthreeaxProbeRules\%$ and the expected-value comparison at
 $\EthreeaxProbeCompare\%$ ($\S$\ref{sec:evprobe}). Finally, each cell holds
 $\EthreeaxCellN$ games, so every interval is a percentile bootstrap and every $p$-value a
 permutation test with $\EthreeaxPermN$ resamples under a fixed seed, clustered on the game;
 claims about one model in one profile rest on $\EthreeaNpercell$. The game-level randomisation is seeded
-and reproduces, but the model text does not --- replaying one model's cells at identical
+and reproduces, but the model text does not. Replaying one model's cells at identical
 seed and temperature returned different play in $\EthreeaxReproDiff$ of
-$\EthreeaxReproCells$ cells ($\EthreeaxReproPct\%$) --- so we release prompts,
+$\EthreeaxReproCells$ cells ($\EthreeaxReproPct\%$), so we release prompts,
 configurations, seeds and code, and promise reproducibility of the \emph{design} rather
 than of the transcripts. Two of our findings are nulls, and they are the section's most
 secure results rather than failures to find an effect: that no model best-responds where

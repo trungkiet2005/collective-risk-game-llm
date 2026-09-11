@@ -37,8 +37,8 @@ $p^{*}=\PanelPstar$ (dotted vertical), contribute exactly the share of $\PanelFa
 above it. It is drawn beneath the model lines so that a model sitting on it stays visible.
 Top, what a seat contributes of its $\PanelEndowment$-unit endowment; bottom, what it
 finishes with. No line bends at the step. The two panels
-together separate the failure modes: \textsc{grok-4.20-non-reasoning} above the optimum
-and \textsc{qwen3-235b-a22b} below it arrive at the same floor in the lower panel, one by
+together separate the failure modes: Grok above the optimum
+and Qwen below it arrive at the same floor in the lower panel, one by
 buying a target it did not need and one by paying for a target it never reaches.}
 \label{fig:grid}
 \end{figure}
@@ -60,9 +60,9 @@ endowments towards a group target and a catastrophe lottery fires with probabili
 they miss it. The game suits the question because $p$ is a dial the experimenter owns. It moves the
 optimum from ``contribute nothing'' to ``contribute exactly your share'' at a threshold we
 derive in closed form, so an agent that is choosing and an agent that is repeating are
-told apart by whether anything changes when the optimum does. We run $\PanelNgames$ games on \PanelNmodelsWord{} production models --- one per provider,
-all at the cheap tier of their family --- and apply three controls, each of which removes
-one explanation for the cooperation the models display.
+told apart by whether anything changes when the optimum does. We run $\PanelNgames$ games on \PanelNmodelsWord{} production models, one per provider
+and all at the cheap tier of their family. Three controls follow, and each removes one
+explanation for the cooperation the models display.
 
 The first control varies the risk itself over an \PanelNrisksWord{}-point grid whose endpoint,
 $p=0$, removes the catastrophe altogether and thereby makes contributing strictly
@@ -91,7 +91,7 @@ Our contributions are the following.
   endowment cap in two models, so the behaviour is not compliance with a supplied focal
   point. The agents answer $\PanelProbeRulesN$ in-situ questions about the rules at
   $\PanelProbeRulesAcc\%$ and, at $p=\PanelProbeLowRisk$, identify contributing nothing as
-  the higher-paying strategy at $\PanelProbeCompareLowAcc\%$ --- then contribute
+  the higher-paying strategy at $\PanelProbeCompareLowAcc\%$. They then contribute
   $\PanelProbeLowContrib$ units in the same games. Knowing the answer and acting on it come
   apart.
 

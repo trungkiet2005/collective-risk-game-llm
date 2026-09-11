@@ -237,7 +237,7 @@ def emit_e3a(mac: Macros, e3a: pd.DataFrame) -> None:
                     quit_round = t
                     break
             mac.add("Quit%s%s" % (PROFILE_MACRO[prof], model),
-                    "--" if quit_round is None else str(quit_round))
+                    "n/a" if quit_round is None else str(quit_round))
 
     # Model nao CHIU DIEU CHINH nhung cham nhat, va la nhung model nao. Can macro rieng vi
     # hai model co the trung so: viet "rounds 7 and 7" trong paper doc nhu mot cai bug.
@@ -399,7 +399,7 @@ def emit_anchor(mac: Macros) -> None:
             stayed_p.append(p)
     # Văn xuôi cần MỘT con số để nói "ba model kia không nhúc nhích": con số đúng là p NHỎ
     # NHẤT trong ba, vì nó chặn trên cả ba. Tính ở đây chứ đừng gõ tay một ngưỡng.
-    mac.add("AnchorPStayedMin", pfmt(min(stayed_p)) if stayed_p else "--")
+    mac.add("AnchorPStayedMin", pfmt(min(stayed_p)) if stayed_p else "n/a")
     mac.add("AnchorMovedN", str(len(moved)))
     mac.add("AnchorMovedModels",
             " and ".join(map(pname, moved)) if len(moved) <= 2

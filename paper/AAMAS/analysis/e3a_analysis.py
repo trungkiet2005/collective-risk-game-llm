@@ -1201,7 +1201,7 @@ def main() -> int:
     # Giá trị mang sẵn `$...$` và dấu `--`: phải dùng NGOÀI math mode (`rounds~\Ethreea...`).
     # Nếu bọc thêm `$...$` quanh nó thì `--` thành HAI DẤU TRỪ chứ không phải gạch nối en —
     # đã in ra "6 − −10" một lần rồi, đừng lặp lại.
-    mac.add("LateRounds", f"${INFER_ROUND}$--${N_ROUNDS}$")
+    mac.add("LateRounds", f"${INFER_ROUND}$ to ${N_ROUNDS}$")
     mac.num("RoundOneMeanDom", float(r1_dom.mean()))
     mac.num("RoundOneLossDom", float((r1_dom * surv_dom).mean()))
     mac.num("LateTotalDom", float(late_dom.mean()))

@@ -38,10 +38,10 @@ For a system designer the consequence is asymmetric, and it is the reason we rep
 to the optimum rather than a success rate. As collaborators these agents are excellent:
 they reach the group target in most populations, they do not defect opportunistically, and
 they never hold the group hostage. As stakeholders they are unsafe, because they will not
-protect the resources entrusted to them --- a scripted free-rider out-earns every model in
+protect the resources entrusted to them. A scripted free-rider out-earns every model in
 the panel (\S\ref{sec:bestresponse}), and a group-level metric records that outcome as a
 success. The two failure modes we observe are invisible to such a metric from opposite
-sides: \textsc{grok-4.20-non-rea\-son\-ing} reaches the target in
+sides: Grok reaches the target in
 $\PanelReachGrok\%$ of games while finishing with $\PanelPayGrok$ of
 $\PanelEndowment$ units, and Qwen pays $\PanelOwnQwen$ units into pots
 that never reach the target at all. A deployment that reads only whether the shared goal
@@ -51,8 +51,9 @@ was met will rank both as it should not.
 Sections~\ref{sec:riskgrid} and~\ref{sec:controls} are self-play: all \PanelNplayersWord{} seats hold one
 model. That design is the object of our criticism, and we answer it in
 Section~\ref{sec:bestresponse} with fixed opponents rather than with a genuinely mixed
-population. Fixed opponents buy exactness --- the best response is enumerable --- at the
-cost of realism, since a scripted seat cannot respond to the model as a second model would.
+population. Fixed opponents buy exactness, because the best response is then enumerable,
+at the cost of realism: a scripted seat cannot respond to the model as a second model
+would.
 A round-robin over mixed pairs is the natural next measurement and is not reported here.
 The panel is \PanelNmodelsWord{} models, one per provider and all at the inexpensive tier, so a
 capability effect within a family is outside what we can see; cells hold
@@ -64,7 +65,7 @@ expected payoff assumes risk neutrality; we therefore rest the conclusions on th
 column and on the strictly dominated profiles, where contributing loses under every
 increasing utility and no such assumption is in play. One of the two value probes asks for
 a point estimate mid-game and is ambiguous between ``every round'' and ``every remaining
-round'' --- several wrong answers are correct readings of the second --- so we report its
+round''. Several wrong answers are correct readings of the second, so we report its
 $\PanelProbeEvPointAcc\%$ for completeness and rest nothing on it. Finally, the game-level
 randomisation is seeded and reproduces, but the model text does not: replaying identical
 cells at identical seed and temperature returns different play. We release prompts,
