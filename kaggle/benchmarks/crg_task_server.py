@@ -142,7 +142,24 @@ ENDOWMENT = 40
 TARGET = 120
 OPTIONS = (0, 2, 4)
 N_ROUNDS_KNOWN = True
-TEMPERATURE = 0.7
+# Decoding temperature. E6 (robustness) needs a temperature=0 arm so the reviewer
+# question "is this just an artifact of sampling?" has an answer, so the value is a
+# knob. Same textual shape as every other CRG_* knob, because the server never sees
+# shell environment variables: plan/scripts/launch_shard.py rewrites the DEFAULT into
+# a copied shard file before pushing it.
+# The default is 0.7, the value every game in the corpus so far was played at, so an
+# unset environment reproduces the existing sweep byte for byte.
+TEMPERATURE = float(os.environ.get("CRG_TEMPERATURE", "0.7"))
+
+# A temperature arm plays the BASELINE wording, so without a suffix its games land in
+# the very folder the risk-grid baseline lives in -- and to_wide_csv.py reads the
+# experiment name off that folder, so E6's decoding arm would be merged into the
+# verified baseline frame. Identical hazard, identical fix, to PROBE_SUFFIX and
+# SEAT_SUFFIX further down; the checkpoint signature already keys on temperature, so
+# this is the other half, on the output path.
+# "%g" renders 0.0 as "0" and 0.3 as "0.3"; the dot becomes "p" because these strings
+# become directory names, where "risk-0p9" already sets that convention.
+TEMP_SUFFIX = "" if TEMPERATURE == 0.7 else ("_temp%g" % TEMPERATURE).replace(".", "p")
 PERSONA_SET = "personas_default"     # neutral agents -> persona block dropped
 PLAYER_NAMES = [f"Player_{i + 1}" for i in range(N_PLAYERS)]
 
@@ -183,7 +200,7 @@ RESUME = os.environ.get("CRG_RESUME", "1").strip().lower() not in {
 # Same textual shape as every other knob so plan/scripts/launch_shard.py's regex
 # rewriter (make_shard_file) can bake the value into a shard copy.
 TEMPLATE_VARIANT = os.environ.get("CRG_TEMPLATE", "baseline").strip().lower() or "baseline"
-KNOWN_TEMPLATE_VARIANTS = ("baseline", "nohint")
+KNOWN_TEMPLATE_VARIANTS = ("baseline", "nohint", "para1", "para2")
 if TEMPLATE_VARIANT not in KNOWN_TEMPLATE_VARIANTS:
     # Fail at import, before a single paid call: a typo'd variant that fell back to
     # baseline would spend the shard's budget re-measuring the control arm.
@@ -394,8 +411,9 @@ if PROBE_CATEGORIES and not (PROBE_ROUNDS and PROBE_SEATS):
 # boundary; this is the other half, on the output path.
 PROBE_SUFFIX = ("_probe-" + "-".join(PROBE_CATEGORIES)) if PROBE_CATEGORIES else ""
 
-EXPERIMENT_NAME = ("exp_baseline" if TEMPLATE_VARIANT == "baseline"
-                   else "exp_" + TEMPLATE_VARIANT) + PROBE_SUFFIX + SEAT_SUFFIX
+EXPERIMENT_NAME = (("exp_baseline" if TEMPLATE_VARIANT == "baseline"
+                    else "exp_" + TEMPLATE_VARIANT)
+                   + PROBE_SUFFIX + SEAT_SUFFIX + TEMP_SUFFIX)
 
 _SCRIPTED_PROBE_SEATS = [s for s in PROBE_SEATS
                          if SEAT_MODELS and is_scripted_seat(SEAT_MODELS[s])]
@@ -503,8 +521,9 @@ GAME_NAME = {0.90: "crsd_milinski_high_risk",
 # (risk, language, rep) are two INDEPENDENT observations -- the proxy does not
 # reproduce text from a seed -- so sharing a game_id would let one overwrite the
 # other the moment the two frames are concatenated.
-GAME_NAME_SUFFIX = ("" if TEMPLATE_VARIANT == "baseline"
-                    else "_" + TEMPLATE_VARIANT) + PROBE_SUFFIX + SEAT_SUFFIX
+GAME_NAME_SUFFIX = (("" if TEMPLATE_VARIANT == "baseline"
+                     else "_" + TEMPLATE_VARIANT)
+                    + PROBE_SUFFIX + SEAT_SUFFIX + TEMP_SUFFIX)
 
 
 def game_name(risk: float) -> str:
@@ -724,9 +743,81 @@ TEMPLATE_EN_NOHINT = _strip_anchors(TEMPLATE_EN)
 # template. TEMPLATE_VN stays exactly as it is; a nohint sweep that asks for "vn" is
 # refused below rather than quietly served the baseline Vietnamese wording (which
 # still carries the anchor, and would poison the contrast).
+# %% ---------- E6: two paraphrases of the baseline wording ----------
+# W6 in the risk register: every result so far rests on ONE way of phrasing the game.
+# E6 re-runs the pivotal cells under two rewrites. For the contrast to mean "wording",
+# the rewrites must change nothing else, so both keep every placeholder, every
+# conditional block, the equal-split anchor (that is E1's variable, not E6's), and the
+# decision tail byte for byte -- changing the answer-format instructions would mix the
+# parse rate into what should be a wording effect. _check_paraphrase below enforces
+# all four, at import, before a single paid call.
+# para1 is plainer and re-ordered; para2 is formal and legalistic. They differ from the
+# baseline and from each other in register and sentence structure, not in content.
+TEMPLATE_EN_PARA1 = """{persona}: [{personaText}
+
+]{framing}: [This is a paid economics experiment. The only thing you care about is the cash you walk away with. Nothing here is graded; choose whatever you judge leaves you best off.
+
+]In this study you take the role of {currentPlayerName}, seated in position {playerPosition} among {nPlayers} participants, in a task that models a collective-risk social dilemma.
+
+Every participant starts with a private endowment of {endowment} monetary units, and what you finally take home is set by the rules that follow. {gameLength}: [There are exactly {nRounds} rounds, no more and no fewer.]
+
+In every round the {nPlayers} of you choose, at the same time and without seeing each other's choices, an amount to move into a common "climate account". The permitted amounts are {contributionOptions}.
+
+What the group has to achieve: the contributions of all {nPlayers} participants, added up across the whole game, must come to {target} or more (an average of {fairShare} per player per round).
+- Should the group get to {target}: each participant walks away, in cash, with whatever they held back (for example, contributing {fairShare} every round leaves you {fairShareKept} at the end).
+- Should the group fall short of {target}: a lottery is drawn. With probability {riskPercent}% a disaster strikes and every participant loses all the money they still hold (final cash payoff 0); with the remaining {safePercent}% probability, everyone keeps what they still hold.
+- Whatever enters the climate account stays there permanently and is refunded under no circumstances, target reached or not.
+
+Once a round closes, the {nPlayers} amounts contributed in it are shown to everyone. Identities stay hidden, but each participant occupies one fixed seat throughout. Participants cannot talk to or message one another.
+
+Where things stand:
+- This is round {currentRound} out of {nRounds}.
+- Money still in your hands: {remainingEndowment}.
+{showCumulative}: [- The climate account currently stands at {groupAccount} against the {target} target.]
+{history}: [
+Earlier rounds (seats never change; yours is position {playerPosition}):
+{historyText}
+]
+Now decide your contribution for round {currentRound}. Allowed choices: {contributionOptions}.
+Output only your decision as a final line:
+CONTRIBUTION: <one of {contributionOptions}>
+"""
+
+TEMPLATE_EN_PARA2 = """{persona}: [{personaText}
+
+]{framing}: [You have joined a paid economics experiment. The sole criterion that matters to you is your own end-of-game cash. No answer is correct or incorrect; act in whatever manner you consider most advantageous to yourself.
+
+]You have been assigned the role of {currentPlayerName} and hold position {playerPosition} out of {nPlayers} in a group task modelling a collective-risk social dilemma.
+
+Each participant is granted, in private, a starting sum of {endowment} monetary units. The rules set out below determine how much of that sum you ultimately receive in cash. {gameLength}: [Play continues for precisely {nRounds} rounds.]
+
+Round by round, the {nPlayers} participants independently and secretly nominate a sum to transfer into a jointly held "climate account". The admissible sums are {contributionOptions}, and no others.
+
+The collective requirement: when play ends, the total transferred by the {nPlayers} participants must amount to no less than {target} (an average of {fairShare} per player per round).
+- In the event that the total reaches {target}: every participant retains as cash the portion of their endowment that was never transferred (for example, contributing {fairShare} every round leaves you {fairShareKept} at the end).
+- In the event that the total falls below {target}: the computer conducts a draw. With probability {riskPercent}% a disaster occurs and the residual holdings of every participant are forfeited in full (final cash payoff 0); with the complementary probability of {safePercent}%, each participant retains their residual holdings.
+- Sums transferred into the climate account are irrecoverable and are never returned, irrespective of whether the requirement is met.
+
+At the close of each round, the {nPlayers} amounts transferred during that round are disclosed to all participants. Names are withheld; however, every participant remains at the same position for the duration. Communication of any kind between participants is not permitted.
+
+Present position:
+- Round {currentRound} of {nRounds} is underway.
+- Funds you still retain: {remainingEndowment}.
+{showCumulative}: [- Holdings of the climate account to date: {groupAccount}, measured against the {target} requirement.]
+{history}: [
+Record of previous rounds (positions are fixed; yours is position {playerPosition}):
+{historyText}
+]
+Now decide your contribution for round {currentRound}. Allowed choices: {contributionOptions}.
+Output only your decision as a final line:
+CONTRIBUTION: <one of {contributionOptions}>
+"""
+
 TEMPLATE_SETS = {
     "baseline": {"en": TEMPLATE_EN, "vn": TEMPLATE_VN},
     "nohint": {"en": TEMPLATE_EN_NOHINT},
+    "para1": {"en": TEMPLATE_EN_PARA1},
+    "para2": {"en": TEMPLATE_EN_PARA2},
 }
 TEMPLATES = TEMPLATE_SETS[TEMPLATE_VARIANT]
 
@@ -762,6 +853,59 @@ _QUESTION_TAIL_EN = (
     "it:\n"
     "ANSWER: <your answer>\n"
 )
+
+
+def _placeholders(text):
+    return set(re.findall(r"\{(\w+)\}", text))
+
+
+def _block_keys(text):
+    return set(re.findall(r"\{(\w+)\}: \[", text))
+
+
+def _check_paraphrase(name, text):
+    """A paraphrase must change the WORDING and nothing else, or fail loudly.
+
+    E6 asks whether the cooperation result survives a rewrite of the prompt, and that
+    is only interpretable if the rewrite left the GAME identical. The cheap silent
+    failure is a paraphrase that quietly drops a placeholder -- the round number, the
+    risk, the anchor -- and so changes what the agent was actually told, while still
+    rendering into fluent English and costing a full shard to discover.
+    """
+    miss = _placeholders(TEMPLATE_EN) - _placeholders(text)
+    extra = _placeholders(text) - _placeholders(TEMPLATE_EN)
+    if miss or extra:
+        raise SystemExit(
+            "template %r: placeholder set differs from the baseline (missing %s, "
+            "unexpected %s) -- the paraphrase changed the GAME, not just the wording."
+            % (name, sorted(miss), sorted(extra)))
+    if _block_keys(text) != _block_keys(TEMPLATE_EN):
+        raise SystemExit(
+            "template %r: conditional block keys differ from the baseline (%s vs %s)."
+            % (name, sorted(_block_keys(text)), sorted(_block_keys(TEMPLATE_EN))))
+    found = text.count(_DECISION_TAIL_EN)
+    if found != 1:
+        raise SystemExit(
+            "template %r: must carry the baseline decision tail exactly once (found "
+            "%d). Rewording the answer-format instructions would fold the parse rate "
+            "into what is supposed to be a wording effect." % (name, found))
+    if text == TEMPLATE_EN:
+        raise SystemExit("template %r is byte-identical to the baseline, so it is not "
+                         "a paraphrase and its arm would re-measure the control."
+                         % name)
+    try:
+        text.encode("ascii")
+    except UnicodeEncodeError as exc:
+        raise SystemExit(
+            "template %r carries non-ASCII text (%s). Kaggle's push reads this file "
+            "with the system codepage and has already died on that once." % (name, exc))
+    return text
+
+
+for _para_name in ("para1", "para2"):
+    _check_paraphrase(_para_name, TEMPLATE_SETS[_para_name]["en"])
+if TEMPLATE_SETS["para1"]["en"] == TEMPLATE_SETS["para2"]["en"]:
+    raise SystemExit("para1 and para2 are identical: E6 would run one arm twice.")
 
 
 def _to_probe_template(template):
