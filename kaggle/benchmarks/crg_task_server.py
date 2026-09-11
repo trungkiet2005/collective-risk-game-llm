@@ -308,8 +308,6 @@ SEAT_SUFFIX = ("_" + SEAT_TAG) if SEAT_TAG else ""
 # the other five seats is as much the instrument as the prompt is, and a
 # best-response shard that resumed into (or overwrote) the baseline shard of the same
 # cell would produce one games.csv holding two different experiments.
-EXPERIMENT_NAME = ("exp_baseline" if TEMPLATE_VARIANT == "baseline"
-                   else "exp_" + TEMPLATE_VARIANT) + SEAT_SUFFIX
 
 # Prompt-template variant identifier. The templates below are variant "baseline".
 # ANY later prompt arm (a no-hint arm, a framing arm, a computed-totals arm) must
@@ -387,6 +385,18 @@ if _BAD_PROBE_SEATS:
 if PROBE_CATEGORIES and not (PROBE_ROUNDS and PROBE_SEATS):
     raise SystemExit("CRG_PROBE is on but CRG_PROBE_ROUNDS/CRG_PROBE_SEATS select "
                      "nothing to ask")
+# The probe earns a folder suffix for the same reason the template variant does.
+# A probe run plays the BASELINE condition (probe questions are separate, stateless
+# calls that never enter the history), so without a suffix it lands in the very
+# folder baseline data already lives in -- and downstream `to_wide_csv.py` reads the
+# experiment name off that folder, so E2 games would be merged into the verified
+# baseline frame. The checkpoint signature already refuses to resume across this
+# boundary; this is the other half, on the output path.
+PROBE_SUFFIX = ("_probe-" + "-".join(PROBE_CATEGORIES)) if PROBE_CATEGORIES else ""
+
+EXPERIMENT_NAME = ("exp_baseline" if TEMPLATE_VARIANT == "baseline"
+                   else "exp_" + TEMPLATE_VARIANT) + PROBE_SUFFIX + SEAT_SUFFIX
+
 _SCRIPTED_PROBE_SEATS = [s for s in PROBE_SEATS
                          if SEAT_MODELS and is_scripted_seat(SEAT_MODELS[s])]
 if PROBE_CATEGORIES and _SCRIPTED_PROBE_SEATS:
@@ -489,8 +499,12 @@ GAME_NAME = {0.90: "crsd_milinski_high_risk",
 # A mixed group appends its seat tag on top of that, for the same reason: the
 # baseline row and the best-response row of the same (risk, language, rep) would
 # otherwise share a game_id, and once the two frames meet one of them wins silently.
+# The probe appends here too: a probe game and a baseline game of the same
+# (risk, language, rep) are two INDEPENDENT observations -- the proxy does not
+# reproduce text from a seed -- so sharing a game_id would let one overwrite the
+# other the moment the two frames are concatenated.
 GAME_NAME_SUFFIX = ("" if TEMPLATE_VARIANT == "baseline"
-                    else "_" + TEMPLATE_VARIANT) + SEAT_SUFFIX
+                    else "_" + TEMPLATE_VARIANT) + PROBE_SUFFIX + SEAT_SUFFIX
 
 
 def game_name(risk: float) -> str:

@@ -321,8 +321,16 @@ def test_probing_leaves_the_decisions_byte_identical(tmp_path, monkeypatch):
     assert len(probed_calls) - len(plain_calls) == probed.probes_per_game() == 30
     for field in ("group_total", "target_reached", "catastrophe", "mean_payoff"):
         assert probed_result.get(field) == plain_result.get(field)
-    assert ((tmp_path / "probed" / "turns.jsonl").read_text(encoding="utf-8")
-            == (tmp_path / "plain" / "turns.jsonl").read_text(encoding="utf-8"))
+    # turns.jsonl phai giong nhau O MOI THU TRU game_id. game_id thi BAT BUOC khac:
+    # ban probe va ban baseline cua cung (risk, lang, rep) la HAI QUAN SAT DOC LAP
+    # (proxy khong tai lap van ban theo seed), nen neu chung cung game_id thi khi hai
+    # khung du lieu gap nhau mot ban se de len ban kia ma khong ai thay. Day dung la
+    # ly do nhanh nohint cung mang hau to -- xem GAME_NAME_SUFFIX trong task server.
+    probed_turns = (tmp_path / "probed" / "turns.jsonl").read_text(encoding="utf-8")
+    plain_turns = (tmp_path / "plain" / "turns.jsonl").read_text(encoding="utf-8")
+    assert "_probe-rules-value__" in probed_turns
+    assert "_probe-rules-value__" not in plain_turns
+    assert probed_turns.replace("_probe-rules-value__", "__") == plain_turns
 
 
 def test_probes_are_identical_under_concurrency(tmp_path, monkeypatch):
