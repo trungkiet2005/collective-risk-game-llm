@@ -9,6 +9,13 @@ __pycache__/
 .venv/
 venv/
 .env
+# MỌI file .env, không chỉ `.env` ở gốc — lớp phòng vệ thứ hai cho credential.
+# `launch_shard.py` ghi `account.env` (chứa MODEL_PROXY_API_KEY còn SỐNG) vào từng thư mục
+# shard, và hiện an toàn CHỈ VÌ chúng nằm dưới `/plan/runs/` đã bị ignore. Nhưng CLAUDE.md
+# lại hướng dẫn `kaggle benchmarks auth -y --env-file account.env`, và chạy lệnh đó từ gốc
+# repo sẽ sinh ra một `account.env` KHÔNG được che bởi luật nào. Đừng để credential chỉ
+# được cứu bởi việc nó tình cờ nằm đúng thư mục.
+*.env
 
 # Kết quả & model weights (đừng commit) — NEO GỐC (dấu /) để KHÔNG nuốt nhầm
 # package con như crsd/models/ hay crsd/.../results/.
