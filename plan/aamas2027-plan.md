@@ -292,15 +292,15 @@ CỐ Ý ĐỂ NGUYÊN.** Đó là bản ghi lịch sử của những gì đã c
 
 ## 6. Số học của $160/ngày — sự thật khó chịu
 
-### 6.1 Credit là 19 hũ $10, không phải một hũ $190
+### 6.1 Credit là 21 hũ $10, không phải một hũ $210
 
 Trần là **$10/account/24h**, và **một `kaggle b t run` không chia được qua nhiều account**.
-**19 account sống × $10 = ~$190/ngày** (cập nhật 10-09-2026: người dùng thêm 6 account,
-5 trong đó sống — xem CLAUDE.md). Hệ quả cứng:
+**21 account sống × $10 = ~$210/ngày** (cập nhật 11-09-2026: thêm `kakagotto` +
+`tonngohan`, cả hai sống và còn nguyên $10 — xem CLAUDE.md). Hệ quả cứng:
 
 - **Mỗi shard phải ≤ $5** (nhắm một nửa trần, chừa chỗ cho một cú đắt bất ngờ). Đã từng
   mất 3 shard vì tin probe "còn quota" rồi đẩy shard $7.80 vào — nó vẫn 403.
-- **Muốn tiêu $190 thì phải chạy ≥ 19 shard/ngày trên ≥ 19 account.** Chạy sâu trên ít
+- **Muốn tiêu $210 thì phải chạy ≥ 21 shard/ngày trên ≥ 21 account.** Chạy sâu trên ít
   account là cách chắc chắn nhất để **không** tiêu được credit.
 - Quota là **cửa sổ trượt 24h, không reset lúc nửa đêm** (`acc5` vẫn 403 sau nửa đêm UTC).
   "Dùng không hết thì mất" đúng theo nghĩa *không tích luỹ được*, chứ không phải *mất lúc 0h*.
@@ -376,7 +376,7 @@ Muốn thật sự dùng hết credit thì phải **mở panel** → xem §15, c
 | | +40% dự phòng chạy lại | | | | **$254** | |
 
 **$254 trên 28 ngày = $9/ngày trung bình**, đỉnh ~$28 vào ngày E3b. So với trần
-$190/ngày: dùng **~5%**.
+$210/ngày: dùng **~4%**.
 
 ### 7.0 ♻️ Tái sử dụng data cũ — kiểm kê 10-09-2026
 

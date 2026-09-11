@@ -237,24 +237,39 @@ cầu dựng lại figure bản IF; lúc đó mới trỏ sang `Legacy_Results/r
 - `kaggle-api-2\*.md`  — 5 token `KGAT_...` (acc1–acc5), token là dòng bắt đầu bằng `KGAT_`.
 - `kaggle-api-3\*.txt` — **6 token, thêm 10-09-2026** (acc06–acc11). Cùng định dạng token
   thô như `kaggle-api/`, không phải `.md` như `kaggle-api-2/`.
+- `kaggle-api-4\*.txt` — **2 token, thêm 11-09-2026** (`kakagotto`, `tonngohan`). Cùng
+  định dạng token thô, tên file = tên account.
 - `kaggle*.json` (root) — 5 cặp `username/key` kiểu cũ (foundnotkiet, kit567, hunhtrungkit,
   tnkiet, trungkiet).
+
+⚠️ **CÓ HAI thư mục tên `kaggle_for_research`, và chỉ MỘT cái được code đọc.**
+
+| Đường dẫn | Vai trò |
+|---|---|
+| `D:\AI_PhD\GameTheory\kaggle_for_research\` | ✅ **CRED_ROOT thật** — `launch_shard.py` chỉ đọc ở đây |
+| `D:\AI_PhD\kaggle_for_research\` | ❌ Bản cũ/trùng (thiếu `kaggle-api-3/`), kèm các thư mục rác `kaggle-config-<account>/` do `KAGGLE_CONFIG_DIR` đẻ ra |
+
+Ngày 11-09-2026 token account mới được thả vào **thư mục sai** (`D:\AI_PhD\kaggle_for_research\`),
+nên `ls` ở CRED_ROOT ra rỗng và tưởng người dùng chưa thêm gì. **Không tìm thấy account mới
+thì kiểm cả hai chỗ trước khi kết luận**, rồi copy về CRED_ROOT — đừng trỏ `ACCOUNTS` sang
+thư mục kia, vì hai cây credential song song là cách chắc chắn nhất để probe và run đọc lệch nhau.
 
 Bảng ánh xạ tên → credential nằm ở `ACCOUNTS` trong
 [`plan/scripts/launch_shard.py`](plan/scripts/launch_shard.py) — thêm account mới thì sửa
 đúng chỗ đó, mọi script khác đọc lại từ đấy.
 
-**Tổng 23 account. Probe 10-09-2026 (sau khi thêm lô mới): 19 sống.**
+**Tổng 25 account. Probe 11-09-2026 (sau khi thêm lô `kaggle-api-4/`): 21 sống.**
 
 | | Account |
 |---|---|
-| ✅ **19 sống** | acc1–acc5 · **acc06, acc07, acc08, acc09, acc11** · chisboiz · chunaiu · foundnotkiet · hunhtrungkit · kit567 · tnkiet · trungkiet · trunkdabest · vinhdinhthien |
-| ❌ **4 chết** | `chiboiz` · `chinguyentran` · `trnnguynchis` · **`acc10`** |
+| ✅ **21 sống** | acc1–acc5 · acc06, acc07, acc08, acc09, acc11 · chisboiz · chunaiu · foundnotkiet · hunhtrungkit · **kakagotto** · kit567 · tnkiet · **tonngohan** · trungkiet · trunkdabest · vinhdinhthien |
+| ❌ **4 chết** | `chiboiz` · `chinguyentran` · `trnnguynchis` · `acc10` |
 
 Cả 4 account chết **cùng một lỗi**: `403 "missing phone/identity verification"` khi xin
 Model Proxy key. Login và xem model list vẫn được, nên nhìn bằng mắt sẽ tưởng còn dùng
-tốt — chỉ bước xin key mới lộ. `trnnguynchis` hỏng từ 12-08 và tới 10-09 vẫn chưa được
-xác minh; `acc10` chết ngay từ lúc thêm vào.
+tốt — chỉ bước xin key mới lộ. `trnnguynchis` hỏng từ 12-08 và tới 11-09 vẫn chưa được
+xác minh; `acc10` chết ngay từ lúc thêm vào. Danh sách chết **không đổi** giữa probe 10-09
+và 11-09, tức 4 cái này hỏng bền chứ không phải trục trặc nhất thời.
 
 ⚠️ **Sức khoẻ account TRÔI theo thời gian** — mất 2 account trong 4 tuần. **Đừng tin danh
 sách trong file này**, nó là ảnh chụp. Probe lại trước mỗi đợt chạy lớn:
@@ -266,7 +281,9 @@ python plan/scripts/probe_accounts.py          # 8 luong song song, ~1 phut
 Account chết vẫn được GIỮ trong bảng `ACCOUNTS` (không xoá) để probe kiểm lại được — một
 account 403 vì chưa xác minh SĐT có thể sống lại sau khi người dùng xác minh.
 
-**Trần credit ngày: 19 account × $10 = ~$190/ngày.**
+**Trần credit ngày: 21 account × $10 = ~$210/ngày.** Hai account mới (`kakagotto`,
+`tonngohan`) chưa tiêu đồng nào, nên chúng là chỗ còn nhiều quota nhất — ưu tiên đẩy
+shard đắt vào đó trước khi đụng tới các account đã chạy E1/E2/E3a.
 
 ⚠️ **Probe chỉ trả lời CÒN/HẾT, KHÔNG trả lời CÒN BAO NHIÊU.** Xin được key ≠ đủ quota cho
 shard của bạn. Đã trả giá cho bài học này 2 lần: `trunkdabest` probe xanh nhưng push
@@ -279,10 +296,38 @@ trông như chưa tiêu gì).
 tốn gì. Vì vậy khi cần nhiều account, cứ thử push lần lượt và lấy những cái qua được, đừng
 cố đoán trước.
 
+**Muốn ước lượng gần đúng (11-09-2026): đọc `.run.json` đã tải về, đừng đọc log.** Artifact
+tải về có trường `results[].dictResult.usage_total_cost_usd` — đây mới là con số chi phí
+thật, khác với `cost_usd` trong log (trường đó nhiều shard không ghi).
+
+```bash
+# tong chi phi + cua so truot 24h theo account, doc tu D:/tmp/crgdl/<account>/**/*.run.json
+python - <<'EOF'
+import json; from pathlib import Path; from collections import defaultdict
+from datetime import datetime, timedelta, timezone
+cut = datetime.now(timezone.utc) - timedelta(hours=24); agg = defaultdict(float)
+for rj in Path("D:/tmp/crgdl").glob("*/**/*.run.json"):
+    d = json.load(open(rj, encoding="utf-8")); t = d.get("endTime") or d.get("startTime")
+    if not t or datetime.fromisoformat(t.replace("Z","+00:00")) < cut: continue
+    agg[rj.relative_to(Path("D:/tmp/crgdl")).parts[0]] += sum(
+        (r.get("dictResult") or {}).get("usage_total_cost_usd", 0) or 0 for r in d.get("results") or [])
+for a, c in sorted(agg.items(), key=lambda x: -x[1]): print(f"{a:16} da tieu 24h ${c:6.2f}  con ~${10-c:5.2f}")
+EOF
+```
+
+**Hai cái bẫy của con số này, nhớ cả hai:**
+
+1. **Nó là CẬN DƯỚI, không phải số đúng.** Đo 11-09-2026: **37/152 run.json không có
+   trường cost** (~24%), nên thực tế đã tiêu **nhiều hơn** số in ra. Đừng lấy nó để quyết
+   định "còn đủ chỗ cho shard $5" — chỉ dùng để XẾP HẠNG account nào rảnh nhất.
+2. **Quota là cửa sổ TRƯỢT 24h, không reset nửa đêm.** Cho nên tổng chi phí trọn đời vô
+   nghĩa (nhiều account đã vượt xa $10 cộng dồn qua nhiều ngày) — chỉ phần trong 24h qua
+   mới tính vào trần. Account chạy shard $7 lúc 22:00 thì 22:00 hôm sau mới dùng lại được.
+
 **Cách nạp credential (2 kiểu, chọn 1 theo nguồn):**
 ```bash
 export KAGGLE_CONFIG_DIR=<thư mục riêng cho account này>   # tránh đụng ~/.kaggle
-# kiểu token (kaggle-api/, kaggle-api-2/):
+# kiểu token (kaggle-api/, kaggle-api-2/, kaggle-api-3/, kaggle-api-4/):
 export KAGGLE_API_TOKEN=KGAT_xxxxxxxx
 # kiểu cũ (kaggle*.json): đặt username/key hoặc copy file thành $KAGGLE_CONFIG_DIR/kaggle.json
 export KAGGLE_USERNAME=... ; export KAGGLE_KEY=...
@@ -301,7 +346,9 @@ kaggle benchmarks auth -y --env-file account.env   # ghi MODEL_PROXY_URL + MODEL
 - Response trả kèm `usage.cost` (nanodollars) để theo dõi chi phí/quota.
 
 **Khi 1 account hết quota / rate-limit / key hết hạn không xin lại được → switch:**
-1. Chuyển sang account kế tiếp trong danh sách 16 account sống (mỗi account 1
+1. Chuyển sang account kế tiếp trong danh sách account còn sống — **probe lại bằng
+   `probe_accounts.py`, đừng tin con số viết trong file này** (nó là ảnh chụp và đã lạc
+   hậu ba lần: 16 → 19 → 21). Mỗi account 1
    `KAGGLE_CONFIG_DIR` riêng để creds không đè nhau).
 2. Chạy lại `kaggle benchmarks auth` để lấy proxy key mới cho account đó.
 3. Bỏ qua `trnnguynchis` cho tới khi được verify.

@@ -60,6 +60,10 @@ ACCOUNTS = {
     # Lô bổ sung 10-09-2026 (kaggle-api-3/): cùng định dạng token thô như kaggle-api/.
     **{n: ("token_txt", CRED_ROOT / "kaggle-api-3" / f"{n}.txt") for n in (
         "acc06", "acc07", "acc08", "acc09", "acc10", "acc11")},
+    # Lô bổ sung 11-09-2026 (kaggle-api-4/). Người dùng thả token vào
+    # D:/AI_PhD/kaggle_for_research/ (KHÁC CRED_ROOT) rồi copy vào đây — xem CLAUDE.md.
+    **{n: ("token_txt", CRED_ROOT / "kaggle-api-4" / f"{n}.txt") for n in (
+        "kakagotto", "tonngohan")},
     "trungkiet":    ("json", CRED_ROOT / "kaggle.json"),
     "foundnotkiet": ("json", CRED_ROOT / "kaggle (1).json"),
     "kit567":       ("json", CRED_ROOT / "kaggle (2).json"),

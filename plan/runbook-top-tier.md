@@ -32,7 +32,7 @@ nhánh open-weight để data ghép chung được.
 
 ---
 
-## 2 · 16 account và cách nạp credential
+## 2 · 21 account sống và cách nạp credential
 
 Kho credential **ngoài repo**: `D:\AI_PhD\GameTheory\kaggle_for_research\`
 (đừng bao giờ dán key thật vào repo).
@@ -41,10 +41,13 @@ Kho credential **ngoài repo**: `D:\AI_PhD\GameTheory\kaggle_for_research\`
 |---|---|---|
 | `kaggle-api\*.txt` | `chiboiz`, `chinguyentran`, `chisboiz`, `chunaiu`, `trunkdabest`, `vinhdinhthien` | token — cả file là 1 dòng `KGAT_...` |
 | `kaggle-api-2\*.md` | `acc1`…`acc5` | token — dòng bắt đầu bằng `KGAT_` trong file .md |
+| `kaggle-api-3\*.txt` | `acc06`…`acc11` (thêm 10-09-2026) | token thô, như `kaggle-api/` |
+| `kaggle-api-4\*.txt` | `kakagotto`, `tonngohan` (thêm 11-09-2026) | token thô, như `kaggle-api/` |
 | `kaggle*.json` | `trungkiet`, `foundnotkiet`, `kit567`, `hunhtrungkit`, `tnkiet` | cặp `username`/`key` kiểu cũ |
 
-> ❌ **BỎ QUA `trnnguynchis`** — login được nhưng xin Model Proxy key bị 403 thiếu xác
-> minh SĐT. Còn đúng **16 account dùng được**.
+> ❌ **BỎ QUA 4 account chết** (403 thiếu xác minh SĐT, probe 11-09-2026):
+> `chiboiz`, `chinguyentran`, `trnnguynchis`, `acc10`. Còn **21/25 account dùng được**.
+> Danh sách này là ẢNH CHỤP — chạy `python plan/scripts/probe_accounts.py` trước mỗi đợt lớn.
 
 **Mỗi account PHẢI có `KAGGLE_CONFIG_DIR` riêng**, nếu không credential đè lẫn nhau:
 
