@@ -20,6 +20,7 @@ Ví dụ:
         --model gpt-5.6-sol --download-only
 """
 import argparse
+import json
 import os
 import re
 import shutil
@@ -399,11 +400,23 @@ def main():
                                 timeout=300)
         errored = [m for m in args.model
                    if re.search(rf"{re.escape(m)}\s+Errored", status_out)]
+        done_info = {}
         for m in args.model:
             rc, out = run_cmd(h, env, ["kaggle", "b", "t", "log", args.task, "-m", m],
                               timeout=600)
             (shard_dir / f"log__{re.sub(r'[^A-Za-z0-9._-]+', '-', m)}.txt").write_text(
                 out, encoding="utf-8")
+            # Bao cao cuoi sweep cua CHINH server. Day la nguon duy nhat noi dung
+            # ve viec run VUA ROI lam duoc gi. Moi cach dem file deu co the bi data
+            # cua mot run TRUOC do tren cung task qua mat.
+            for line in out.splitlines():
+                i = line.find("[CRG_DONE]")
+                if i == -1:
+                    continue
+                try:
+                    done_info[m] = json.loads(line[i + len("[CRG_DONE]"):].strip())
+                except ValueError:
+                    pass
             for line in out.splitlines():
                 if re.search(r"\[cfg\]|\[game|parse_fail|cost_usd|SUMMARY|games_per", line):
                     log(h, f"   {m}: {line.strip()}")
@@ -441,6 +454,32 @@ def main():
                                "Data VAN CON tren server: tai lai bang duong dan ngan hon.")
                 else:
                     log(h, f"download {m} OK -> {dest} ({len(got)} games.csv)")
+
+        # Cong kiem THEO BAO CAO CUA SERVER, dat TRUOC cong download.
+        # Do that 12-09-2026: mot task chua NHIEU run (moi gia tri k cua cung mot
+        # cap la mot run rieng), nen dem games.csv theo thu muc task van thay data
+        # cua run TRUOC do va cho qua mot run hong toan bo. acc08/crg-e3b-flash-grok:
+        # run cu de lai 30 van sach, run moi hong ca 30 o vi 403 quota, shard bao
+        # rc=0. `n_games` = resumed + new, nen shard resume dung han van qua cong nay.
+        bad_sweep = []
+        for m in args.model:
+            info = done_info.get(m)
+            if info is None:
+                bad_sweep.append("%s: khong co [CRG_DONE] -> run CHUA HE ket thuc" % m)
+            elif (info.get("failed_games") or 0) > 0:
+                cells = info.get("failed_cells") or []
+                first = str(cells[0])[:200] if cells else ""
+                bad_sweep.append("%s: %d o hong%s"
+                                 % (m, int(info["failed_games"]),
+                                    (" - " + first) if first else ""))
+            elif not (info.get("n_games") or 0):
+                bad_sweep.append("%s: n_games=0 -> khong sinh duoc van nao" % m)
+        if bad_sweep:
+            log(h, "!! SHARD CHUA XONG - server bao sweep KHONG sach:")
+            for b in bad_sweep:
+                log(h, "   " + b)
+            print("log: %s" % log_path)
+            return 6
 
         if dl_failed:
             # Không được ghi XONG: check_runs.py sẽ báo xanh trong khi không có data.
