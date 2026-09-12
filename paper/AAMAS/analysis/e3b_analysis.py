@@ -150,26 +150,35 @@ def audit(games):
 
 # ------------------------------------------------------------------- hoi quy ------
 def panel_rows(games, model):
-    """(y, x, game, round) cho MOT model: y = gop cua ghe do o vong t,
-    x = gop TB cua 5 ghe kia o vong t-1."""
-    y, x, gid, rnd = [], [], [], []
+    """(y, x, pot, game, round) cho MOT model.
+
+    y   = dong gop cua ghe do o vong t
+    x   = dong gop TRUNG BINH cua 5 ghe kia o vong t-1
+    pot = tong quy TRUOC vong t
+
+    `pot` co mat de tach hai co che khac nhau ma bo ba chung mot dau. Xem
+    `partner_response` ben duoi.
+    """
+    y, x, pot, gid, rnd = [], [], [], [], []
     for g in games:
         T = min(len(m) for m in g["moves"])
-        for i, m in enumerate(g["seats"]):
-            if m != model:
-                continue
-            for t in range(1, T):
+        for t in range(1, T):
+            pot_t = sum(sum(mv[:t]) for mv in g["moves"])
+            for i, m in enumerate(g["seats"]):
+                if m != model:
+                    continue
                 others = sum(g["moves"][j][t - 1]
                              for j in range(N_SEATS) if j != i) / (N_SEATS - 1)
                 y.append(g["moves"][i][t])
                 x.append(others)
+                pot.append(pot_t)
                 gid.append(g["id"])
                 rnd.append(t)
-    return (np.array(y, float), np.array(x, float),
+    return (np.array(y, float), np.array(x, float), np.array(pot, float),
             np.array(gid), np.array(rnd, int))
 
 
-def twoway_fe_ols(y, x, gid, rnd, coef_only=False):
+def twoway_fe_ols(y, x, gid, rnd, coef_only=False, extra=None):
     """He so cua x sau khi hut HIEU UNG CO DINH theo van va theo vong.
 
     Hut hieu ung co dinh theo van bang cach tru trung binh trong van (within), roi dua
@@ -189,8 +198,13 @@ def twoway_fe_ols(y, x, gid, rnd, coef_only=False):
     for j in range(1, len(uniq_r)):
         D[:, j - 1] = (r_idx == j).astype(float)
 
-    X = np.column_stack([demean(x)] + [demean(D[:, j]) for j in range(D.shape[1])]) \
-        if D.shape[1] else demean(x).reshape(-1, 1)
+    cols = [demean(x)]
+    if extra is not None:
+        # Bien khu them (muc quy). Phai demean giong moi cot khac, neu khong hieu ung
+        # co dinh theo van khong duoc hut het va he so cua x se lech.
+        cols.append(demean(extra))
+    cols += [demean(D[:, j]) for j in range(D.shape[1])]
+    X = np.column_stack(cols)
     yy = demean(y)
 
     XtX_inv = np.linalg.pinv(X.T @ X)
@@ -214,7 +228,7 @@ def twoway_fe_ols(y, x, gid, rnd, coef_only=False):
     return float(b[0]), float(np.sqrt(V[0, 0])), n_g, len(y)
 
 
-def perm_p(y, x, gid, rnd, seed=20260912, n=500):
+def perm_p(y, x, gid, rnd, seed=20260912, n=500, extra=None):
     """p hoan vi: thay chuoi hanh vi cua dong doi bang chuoi cua MOT VAN KHAC.
 
     Gia thuyet khong can kiem la: "dong gop cua toi khong lien quan toi hanh vi cua
@@ -229,7 +243,7 @@ def perm_p(y, x, gid, rnd, seed=20260912, n=500):
     nao: no van chay, van in ra mot con so trong hinh dang cua mot p-value.
     """
     rng = np.random.default_rng(seed)
-    b0, _, _, _ = twoway_fe_ols(y, x, gid, rnd)
+    b0, _, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=extra)
 
     # gom chi so theo van, roi nhom cac van theo DO DAI khoi: chi hoan doi duoc giua
     # nhung van co cung so quan sat, neu khong x va y khong con xep hang duoc voi nhau.
@@ -252,7 +266,7 @@ def perm_p(y, x, gid, rnd, seed=20260912, n=500):
             src = rng.permutation(games_L)
             for dst, s in zip(games_L, src):
                 x_perm[order[dst]] = x[order[s]]
-        b, _, _, _ = twoway_fe_ols(y, x_perm, gid, rnd, coef_only=True)
+        b, _, _, _ = twoway_fe_ols(y, x_perm, gid, rnd, coef_only=True, extra=extra)
         if abs(b) >= abs(b0):
             hits += 1
     return (hits + 1) / (n + 1)
@@ -303,17 +317,23 @@ def main():
 
     # ---- co di co lai -------------------------------------------------------
     print("\nPHAN UNG VOI DONG DOI (hieu ung co dinh van + vong, cluster theo van)")
-    print("  %-7s %9s %9s %8s %8s %9s" % ("model", "he so", "sai so", "t", "van", "p hoan vi"))
+    print("  Cot 'tho' khong khu muc quy; cot 'khu quy' co. Chenh lech giua hai cot la")
+    print("  phan do BAM MUC TIEU chu khong phai phan ung voi nguoi.")
+    print("  %-7s %17s %17s %7s %9s"
+          % ("model", "tho", "khu quy", "van", "p hoan vi"))
     reciprocity = {}
     for m in ORDER:
-        y, x, gid, rnd = panel_rows(games, m)
-        b, se, n_g, n_obs = twoway_fe_ols(y, x, gid, rnd)
-        t = b / se if se else float("nan")
-        p = perm_p(y, x, gid, rnd)
-        reciprocity[m] = (b, se, t, n_g, n_obs, p)
-        print("  %-7s %9.3f %9.3f %8.2f %8d %9.4f" % (m, b, se, t, n_g, p))
+        y, x, pot, gid, rnd = panel_rows(games, m)
+        b_raw, se_raw, n_g, n_obs = twoway_fe_ols(y, x, gid, rnd)
+        b, se, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=pot)
+        tstat = b / se if se else float("nan")
+        p = perm_p(y, x, gid, rnd, extra=pot)
+        reciprocity[m] = (b, se, tstat, n_g, n_obs, p, b_raw, se_raw)
+        print("  %-7s %8.3f (%.3f) %8.3f (%.3f) %7d %9.4f"
+              % (m, b_raw, se_raw, b, se, n_g, p))
         M.add("Erecip%s" % m.capitalize(), "%.2f" % b)
         M.add("Erecip%sSE" % m.capitalize(), "%.2f" % se)
+        M.add("Erecip%sRaw" % m.capitalize(), "%.2f" % b_raw)
         M.add("Erecip%sP" % m.capitalize(),
               ("<0.001" if p < 0.001 else "%.3f" % p))
 
@@ -345,13 +365,14 @@ def main():
     # ---- bang ---------------------------------------------------------------
     rows = []
     for m in ORDER:
-        b, se, t, n_g, n_obs, p = reciprocity[m]
-        rows.append(r"%s & $%.2f$ & $(%.2f)$ & %s \\" % (
-            PRETTY[m], b, se, ("$<$0.001" if p < 0.001 else "%.3f" % p)))
+        b, se, tstat, n_g, n_obs, p, b_raw, se_raw = reciprocity[m]
+        rows.append(r"%s & $%.2f$ & $%.2f$ & $(%.2f)$ & %s \\" % (
+            PRETTY[m], b_raw, b, se,
+            ("$<$0.001" if p < 0.001 else "%.3f" % p)))
     (TABLES / "e3b_table_reciprocity.tex").write_text(
         "\n".join([
-            r"\begin{tabular}{lrrr}", r"\toprule",
-            r"Model & Slope & (SE) & $p$ \\", r"\midrule",
+            r"\begin{tabular}{lrrrr}", r"\toprule",
+            r"Model & Raw & Net of pool & (SE) & $p$ \\", r"\midrule",
             *rows, r"\bottomrule", r"\end{tabular}", ""]),
         encoding="utf-8")
     print("  ghi paper/AAMAS/tables/e3b_table_reciprocity.tex")
