@@ -150,16 +150,21 @@ def audit(games):
 
 # ------------------------------------------------------------------- hoi quy ------
 def panel_rows(games, model):
-    """(y, x, pot, game, round) cho MOT model.
+    """(y, x, pot, own, game, round, seat) cho MOT model.
 
     y   = dong gop cua ghe do o vong t
     x   = dong gop TRUNG BINH cua 5 ghe kia o vong t-1
     pot = tong quy TRUOC vong t
+    own = tong gop cua CHINH ghe do truoc vong t
 
-    `pot` co mat de tach hai co che khac nhau ma bo ba chung mot dau. Xem
-    `partner_response` ben duoi.
+    `pot` co mat de tach hai co che khac nhau ma bo ba chung mot dau.
+    `own` va `seat` chi phuc vu phep hoan vi: quy la HAM XAC DINH cua chuoi dong doi
+        quy_t = own_t + 5 * (tong trung binh dong doi o cac vong < t)
+    (dang thuc nay duoc kiem dung tren toan bo data), nen khi hoan vi xao chuoi dong doi
+    thi PHAI dung lai quy tu chuoi da xao. Ban truoc giu nguyen quy va vi the sinh phan
+    phoi null voi mot bien khu khong tuong thich voi hoi quy tu.
     """
-    y, x, pot, gid, rnd = [], [], [], [], []
+    y, x, pot, own, gid, rnd, seat = [], [], [], [], [], [], []
     for g in games:
         T = min(len(m) for m in g["moves"])
         for t in range(1, T):
@@ -172,10 +177,13 @@ def panel_rows(games, model):
                 y.append(g["moves"][i][t])
                 x.append(others)
                 pot.append(pot_t)
+                own.append(sum(g["moves"][i][:t]))
                 gid.append(g["id"])
                 rnd.append(t)
+                seat.append(i)
     return (np.array(y, float), np.array(x, float), np.array(pot, float),
-            np.array(gid), np.array(rnd, int))
+            np.array(own, float), np.array(gid), np.array(rnd, int),
+            np.array(seat, int))
 
 
 def twoway_fe_ols(y, x, gid, rnd, coef_only=False, extra=None):
@@ -228,7 +236,7 @@ def twoway_fe_ols(y, x, gid, rnd, coef_only=False, extra=None):
     return float(b[0]), float(np.sqrt(V[0, 0])), n_g, len(y)
 
 
-def perm_p(y, x, gid, rnd, seed=20260912, n=500, extra=None):
+def perm_p(y, x, gid, rnd, seed=20260912, n=500, own=None, seat=None):
     """p hoan vi: thay chuoi hanh vi cua dong doi bang chuoi cua MOT VAN KHAC.
 
     Gia thuyet khong can kiem la: "dong gop cua toi khong lien quan toi hanh vi cua
@@ -243,7 +251,24 @@ def perm_p(y, x, gid, rnd, seed=20260912, n=500, extra=None):
     nao: no van chay, van in ra mot con so trong hinh dang cua mot p-value.
     """
     rng = np.random.default_rng(seed)
-    b0, _, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=extra)
+
+    def pool_of(xv):
+        """Dung lai muc quy tu mot chuoi dong doi bat ky, theo dung dang thuc tren."""
+        if own is None or seat is None:
+            return None
+        out = np.empty_like(xv)
+        for key, idx in per_seat.items():
+            out[idx] = own[idx] + 5 * np.cumsum(xv[idx])
+        return out
+
+    # nhom chi so theo (van, ghe) va sap theo vong: cumsum chi dung khi dung thu tu
+    per_seat = defaultdict(list)
+    for i in range(len(y)):
+        per_seat[(gid[i], seat[i] if seat is not None else 0)].append(i)
+    for key in per_seat:
+        per_seat[key] = np.array(sorted(per_seat[key], key=lambda i: rnd[i]))
+
+    b0, _, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=pool_of(x))
 
     # gom chi so theo van, roi nhom cac van theo DO DAI khoi: chi hoan doi duoc giua
     # nhung van co cung so quan sat, neu khong x va y khong con xep hang duoc voi nhau.
@@ -266,7 +291,8 @@ def perm_p(y, x, gid, rnd, seed=20260912, n=500, extra=None):
             src = rng.permutation(games_L)
             for dst, s in zip(games_L, src):
                 x_perm[order[dst]] = x[order[s]]
-        b, _, _, _ = twoway_fe_ols(y, x_perm, gid, rnd, coef_only=True, extra=extra)
+        b, _, _, _ = twoway_fe_ols(y, x_perm, gid, rnd, coef_only=True,
+                                   extra=pool_of(x_perm))
         if abs(b) >= abs(b0):
             hits += 1
     return (hits + 1) / (n + 1)
@@ -337,11 +363,11 @@ def main():
           % ("model", "tho", "khu quy", "van", "p hoan vi"))
     reciprocity = {}
     for m in ORDER:
-        y, x, pot, gid, rnd = panel_rows(games, m)
+        y, x, pot, own, gid, rnd, seat = panel_rows(games, m)
         b_raw, se_raw, n_g, n_obs = twoway_fe_ols(y, x, gid, rnd)
         b, se, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=pot)
         tstat = b / se if se else float("nan")
-        p = perm_p(y, x, gid, rnd, extra=pot)
+        p = perm_p(y, x, gid, rnd, own=own, seat=seat)
         reciprocity[m] = (b, se, tstat, n_g, n_obs, p, b_raw, se_raw)
         print("  %-7s %8.3f (%.3f) %8.3f (%.3f) %7d %9.4f"
               % (m, b_raw, se_raw, b, se, n_g, p))

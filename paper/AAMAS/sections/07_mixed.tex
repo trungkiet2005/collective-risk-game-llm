@@ -20,6 +20,14 @@
 %% quan tam gi toi dong doi. Bo doan nay thi muc bien thanh mot khang dinh ve an khong ma
 %% du lieu khong do duoc.
 %%
+%% PHEP HOAN VI: quy PHAI duoc dung lai tu chuoi dong doi da xao, khong duoc giu
+%% nguyen. Quy truoc vong t la ham xac dinh cua chuoi do:
+%%     quy_t = (gop cua chinh ghe do truoc t) + 5 * (tong trung binh dong doi truoc t)
+%% Ban dau toi xao chuoi dong doi ma giu nguyen quy, nen phan phoi null duoc sinh voi
+%% mot bien khu khong tuong thich voi hoi quy tu. Sua roi thi p cua qwen di tu 0,010
+%% len 0,072 va grok tu 0,017 len 0,198, tuc CA HAI mat y nghia, va ket luan gon lai
+%% thay vi yeu di. Loi nay do mot vong review doc lap chi ra.
+%%
 %% ==> CON SO TRONG BANG HIEN TAI LA TAM: chung sinh tu mot luot chay CHUA XONG
 %% (mot phan ba luoi con thieu, va so van chua deu giua cac model, nen cong can
 %% bang cua verify_wide.py se do). Dau va do lon cua moi he so da on dinh qua hai
@@ -70,14 +78,12 @@ size of the threshold channel.
 
 \input{tables/e3b_table_reciprocity.tex}
 
-Net of the pool, \ErecipNNull{} of the \EthreebModels{} models show no response that a
-permutation test can separate from zero, and \ErecipNTiny{} more show one smaller than a
-quarter of a contribution step. Contributions are chosen from 0, 2 or 4, so a slope that
-small means a partner who gives one unit more buys almost nothing in return. That leaves
-\ErecipNReal{} model whose response is large enough to appear in play, \ErecipRealModels,
-and its response runs the wrong way: it gives less to partners who give more. So
-\ErecipNBlind{} of the \EthreebModels{} are watching a running total rather than the
-agents producing it, and the one that watches the agents exploits them.
+Net of the pool, \ErecipNBlind{} of the \EthreebModels{} models answer their partners
+with nothing a permutation test can separate from zero, or with less than a quarter of a
+contribution step, which on a choice set of 0, 2 and 4 is not a faint response but no
+response. The remaining \ErecipNReal{} is \ErecipRealModels, and it runs the wrong way:
+it gives less to partners who give more. The others are watching a running total rather
+than the agents producing it, and the one that watches the agents exploits them.
 
 \paragraph{Company changes one model, and only in the aggregate.}
 The same data answers a second and coarser question. Does a model contribute differently
