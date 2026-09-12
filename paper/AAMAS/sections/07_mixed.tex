@@ -82,11 +82,16 @@ agents producing it, and the one that watches the agents exploits them.
 \paragraph{Company changes one model, and only in the aggregate.}
 The same data answers a second and coarser question. Does a model contribute differently
 when more of its own kind fill the table? Here one model does separate itself.
-Table~\ref{tab:mixed-comp} gives mean contribution per seat against the number of seats
-the model holds. \EcompTopModel{} rises across that range by \EcompTopSpan{} units, about
-\EcompRatio{} times the next largest movement, while the rest stay flat.
+Averaged over a whole game, \EcompTopModel{} rises by \EcompTopSpan{} units as its own
+kind fills more of the table, about \EcompRatio{} times the largest movement any other
+model shows, and the other four stay flat. The per-mixture means are in the supplementary
+material.
 
-\input{tables/e3b_table_composition.tex}
+%% BANG THANH PHAN da chuyen ra supplementary de tra ngan sach trang. No dung 25 con so
+%% cho mot khang dinh dinh tinh, va cac trung binh theo tung muc pha tron la chi tiet ho
+%% tro chu khong phai thu quyet dinh (plan §1 chi doi thu quyet dinh nam trong 8 trang).
+%% Generator VAN sinh tables/e3b_table_composition.tex; dung lai chi can \input lai va
+%% tro tham chieu ve day.
 
 The two questions come apart, and that is the useful part. The model with the largest
 effect of company has no response to its partners inside a game, and the models with a
@@ -94,12 +99,6 @@ detectable within-game response barely move with company at all. A study that me
 only one of the two would have named a different model as the social one, and would have
 been wrong either way. Company shifts an average; it does not mean anyone is watching.
 
-\paragraph{What this means for evaluating agents.}
-An evaluation that places a single model against fixed opponents cannot see any of this,
-because fixed opponents give nothing to respond to and one model at every seat gives
-nothing to distinguish. The behaviour that a multi-agent deployment depends on, adjusting
-to whoever is actually there, is the behaviour these tables are built to detect, and
-almost none of it is present. Together with the earlier findings that no model best
-responds to an opponent it has been told about, and that none of them moves when the
-catastrophe probability moves, the picture is consistent and narrow: these agents act on
-the state of the pool, not on models of each other.
+%% DOAN "What this means for evaluating agents" da chuyen y sang muc Discussion:
+%% do la binh luan ve he qua chu khong phai ket qua, va de o day thi mot muc ket qua
+%% ket thuc bang mot doan khong co mot con so nao.
