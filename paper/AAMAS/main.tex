@@ -54,6 +54,7 @@
 \input{tables/panel_numbers.tex}
 \input{tables/e3a_numbers.tex}
 \input{tables/e3a_prose_numbers.tex}
+\input{tables/e3b_numbers.tex}
 
 \begin{document}
 
@@ -66,27 +67,29 @@ collective-risk dilemmas}
 \begin{abstract}
 Language-model agents are being deployed into settings where their choices impose risk on
 a group, yet most of the evidence about how they behave there comes from self-play, in
-which one model faces copies of itself. Self-play cannot separate an agent reasoning about
-its opponents from an agent executing a fixed script, because the two produce the same
-transcript. We run $\PanelNgames$ games of the collective-risk social dilemma across
-\PanelNmodelsWord{} production models and break that symmetry three ways. On an
-\PanelNrisksWord{}-point grid of
-catastrophe risk, \PanelNFlatWord{} of \PanelNmodelsWord{} models contribute the same
-amount at every level, and a fourth changes only at the control at $p=0$. There
-contributing is strictly dominated, yet $\PanelZeroSeatsPaying$ of $\PanelZeroSeats$ seats
-still pay, and the panel forfeits $\PanelForfeitPanelPct\%$ of the payoff attainable at
-the welfare-optimal outcome. Deleting the prompt's equal-split gloss
-never lowers contribution and raises it to the endowment cap in two models, so the
-cooperation is not compliance with a supplied focal point. Nor is it a failure of
-comprehension: asked in the middle of their own games, the agents answer
-$\PanelProbeRulesN$ questions about the rules at $\PanelProbeRulesAcc\%$ and identify the
-higher-paying strategy at $p=\PanelProbeLowRisk$ at $\PanelProbeCompareLowAcc\%$, then
-contribute $\PanelProbeLowContrib$ units against their own stated answer. Finally, seating
-one model against $\EthreeaxSeatsScripted$ scripted opponents makes the best response computable: no model
-plays it in any of $\EthreeaNgames$ games, including $\EthreeaDominatedGames$ in which
-every alternative is strictly dominated, and a trivial free-rider out-earns every model in
-the panel. Cooperation from these agents is a fixed schedule rather than a choice, which
-makes them safe collaborators and unsafe stakeholders.
+which one model faces copies of itself. Self-play cannot separate an agent that reasons
+about its opponents from an agent that runs a fixed schedule, because the two produce the
+same transcript. We run $\PanelNgames$ games of the collective-risk social dilemma across
+\PanelNmodelsWord{} production models and break that symmetry three ways.
+
+Across an \PanelNrisksWord{}-point grid of catastrophe risk, the panel pays on a schedule
+that the risk does not move. At the control where no catastrophe is possible, and
+contributing is therefore strictly dominated under every increasing utility, most seats
+still pay, and the panel forfeits $\PanelForfeitPanelPct\%$ of the payoff that was
+attainable. Deleting the prompt's equal-split gloss never lowers contribution, so the
+cooperation is not compliance with a supplied focal point. Nor is it misunderstanding:
+asked about the rules in the middle of their own games, the agents name the higher-paying
+action and then contribute against their own answer.
+
+Seating one model against scripted opponents makes the best response computable, and no
+model plays it in any game, including the games in which every alternative is strictly
+dominated. Seating two different models at one table shows what is missing.
+\ErecipNBlind{} of \EthreebModels{} act on the running total in the shared account rather
+than on the agents filling it, and the one model whose response to its partners is large
+enough to appear in play gives less to partners who give more.
+
+Cooperation from these agents is a fixed schedule rather than a choice. That makes them
+safe collaborators and unsafe stakeholders.
 \end{abstract}
 
 \begin{CCSXML}
@@ -113,6 +116,7 @@ empirical game theory}
 \input{sections/04_riskgrid.tex}
 \input{sections/05_controls.tex}
 \input{sections/06_bestresponse.tex}
+\input{sections/07_mixed.tex}
 \input{sections/07_discussion.tex}
 
 %% References bat dau o TRANG MOI. Hai ly do, ca hai deu co loi: luat nha cua nguoi dung

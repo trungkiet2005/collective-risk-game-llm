@@ -1,0 +1,21 @@
+%% SINH TU DONG boi paper/AAMAS/analysis/e3b_analysis.py -- DUNG SUA TAY.
+%% Moi con so goi qua macro cua e3b_numbers.tex nen bang va van xuoi khong lech nhau.
+%% Can: \usepackage{booktabs}
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{2.5pt}%
+\caption{Mean contribution per seat over a whole game, against the number of seats the model holds, given in the column headings. A seat can pay at most 40 across the game. A flat row means the company at the table does not change what the model pays.}
+\label{tab:mixed-comp}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+Claude Haiku 4.5 & 19.5 & 20.5 & 22.0 & 21.0 & 21.1 \\
+Gemini 3.5 Flash Lite & 19.7 & 18.2 & 19.0 & 19.8 & 19.9 \\
+GPT-5.6 Luna & 16.7 & 19.4 & 17.5 & 19.6 & 19.3 \\
+Qwen3 235B & 19.9 & 19.2 & 19.1 & 19.2 & 18.7 \\
+Grok 4.20 & 26.1 & 27.9 & 28.6 & 29.5 & 32.8 \\
+\bottomrule
+\end{tabular}
+\end{table}

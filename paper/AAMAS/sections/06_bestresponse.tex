@@ -307,32 +307,15 @@ Grok paying $\EthreeaSlopeDefectGrok$ more units per unit of $p$ against all-def
 $\EthreeaSlopeDefectFlash$, while Qwen alone moves the other way
 ($\EthreeaSlopeDefectQwen$). Contributions are flat under \textsc{fair-share} and
 \textsc{cond.\ coop.}, which is where flatness is the failure, because there the optimum
-does switch at $p^{*}$ (Figure~\ref{fig:e3a-risk}).
+does switch at $p^{*}$ (Proposition~\ref{prop:br}).
 
-%% HINH 2 — dong gop theo muc risk. BE NGANG: file PDF rong dung 241.15pt (TeX pt), tuc
-%% dung \columnwidth cua acmart sigconf, nen `width=\columnwidth` la phep nhan 1.0 va co
-%% chu 7,2pt trong hinh in ra dung 7,2pt. Ban truoc rong 203,99pt nen bi PHONG TO 1,18 lan
-%% (chu 7,2pt in ra ~8,5pt) trong khi hinh kia bi phong 1,03 lan — hai hinh cung mot muc ma
-%% khac co chu. Ca hai gio sinh o cung be ngang; dung them/bot tham so width o day, sua o
-%% COLUMN_IN trong e3a_analysis.py neu mot ngay doi template.
-%% Mo bang PyMuPDF se thay 240.25 chu khong phai 241.15: PDF do bang PostScript pt (1/72in)
-%% con TeX do bang TeX pt (1/72,27in). Cung mot be ngang vat ly — dung "sua".
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/e3a_gap_by_risk.pdf}
-\caption{Total contributed by the LLM seat over the ten rounds, of the
-$\EthreeaEndowment$-unit endowment, against catastrophe risk; one panel per opponent
-profile, $n=\EthreeaxCellN$ games per point, with percentile bootstrap $95\%$ intervals.
-The thick grey dashed line is the best response of Proposition~\ref{prop:br}, drawn beneath the model
-lines so that models sitting exactly on it stay visible; under \textsc{fair-share} and
-\textsc{cond.\ coop.} it steps from $\EthreeaBRTotCoopPthree$ to $\EthreeaBRTotCoopPseven$
-at $p^{*}=\EthreeaPstar$, and the two open circles mark the tied pair there, either of
-which scores a zero gap. Flash-Lite's intervals vanish under \textsc{fair-share} because
-all $\EthreeaCoopModalNFlash$ of its games are identical. There is no variation to
-express, rather than none existing. Every marker sits at its true risk level; where models play the
-same value, nested line widths and unfilled markers keep both visible.}
-\label{fig:e3a-risk}
-\end{figure}
+%% HINH 2 (dong gop theo muc risk) DA BI CAT, KHONG PHAI BI QUEN.
+%% Day la nhat cat thu nhat trong danh sach ngan sach trang o dau file: -0,61 cot,
+%% do duoc, va la nhat re nhat vi noi dung cua no da co bang loi trong doan noi ve
+%% chinh sach suy bien. Tham chieu cu da tro sang Menh de 1, la thu that su chong
+%% lung cho cau "toi uu co doi tai p*".
+%% Generator VAN sinh figures/e3a_gap_by_risk.pdf, nen dung lai chi can \input lai
+%% khoi figure va tro tham chieu ve day.
 
 \subsection{What this measures, and what it does not}
 \label{sec:e3a-limits}
