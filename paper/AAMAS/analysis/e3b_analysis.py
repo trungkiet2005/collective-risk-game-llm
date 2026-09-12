@@ -314,6 +314,20 @@ def main():
     M = Macros()
     M.add("EthreebGames", "%d" % len(games))
     M.add("EthreebSeatGames", "%d" % sum(seatgames.values()))
+    # Thiet ke duoc SUY TU DATA, khong go tay: so cap model thuc co, so muc pha tron,
+    # so muc rui ro, so lan lap. Neu mot ô chet thi cac con so nay tu giam theo va van
+    # khop voi bang, thay vi mo ta mot thiet ke khong ton tai.
+    pairs = {tuple(sorted(set(g["seats"]))) for g in games}
+    mixes = {g["seats"].count(min(set(g["seats"]), key=lambda s: FULL[s])) for g in games}
+    risks = {g["risk"] for g in games}
+    reps = {g["rep"] for g in games}
+    M.add("EthreebPairs", "%d" % len(pairs))
+    M.add("EthreebMixtures", "%d" % len(mixes))
+    M.add("EthreebRisks", "%d" % len(risks))
+    M.add("EthreebReps", "%d" % len(reps))
+    M.add("EthreebGamesPerModel", "%d" % min(present.values()))
+    M.add("EthreebSeatGamesPerModel", "%d" % min(seatgames.values()))
+    M.add("EthreebModels", "%d" % len(present))
 
     # ---- co di co lai -------------------------------------------------------
     print("\nPHAN UNG VOI DONG DOI (hieu ung co dinh van + vong, cluster theo van)")
@@ -337,10 +351,26 @@ def main():
         M.add("Erecip%sP" % m.capitalize(),
               ("<0.001" if p < 0.001 else "%.3f" % p))
 
-    pos = [m for m in ORDER if reciprocity[m][0] > 0]
-    neg = [m for m in ORDER if reciprocity[m][0] < 0]
-    M.add("ErecipNPositive", "%d" % len(pos))
-    M.add("ErecipNNegative", "%d" % len(neg))
+    # Dem theo Y NGHIA, khong theo dau. Dau khong phai cau hoi: mot he so 0,08 tren tap
+    # lua chon {0, 2, 4} nghia la dong doi gop them mot don vi thi model gop them tam
+    # phan tram don vi, tuc khong phan ung. Nen tach ba nhom: khong phat hien duoc,
+    # phat hien duoc nhung nho hon mot buoc, va du lon de thay trong hanh vi.
+    ALPHA, STEP = 0.05, 0.25
+    null = [m for m in ORDER if reciprocity[m][5] >= ALPHA]
+    tiny = [m for m in ORDER
+            if reciprocity[m][5] < ALPHA and abs(reciprocity[m][0]) < STEP]
+    real = [m for m in ORDER
+            if reciprocity[m][5] < ALPHA and abs(reciprocity[m][0]) >= STEP]
+    M.add("ErecipNNull", "%d" % len(null))
+    M.add("ErecipNTiny", "%d" % len(tiny))
+    M.add("ErecipNReal", "%d" % len(real))
+    M.add("ErecipNBlind", "%d" % (len(null) + len(tiny)))
+    M.add("ErecipRealModels", ", ".join(PRETTY[m] for m in real) or "none")
+    M.add("ErecipThreshold", "%.2f" % STEP)
+    print("  khong phat hien duoc: %s" % ([PRETTY[m] for m in null] or "khong co"))
+    print("  phat hien duoc nhung < %.2f buoc: %s"
+          % (STEP, [PRETTY[m] for m in tiny] or "khong co"))
+    print("  du lon de thay: %s" % ([PRETTY[m] for m in real] or "khong co"))
 
     # ---- thanh phan nhom ----------------------------------------------------
     print("\nTONG GOP MOI GHE THEO SO DONG LOAI TRONG NHOM")
@@ -351,6 +381,7 @@ def main():
             for i, s in enumerate(g["seats"]):
                 if s == m:
                     comp[m][k].append(sum(g["moves"][i]))
+    spans_all = {}
     print("  %-7s" % "model" + "".join("%8s" % ("k=%d" % k) for k in range(1, 6)) + "%10s" % "bien thien")
     for m in ORDER:
         vals = [np.mean(comp[m][k]) if comp[m][k] else np.nan for k in range(1, 6)]
@@ -358,6 +389,14 @@ def main():
         span = (max(good) - min(good)) if len(good) > 1 else float("nan")
         print("  %-7s" % m + "".join("%8.1f" % v for v in vals) + "%10.1f" % span)
         M.add("Ecomp%sSpan" % m.capitalize(), "%.1f" % span)
+        spans_all[m] = span
+
+    top = max(spans_all, key=lambda m: spans_all[m])
+    rest = max((m for m in spans_all if m != top), key=lambda m: spans_all[m])
+    M.add("EcompTopModel", PRETTY[top])
+    M.add("EcompTopSpan", "%.1f" % spans_all[top])
+    M.add("EcompNextSpan", "%.1f" % spans_all[rest])
+    M.add("EcompRatio", "%.1f" % (spans_all[top] / max(spans_all[rest], 1e-9)))
 
     TABLES.mkdir(parents=True, exist_ok=True)
     M.write(TABLES / "e3b_numbers.tex")
@@ -371,9 +410,29 @@ def main():
             ("$<$0.001" if p < 0.001 else "%.3f" % p)))
     (TABLES / "e3b_table_reciprocity.tex").write_text(
         "\n".join([
+            "%% SINH TU DONG boi paper/AAMAS/analysis/e3b_analysis.py -- DUNG SUA TAY.",
+            "%% Moi con so goi qua macro cua e3b_numbers.tex nen bang va van "
+            "xuoi khong lech nhau.",
+            "%% Can: \\usepackage{booktabs}",
+            r"\begin{table}[t]", r"\centering", r"\small",
+            # Cot acmart chi 241,15pt. Do that: o tabcolsep mac dinh 6pt, bang
+            # phan ung tran 4,96pt va bang thanh phan tran 15,12pt. Dat trong
+            # table env nen khong ro ri ra ngoai.
+            r"\setlength{\tabcolsep}{2.5pt}%",
+            r"\caption{How each model answers its partners. The slope is the change in "
+            r"a seat's contribution in one round for a one unit change in the mean "
+            r"contribution of the other five seats in the previous round. \emph{Raw} "
+            r"compares within a game and within a round, which holds the catastrophe "
+            r"probability, the pair and the mixture fixed. \emph{Net of pool} adds the "
+            r"size of the pool, which removes the part of the association that is only "
+            r"an agent steering toward the threshold. Contributions are chosen from 0, "
+            r"2 or 4, so a slope well below one is small in behaviour as well as in "
+            r"arithmetic. Standard errors treat one game as one unit; $p$ is a "
+            r"permutation test that gives a game the partner history of another game.}",
+            r"\label{tab:mixed-recip}",
             r"\begin{tabular}{lrrrr}", r"\toprule",
             r"Model & Raw & Net of pool & (SE) & $p$ \\", r"\midrule",
-            *rows, r"\bottomrule", r"\end{tabular}", ""]),
+            *rows, r"\bottomrule", r"\end{tabular}", r"\end{table}", ""]),
         encoding="utf-8")
     print("  ghi paper/AAMAS/tables/e3b_table_reciprocity.tex")
 
@@ -384,34 +443,32 @@ def main():
                          " & ".join("%.1f" % v for v in vals) + r" \\")
     (TABLES / "e3b_table_composition.tex").write_text(
         "\n".join([
+            "%% SINH TU DONG boi paper/AAMAS/analysis/e3b_analysis.py -- DUNG SUA TAY.",
+            "%% Moi con so goi qua macro cua e3b_numbers.tex nen bang va van "
+            "xuoi khong lech nhau.",
+            "%% Can: \\usepackage{booktabs}",
+            r"\begin{table}[t]", r"\centering", r"\small",
+            # Cot acmart chi 241,15pt. Do that: o tabcolsep mac dinh 6pt, bang
+            # phan ung tran 4,96pt va bang thanh phan tran 15,12pt. Dat trong
+            # table env nen khong ro ri ra ngoai.
+            r"\setlength{\tabcolsep}{2.5pt}%",
+            r"\caption{Mean contribution per seat over a whole game, against the number "
+            r"of seats the model holds, given in the column headings. A seat can pay "
+            r"at most 40 across the "
+            r"game. A flat row means the company at the table does not change what the "
+            r"model pays.}",
+            r"\label{tab:mixed-comp}",
             r"\begin{tabular}{lrrrrr}", r"\toprule",
-            r"Model & $k{=}1$ & $k{=}2$ & $k{=}3$ & $k{=}4$ & $k{=}5$ \\",
-            r"\midrule", *comp_rows, r"\bottomrule", r"\end{tabular}", ""]),
+            r"Model & 1 & 2 & 3 & 4 & 5 \\",
+            r"\midrule", *comp_rows, r"\bottomrule", r"\end{tabular}",
+            r"\end{table}", ""]),
         encoding="utf-8")
     print("  ghi paper/AAMAS/tables/e3b_table_composition.tex")
 
-    # ---- hinh ---------------------------------------------------------------
-    try:
-        import matplotlib
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
-        fig, ax = plt.subplots(figsize=(5.2, 2.9))
-        xs = np.arange(len(ORDER))
-        bs = [reciprocity[m][0] for m in ORDER]
-        ses = [reciprocity[m][1] for m in ORDER]
-        ax.axhline(0, color="0.3", lw=0.8)
-        ax.errorbar(xs, bs, yerr=[1.96 * s for s in ses], fmt="o", capsize=3, color="0.15")
-        ax.set_xticks(xs)
-        ax.set_xticklabels([PRETTY[m].split()[0] for m in ORDER])
-        ax.set_ylabel("response to partners")
-        ax.set_title("Contribution at round $t$ vs partners' mean at $t-1$", fontsize=9)
-        fig.tight_layout()
-        FIGURES.mkdir(parents=True, exist_ok=True)
-        fig.savefig(FIGURES / "e3b_reciprocity.pdf")
-        print("  ghi paper/AAMAS/figures/e3b_reciprocity.pdf")
-    except ImportError:
-        print("  (khong co matplotlib -> bo qua hinh)")
-
+    # KHONG sinh hinh. Hinh duy nhat co the ve o day la cac he so cua
+    # tab:mixed-recip kem khoang tin cay, tuc trung noi dung voi mot bang da co.
+    # Ghi chu ngan sach trang trong 06_bestresponse.tex da ghi bai hoc nay khi xoa
+    # mot heatmap chua bao gio duoc \\input vi moi o cua no trung voi hai cot bang.
     return 0
 
 

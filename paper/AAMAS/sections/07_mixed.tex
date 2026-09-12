@@ -1,0 +1,98 @@
+%% =====================================================================================
+%% P-6 — Mixed populations. Muc LaTeX DOC LAP.
+%%
+%% PHU THUOC PREAMBLE:
+%%   \usepackage{booktabs}                  <- hai file bang
+%%   \input{tables/e3b_numbers.tex}         <- macro \Ethreeb.../\Erecip.../\Ecomp...
+%%                                             (paper/AAMAS/analysis/e3b_analysis.py)
+%%
+%% LUAT CUA MUC: KHONG GO TAY MOT CON SO NAO. Moi con so la macro sinh tu results/.
+%% Ke ca so cap model va so muc pha tron: chung duoc SUY TU DATA, nen neu mot o chet thi
+%% van xuoi tu giam theo thay vi mo ta mot thiet ke khong ton tai.
+%% NGOAI LE, co y: "0, 2 hoac 4", "six", "two" la DINH NGHIA tro choi da phat bieu o muc
+%% Method, khong phai ket qua do duoc, nen go thang.
+%%
+%% VI SAO CO DOAN "net of the pool" — DUNG BO NO
+%% Ba model thoat tien trong nhu gop it di khi dong doi gop nhieu, tuc nhu an khong. Voi
+%% hai trong ba, do la ao. Quy truoc mot vong = quy truoc vong do + phan minh gop + nam
+%% lan trung binh dong doi, nen trung binh dong doi LA MOT THANH PHAN cua quy, va mot
+%% agent chi nham toi nguong se tu dong gop it di sau khi dong doi gop nhieu, khong vi
+%% quan tam gi toi dong doi. Bo doan nay thi muc bien thanh mot khang dinh ve an khong ma
+%% du lieu khong do duoc.
+%%
+%% NGAN SACH TRANG: chi tieu 1,6 trang = 3,2 cot, GOM float. Hai bang nho + van xuoi.
+%% Do bang cach render (xem ghi chu trong 06_bestresponse.tex), KHONG dung \pagetotal.
+%% =====================================================================================
+
+\section{Watching the pool, not the players}
+\label{sec:mixed}
+
+Every table so far has held one model in all six seats, or one model against five fixed
+scripts. Both leave the same question open, and it is the question that matters for a
+system of several agents. An agent that always pays its fair share cannot be told apart
+from an agent that watches its partners closely and keeps finding no reason to change.
+To separate those two, the partners have to be worth watching. So we seat two different
+models at the same table.
+
+\paragraph{Design.}
+All \EthreebPairs{} pairs of the \EthreebModels{} models play together. Each pair plays at
+\EthreebMixtures{} mixtures, from one seat of the first model up to five, at
+\EthreebRisks{} catastrophe probabilities, with \EthreebReps{} repetitions of each cell.
+The design balances itself: in a round robin over all pairs, every model sits in the same
+number of games and fills the same number of seats as every other, so no comparison here
+rests on one model having been measured more often. Positions rotate as well, so a model's
+identity is never tied to where it sits.
+
+\paragraph{The response to partners, and the part of it that is not real.}
+For each seat we ask a simple question. When the other five seats contributed more in the
+previous round, does this seat contribute more in the next one? We use the previous round
+because all six decide at the same time, so a comparison inside one round would measure
+resemblance rather than response. We compare within a game and within a round, which
+removes the catastrophe probability, the pair, and the mixture in one step, since all
+three are fixed for the whole game. Standard errors treat one game as one unit, because
+six seats across ten rounds of the same game share a history, a pool and a lottery draw.
+
+Read raw, three models give less when their partners gave more, which reads as free
+riding. For two of them it is an artifact of the threshold. The pool before a round is
+the pool before the previous one, plus what the seat itself gave, plus five times the
+partners' mean. The partners' mean is therefore part of the pool, and an agent steering
+only toward the threshold will give less after its partners give more, with no interest
+in the partners at all. Holding the pool fixed asks whether it still matters who filled
+it. Table~\ref{tab:mixed-recip} reports both, and the gap between the two columns is the
+size of the threshold channel.
+
+\input{tables/e3b_table_reciprocity.tex}
+
+Net of the pool, \ErecipNNull{} of the \EthreebModels{} models show no response that a
+permutation test can separate from zero, and \ErecipNTiny{} more show one smaller than a
+quarter of a contribution step. Contributions are chosen from 0, 2 or 4, so a slope that
+small means a partner who gives one unit more buys almost nothing in return. That leaves
+\ErecipNReal{} model whose response is large enough to appear in play, \ErecipRealModels,
+and its response runs the wrong way: it gives less to partners who give more. So
+\ErecipNBlind{} of the \EthreebModels{} are watching a running total rather than the
+agents producing it, and the one that watches the agents exploits them.
+
+\paragraph{Company changes one model, and only in the aggregate.}
+The same data answers a second and coarser question. Does a model contribute differently
+when more of its own kind fill the table? Here one model does separate itself.
+Table~\ref{tab:mixed-comp} gives mean contribution per seat against the number of seats
+the model holds. \EcompTopModel{} rises across that range by \EcompTopSpan{} units, about
+\EcompRatio{} times the next largest movement, while the rest stay flat.
+
+\input{tables/e3b_table_composition.tex}
+
+The two questions come apart, and that is the useful part. The model with the largest
+effect of company has no response to its partners inside a game, and the models with a
+detectable within-game response barely move with company at all. A study that measured
+only one of the two would have named a different model as the social one, and would have
+been wrong either way. Company shifts an average; it does not mean anyone is watching.
+
+\paragraph{What this means for evaluating agents.}
+An evaluation that places a single model against fixed opponents cannot see any of this,
+because fixed opponents give nothing to respond to and one model at every seat gives
+nothing to distinguish. The behaviour that a multi-agent deployment depends on, adjusting
+to whoever is actually there, is the behaviour these tables are built to detect, and
+almost none of it is present. Together with the earlier findings that no model best
+responds to an opponent it has been told about, and that none of them moves when the
+catastrophe probability moves, the picture is consistent and narrow: these agents act on
+the state of the pool, not on models of each other.
