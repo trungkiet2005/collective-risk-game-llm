@@ -84,6 +84,137 @@ Every wide CSV currently has 82 columns, divided into four blocks:
 | C: group outcome | 7 | `group_contributions`, `pot_cumulative`, `group_total`, target/catastrophe, payoff and parse QA |
 | D: agents 1–6 | 54 | nine `agent{i}_...` fields per seat |
 
+## AI analysis context
+
+This section is intended to make this card usable as a standalone context for an
+analysis agent. Paths are relative to the repository root.
+
+### Complete schema and types
+
+The exact CSV header is:
+
+```text
+game_id, experiment, language, rep, seed, persona_set, persona_seats, memory_mode,
+opponent_profile, framing, risk_framing, show_computed_totals, n_players, endowment,
+contribution_options, target, risk_probability, n_rounds_is_known, max_rounds,
+played_rounds, agents_communicate, group_contributions, pot_cumulative, group_total,
+target_reached, catastrophe, mean_payoff, n_parse_failures,
+agent{i}_name, agent{i}_llm, agent{i}_personality,
+agent{i}_knows_opponent_with_prob, agent{i}_strategies, agent{i}_scores,
+agent{i}_messages, agent{i}_payoff, agent{i}_parse_failures  (i = 1,...,6)
+```
+
+The last template expands to 54 columns, nine per seat; the first block has 28
+columns, for 82 total. Scalar fields are strings, integers, floats, or booleans as
+named by the field. `contribution_options`, `group_contributions`, `pot_cumulative`,
+`agent{i}_strategies`, `agent{i}_scores`, and `agent{i}_messages` are Python literal
+lists, not JSON; decode them with `ast.literal_eval`. Empty list fields are `[]`.
+Missing values must not be silently converted to zero.
+
+Identity/design fields: `game_id` identifies a game; `experiment` is the authoritative
+condition label; `language` is currently always `en`; `rep` and `seed` identify the
+repetition and game-level randomization; `persona_set` and `persona_seats` describe
+the realized persona assignment; `memory_mode`, `framing`, `risk_framing`, and
+`show_computed_totals` describe prompt/game controls; `opponent_profile` is used by
+E3a. `agents_communicate` is currently false; do not infer E5 results from it.
+
+Rule fields mean: `n_players=6`, `endowment=40`, legal actions are `{0,2,4}`,
+`target=120`, `risk_probability=p`, `max_rounds=10`, and normally
+`played_rounds=10`. `contribution_options` is the observed support in a game, not the
+legal action set. `n_rounds_is_known` records whether the prompt disclosed the round
+count.
+
+For seat `i`, `agent{i}_llm` is the actual model or scripted policy in that seat;
+`agent{i}_strategies[t]` is its contribution in round `t`; `agent{i}_scores[t]` is
+its remaining private account after round `t`, not a per-round payoff;
+`agent{i}_messages[t]` is the message/trace slot (normally empty);
+`agent{i}_payoff` is final payoff after the group lottery; and
+`agent{i}_parse_failures` counts missing/truncated contribution markers.
+
+### Mechanics and derived quantities
+
+Let `x[i,t] = agent{i}_strategies[t]` and `G[t] = group_contributions[t]`:
+
+```text
+G[t] = sum_i x[i,t]
+pot_cumulative[t] = sum_{s <= t} G[s]
+group_total = pot_cumulative[-1]
+target_reached = (group_total >= target)
+private_score[i,t] = endowment - sum_{s <= t} x[i,s]
+agent{i}_payoff = 0 if catastrophe == 1 else private_score[i,-1]
+mean_payoff = mean(agent{i}_payoff for i=1,...,6)
+```
+
+The catastrophe lottery is evaluated only if the target is missed. Thus
+`catastrophe=0` whenever `target_reached=1`; there is no intermediate payoff or
+learning payoff. Money is settled once at the end of the game.
+
+The equal-share total is 120 and the fair share is 2 per seat per round. Under the
+risk-neutral benchmark, the theoretical pivot is `p*=0.5` because certain payoff 20
+from contributing the fair share equals `(1-p)*40` from contributing zero. The paper's
+attainable benchmark and derived welfare metrics are:
+
+```text
+optimal_payoff(p) = max((1-p) * endowment, target / n_players)
+welfare_gap = optimal_payoff(p) - observed mean_payoff
+welfare_loss_pct = 100 * welfare_gap / optimal_payoff(p)
+```
+
+At `p=0`, contributing is strictly dominated under any increasing utility. Realized
+catastrophe counts are noisy end-of-game outcomes and should be separated from
+contribution and target-rate analyses.
+
+### Experiment-specific context
+
+| Experiment | Meaning |
+|---|---|
+| `exp_baseline` | Five-model self-play; `p=0,0.1,...,1.0`; 10 repetitions per cell. |
+| `exp_nohint` | E1: `p=0.1,0.5,0.9`; removes both explicit equal-split wording spans while retaining target, group size, and round count. |
+| `exp_evprobe` | E2: same game condition at three risks. Separate rule/value probe calls occur at rounds 1, 5, and 10 and do not enter game history. Probe results are in the root probe files, not wide rows. |
+| `exp_bestresponse_defect` | E3a: one LLM in `agent1` against five scripted `always_0` seats. |
+| `exp_bestresponse_coop` | E3a: one LLM against five scripted `always_2` seats. |
+| `exp_bestresponse_carry` | E3a: one LLM against five scripted `always_4` seats. |
+| `exp_bestresponse_cond` | E3a: one LLM against five scripted conditional cooperators. |
+| `exp_mixed` | E3b: all model pairs, ten compositions from one through five seats of model A, `p=0.1,0.5,0.9`, 10 repetitions. Inspect all six `agent{i}_llm` fields; the slug alone is not the seat truth. |
+| `exp_para1`, `exp_para2` | E6: endpoint cells `p=0.1,0.9` under two baseline-prompt paraphrases. |
+| `exp_baseline_temp0` | E6: endpoint cells under the baseline prompt at temperature 0. |
+| E7 | Offline scripted reference; not represented by rows in `results/`. Use `paper/AAMAS/analysis/e7_reference.py` and its generated artifacts. |
+| E5 | No current results. Do not infer them from the schema. |
+
+In E3a, `agent1_*` is the LLM seat and `agent2_*` through `agent6_*` are scripted;
+their `agent{i}_llm` values contain `scripted:<policy>`. Main runs use English prompts,
+temperature 0.7, and `max_out=3000` where recorded by provenance; the E6 temp-zero arm
+is the exception. Seeds reproduce game randomization/design, not necessarily model text.
+
+### Statistical conventions
+
+The default independent unit is the game, not a seat-round decision: six seats and ten
+rounds within a game share history, pool, and lottery. Do not treat 60 decisions per
+game as 60 independent observations. Report `n_games` and denominators for all rates.
+Target rate is `mean(target_reached)`, catastrophe rate is `mean(catastrophe)`, and
+per-seat contribution is total contribution divided by six, averaged at the game/model
+level. The paper uses game-level percentile bootstrap intervals and permutation tests
+over game-level labels; use the relevant analysis script for the exact resample count
+and seed. Retain the two known parse-failure rows by default and report them; do not
+silently drop them.
+
+### Authoritative analysis entry points
+
+```text
+paper/AAMAS/analysis/panel_analysis.py       # baseline grid and panel numbers
+paper/AAMAS/analysis/e3a_analysis.py        # E3a best-response analysis
+paper/AAMAS/analysis/e3a_prose_numbers.py   # E3a prose values
+paper/AAMAS/analysis/e3b_analysis.py        # E3b mixed-population analysis
+paper/AAMAS/analysis/e6_analysis.py         # E6 robustness analysis
+paper/AAMAS/analysis/e7_reference.py        # E7 scripted reference
+plan/scripts/verify_wide.py                 # structural/balance validation
+```
+
+When a derived value conflicts with an informal calculation, prefer the corresponding
+analysis script and generated tables under `paper/AAMAS/tables/`. `results/` contains
+wide game summaries only; prompts, reasoning traces, and server shard logs are not
+stored here.
+
 The important outcome fields are:
 
 - `group_contributions`: string representation of a length-10 list containing the group
