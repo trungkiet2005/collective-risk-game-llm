@@ -27,19 +27,14 @@ one model in every seat gives nothing to tell apart, so a schedule and a policy
 leave the same transcript. Section~\ref{sec:mixed} is built to separate them, and
 finds that almost none of the responding is there.
 
-Three controls, each removing a different explanation, converge on one description. Moving
-the catastrophe risk across its whole range leaves the contribution schedule of
-\PanelNFlatWord{} of \PanelNmodelsWord{} models unchanged, and the one model that does
-react reacts once, at the point where the risk disappears entirely. Deleting the sentences that supply
-the equal split does not reduce contribution in any model and raises two of them to their
-endowment cap, so the schedule is not obedience to the prompt. Asking the agents outright
-establishes that the arithmetic is available to them and unused. Replacing their opponents
-with policies that make the best response computable shows that the schedule does not bend
-to the opponent either, not in any of $\EthreeaNgames$ games and not in the
-$\EthreeaDominatedGames$ where every alternative is strictly dominated. What these agents
-bring to a collective-risk setting is a fixed contribution schedule, close to the focal
-split, that is insensitive to the risk, to the prompt's framing and to what the other
-agents do.
+Five diagnostic layers converge on one qualified description. Risk, prompt and comprehension
+controls show that the contribution schedule is largely fixed and available arithmetic is
+unused. Scripted opponents show no best response in the strictly dominated games, while
+mixed populations show that apparent partner response largely reflects the running pool.
+E6 shows that this pattern survives two prompt paraphrases and temperature-zero decoding
+for four models, while Grok retains a risk response. What these agents bring to a
+collective-risk setting is therefore usually a fixed contribution schedule, close to the
+focal split, rather than a uniformly risk-insensitive policy.
 
 For a system designer the consequence is asymmetric, and it is the reason we report a gap
 to the optimum rather than a success rate. As collaborators these agents are excellent:
@@ -56,18 +51,18 @@ was met will rank both as it should not.
 
 \paragraph{Limitations.}
 Sections~\ref{sec:riskgrid} and~\ref{sec:controls} are self-play: all \PanelNplayersWord{} seats hold one
-model. That design is the object of our criticism, and we answer it in
-Section~\ref{sec:bestresponse} with fixed opponents rather than with a genuinely mixed
-population. Fixed opponents buy exactness, because the best response is then enumerable,
-at the cost of realism: a scripted seat cannot respond to the model as a second model
-would.
-A round-robin over mixed pairs is the natural next measurement and is not reported here.
-The panel is \PanelNmodelsWord{} models, one per provider and all at the inexpensive tier, so a
+model. That design is the object of our criticism. We complement it with fixed opponents
+in Section~\ref{sec:bestresponse}, where the best response is enumerable, and with the
+balanced round-robin in Section~\ref{sec:mixed}, where a second model can respond. Neither
+is a naturalistic deployment: scripted opponents buy exactness at the cost of realism, and
+the mixed tables contain only two model types at a time, without communication or
+institutional rules. The panel is \PanelNmodelsWord{} models, one per provider and all at the inexpensive tier, so a
 capability effect within a family is outside what we can see; cells hold
 $\PanelNpercell$ games, which is why every interval is a bootstrap and every test a
 permutation test on games rather than on seats. We run one prompt template at one
-temperature, and although the focal-point deletion of Section~\ref{sec:nohint} is a
-paraphrase of a kind, it is not a systematic sensitivity analysis. Pricing a gap in
+temperature in the main panel, although E6 adds two endpoint paraphrases and a
+temperature-zero arm. E6 is still not a systematic sensitivity analysis over prompt
+families, temperatures, or model capabilities. Pricing a gap in
 expected payoff assumes risk neutrality; we therefore rest the conclusions on the $p=0$
 column and on the strictly dominated profiles, where contributing loses under every
 increasing utility and no such assumption is in play. One of the two value probes asks for

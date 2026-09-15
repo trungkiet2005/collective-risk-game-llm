@@ -28,12 +28,9 @@
 %% len 0,072 va grok tu 0,017 len 0,198, tuc CA HAI mat y nghia, va ket luan gon lai
 %% thay vi yeu di. Loi nay do mot vong review doc lap chi ra.
 %%
-%% ==> CON SO TRONG BANG HIEN TAI LA TAM: chung sinh tu mot luot chay CHUA XONG
-%% (mot phan ba luoi con thieu, va so van chua deu giua cac model, nen cong can
-%% bang cua verify_wide.py se do). Dau va do lon cua moi he so da on dinh qua hai
-%% co mau nen VAN XUOI khong phai viet lai, nhung phai chay lai
-%%     python paper/AAMAS/analysis/e3b_analysis.py
-%% sau khi luoi day du roi moi nop.
+%% Du lieu E3b da hoan tat: 1,500 van = 10 cap × 5 thanh phan × 3 muc risk × 10 lap.
+%% Truoc khi bien dich, chay lai `e3b_analysis.py`; macro, bang va van xuoi se cung
+%% cap nhat tu results/exp_mixed/.
 %%
 %% NGAN SACH TRANG: chi tieu 1,6 trang = 3,2 cot, GOM float. Hai bang nho + van xuoi.
 %% Do bang cach render (xem ghi chu trong 06_bestresponse.tex), KHONG dung \pagetotal.
@@ -73,12 +70,14 @@ the pool before the previous one, plus what the seat itself gave, plus five time
 partners' mean. The partners' mean is therefore part of the pool, and an agent steering
 only toward the threshold will give less after its partners give more, with no interest
 in the partners at all. Holding the pool fixed asks whether it still matters who filled
-it. Table~\ref{tab:mixed-recip} reports both, and the gap between the two columns is the
-size of the threshold channel.
+it. Our primary specification also controls the focal seat's contribution in the previous
+round, so persistence cannot masquerade as partner response. Table~\ref{tab:mixed-recip}
+reports the raw association and this adjusted coefficient; the adjustment holds both the
+running pool and own lag fixed.
 
 \input{tables/e3b_table_reciprocity.tex}
 
-Net of the pool, \ErecipNBlind{} of the \EthreebModels{} models answer their partners
+After controlling for the pool and own previous action, \ErecipNBlind{} of the \EthreebModels{} models answer their partners
 with nothing a permutation test can separate from zero, or with less than a quarter of a
 contribution step, which on a choice set of 0, 2 and 4 is not a faint response but no
 response. The remaining \ErecipNReal{} is \ErecipRealModels, and it runs the wrong way:

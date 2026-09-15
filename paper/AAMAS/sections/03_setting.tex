@@ -85,8 +85,9 @@ tier of its family, so that no result is an artefact of a single vendor's post-t
 \textsc{gpt-5.6-luna} (Luna), \textsc{qwen3-235b-a22b-instruct} (Qwen) and
 \textsc{grok-4.20-non-rea\-son\-ing} (Grok), named by their short forms from here on. Every
 experiment runs every model on exactly the same number of games; price never determines
-sample size. All games are in English, at temperature $0.7$, with every seat holding a
-neutral persona.
+sample size. The main panel is in English, at temperature $0.7$, with every seat holding a
+neutral persona. E6 adds two prompt paraphrases and a temperature-zero arm at the endpoint
+risk cells $p\in\{0.1,0.9\}$, with \EsixReps{} games per model, arm, and risk level.
 
 Each round a seat receives the rules, the complete per-seat history in fixed positions, and
 a request for one contribution. The running group total is \emph{not} printed, so a seat
@@ -95,8 +96,12 @@ behaviour, and because Section~\ref{sec:bestresponse} needs a measure that uses 
 the prompt displays. A reply is parsed from a \texttt{CONTRIBUTION:}\ line. Replies that
 reach the output cap before that line are retried at a quadrupled cap rather than parsed,
 because a truncated chain of arithmetic otherwise yields a plausible number that was never
-a decision; every game reported here has zero parse failures and zero truncations across
-$\PanelNdecisionsAll$ decisions.
+a decision. Across the main panel and diagnostic experiments there are $\PanelNgamesAll$ games and
+$\PanelNseatRoundActions$ seat--round actions. The self-play/control panel contributes
+$\PanelNdecisionsPanel$ model-seat decisions; the scripted-opponent experiment contributes
+one LLM decision per round, and the mixed-population experiment contributes six. In total,
+the study contains $\PanelNllmDecisionsAll$ LLM decisions; all reported games have zero
+parse failures and zero truncations.
 
 Cells hold $\PanelNpercell$ games each, indexed by a repetition number that also seeds the
 catastrophe lottery, so the same repetition faces the same draw at every risk level.

@@ -438,7 +438,10 @@ def main() -> int:
     ps = sorted(base.risk_probability.unique())
     print(f"[B] {len(base)} ván · {len(ps)} mức risk · {base.m.nunique()} model")
 
-    add("Ngames", str(len(base) + 150 + 150 + 1000))
+    all_games = len(base) + 150 + 150 + 1000 + 1500
+    add("Ngames", str(all_games))
+    add("NgamesPanel", str(len(base) + 150 + 150))
+    add("NgamesAll", str(all_games))
     add("NgamesBaseline", str(len(base)))
     add("NgamesPerModel", str(len(base) // base.m.nunique()))
     count("Nmodels", int(base.m.nunique()))
@@ -455,7 +458,9 @@ def main() -> int:
     add("Ndecisions", f"{len(base) * N_PLAYERS * N_ROUNDS:,}".replace(",", "{,}"))
     # 1850 ván × 6 ghế × 10 vòng. Đếm cả E3a, vì cổng "0 lượt hỏng / 0 lượt bị cắt" chạy
     # trên TOÀN BỘ vòng chạy chứ không riêng lưới baseline.
-    add("NdecisionsAll", f"{1850 * N_PLAYERS * N_ROUNDS:,}".replace(",", "{,}"))
+    add("NdecisionsPanel", f"{(len(base) + 150 + 150) * N_PLAYERS * N_ROUNDS:,}".replace(",", "{,}"))
+    add("NseatRoundActions", f"{all_games * N_PLAYERS * N_ROUNDS:,}".replace(",", "{,}"))
+    add("NllmDecisionsAll", f"{(len(base) + 150 + 150) * N_PLAYERS * N_ROUNDS + 1000 * N_ROUNDS + 1500 * N_PLAYERS * N_ROUNDS:,}".replace(",", "{,}"))
     add("Nperm", str(N_PERM))
     add("NpermTex", f"{N_PERM:,}".replace(",", "{,}"))
     add("Nboot", f"{N_BOOT:,}".replace(",", "{,}"))

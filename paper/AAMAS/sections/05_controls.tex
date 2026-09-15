@@ -34,13 +34,34 @@ $p\in\{\PanelNohintRisks\}$, and Table~\ref{tab:controls} reports them side by s
 
 \input{tables/panel_table_controls.tex}
 
-\subsection{Deleting the focal point}
+\subsection{Robustness to wording and decoding}
+\label{sec:e6}
+
+The preceding controls change one explanation at a time. E6 asks whether the central
+risk-response result is instead an artefact of the exact wording or sampling setting. We
+repeat both endpoint cells, $p\in\{\EsixLowRisk,\EsixHighRisk\}$, under two paraphrases of
+the baseline prompt and under the baseline prompt at temperature zero, for
+$\EsixGames$ games in total. Table~\ref{tab:e6} reports the change in mean contribution per
+seat between the high- and low-risk cells for each arm.
+
+\input{tables/e6_table_robustness.tex}
+
+The result is robust with an important qualification. For \EsixStableModels{} models, the
+largest absolute change across all three arms is only \EsixStableMaxDelta{} units per seat;
+Haiku, Flash-Lite, Luna and Qwen therefore preserve the near-flat risk response under both
+wording changes and deterministic decoding. Grok remains the exception: its high-minus-low
+change ranges from \EsixGrokDeltaMin{} to \EsixGrokDeltaMax{} units across the arms. E6 thus
+rules out a purely prompt- or temperature-specific explanation for the flat response of
+most of the panel, while also preventing us from describing the panel as uniformly
+insensitive to risk.
+
+\subsection{Removing the explicit equal-split cue}
 \label{sec:nohint}
 
 The prompt states the equal split twice: once as a gloss on the target (``an average of
 $\PanelFairShare$ per player per round'') and once as a worked example on the payoff line
 (``contributing $\PanelFairShare$ every round leaves you $\PanelFairTotal$ at the end'').
-We delete both spans and change nothing else, which leaves the target, the group size and
+We remove both spans and change nothing else, which leaves the target, the group size and
 the round count in place, so the split remains derivable by one division. Each model plays
 $\PanelNohintGames$ games with the spans deleted against the $\PanelNohintGames$ baseline
 games at the same risk levels.

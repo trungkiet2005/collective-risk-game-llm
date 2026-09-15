@@ -17,6 +17,7 @@
 %%     python paper/AAMAS/analysis/panel_analysis.py   -> \Panel...   (§4, §5)
 %%     python paper/AAMAS/analysis/e3a_analysis.py     -> \Ethreea... (§6)
 %%     python paper/AAMAS/analysis/e3a_prose_numbers.py-> \Ethreeax...(§6)
+%%     python paper/AAMAS/analysis/e3b_analysis.py     -> \Ethreeb... (§7)
 %% Doi data -> chay lai ba script -> text va bang cung doi. Thay minh dinh go tay mot con
 %% so vao section nao thi DUNG LAI va di them mot macro vao script.
 %% =====================================================================================
@@ -55,6 +56,8 @@
 \input{tables/e3a_numbers.tex}
 \input{tables/e3a_prose_numbers.tex}
 \input{tables/e3b_numbers.tex}
+\input{tables/e6_numbers.tex}
+\input{tables/e7_numbers.tex}
 
 \begin{document}
 
@@ -69,8 +72,9 @@ Language-model agents are being deployed into settings where their choices impos
 a group, yet most of the evidence about how they behave there comes from self-play, in
 which one model faces copies of itself. Self-play cannot separate an agent that reasons
 about its opponents from an agent that runs a fixed schedule, because the two produce the
-same transcript. We run $\PanelNgames$ games of the collective-risk social dilemma across
-\PanelNmodelsWord{} production models and break that symmetry three ways.
+same transcript. We run $\PanelNgamesAll$ games of the collective-risk social dilemma across
+\PanelNmodelsWord{} production models, plus $\EsixGames$ E6 robustness games, and break that symmetry through five diagnostic
+layers.
 
 Across an \PanelNrisksWord{}-point grid of catastrophe risk, the panel pays on a schedule
 that the risk does not move. At the control where no catastrophe is possible, and
@@ -79,17 +83,23 @@ still pay, and the panel forfeits $\PanelForfeitPanelPct\%$ of the payoff that w
 attainable. Deleting the prompt's equal-split gloss never lowers contribution, so the
 cooperation is not compliance with a supplied focal point. Nor is it misunderstanding:
 asked about the rules in the middle of their own games, the agents name the higher-paying
-action and then contribute against their own answer.
+action and then contribute against their own answer. Two prompt paraphrases and
+temperature-zero decoding preserve the near-flat risk response of four models, while
+Grok retains a measurable response.
 
-Seating one model against scripted opponents makes the best response computable, and no
-model plays it in any game, including the games in which every alternative is strictly
-dominated. Seating two different models at one table shows what is missing.
+Seating one model against scripted opponents makes the best response computable. No model
+best-responds in any of the strictly dominated games, although $\EthreeaOptimalGames$ of
+$\EthreeaNgames$ scripted-opponent games are exactly optimal under the risk-neutral
+benchmark. Seating two different models at one table shows what is missing.
 \ErecipNBlind{} of \EthreebModels{} act on the running total in the shared account rather
 than on the agents filling it, and the one model whose response to its partners is large
 enough to appear in play gives less to partners who give more.
 
-Cooperation from these agents is a fixed schedule rather than a choice. That makes them
-safe collaborators and unsafe stakeholders.
+Cooperation from these agents is usually a fixed schedule conditional on the prompt, with
+one model retaining a measurable risk response under the robustness checks. The result
+separates cooperative appearance from resource-sensitive decision making: in this setting,
+these agents can be reliable contributors while remaining exploitable when entrusted with
+scarce resources.
 \end{abstract}
 
 \begin{CCSXML}

@@ -36,6 +36,31 @@ Table~\ref{tab:grid} gives the numbers.
 
 \input{tables/panel_table_grid.tex}
 
+\paragraph{The reference policies reproduce the predicted step.}
+E7 runs the same engine with scripted policies to make the benchmark observable rather than
+just asserted. The risk-neutral EV maximiser contributes \EsevenEVBelow{} below
+$p^{*}=\EsevenPivot$ and \EsevenEVAbove{} at and above it, while always contributing the
+fair share and always contributing the maximum produce flat totals of
+\EsevenFairTotal{} and \EsevenMaxTotal{}, respectively. The conditional-cooperator
+reference is also flat at the target, whereas three EV maximisers paired with three
+conditional cooperators produce only \EsevenMixThreeThree{} at low risk. Figure~\ref{fig:e7}
+shows these reference paths together with the model paths; it is the control that validates
+the step function used throughout the paper.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/e7_reference.pdf}
+\Description{Scripted reference policies produce flat contribution paths for defecting,
+fair-share, maximum, and conditional-cooperation policies, while risk-neutral expected-value
+maximisation jumps from zero to the target at probability one half. Coloured model paths are
+overlaid for comparison.}
+\caption{E7 scripted reference paths for the collective-risk game. The risk-neutral
+expected-value policy changes at the theoretical pivot $p^{*}=\EsevenPivot$; the other
+scripted policies provide flat anchors. Coloured lines show the self-play model means from
+the main grid.}
+\label{fig:e7}
+\end{figure}
+
 \paragraph{The schedule does not move when the optimum does.}
 Of \PanelNmodelsWord{} models, \PanelNFlatWord{} show no detectable dependence on $p$ at
 all (\PanelFlatModels{}; largest slope $\PanelSlopeHaiku$ units per unit of $p$,

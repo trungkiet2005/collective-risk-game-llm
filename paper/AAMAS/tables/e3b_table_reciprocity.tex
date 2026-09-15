@@ -5,17 +5,17 @@
 \centering
 \small
 \setlength{\tabcolsep}{2.5pt}%
-\caption{How each model answers its partners. The slope is the change in a seat's contribution in one round for a one unit change in the mean contribution of the other five seats in the previous round. \emph{Raw} compares within a game and within a round, which holds the catastrophe probability, the pair and the mixture fixed. \emph{Net of pool} adds the size of the pool, which removes the part of the association that is only an agent steering toward the threshold. Contributions are chosen from 0, 2 or 4, so a slope well below one is small in behaviour as well as in arithmetic. Standard errors treat one game as one unit; $p$ is a permutation test that gives a game the partner history of another game.}
+\caption{How each model answers its partners. The slope is the change in a seat's contribution in one round for a one unit change in the mean contribution of the other five seats in the previous round. \emph{Raw} compares within a game and within a round, which holds the catastrophe probability, the pair and the mixture fixed. \emph{Net of pool} adds the size of the pool, which removes the part of the association that is only an agent steering toward the threshold. The adjusted column also controls the focal seat's contribution in the previous round. Contributions are chosen from 0, 2 or 4, so a slope well below one is small in behaviour as well as in arithmetic. Standard errors treat one game as one unit; $p$ is a permutation test that gives a game the partner history of another game.}
 \label{tab:mixed-recip}
 \begin{tabular}{lrrrr}
 \toprule
-Model & Raw & Net of pool & (SE) & $p$ \\
+Model & Raw & Adjusted & (SE) & $p$ \\
 \midrule
-Claude Haiku 4.5 & $-0.30$ & $-0.02$ & $(0.07)$ & 0.784 \\
-Gemini 3.5 Flash Lite & $-0.22$ & $-0.06$ & $(0.05)$ & 0.469 \\
-GPT-5.6 Luna & $-0.46$ & $-0.32$ & $(0.07)$ & 0.002 \\
-Qwen3 235B & $0.22$ & $0.08$ & $(0.04)$ & 0.072 \\
-Grok 4.20 & $0.06$ & $0.08$ & $(0.04)$ & 0.198 \\
+Claude Haiku 4.5 & $-0.20$ & $0.07$ & $(0.04)$ & 0.319 \\
+Gemini 3.5 Flash Lite & $-0.25$ & $-0.10$ & $(0.04)$ & 0.002 \\
+GPT-5.6 Luna & $-0.45$ & $-0.31$ & $(0.05)$ & 0.002 \\
+Qwen3 235B & $0.25$ & $0.03$ & $(0.04)$ & 0.413 \\
+Grok 4.20 & $0.04$ & $0.10$ & $(0.02)$ & 0.002 \\
 \bottomrule
 \end{tabular}
 \end{table}

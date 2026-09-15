@@ -150,7 +150,7 @@ def audit(games):
 
 # ------------------------------------------------------------------- hoi quy ------
 def panel_rows(games, model):
-    """(y, x, pot, own, game, round, seat) cho MOT model.
+    """(y, x, pot, own, ownlag, game, round, seat) cho MOT model.
 
     y   = dong gop cua ghe do o vong t
     x   = dong gop TRUNG BINH cua 5 ghe kia o vong t-1
@@ -164,7 +164,7 @@ def panel_rows(games, model):
     thi PHAI dung lai quy tu chuoi da xao. Ban truoc giu nguyen quy va vi the sinh phan
     phoi null voi mot bien khu khong tuong thich voi hoi quy tu.
     """
-    y, x, pot, own, gid, rnd, seat = [], [], [], [], [], [], []
+    y, x, pot, own, ownlag, gid, rnd, seat = [], [], [], [], [], [], [], []
     for g in games:
         T = min(len(m) for m in g["moves"])
         for t in range(1, T):
@@ -178,11 +178,12 @@ def panel_rows(games, model):
                 x.append(others)
                 pot.append(pot_t)
                 own.append(sum(g["moves"][i][:t]))
+                ownlag.append(g["moves"][i][t - 1])
                 gid.append(g["id"])
                 rnd.append(t)
                 seat.append(i)
     return (np.array(y, float), np.array(x, float), np.array(pot, float),
-            np.array(own, float), np.array(gid), np.array(rnd, int),
+            np.array(own, float), np.array(ownlag, float), np.array(gid), np.array(rnd, int),
             np.array(seat, int))
 
 
@@ -208,9 +209,11 @@ def twoway_fe_ols(y, x, gid, rnd, coef_only=False, extra=None):
 
     cols = [demean(x)]
     if extra is not None:
+        if not isinstance(extra, (list, tuple)):
+            extra = [extra]
         # Bien khu them (muc quy). Phai demean giong moi cot khac, neu khong hieu ung
         # co dinh theo van khong duoc hut het va he so cua x se lech.
-        cols.append(demean(extra))
+        cols.extend(demean(v) for v in extra)
     cols += [demean(D[:, j]) for j in range(D.shape[1])]
     X = np.column_stack(cols)
     yy = demean(y)
@@ -236,7 +239,7 @@ def twoway_fe_ols(y, x, gid, rnd, coef_only=False, extra=None):
     return float(b[0]), float(np.sqrt(V[0, 0])), n_g, len(y)
 
 
-def perm_p(y, x, gid, rnd, seed=20260912, n=500, own=None, seat=None):
+def perm_p(y, x, gid, rnd, seed=20260912, n=500, own=None, ownlag=None, seat=None):
     """p hoan vi: thay chuoi hanh vi cua dong doi bang chuoi cua MOT VAN KHAC.
 
     Gia thuyet khong can kiem la: "dong gop cua toi khong lien quan toi hanh vi cua
@@ -268,7 +271,10 @@ def perm_p(y, x, gid, rnd, seed=20260912, n=500, own=None, seat=None):
     for key in per_seat:
         per_seat[key] = np.array(sorted(per_seat[key], key=lambda i: rnd[i]))
 
-    b0, _, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=pool_of(x))
+    extras = [pool_of(x)] if own is not None else []
+    if ownlag is not None:
+        extras.append(ownlag)
+    b0, _, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=extras)
 
     # gom chi so theo van, roi nhom cac van theo DO DAI khoi: chi hoan doi duoc giua
     # nhung van co cung so quan sat, neu khong x va y khong con xep hang duoc voi nhau.
@@ -291,8 +297,11 @@ def perm_p(y, x, gid, rnd, seed=20260912, n=500, own=None, seat=None):
             src = rng.permutation(games_L)
             for dst, s in zip(games_L, src):
                 x_perm[order[dst]] = x[order[s]]
+        extras_perm = [pool_of(x_perm)] if own is not None else []
+        if ownlag is not None:
+            extras_perm.append(ownlag)
         b, _, _, _ = twoway_fe_ols(y, x_perm, gid, rnd, coef_only=True,
-                                   extra=pool_of(x_perm))
+                                   extra=extras_perm)
         if abs(b) >= abs(b0):
             hits += 1
     return (hits + 1) / (n + 1)
@@ -363,11 +372,11 @@ def main():
           % ("model", "tho", "khu quy", "van", "p hoan vi"))
     reciprocity = {}
     for m in ORDER:
-        y, x, pot, own, gid, rnd, seat = panel_rows(games, m)
+        y, x, pot, own, ownlag, gid, rnd, seat = panel_rows(games, m)
         b_raw, se_raw, n_g, n_obs = twoway_fe_ols(y, x, gid, rnd)
-        b, se, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=pot)
+        b, se, _, _ = twoway_fe_ols(y, x, gid, rnd, extra=[pot, ownlag])
         tstat = b / se if se else float("nan")
-        p = perm_p(y, x, gid, rnd, own=own, seat=seat)
+        p = perm_p(y, x, gid, rnd, own=own, ownlag=ownlag, seat=seat)
         reciprocity[m] = (b, se, tstat, n_g, n_obs, p, b_raw, se_raw)
         print("  %-7s %8.3f (%.3f) %8.3f (%.3f) %7d %9.4f"
               % (m, b_raw, se_raw, b, se, n_g, p))
@@ -449,15 +458,16 @@ def main():
             r"a seat's contribution in one round for a one unit change in the mean "
             r"contribution of the other five seats in the previous round. \emph{Raw} "
             r"compares within a game and within a round, which holds the catastrophe "
-            r"probability, the pair and the mixture fixed. \emph{Net of pool} adds the "
-            r"size of the pool, which removes the part of the association that is only "
-            r"an agent steering toward the threshold. Contributions are chosen from 0, "
+            r"probability, the pair and the mixture fixed. \emph{Adjusted} additionally "
+            r"controls the running pool and own previous action, removing the part of the "
+            r"an agent steering toward the threshold. The adjusted column also controls "
+            r"the focal seat's contribution in the previous round. Contributions are chosen from 0, "
             r"2 or 4, so a slope well below one is small in behaviour as well as in "
             r"arithmetic. Standard errors treat one game as one unit; $p$ is a "
             r"permutation test that gives a game the partner history of another game.}",
             r"\label{tab:mixed-recip}",
             r"\begin{tabular}{lrrrr}", r"\toprule",
-            r"Model & Raw & Net of pool & (SE) & $p$ \\", r"\midrule",
+            r"Model & Raw & Adjusted & (SE) & $p$ \\", r"\midrule",
             *rows, r"\bottomrule", r"\end{tabular}", r"\end{table}", ""]),
         encoding="utf-8")
     print("  ghi paper/AAMAS/tables/e3b_table_reciprocity.tex")

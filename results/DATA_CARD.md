@@ -1,347 +1,199 @@
-# Data card — `results/` (vòng chạy AAMAS 2027)
+# Data card — `results/`
 
-Kho kết quả của nhánh `aamas2027-e0`. Tài liệu tự mô tả cho bất cứ ai (người hay model)
-viết code phân tích trên bộ này: đường dẫn, ý nghĩa từng cột, bất biến đã kiểm, loader
-chạy được ngay.
+This directory contains the current AAMAS 2027 collective-risk-game results. The
+authoritative experiment plan is [`plan/aamas2027-plan.md`](../plan/aamas2027-plan.md),
+and source/run provenance is recorded in [`PROVENANCE.json`](PROVENANCE.json). The
+separate [`Legacy_Results/`](../Legacy_Results/) tree is not part of the counts below.
 
-Kế hoạch sinh ra bộ dữ liệu này: [`plan/aamas2027-plan.md`](../plan/aamas2027-plan.md).
+## Snapshot
 
-> ⚠️ `Legacy_Results/` là kho **khác** và đã **đóng băng** — data cũ tới 10-09-2026, trải
-> nhiều panel/prompt/vòng chạy khác nhau. Đừng trộn nó vào bảng của bộ này.
+The directory currently contains 3,650 game-level wide CSV rows in 365 CSV files. All
+rows use the same CRSD game: six players, ten rounds, endowment 40 per player, legal
+contributions `{0, 2, 4}`, and a group target of 120. All recorded games are English
+(`language = en`). A game has 60 seat-round decisions, so the wide CSVs represent
+219,000 seat-round decisions.
+There are 706 recorded catastrophes. Two agent-level parse/truncation events are flagged
+in E6 `exp_para1`; details and their retained rows are documented below.
 
----
+The five model tags are:
 
-## 1. Tổng quan
-
-| Thuộc tính | Giá trị |
+| `agent1_llm` / model tag | Short name |
 |---|---|
-| Trò chơi | Collective-risk social dilemma (Milinski et al., 2008) |
-| Nhóm | 6 người chơi, vốn mỗi người 40, đóng góp mỗi vòng ∈ {0, 2, 4} |
-| Mục tiêu | tổng đóng góp ≥ 120 sau 10 vòng |
-| Nếu trượt | xổ số **cấp nhóm** một lần: với xác suất `p` mọi người mất hết |
-| Số vòng | 10, cố định, **có nói trước cho agent** |
-| Ngôn ngữ | `en` — chỉ tiếng Anh |
-| Ván | **550** = 5 model × 11 mức risk × 10 rep |
-| Lượt quyết định | 33.000 (mỗi ván 6 ghế × 10 vòng) |
-| Parse hỏng | **0** |
-| Thảm hoạ | 96 ván |
-| Dung lượng | ~850 KB (chỉ wide CSV) |
+| `anthropic-claude-haiku-4-5-20251001` | Haiku |
+| `google-gemini-3.5-flash-lite` | Flash-Lite |
+| `openai-gpt-5.6-luna` | Luna |
+| `qwen-qwen3-235b-a22b-instruct-2507` | Qwen |
+| `xai-grok-4.20-0309-non-reasoning` | Grok |
 
-**Đã xong: thí nghiệm B (lưới risk).** Chưa có ván nào cho E1, E2, E3a, E3b, E6, E5 —
-xem `plan/aamas2027-plan.md` §7.
+## Experiment inventory
 
----
+| Directory | Role | Games | Risk cells | Repetitions |
+|---|---|---:|---|---:|
+| `exp_baseline` | Main self-play risk grid | 550 | 0.0–1.0 by 0.1 (11) | 10 |
+| `exp_nohint` | E1: equal-split wording removed | 150 | 0.1, 0.5, 0.9 | 10 |
+| `exp_evprobe` | E2: in-game comprehension/value probes | 150 | 0.1, 0.5, 0.9 | 10 |
+| `exp_bestresponse_defect` | E3a: five scripted all-defect opponents | 250 | 0.1, 0.3, 0.5, 0.7, 0.9 | 10 |
+| `exp_bestresponse_coop` | E3a: five scripted always-2 opponents | 250 | same as above | 10 |
+| `exp_bestresponse_carry` | E3a: five scripted always-4 opponents | 250 | same as above | 10 |
+| `exp_bestresponse_cond` | E3a: five scripted conditional cooperators | 250 | same as above | 10 |
+| `exp_mixed` | E3b: mixed-population round robin | 1,500 | 0.1, 0.5, 0.9 | 10 |
+| `exp_para1` | E6: prompt paraphrase 1 | 100 | 0.1, 0.9 | 10 |
+| `exp_para2` | E6: prompt paraphrase 2 | 100 | 0.1, 0.9 | 10 |
+| `exp_baseline_temp0` | E6: baseline prompt, temperature 0 | 100 | 0.1, 0.9 | 10 |
+| **Total wide CSVs** |  | **3,650** |  |  |
 
-## 2. Cây thư mục
+E7 is an offline scripted-reference experiment. Its 2,640 games are represented by
+the generated artifacts in `paper/AAMAS/` rather than by rows under `results/`; see
+[`paper/AAMAS/analysis/e7_reference.py`](../paper/AAMAS/analysis/e7_reference.py).
+There are currently no E5 results in this directory.
 
-```
+The E2 probe answers are not stored in the game CSVs. They are stored at the root of
+`results/` in `exp_evprobe_probes.jsonl` and `exp_evprobe_probes.csv` (4,500 probe
+records: 3,600 rule questions and 900 value questions). Probe calls were separate from
+the game history, so `exp_evprobe/` remains a baseline game condition.
+
+## Directory layout
+
+```text
 results/
-├── DATA_CARD.md                <- file này
-├── PROVENANCE.json             <- ván nào từ đâu ra
-├── exp_evprobe_probes.jsonl    <- câu trả lời probe của E2 (xem dưới)
-├── exp_evprobe_probes.csv      <- cùng nội dung, dạng bảng phẳng
-└── <experiment>/         <- exp_baseline, exp_nohint, exp_evprobe, …
-    └── <p>/              <- 0, 0.1, 0.2, … 1   (tên thư mục = con số)
-        └── <model_tag>/
-            └── p<p>_<lang>_<model_tag>.csv
+├── DATA_CARD.md
+├── PROVENANCE.json
+├── exp_evprobe_probes.jsonl
+├── exp_evprobe_probes.csv
+└── <experiment>/<risk>/<model-tag>/*.csv
 ```
 
-### ⚠️ `exp_evprobe`: kết quả nằm NGOÀI wide CSV
+Under each experiment, risk directory names are numeric strings (`0`, `0.1`, …, `1`),
+and each model directory contains one wide CSV. The risk directory name and the `p...`
+part of the filename must use the same literal string. Do not place README files inside
+an experiment directory: loaders sort risk directories with `float(p.name)`.
 
-Với mọi experiment khác, wide CSV là toàn bộ dữ liệu. **E2 thì không.** Wide CSV mô tả
-ván chơi, còn phép đo của E2 là *model có hiểu luật và so sánh được kỳ vọng không* — thứ
-đó nằm ở **`exp_evprobe_probes.jsonl`** (4.500 bản ghi: 150 ván × 30 câu), một dòng một
-câu hỏi, kèm `question_text`, `raw_response`, `parsed_answer`, `ground_truth`, `correct`.
+The canonical game key is
+`(experiment, model tag, risk_probability, rep)`. In mixed experiments, the model
+directory is a composition slug; inspect `agent1_llm` through `agent6_llm` to determine
+which model or scripted policy occupies each seat.
 
-Hai file đó nằm ở **gốc `results/`** chứ không nằm dưới `results/exp_evprobe/`, vì luật
-đường dẫn chỉ cho phép thư mục **tên là số** dưới `<experiment>/` — một file lạc vào đó
-làm `float(p.name)` ném `ValueError` và giết cả lần đọc. Cùng lý do với `DATA_CARD.md`.
+## Schema — 82 columns
 
-Đọc nhanh:
+Every wide CSV currently has 82 columns, divided into four blocks:
 
-```python
-import pandas as pd
-pr = pd.read_json("results/exp_evprobe_probes.jsonl", lines=True)
-pr.groupby("category").correct.mean()   # rules 1.000 · value 0.772
-pr.groupby("model").correct.mean()
-```
+| Block | Columns | Meaning |
+|---|---:|---|
+| A: identity/design | 12 | `game_id`, `experiment`, `language`, `rep`, `seed`, persona and framing fields |
+| B: game rules | 9 | `n_players`, `endowment`, `contribution_options`, `target`, risk and round fields |
+| C: group outcome | 7 | `group_contributions`, `pot_cumulative`, `group_total`, target/catastrophe, payoff and parse QA |
+| D: agents 1–6 | 54 | nine `agent{i}_...` fields per seat |
 
-Câu hỏi probe là **lệnh gọi riêng, không chèn vào lịch sử ván**, nên ván trong
-`exp_evprobe/` vẫn đúng điều kiện baseline; chênh lệch so với `exp_baseline` là nhiễu lấy
-mẫu chứ không phải hiệu ứng của probe.
+The important outcome fields are:
 
-Ví dụ: `results/exp_baseline/0.9/openai-gpt-5.6-luna/p0.9_en_openai-gpt-5.6-luna.csv`
+- `group_contributions`: string representation of a length-10 list containing the group
+  contribution in each round.
+- `pot_cumulative`: string representation of the cumulative group total after each round.
+- `group_total`: final value of `pot_cumulative`.
+- `target_reached`: 1 exactly when `group_total >= target`.
+- `catastrophe`: the group lottery outcome; it can be 1 only when the target was missed.
+- `mean_payoff`: mean final payoff across the six seats.
+- `agent{i}_strategies`: that seat's ten round contributions.
+- `agent{i}_scores`: that seat's remaining private account after each round, not a
+  per-round payoff.
+- `agent{i}_payoff`: final payoff after the group lottery.
+- `agent{i}_parse_failures`: round-level missing-marker/truncation count for that seat.
 
-**Chỉ một định dạng: wide CSV.** Không có `results/raw/`, không có tầng `wide/`.
+`contribution_options` is an observed-support field, not the game rule. The legal action
+set is always `{0, 2, 4}`, but a particular game may contain only `[2]`, for example, if
+all seats chose 2 in every round. Across the 3,650 wide rows, the observed supports are:
 
-> ⚠️ **`results/` KHÔNG chứa reasoning và prompt.** Chúng chỉ nằm trong `turns.jsonl` của
-> thư mục shard tải về (`plan/runs/`, `D:/tmp/crgdl/` — đều gitignore), và `results/`
-> **không dựng lại được** chúng. Muốn giữ corpus reasoning thì phải backup thư mục shard.
-> Đổi lại: `results/` gọn ~1,5 KB/ván nên track trọn vào git được.
-
-Sinh và kiểm:
-
-```bash
-python plan/scripts/to_wide_csv.py --src <thu-muc-shard> --only-model <model_tag>
-python plan/scripts/verify_wide.py --expect-reps 10
-```
-
-**Quy tắc đường dẫn (không có ngoại lệ):**
-
-- Dưới `<experiment>/` **chỉ được có thư mục tên là số**. Loader sắp xếp bằng
-  `float(p.name)`; một file `README.md` lạc vào đó làm **vỡ cả ingest** chứ không bị bỏ
-  qua. Đó là lý do file này nằm ở gốc `results/`.
-- `<p>` trong tên thư mục và tên file là **cùng một chuỗi literal**: `0.9` không phải
-  `0.90`, `1` không phải `1.0`, `0` không phải `0.0`.
-- `<model_tag>` lặp nguyên văn trong tên file và **bằng ô `agent1_llm`** (bàn đồng nhất).
-  Bàn dị thể dùng tiền tố `mix__`.
-
-Glob dùng được:
-
-```python
-root.glob("*/*/*/*.csv")                                # tất cả
-root.glob("exp_baseline/0.9/*/*.csv")                   # mọi model ở p = 0.9
-root.glob("exp_baseline/*/openai-gpt-5.6-luna/*.csv")   # một model, mọi mức risk
-```
-
----
-
-## 3. Hiện có gì
-
-Cả 5 model đều **11 mức risk (0.0 → 1.0, bước 0.1) × rep 0–9 = 110 ván**.
-
-| model_tag | Nguồn |
-|---|---|
-| `anthropic-claude-haiku-4-5-20251001` | nhập lại từ `Legacy_Results/` (§6) |
-| `google-gemini-3.5-flash-lite` | nhập lại từ `Legacy_Results/` |
-| `openai-gpt-5.6-luna` | nhập lại từ `Legacy_Results/` |
-| `xai-grok-4.20-0309-non-reasoning` | nhập lại từ `Legacy_Results/` |
-| `qwen-qwen3-235b-a22b-instruct-2507` | **chạy mới 10-09-2026**, $0,97 |
-
-Lưới **cân bằng tuyệt đối**: số ván của một model do **thiết kế** quyết định, không bao
-giờ do **giá** model quyết định — dù `claude-haiku-4-5` đắt gấp 6,6 lần `qwen3-235b`.
-
-**Rep là khoá ghép giữa các mức risk.** Xổ số thảm hoạ chỉ phụ thuộc `rep`, nên cùng `rep`
-ở hai mức risk khác nhau dùng **chung một số ngẫu nhiên** (common random numbers) — kỹ
-thuật giảm phương sai khi so risk theo cặp. Đừng phá tính chất này bằng cách lọc rep khác
-nhau cho từng mức.
-
-### Tỉ lệ đạt mục tiêu (%), 10 ván mỗi ô
-
-| model | 0.0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `claude-haiku-4-5` | 80 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 |
-| `gemini-3.5-flash-lite` | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 |
-| `gpt-5.6-luna` | 0 | 80 | 90 | 90 | 70 | 80 | 90 | 50 | 90 | 70 | 60 |
-| `qwen3-235b` | 0 | 0 | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `grok-4.20-non-reasoning` | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 |
-
-**Số thô, chưa kiểm định — đừng trích thẳng vào paper.** n = 10/ô nên phải dùng
-permutation/exact test, không dùng t-test.
-
-Ba kiểu hành vi tách bạch rõ: (a) **mù rủi ro** — haiku, gemini, grok đạt 100% ở *mọi* mức
-kể cả `p = 0`, nơi không có thảm hoạ nào để tránh, nên đó không phải hợp tác có tính toán;
-(b) **phản ứng có điều kiện** — `gpt-5.6-luna`, model duy nhất phản ứng với `p = 0`;
-(c) **gần như bỏ mặc** — `qwen3-235b`, gần như không bao giờ đạt target kể cả ở `p = 1.0`
-(thảm hoạ chắc chắn xảy ra nếu trượt).
-
----
-
-## 4. Schema — 82 cột
-
-### Khối A — định danh ván & thiết kế (12)
-
-| cột | dtype | miền | nghĩa |
-|---|---|---|---|
-| `game_id` | str | duy nhất trong file | định danh ván, mã hoá cả game config/model/lang/rep |
-| `experiment` | str | `exp_baseline`, … | tên thí nghiệm |
-| `language` | str | `en` | bằng token `<lang>` trong tên file |
-| `rep` | int | 0–9 | lần lặp — **khoá ghép giữa các mức risk** |
-| `seed` | int | | seed tái lập (xem cảnh báo §6) |
-| `persona_set` | str | `personas_default` | file persona đã dùng |
-| `persona_seats` | str | `NNNNNN` | tính cách theo ghế thực tế (N/C/S) sau khi hoán vị |
-| `memory_mode` | str | `full_history` | |
-| `opponent_profile` | str | `""` | chỉ dùng ở E3a |
-| `framing` | 0/1 | 0 | có framing khí hậu không |
-| `risk_framing` | str | `lottery` | cách nêu rủi ro |
-| `show_computed_totals` | 0/1 | 0 | prompt có đưa sẵn tổng tính trước không |
-
-### Khối B — luật chơi (9)
-
-`n_players` (6) · `endowment` (40.0) · `contribution_options` (**KHÔNG phải hằng số —
-xem cảnh báo ngay dưới**) · `target` (120.0) · `risk_probability` (float, = `<p>` trong
-đường dẫn) · `n_rounds_is_known` (True) · `max_rounds` (10) · `played_rounds` (10) ·
-`agents_communicate` (False)
-
-Giữ nguyên tên slot của FAIRGAME để tương thích với corpus prisoner's-dilemma; **trừ
-`contribution_options`**, chúng không đổi trong bộ hiện tại nên **đừng dùng làm biến
-phân tích**.
-
-#### ⚠️ `contribution_options` ghi tập nước đi QUAN SÁT ĐƯỢC, không ghi luật chơi
-
-Tài liệu này trước đây ghi ô đó là hằng số `"[0, 2, 4]"`. **Sai.**
-[`crsd/dataio/wide_csv.py`](../crsd/dataio/wide_csv.py) tính nó bằng
-`sorted({int(x) for c in contribs.values() for x in c})` — tức tập các mức đóng góp mà
-**sáu ghế thực sự chơi trong đúng ván đó**. Ván nào cả bàn cùng chơi 2 suốt mười vòng thì
-ô này ghi `"[2]"`. Luật chơi vẫn luôn là `{0, 2, 4}`; nó nằm trong prompt và trong
-`crsd/engine/state.py`, không nằm ở cột này.
-
-Phân bố đo được trên 1.850 ván hiện có:
-
-| giá trị | số ván | % |
+| Value | Games | Share |
 |---|---:|---:|
-| `[0, 2, 4]` | 728 | 39,4 |
-| `[2]` | 545 | 29,5 |
-| `[0, 2]` | 236 | 12,8 |
-| `[2, 4]` | 236 | 12,8 |
-| `[4]` | 65 | 3,5 |
-| `[0, 4]` | 30 | 1,6 |
-| `[0]` | 10 | 0,5 |
+| `[0, 2, 4]` | 1,867 | 51.2% |
+| `[2]` | 849 | 23.3% |
+| `[0, 2]` | 477 | 13.1% |
+| `[2, 4]` | 348 | 9.5% |
+| `[4]` | 69 | 1.9% |
+| `[0, 4]` | 30 | 0.8% |
+| `[0]` | 10 | 0.3% |
 
-Riêng 1.000 ván E3a (`exp_bestresponse_*`): `[0, 2, 4]` 409 · `[2]` 284 · `[0, 2]` 159
-· `[2, 4]` 96 · `[0, 4]` 26 · `[4]` 26 — chỉ 40,9% số dòng mang đủ ba nước đi.
+## Loading the wide CSVs
 
-**Hệ quả bắt buộc.** Đừng đọc cột này ra config. Dựng lại tập nước đi hợp lệ từ nó để tính
-best response là suy luật chơi ra từ hành vi, và với ván mà cả bàn chơi 2 thì bạn sẽ kết
-luận trò chơi chỉ có một nước đi — best response trở thành vô nghĩa.
-`paper/AAMAS/analysis/e3a_analysis.py` hardcode `OPTIONS = (0, 2, 4)` đúng vì lý do này.
-Ngược lại cột này **dùng được** như một thống kê mô tả rẻ tiền: nó chính là câu trả lời cho
-"ván này có ai từng chạm 0 / chạm 4 không".
-
-### Khối C — kết cục nhóm (7)
-
-| cột | dtype | nghĩa |
-|---|---|---|
-| `group_contributions` | str→list, dài 10 | tổng đóng góp cả nhóm **từng vòng** |
-| `pot_cumulative` | str→list, dài 10, không giảm | quỹ chung tích luỹ sau mỗi vòng |
-| `group_total` | float | `pot_cumulative[-1]` |
-| `target_reached` | 0/1 | `group_total >= target` |
-| `catastrophe` | 0/1 | kết quả xổ số — **chỉ xổ khi trượt target** |
-| `mean_payoff` | float | trung bình payoff 6 ghế |
-| `n_parse_failures` | int | tổng lượt hỏng cả ván — **cổng QA, phải bằng 0** |
-
-Khối này **không có trong corpus prisoner's-dilemma** — đặc thù CRSD, nơi kết cục thuộc về
-cả nhóm chứ không phải từng cặp.
-
-### Khối D — mỗi agent i = 1…6 (9 cột × 6 = 54)
-
-| cột | dtype | nghĩa |
-|---|---|---|
-| `agent{i}_name` | str | `Player_1` … `Player_6` |
-| `agent{i}_llm` | str | model/chính sách **thật** cầm ghế này (`scripted:always_4` ở E3a) |
-| `agent{i}_personality` | str | `neutral` / `cooperative` / `selfish` |
-| `agent{i}_knows_opponent_with_prob` | int | 0 — slot FAIRGAME, giữ để tương thích |
-| `agent{i}_strategies` | str→list, dài 10 | **đóng góp từng vòng**, ∈ {0,2,4} |
-| `agent{i}_scores` | str→list, dài 10, không tăng | **tài khoản riêng còn lại sau mỗi vòng** |
-| `agent{i}_messages` | str→list | `[]` (câu pledge ở E5) |
-| `agent{i}_payoff` | float | payoff cuối **sau xổ số**: 0 nếu `catastrophe`, ngược lại `scores[-1]` |
-| `agent{i}_parse_failures` | int | số vòng hỏng/bị cắt của riêng ghế này |
-
-#### ⚠️ `agent{i}_scores` khác `agent1_scores` của corpus PD
-
-Ở corpus prisoner's-dilemma, `agent1_scores[t]` là **penalty vòng t** và phụ thuộc nước đi
-của đối thủ. Ở CRSD **không tồn tại payoff theo vòng**: tiền chỉ kết toán một lần ở cuối,
-sau xổ số cấp nhóm.
-
-Nên ở đây `agent{i}_scores` = **tài khoản riêng còn lại sau mỗi vòng**
-(`endowment − cumsum(strategies)`). Nó **là hàm tất định của `agent{i}_strategies`** — cố ý
-như vậy để code loader dùng chung được với corpus PD: cùng `ast.literal_eval`, cùng ra list
-10 số cùng đơn vị tiền. Phần "phụ thuộc người khác" mà cột `scores` của PD mang, ở CRSD nằm
-ở **cấp nhóm**, trong `pot_cumulative`.
-
----
-
-## 5. Loader
-
-Các cột list là **Python literal dấu nháy đơn, KHÔNG phải JSON** — dùng `ast.literal_eval`.
+The list-valued columns are Python literals, not JSON. Use `ast.literal_eval` rather
+than `json.loads`.
 
 ```python
-import ast, pathlib
+import ast
+import pathlib
 import pandas as pd
 
 ROOT = pathlib.Path("results")
-LIST_COLS = (["group_contributions", "pot_cumulative"]
-             + [f"agent{i}_{k}" for i in range(1, 7) for k in ("strategies", "scores", "messages")])
+LIST_COLS = (
+    ["group_contributions", "pot_cumulative"]
+    + [f"agent{i}_{k}" for i in range(1, 7)
+       for k in ("strategies", "scores", "messages")]
+)
 
-def load(experiment="exp_baseline") -> pd.DataFrame:
+def load(experiment="exp_baseline"):
     frames = []
-    for f in sorted((ROOT / experiment).glob("*/*/*.csv"),
-                    key=lambda p: float(p.parent.parent.name)):
-        df = pd.read_csv(f)
-        for c in LIST_COLS:
-            df[c] = df[c].map(ast.literal_eval)
-        df["model_tag"] = f.parent.name
-        frames.append(df)
+    files = sorted((ROOT / experiment).glob("*/*/*.csv"),
+                   key=lambda p: float(p.parent.parent.name))
+    for path in files:
+        frame = pd.read_csv(path)
+        for column in LIST_COLS:
+            frame[column] = frame[column].map(ast.literal_eval)
+        frame["model_tag"] = path.parent.name
+        frames.append(frame)
     return pd.concat(frames, ignore_index=True)
 
 df = load()
-print(df.groupby(["model_tag", "risk_probability"])["target_reached"].mean().unstack())
+print(df.groupby(["model_tag", "risk_probability"])
+        ["target_reached"].mean().unstack())
 ```
 
-Khoá ghép một ván: `(experiment, model_tag, risk_probability, rep)`.
+For E6, load `exp_para1`, `exp_para2`, and `exp_baseline_temp0` separately. For E2,
+load the probe files with `pd.read_json(..., lines=True)` or `pd.read_csv(...)`.
 
----
+## Integrity and known exceptions
 
-## 6. Nguồn gốc, cảnh báo, bất biến
+`python plan/scripts/verify_wide.py --expect-reps 10` currently checks all 3,650 games
+and reports two known violations. Both are one missing/truncated contribution marker in
+`agent2` of Grok games in `exp_para1`:
 
-### 4/5 model nhập lại từ `Legacy_Results/`
+| File | Risk | Rep | Issue |
+|---|---:|---:|---|
+| `exp_para1/0.1/xai-grok-4.20-0309-non-reasoning/...csv` | 0.1 | 3 | one `agent2_parse_failures` |
+| `exp_para1/0.9/xai-grok-4.20-0309-non-reasoning/...csv` | 0.9 | 8 | one `agent2_parse_failures` |
 
-440 trong 550 ván **không phải chạy mới** — nhập từ
-`Legacy_Results/results/frontier/dense_grid/` bằng
-[`plan/scripts/import_legacy_b.py`](../plan/scripts/import_legacy_b.py). Nguồn từng model
-ghi trong [`PROVENANCE.json`](PROVENANCE.json). Data cũ chạy đúng config baseline tiếng Anh
-trên lưới 11 điểm nên dùng lại được nguyên vẹn.
+The affected rows are retained in the dataset. At the game level, `n_parse_failures`
+sums to 2; the apparent sum of 4 across all `*_parse_failures` columns double-counts the
+same events in the game total and seat-level column. These are the only current parse/
+truncation exceptions reported by `verify_wide.py`.
 
-**`risk_framing` và `show_computed_totals` không tồn tại trong schema cũ** — được điền mặc
-định `lottery` / `0`, đúng cấu hình baseline gốc, nhưng là **suy ra** chứ không đọc từ file.
-Ván chạy mới có giá trị thật.
+The structural checks enforce the following invariants for every row:
 
-### `qwen3-235b` phải chạy lại toàn bộ
+- all list lengths equal `played_rounds`;
+- the six seat contributions sum to `group_contributions` in every round;
+- `pot_cumulative` is the cumulative sum and `group_total` is its final value;
+- `target_reached` agrees with `group_total >= target`;
+- catastrophe is zero whenever the target is reached;
+- each private score is non-increasing and equals the endowment minus cumulative own
+  contributions;
+- each final payoff agrees with the catastrophe outcome and final private score;
+- language is `en`, risk matches the directory, and repetition/model keys are unique;
+- every experiment is balanced across the five models, except that mixed compositions
+  are validated by seat counts rather than by the directory name.
 
-Data cũ của nó có 990 ván nhưng **hỏng**: ở 0,88% số lượt model tính nhẩm dài rồi **bị cắt
-trước khi kịp viết dòng `CONTRIBUTION:`**; parser rơi xuống nhánh quét-prose, nhặt một chữ
-số ra từ chính đoạn suy luận, và vẫn trả `parse_failed=False`. Một ván có 60 quyết định nên
-0,88% lượt hỏng làm **39,5% số ván** sai quỹ đạo, rải đều khắp 11 mức risk → không rep nào
-sạch ở cả 11 mức.
+## Provenance and reproducibility
 
-110 ván hiện tại chạy mới 10-09-2026 với `--max-out 3000` và bản sửa retry-khi-bị-cắt.
-Trong lô đó cơ chế mới **nổ 6 lần** — đúng 6 lượt mà code cũ sẽ bịa số.
+Four models' baseline-grid rows were imported from `Legacy_Results`; Qwen's 110 baseline
+rows were rerun because the earlier corpus contained truncation-related silent parse
+errors. Baseline and E1–E3 provenance is recorded in `PROVENANCE.json`; mixed-population
+and E6 details are recorded in the corresponding launch scripts and plan under
+`plan/scripts/` and `plan/aamas2027-plan.md`.
 
-> 🚨 **Chỉ số trung bình KHÔNG phát hiện được lỗi này.** qwen trung bình 24,5 token/quyết
-> định trên cap 3000 = **0,8%** — mọi cổng dựa trên `usage_output_tokens / n_decisions` đều
-> xanh rực. Chỉ **đuôi** phân bố vượt trần, nên phải kiểm **từng lượt**.
+The game-level RNG is reproducible from the recorded seed and repetition design, including
+catastrophe draws and persona assignment. Model-generated text is not guaranteed to be
+reproducible at the same seed: replaying a cell is a new observation, not a byte-identical
+copy. Prompts, configuration, code, and seeds support reproduction of the design, not an
+identical transcript.
 
-### ⚠️ `seed` KHÔNG làm văn bản model tái lập được
-
-Chạy lại cùng một ô `(risk, rep)` với cùng `seed` và `temperature=0.7` cho kết quả khác
-nhau ở **31/54 ô = 57%** (đo trên qwen, đã loại trừ ảnh hưởng của bản sửa cắt-output).
-
-| Cái gì | Tái lập? |
-|---|---|
-| RNG cấp game (xổ số thảm hoạ, hoán vị persona) | ✅ có — chỉ phụ thuộc `rep` |
-| Văn bản model sinh ra | ❌ không — proxy nhận `seed` nhưng không tái lập |
-
-**Hệ quả cho paper:** không được hứa tái lập theo seed. Nói đúng là: prompt + config + seed
-+ code được công bố, các ô độc lập tái lập được về mặt *thiết kế*, còn văn bản model thì
-không. Hứa sai chỗ này reviewer kiểm được bằng cách chạy thử.
-
-**Hệ quả khi gom:** chạy lại một ô = một **quan sát mới**, không phải bản sao.
-`to_wide_csv.py` mặc định **báo lỗi** khi trùng `rep`; muốn giữ lần mới nhất phải khai báo
-`--on-conflict newest`.
-
-### Bất biến — `verify_wide.py` kiểm, exit 1 nếu vi phạm
-
-- Mọi cột list dài đúng `played_rounds`.
-- `sum(agent{i}_strategies)` từng vòng == `group_contributions`.
-- `pot_cumulative` == cumsum(`group_contributions`); `group_total` == `pot_cumulative[-1]`.
-- `target_reached` == (`group_total >= target`).
-- `catastrophe` == 0 bất cứ khi nào `target_reached` == 1.
-- `agent{i}_scores` không tăng; `agent{i}_payoff` == 0 nếu `catastrophe`, ngược lại `scores[-1]`.
-- **Cổng cắt-output:** mọi `agent{i}_parse_failures` == 0 (đếm cả lượt thiếu marker
-  `CONTRIBUTION:`, không chỉ cờ `parse_failed`).
-- **Cổng ngôn ngữ:** `language` ∈ {`en`}.
-- **Cổng cân bằng:** trong mỗi experiment, mọi model có **đúng cùng số ván**.
-- `risk_probability` trong file khớp thư mục; `agent1_llm` khớp `model_tag`; không trùng
-  `(experiment, model, risk, rep)`.
-
-Trạng thái 10-09-2026: **550/550 ván qua hết, 0 vi phạm.**
+`results/` contains wide game summaries only. Reasoning traces, prompts, and server shard
+artifacts are not stored here; they remain in the ignored run/download locations described
+in the project runbook.

@@ -89,7 +89,7 @@
 % amssymb/latexsym — muc nay phai compile duoc ma khong bat template nap them goi nao.
 \providecommand{\crgqed}{\rule{0.5em}{0.5em}}
 
-\section{Best-response profiling against known opponents}
+\section{Best responses to scripted opponents}
 \label{sec:bestresponse}
 
 Every result so far comes from one model playing copies of itself, a design that cannot
@@ -218,6 +218,10 @@ panel.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/e3a_rounds_dominated.pdf}
+\Description{Line plots show each model's mean round-by-round contribution against two
+scripted opponent profiles in which contributing is strictly dominated. Several models
+eventually reduce their contribution, but some continue to contribute after repeated
+evidence that their opponents' policies make paying pointless.}
 \caption{Mean contribution in each round, on the two profiles where contributing is
 strictly dominated, so that the best response is $\EthreeaBRDefect$ in every round;
 $n=\EthreeaNpercell$ games per line. Shading marks rounds~\EthreeaLateRounds{}, by which

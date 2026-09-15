@@ -29,6 +29,9 @@ opportunistic counterpart converts its generosity into a transfer.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/panel_risk_response.pdf}
+\Description{Two line plots show the mean contribution and final payoff of five language
+models as catastrophe risk rises from zero to one. A grey step function marks the
+risk-neutral optimum. Most model lines are nearly flat rather than following the step.}
 \caption{Self-play across the whole range of catastrophe risk, $\PanelNgamesBaseline$
 games, $\PanelNpercell$ per cell, with percentile bootstrap $95\%$ intervals. The thick
 grey line is the optimum of Proposition~\ref{prop:eq}, which is simultaneously the
@@ -60,9 +63,10 @@ endowments towards a group target and a catastrophe lottery fires with probabili
 they miss it. The game suits the question because $p$ is a dial the experimenter owns. It moves the
 optimum from ``contribute nothing'' to ``contribute exactly your share'' at a threshold we
 derive in closed form, so an agent that is choosing and an agent that is repeating are
-told apart by whether anything changes when the optimum does. We run $\PanelNgames$ games on \PanelNmodelsWord{} production models, one per provider
-and all at the cheap tier of their family. Three controls follow, and each removes one
-explanation for the cooperation the models display.
+told apart by whether anything changes when the optimum does. We run $\PanelNgamesPanel$ panel/control games on \PanelNmodelsWord{} production models, one per provider
+and all at the cheap tier of their family. Three controls follow, and each removes one explanation
+for the cooperation the models display; we then add a mixed-population test of whether agents
+condition on who contributes.
 
 The first control varies the risk itself over an \PanelNrisksWord{}-point grid whose endpoint,
 $p=0$, removes the catastrophe altogether and thereby makes contributing strictly
@@ -72,7 +76,8 @@ solving the dilemma or reciting the instructions. The third seats one model agai
 opponents whose policies we fix in advance, which makes the best response an arithmetic
 fact rather than an estimate. Alongside all three we ask the playing agent, in the middle
 of its own game, what the rules are and which of two named strategies pays more, so that a
-shortfall in play can be attributed to knowledge or denied it.
+shortfall in play can be attributed to knowledge or denied it. Finally, E6 repeats the two
+diagnostic endpoint cells under two prompt paraphrases and temperature-zero decoding.
 
 Our contributions are the following.
 
@@ -95,14 +100,20 @@ Our contributions are the following.
   $\PanelProbeLowContrib$ units in the same games. Knowing the answer and acting on it come
   apart.
 
-\item \textbf{A best-response profile against known opponents
+\item \textbf{A best-response profile against scripted opponents
   (\S\ref{sec:bestresponse}).} With $\EthreeaxSeatsScripted$ scripted seats the best response is computable
-  exactly. No model plays it in any of $\EthreeaNgames$ games, including the
-  $\EthreeaDominatedGames$ in which contributing is strictly dominated, and a free-rider
-  that contributes nothing out-earns every model in the panel.
+  exactly given the experimenter's policy specification. No model best-responds in the
+  $\EthreeaDominatedGames$ information-set-safe games in which contributing is strictly
+  dominated; across all $\EthreeaNgames$ games, $\EthreeaOptimalGames$ are exactly optimal
+  under the risk-neutral benchmark.
+
+\item \textbf{Opponent conditioning in mixed populations (\S\ref{sec:mixed}).}
+  After controlling for the running pool and the seat's previous action, four models show
+  no behaviorally meaningful partner response; the remaining response is negative.
 \end{itemize}
 
-Read together, the three controls say the same thing from three directions: the cooperation
-these agents display is a schedule rather than a choice. A schedule makes them safe
+Read together, the diagnostic layers say that the cooperation these agents display is mostly
+a schedule rather than a choice, although E6 leaves a model-specific risk response intact.
+A schedule makes them safe
 collaborators and unsafe stakeholders, and that distinction is one a deployment can design
 around only once it is measured.
