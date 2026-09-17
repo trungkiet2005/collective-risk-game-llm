@@ -31,7 +31,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from paper.Interface_Focus.revision._data import OUT, RESULTS, all_turns, label      # noqa: E402
+from _data import OUT, RESULTS, all_turns, label      # noqa: E402
 
 FOCAL = 2
 

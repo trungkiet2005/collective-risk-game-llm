@@ -18,7 +18,8 @@ from matplotlib.patches import Patch
 
 # ----------------------------------------------------------------- paths
 HERE = Path(__file__).resolve().parent
-OS = HERE.parent / "results" / "open_source"
+REPO = HERE.parents[2]
+OS = REPO / "results" / "open_source"
 FIG = HERE / "figures"; FIG.mkdir(exist_ok=True)
 
 # ----------------------------------------------------------------- style
@@ -27,6 +28,8 @@ mpl.rcParams.update({
     "savefig.dpi": 300,
     "font.family": "sans-serif",
     "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
     "font.size": 9,
     "axes.titlesize": 10,
     "axes.labelsize": 9.5,

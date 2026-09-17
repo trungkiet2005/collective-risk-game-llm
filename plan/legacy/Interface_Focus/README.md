@@ -3,11 +3,11 @@
 Manuscript for the study of instruction-tuned LLM agents playing the Milinski (2008)
 collective-risk social dilemma, in the **Royal Society Interface** template, **single column**.
 
-**Title:** *Large language model agents in a collective-risk social dilemma: cooperation tracks prompt salience, not catastrophe risk.*
+**Title:** *Most large language models follow prompt salience more than catastrophe risk in a collective-risk social dilemma across languages.*
 
-> **Under revision.** Reviewer report received 2026-08-13; the working plan, the item-by-item
-> status and the full reviewer text are no longer tracked as a live document.
-> Read that before editing `main.tex`.
+> **Submission preparation.** This manuscript is archived under
+> `plan/legacy/Interface_Focus/` while the repository's active results tree is used for a
+> separate AAMAS study. Do not substitute the active results for the Interface Focus data.
 
 ## Files
 | File | What it is |
@@ -16,13 +16,13 @@ collective-risk social dilemma, in the **Royal Society Interface** template, **s
 | `esm.tex` | Electronic supplementary material: Vietnamese back-translation table, decoding parameters, lottery checks, within-game regressions, anchor strength. Builds standalone with `pdflatex esm` twice; needs the T5 (vntex) encoding for the Vietnamese diacritics. |
 | `revision/*.py` | The revision analyses. Each recomputes from the raw logs and writes JSON to `revision/out/`. See the table below. |
 | `revision/out/tab_effects.tex`, `tab_axes.tex` | Generated tables, `\input` directly by `main.tex` so they cannot drift from the text. **Regenerate with `python revision/r6_summary_tables.py` before building.** |
-| `refs.bib` | 28 references, each web-verified (DOI / arXiv id). |
+| `refs.bib` | Bibliography for this manuscript. |
 | `rsproca_new.cls` | RSIF class. Locally patched: bibliography switched from the upstream `biblatex`+`phys` (which fails to load in this TeX install because its section-patch clashes with the class's custom `\@sect`) to `natbib`+bibtex, and the standard `thebibliography`/`\refname`/`\newblock` scaffolding added because the class does not inherit `article.cls`. |
 | `figures/*.pdf` | The eleven figures (vector). |
-| `make_figures.py` | Regenerates figures 2–7 directly from `../results/open_source/` (self-verifying: numbers come from the raw CSVs). |
+| `make_figures.py` | Regenerates figures 2–7 from the original open-weight archive when available (self-verifying: numbers come from raw CSVs). |
 | `make_pipeline.py` | Regenerates figure 1 (study-design schematic). Includes an automatic text-overflow check: every text element is validated against its container box. |
-| `make_figures_expansion.py` | Figures 8–9 (composition engine, cheap frontier model). |
-| `make_figures_toptier.py` | Figure 10 (top-tier panel), globbing `../results/frontier/*/exp_baseline/games.csv`. |
+| `make_figures_expansion.py` | Figures 8–9 (composition engine, cheap frontier model), when the original archive is available. |
+| `make_figures_toptier.py` | Figure 10 (top-tier panel), reading the original per-model frontier directories when available. |
 | `revision/r3_round_trajectories.py` | Figure 11 (round-by-round trajectories). |
 | `TemplateFigs/` | RSIF logos required by the class. |
 
@@ -36,32 +36,28 @@ collective-risk social dilemma, in the **Royal Society Interface** template, **s
 | `r5_translation_qa.py` | Q2 | Template parity, comprehension accuracy by language and question, tokenisation ratio. Companion prose: `revision/out/r5_backtranslation.md`. |
 | `r6_summary_tables.py` | W7 / W8 | Recomputes every effect in the paper and emits the two new tables. |
 
-`revision/_data.py` is the shared loader. **It deliberately never reads
-`../results/frontier/crsd_all_models.csv`**, which is stale: that merged file predates the
-top-tier sweep and still contains only `gemini-3.1-flash-lite`, so anything joined against
-it silently drops the two models the central result rests on. Read the per-model
-directories instead, as `make_figures_toptier.py` does.
+`revision/_data.py` is the shared loader. It is configured to read the frozen legacy data
+root explicitly, so it cannot silently mix this manuscript with the active AAMAS results.
 
 ## Data source
-The manuscript now covers both arms:
-- `../results/open_source/crsd_all_models.csv` — open-weight behaviour and the composition
-  and comprehension studies.
-- `../results/open_source/crsd_comprehension_all_models.csv` — in-situ probes.
-- `../results/frontier/<model>/exp_baseline/{games.csv,turns.jsonl}` — the commercial arm,
-  read per model directory.
+The manuscript covers open-weight and hosted-model arms. The original raw archive used to
+regenerate all figures is not present in this checkout. The available frozen legacy
+artefacts and generated tables remain preserved for audit, but the active `results/`
+directory belongs to a different study and must not be used as a replacement. A complete
+data-backed rebuild therefore requires restoring the original Interface Focus archive.
 
 ## Build
 ```bash
 python make_pipeline.py                     # figure 1
-python make_figures.py                      # figures 2-7
-python make_figures_expansion.py            # figures 8-9
-python make_figures_toptier.py              # figure 10
-python revision/r3_round_trajectories.py    # figure 11
-python revision/r6_summary_tables.py        # tables 2-3 (\input by main.tex)
+python make_figures.py                      # figures 2-7, requires the original archive
+python make_figures_expansion.py            # figures 8-9, requires the original archive
+python make_figures_toptier.py              # figure 10, requires the original archive
+python revision/r3_round_trajectories.py    # figure 11, requires the original archive
+python revision/r6_summary_tables.py        # tables 2-3, requires the original archive
 pdflatex main && bibtex main && pdflatex main && pdflatex main
 pdflatex esm && pdflatex esm                # supplementary
 ```
-Produces `main.pdf` (23 pages) and `esm.pdf` (6 pages). Requires a LaTeX install with
+Produces `main.pdf` and `esm.pdf`. Requires a LaTeX install with
 `natbib`, `booktabs`, `eurosym`, `cleveref`, `hyperref`, and — for the supplementary only —
 the T5 encoding from `vntex`.
 

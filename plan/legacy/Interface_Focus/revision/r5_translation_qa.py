@@ -46,7 +46,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from paper.Interface_Focus.revision._data import OUT, RESULTS, label                 # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[4]
 PROMPTS = ROOT / "crsd" / "prompts"
 COMP = RESULTS / "open_source" / "crsd_comprehension_all_models.csv"
 

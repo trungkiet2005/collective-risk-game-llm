@@ -36,7 +36,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from paper.Interface_Focus.revision._data import OUT, RESULTS, all_turns, label     # noqa: E402
+from _data import OUT, RESULTS, all_turns, label     # noqa: E402
 
 FIGDIR = Path(__file__).resolve().parents[1] / "figures"
 TARGET, N_PLAYERS, N_ROUNDS = 120.0, 6, 10
@@ -223,7 +223,8 @@ def make_figure(t: pd.DataFrame) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    plt.rcParams.update({"font.size": 7.6, "axes.labelsize": 7.6,
+    plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42,
+                         "font.size": 7.6, "axes.labelsize": 7.6,
                          "xtick.labelsize": 7, "ytick.labelsize": 7,
                          "axes.spines.top": False, "axes.spines.right": False})
     colours = {0.1: "#4477AA", 0.5: "#CCBB44", 0.9: "#CC3311"}

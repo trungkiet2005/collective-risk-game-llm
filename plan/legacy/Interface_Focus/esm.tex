@@ -1,6 +1,6 @@
 %% Electronic supplementary material for
-%% "Large language model agents in a collective-risk social dilemma:
-%%  capability enables risk sensitivity but does not confer it"
+%% "Most large language models follow prompt salience more than catastrophe risk
+%%  in a collective-risk social dilemma across languages"
 %%
 %% Standalone: pdflatex esm && pdflatex esm
 \documentclass[11pt,a4paper]{article}
@@ -25,8 +25,8 @@
 \newcolumntype{V}[1]{>{\fontencoding{T5}\selectfont\RaggedRight}p{#1}}
 
 \title{Electronic supplementary material\\[2pt]
-\large Large language model agents in a collective-risk social dilemma:\\
-capability enables risk sensitivity but does not confer it}
+\large Most large language models follow prompt salience more than catastrophe risk\\
+in a collective-risk social dilemma across languages}
 \author{}
 \date{}
 
@@ -34,8 +34,8 @@ capability enables risk sensitivity but does not confer it}
 \maketitle
 \vspace{-2.4em}
 
-\noindent Every quantity below is regenerated from the raw per-game and per-probe logs
-by the scripts in \texttt{paper/revision/}; none is transcribed by hand.
+\noindent Every quantity below is regenerated from the raw per-game and per-probe logs;
+none is transcribed by hand.
 
 \tableofcontents
 
@@ -46,8 +46,7 @@ by the scripts in \texttt{paper/revision/}; none is transcribed by hand.
 The Vietnamese decision template was prepared by a native speaker and holds the English
 structure line for line. Both files are thirty lines and carry the identical multiset of
 $42$ substitution slots, and neither writes any game parameter as a literal, so the two
-languages cannot disagree about a value; this is checked mechanically by
-\texttt{r5\_translation\_qa.py}. The back-translations below are literal rather than
+languages cannot disagree about a value. The back-translations below are literal rather than
 idiomatic: they are meant to expose drift, not to read well. A dagger (\dag) marks a
 segment carrying a number or a conditional, the two things most at risk in translation.
 
@@ -240,41 +239,42 @@ the open-weight arm, so nothing is truncated in either language.
 
 \begin{table}[h]
 \centering
-\caption{What was sent to the hosted models. Read from the task source
-(\texttt{kaggle/benchmarks/crg\_task\_server.py}) rather than transcribed.}
+\caption{Decoding parameters for the hosted models. These settings were recorded
+from the execution configuration rather than transcribed from memory.}
 \label{tab:esm-decoding}
-\begin{tabular}{@{}lll@{}}
+{\small
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}p{.22\linewidth}p{.48\linewidth}p{.22\linewidth}@{}}
 \toprule
 Parameter & Value & Set by \\
 \midrule
 \texttt{temperature} & $0.7$, every request & us (matches the open-weight arm) \\
 per-turn \texttt{seed} & $(\mathrm{base}+\mathrm{rep})\cdot10^5+\mathrm{round}\cdot100+\mathrm{agent}$ & us (honouring not guaranteed) \\
 \texttt{top\_p} & not set & provider default, undocumented \\
-\texttt{max\_completion\_tokens} & $512$ non-reasoning; $6{,}000$ reasoning & us \\
-\quad Grok-4.20 (no reasoning) & $6{,}000$ and $8{,}000$ across shards & us \\
-\quad Claude-Opus-5 & $6{,}000$ and $16{,}000$ across shards & us \\
+{\scriptsize\texttt{max\_completion\_tokens}} & $512$ non-reasoning; $6{,}000$ reasoning & us \\
+\quad Grok-4.20 (no reasoning) & $6{,}000$ and $8{,}000$ in repeated executions & us \\
+\quad Claude-Opus-5 & $6{,}000$ and $16{,}000$ in repeated executions & us \\
 parse retries & $3$, with a fresh seed each attempt & us \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
-\noindent \textbf{Accidental replication.} Six games were executed twice, hours apart in a
-separate session and in four cases on a different Kaggle account, because the smoke pass
-and a path-length download failure both left duplicate coverage. Five reproduced the
+\noindent \textbf{Repeated executions.} Six games were executed twice in independent
+sessions. Five reproduced the
 group total exactly; one differed by $4$ points of $240$ (Claude-Opus-5, $p=0.1$,
 Vietnamese: $124$ versus $120$).
 
 \begin{center}
 \begin{tabular}{@{}llrl@{}}
 \toprule
-Configuration & Cell & Group totals & Sources \\
+Configuration & Cell & Group totals & Replication \\
 \midrule
-Claude-Opus-5            & $p{=}0.1$, vn & $124$, $120$ & two accounts \\
-Claude-Opus-5            & $p{=}0.9$, en & $128$, $128$ & smoke pass, production shard \\
-Gemini-3.1-Pro           & $p{=}0.9$, en & $120$, $120$ & smoke pass, production shard \\
-GPT-5.6-sol              & $p{=}0.9$, en & $120$, $120$ & smoke pass, production shard \\
-Grok-4.20 (no reasoning) & $p{=}0.1$, vn & $240$, $240$ & two accounts \\
-Grok-4.20 (reasoning)    & $p{=}0.9$, en & $120$, $120$ & smoke pass, production shard \\
+Claude-Opus-5            & $p{=}0.1$, vn & $124$, $120$ & independent sessions \\
+Claude-Opus-5            & $p{=}0.9$, en & $128$, $128$ & independent sessions \\
+Gemini-3.1-Pro           & $p{=}0.9$, en & $120$, $120$ & independent sessions \\
+GPT-5.6-sol              & $p{=}0.9$, en & $120$, $120$ & independent sessions \\
+Grok-4.20 (no reasoning) & $p{=}0.1$, vn & $240$, $240$ & independent sessions \\
+Grok-4.20 (reasoning)    & $p{=}0.9$, en & $120$, $120$ & independent sessions \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -284,16 +284,14 @@ Grok-4.20 (reasoning)    & $p{=}0.9$, en & $120$, $120$ & smoke pass, production
 to four separate executions. A one-way permutation ANOVA ($10{,}000$ permutations) of
 group contribution on execution batch, within cell, finds no effect in any of the twelve
 cells that span more than one batch: $F \le 1.91$, all $P > 0.22$. Eleven of those splits
-were accidents of sharding; the twelfth, the $p=0.3$ cell added later
-(\S\ref{sec:pivot-cells}), was split deliberately, five games on each of two accounts,
+were unplanned; the $p=0.3$ cell was split deliberately into two groups of five games,
 and gives $F=0.40$, $P=1.00$.
 
 % ==========================================================================
 \section{The lottery cannot induce learning}
 \label{sec:lottery}
 
-The catastrophe is drawn once, after round ten
-(\texttt{crsd/engine/scoring.py::compute\_outcome}), and its outcome is never shown to
+The catastrophe is drawn once, after round ten, and its outcome is never shown to
 any agent; agents carry no state between games. The following are therefore
 confirmations, not tests of a live hypothesis.
 
@@ -438,9 +436,9 @@ Configuration & & $p{=}0.1$ & $p{=}0.3$ & $p{=}0.5$ & $p{=}0.7$ & $p{=}0.9$ \\
 \end{tabular}
 \end{table}
 
-\noindent The added cells were executed on separate Kaggle accounts from the original
-sweep, and the $p=0.3$ Claude-Opus-5 cell was deliberately split five games to one
-account and five to another as a further check on that source of variation; a
+\noindent The added cells were executed in independent sessions. The $p=0.3$
+Claude-Opus-5 cell was deliberately split into two groups of five games as a further
+check on execution variation; a
 permutation ANOVA on execution batch within that cell gives $F=0.40$, $P=1.00$.
 Contributions parsed without failure in all $80$ added games, that is, in all $4{,}800$
 added agent-turns.

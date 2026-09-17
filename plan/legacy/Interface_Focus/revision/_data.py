@@ -9,13 +9,19 @@ directories for the same reason; we match it exactly.
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
-RESULTS = ROOT / "results"
+# The manuscript is archived under plan/legacy, while the data remain at the
+# repository root. Keep this path derived from the file location so the
+# analysis remains runnable after the archive move.
+ROOT = Path(__file__).resolve().parents[4]
+# The archived manuscript and the current AAMAS study use different layouts.
+# Make the source explicit so an analyst cannot accidentally mix them.
+RESULTS = Path(os.environ.get("CRG_IF_RESULTS", str(ROOT / "Legacy_Results" / "results")))
 OUT = Path(__file__).resolve().parent / "out"
 OUT.mkdir(exist_ok=True)
 
