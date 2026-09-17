@@ -72,66 +72,65 @@ không thể đạt target — **cả hai trường hợp góp thêm một xu n�
 model vẫn góp. Đây là bằng chứng cho "hợp tác hay chỉ tuân lệnh?" mạnh hơn ablation E1, và
 nó tách hẳn hai thứ đó ra (§7.3).
 
-### 📄 Bản nháp paper AAMAS — ĐÃ ĐỦ MỘT BÀI HOÀN CHỈNH KHÔNG CẦN E3b (11-09-2026)
+### 📄 Paper AAMAS — MAJOR REVISION 16-09-2026 (template chính thức, dùng đủ B + E1..E4 + E6)
 
-`paper/AAMAS/main.tex` compile ra **8 trang, references bắt đầu ở trang 8, 0 undefined
-reference, 0 Overfull \hbox**. Bảy mục, viết trọn trên B + E1 + E2 + E3a:
+**Title:** *Cooperation by Default: LLM Agents in the Collective-Risk Dilemma*.
+`paper/AAMAS/main.tex` dựng bằng **`aamas.cls` chính thức** (từ `aamas_2027_template.zip`,
+không sửa style). Bản dựng: **8 trang thân bài, references từ trang 9, 0 lỗi, 0 undefined,
+0 Overfull, 0 font Type 3.** Abstract dạng text để dán lên OpenReview:
+`paper/AAMAS/OPENREVIEW_ABSTRACT.txt` (246 từ; phải khớp từng chữ với `main.tex`).
 
-| Mục | File | Dựa trên |
+| Mục | File | Dữ liệu |
 |---|---|---|
-| 1 Introduction (+ Hình 1, hình trang đầu) | `sections/01_intro.tex` | — |
-| 2 Related work (**có đoạn khai báo overlap với bản IF**) | `sections/02_related.tex` | — |
-| 3 The game, its equilibria, and the panel | `sections/03_setting.tex` | Mệnh đề 1 |
-| 4 Cooperation that does not depend on the risk | `sections/04_riskgrid.tex` | B (550 ván) |
-| 5 Two things the cooperation is not | `sections/05_controls.tex` | E1 + E2 |
-| 6 Best-response profiling | `sections/06_bestresponse.tex` | E3a (1.000 ván) |
-| 7 Discussion, limitations, ethics | `sections/07_discussion.tex` | — |
+| 1 Introduction | `sections/01_intro.tex` | — |
+| 2 Related work (có đoạn khai overlap với bản IF) | `sections/02_related.tex` | — |
+| 3 Game, Mệnh đề 1–2, thiết kế, prompt nguyên văn | `sections/03_game.tex` | — |
+| 4 Risk does not change the habit | `sections/04_risk.tex` | baseline, nohint, evprobe, para1/2, temp0 |
+| 5 Answers track the risk; play does not | `sections/05_knowing.tex` | evprobe probes, bestresponse ×4 |
+| 6 Habits in mixed groups + 7 Selection (α-Rank) | `sections/06_groups.tex` | mixed |
+| 8 Discussion, threats, limitations, ethics | `sections/07_discussion.tex` | — |
 
-**Câu chuyện đã xoay khỏi "quần thể hỗn hợp" vì E3b chưa có**, và đây là chỗ phải hiểu cho
-đúng trước khi sửa: đóng góp trung tâm bây giờ là **tách biệt giữa BIẾT và LÀM** — cùng một
-agent, trong cùng một ván, trả lời đúng phép so sánh kỳ vọng rồi chơi ngược lại câu trả lời
-của chính nó. Ba đối chứng của §4/§5/§6 mỗi cái loại một cách giải thích rẻ tiền. E3b khi
-xong sẽ vào **§6 hoặc một §7 mới**, không thay câu chuyện.
+**Câu chuyện:** 5 model giá rẻ trả tiền theo **thói quen** (habit = hành vi vẫn tiếp tục khi
+trả tiền đã vô ích: p = 0 hoặc sau khi kết quả đã định), không theo risk; câu trả lời khi được
+hỏi thì theo risk nhưng hành vi không; phản ứng với đối thủ chỉ ở dạng đơn giản; chia đều khít
+không có độ dư; và **quy tắc chấm điểm quyết định ai được chọn** (so với bạn cùng bàn ⇒ người
+trả ít nhất thắng, nhóm sụp; so giữa các bàn ⇒ Flash-Lite thắng ở p ≥ 0,5).
 
-**Ba con số chở cả bài** (đều sinh bằng script, không gõ tay):
+⚠️ **Welfare dùng payoff KỲ VỌNG, không dùng `mean_payoff`.** Xổ số được khoá theo `rep`, nên
+cả kho dữ liệu chỉ có 10 lần rút, dùng lại ở mọi ô, cả 10 đều < 0,47 → mọi ván trượt ở
+p ≥ 0,5 đều dính thảm hoạ. Hành vi không bị ảnh hưởng.
 
-- **p = 0 là cột không cần giả định.** Ở đó đóng góp bị **trội hẳn** (payoff = 40 − c với
-  mọi kết cục), vậy mà **240/300 ghế vẫn đóng**. Mọi claim khác đều tựa vào cột này khi bị
-  hỏi "hay là model chỉ e ngại rủi ro?".
-- **Tách biệt biết/làm.** Panel trả lời **3.600/3.600** câu luật đúng, và ở p = 0,1 thì
-  **94%** nói đúng rằng không đóng gì mới lời hơn — rồi đóng **22,2** đơn vị trong đúng
-  những ván ấy. ⚠️ Nhưng Qwen và Grok trả lời **y hệt một đáp án ở cả ba mức risk**, nên
-  "đúng" của chúng là TRÙNG chứ không phải tính được → claim chỉ đặt trên 3 model còn lại.
-- **Bỏ mỏ neo equal-split KHÔNG làm giảm đóng góp** ở model nào; 3 model tăng, Qwen
-  18,5 → 34,8. Nó là **trần**, không phải động cơ.
-
-**Sinh lại số + dựng lại bài** (chạy đủ ba script rồi mới latexmk):
+**Sinh lại số + figure + bảng, rồi dựng bài** (từ gốc repo):
 
 ```bash
-python paper/AAMAS/analysis/panel_analysis.py      # \Panel...   §4, §5  (254 macro)
-python paper/AAMAS/analysis/e3a_analysis.py        # \Ethreea...  §6
-python paper/AAMAS/analysis/e3a_prose_numbers.py   # \Ethreeax... §6
+python paper/AAMAS/analysis/selfplay.py    # \Cnt \Lot \Grid \NoCue \Rob, fig_selfplay, tab_models, tab_robust
+python paper/AAMAS/analysis/probes.py      # \Probe, fig_knowdo
+python paper/AAMAS/analysis/scripted.py    # \Scr, fig_scripted, tab_settled
+python paper/AAMAS/analysis/mixed.py       # \Mix, fig_mixed
+python paper/AAMAS/analysis/advantage.py   # \Adv, fig_advantage
+python paper/AAMAS/analysis/selection.py   # \Sel, fig_selection (~3 phut)
 cd paper/AAMAS && latexmk -pdf main.tex
 python -m pytest crsd/tests/test_paper_equilibrium.py   # cong chan Menh de 1
 ```
 
-**Ba luật của thư mục paper, vi phạm là lệch số âm thầm:**
+**Luật của thư mục paper:**
 
-1. **Không gõ tay một con số nào vào `sections/`.** Mọi con số là macro; đổi data → chạy
-   lại ba script → text và bảng cùng đổi. Ngoại lệ duy nhất là hằng số luật chơi.
-2. **Một hệ tên model duy nhất**, lấy từ `MODELS` của `e3a_analysis.py`: bảng dùng
-   "Flash-Lite 3.5", văn xuôi dùng "Flash-Lite" (qua `pname()`), slug đầy đủ chỉ xuất hiện
-   **đúng một lần** ở §3.
-3. **Số đếm nhỏ xuất ba dạng**: `\PanelNFlat` (chữ số, cho bảng), `...Word` (chữ, giữa
-   câu — **đừng bọc `$...$`**, math mode in ra chữ nghiêng), `...WordCap` (đầu câu).
+1. **Không gõ tay số đo được vào `sections/`.** Mọi con số là macro do script sinh. Script
+   có guard `RuntimeError` khi dữ liệu không còn khớp câu chữ.
+2. **Một nguồn dữ liệu và tên model**: `analysis/crsd_data.py` (`MODELS`, `SLUG`, payoff kỳ
+   vọng). **Một theme figure**: `analysis/crsd_style.py` (Libertine, bảng màu an toàn mù màu,
+   cổng kiểm cỡ chữ ≥ 7 pt, chồng chữ, bề rộng cột).
+3. Không en/em dash, không mã nội bộ (E1..E7, tên file) trong phần người đọc thấy.
 
-**Còn phải làm trước khi nộp** (không cái nào chặn E3b):
+**Còn phải làm trước khi nộp:**
 
-- [ ] **Kiểm từng mục `refs.bib`** — viết từ trí nhớ, volume/page/năm chưa đối chiếu DOI.
-- [ ] Tải `aamas_2027_template.zip`, đổi `\documentclass` + khối `\acmConference`, dựng
-      lại và kiểm lại số trang + Overfull (hiện dùng `acmart` của MiKTeX).
-- [ ] Đăng ký tác giả trước **17-09**, nộp abstract **01-10**, full paper **08-10**.
-- [ ] Chốt việc chuyển Q8 sang bản AAMAS hay giữ ở IF (plan §2.1, hạn 20/09).
+- [x] Kiểm từng mục `refs.bib` với nguồn gốc (16-09-2026).
+- [x] Chuyển sang template AAMAS 2027 chính thức.
+- [ ] Mọi tác giả có tài khoản OpenReview trước **17-09** (AoE).
+- [ ] Đăng ký abstract **01-10** (dán `OPENREVIEW_ABSTRACT.txt`), nộp full paper **08-10**.
+- [ ] Điền `\acmSubmissionID` sau khi đăng ký abstract.
+- [ ] Cân nhắc chính sách dùng AI của AAMAS 2027 (khai báo nếu AI góp vào phương pháp).
+- [ ] Chốt việc chuyển Q8 sang bản AAMAS hay giữ ở IF (plan §2.1).
 
 ### Việc tiếp theo
 

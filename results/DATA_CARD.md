@@ -7,12 +7,12 @@ separate [`Legacy_Results/`](../Legacy_Results/) tree is not part of the counts 
 
 ## Snapshot
 
-The directory currently contains 3,650 game-level wide CSV rows in 365 CSV files. All
+The directory currently contains 3,950 game-level wide CSV rows in 395 CSV files. All
 rows use the same CRSD game: six players, ten rounds, endowment 40 per player, legal
 contributions `{0, 2, 4}`, and a group target of 120. All recorded games are English
 (`language = en`). A game has 60 seat-round decisions, so the wide CSVs represent
-219,000 seat-round decisions.
-There are 706 recorded catastrophes. Two agent-level parse/truncation events are flagged
+237,000 seat-round decisions.
+There are 741 recorded catastrophes. Two agent-level parse/truncation events are flagged
 in E6 `exp_para1`; details and their retained rows are documented below.
 
 The five model tags are:
@@ -40,7 +40,9 @@ The five model tags are:
 | `exp_para1` | E6: prompt paraphrase 1 | 100 | 0.1, 0.9 | 10 |
 | `exp_para2` | E6: prompt paraphrase 2 | 100 | 0.1, 0.9 | 10 |
 | `exp_baseline_temp0` | E6: baseline prompt, temperature 0 | 100 | 0.1, 0.9 | 10 |
-| **Total wide CSVs** |  | **3,650** |  |  |
+| `exp_wording` | Neutral wording, objective not stated | 150 | 0, 0.1, 0.9 | 10 |
+| `exp_neutral` | Neutral wording plus own-cash objective stated | 150 | 0, 0.1, 0.9 | 10 |
+| **Total wide CSVs** |  | **3,950** |  |  |
 
 E7 is an offline scripted-reference experiment. Its 2,640 games are represented by
 the generated artifacts in `paper/AAMAS/` rather than by rows under `results/`; see
@@ -178,6 +180,8 @@ contribution and target-rate analyses.
 | `exp_mixed` | E3b: all model pairs, ten compositions from one through five seats of model A, `p=0.1,0.5,0.9`, 10 repetitions. Inspect all six `agent{i}_llm` fields; the slug alone is not the seat truth. |
 | `exp_para1`, `exp_para2` | E6: endpoint cells `p=0.1,0.9` under two baseline-prompt paraphrases. |
 | `exp_baseline_temp0` | E6: endpoint cells under the baseline prompt at temperature 0. |
+| `exp_neutral` | Demand-effect control, `p=0,0.1,0.9`. Baseline prompt with "collective-risk social dilemma", "climate account", "must reach" and "disaster" replaced by neutral wording, and the objective sentence "the only thing that matters to you is your own final cash payoff" switched on (`framing = 1`). The equal-split hint is kept. Compare with `exp_baseline` at the same `p`; read it together with `exp_wording`. |
+| `exp_wording` | The same neutral wording as `exp_neutral` with the objective sentence left off (`framing = 0`). `exp_baseline` to `exp_wording` isolates the words; `exp_wording` to `exp_neutral` isolates the stated objective. |
 | E7 | Offline scripted reference; not represented by rows in `results/`. Use `paper/AAMAS/analysis/e7_reference.py` and its generated artifacts. |
 | E5 | No current results. Do not infer them from the schema. |
 
@@ -201,14 +205,21 @@ silently drop them.
 ### Authoritative analysis entry points
 
 ```text
-paper/AAMAS/analysis/panel_analysis.py       # baseline grid and panel numbers
-paper/AAMAS/analysis/e3a_analysis.py        # E3a best-response analysis
-paper/AAMAS/analysis/e3a_prose_numbers.py   # E3a prose values
-paper/AAMAS/analysis/e3b_analysis.py        # E3b mixed-population analysis
-paper/AAMAS/analysis/e6_analysis.py         # E6 robustness analysis
-paper/AAMAS/analysis/e7_reference.py        # E7 scripted reference
-plan/scripts/verify_wide.py                 # structural/balance validation
+paper/AAMAS/analysis/crsd_data.py    # shared loader; expected payoffs; macro writer
+paper/AAMAS/analysis/crsd_style.py   # figure style (palette, fonts, size gates)
+paper/AAMAS/analysis/selfplay.py     # baseline grid, no-cue arm, E6 robustness
+paper/AAMAS/analysis/probes.py       # E2 in-game questions vs play
+paper/AAMAS/analysis/scripted.py     # E3a scripted partners, exact best response
+paper/AAMAS/analysis/mixed.py        # E3b slack and partner response
+paper/AAMAS/analysis/advantage.py    # E3b same-table payoff edge and group success
+paper/AAMAS/analysis/selection.py    # E3b alpha-Rank selection within vs across tables
+paper/AAMAS/analysis/e7_reference.py # E7 scripted reference (not used in the paper)
+plan/scripts/verify_wide.py          # structural/balance validation
 ```
+
+Welfare numbers in the paper use the EXPECTED payoff over the lottery, not
+`mean_payoff`: the lottery is keyed on `rep`, so the corpus holds ten draws reused in
+every cell, all below 0.47, and every missed game at `p >= 0.5` ended in catastrophe.
 
 When a derived value conflicts with an informal calculation, prefer the corresponding
 analysis script and generated tables under `paper/AAMAS/tables/`. `results/` contains
@@ -232,17 +243,17 @@ The important outcome fields are:
 
 `contribution_options` is an observed-support field, not the game rule. The legal action
 set is always `{0, 2, 4}`, but a particular game may contain only `[2]`, for example, if
-all seats chose 2 in every round. Across the 3,650 wide rows, the observed supports are:
+all seats chose 2 in every round. Across the 3,950 wide rows, the observed supports are:
 
 | Value | Games | Share |
 |---|---:|---:|
-| `[0, 2, 4]` | 1,867 | 51.2% |
-| `[2]` | 849 | 23.3% |
-| `[0, 2]` | 477 | 13.1% |
-| `[2, 4]` | 348 | 9.5% |
-| `[4]` | 69 | 1.9% |
-| `[0, 4]` | 30 | 0.8% |
-| `[0]` | 10 | 0.3% |
+| `[0, 2, 4]` | 1,990 | 50.4% |
+| `[2]` | 891 | 22.6% |
+| `[0, 2]` | 533 | 13.5% |
+| `[2, 4]` | 355 | 9.0% |
+| `[4]` | 92 | 2.3% |
+| `[0, 4]` | 64 | 1.6% |
+| `[0]` | 25 | 0.6% |
 
 ## Loading the wide CSVs
 
@@ -283,7 +294,7 @@ load the probe files with `pd.read_json(..., lines=True)` or `pd.read_csv(...)`.
 
 ## Integrity and known exceptions
 
-`python plan/scripts/verify_wide.py --expect-reps 10` currently checks all 3,650 games
+`python plan/scripts/verify_wide.py --expect-reps 10` currently checks all 3,950 games
 and reports two known violations. Both are one missing/truncated contribution marker in
 `agent2` of Grok games in `exp_para1`:
 

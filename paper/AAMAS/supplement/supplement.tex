@@ -1,0 +1,63 @@
+%% =====================================================================================
+%% Supplementary material for "Cooperation by Default: LLM Agents in the Collective-Risk
+%% Dilemma". AAMAS 2027 allows supplementary material only as a separate file, and
+%% reviewers need not read it, so nothing the paper's argument depends on may live here.
+%% Anonymous: no author names, no repository names, no internal run identifiers.
+%%
+%% BUILD (from the repository root):
+%%   python paper/AAMAS/supplement/make_prompts.py
+%%   cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
+%% =====================================================================================
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[scaled=0.86]{beramono}   % monospace with a real bold face for marked spans
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+
+\newtcolorbox{promptbox}{breakable, enhanced, colback=white, colframe=black!45,
+  boxrule=0.5pt, arc=0pt, left=5pt, right=5pt, top=4pt, bottom=4pt,
+  fontupper=\ttfamily\small\raggedright}
+
+\title{Supplementary Material\\[4pt]\large Cooperation by Default: LLM Agents in the
+Collective-Risk Dilemma}
+\author{Anonymous submission}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Models}
+
+Every game was played through one model-serving interface, with the same settings for all
+five models: temperature 0.7 unless a condition states otherwise, and an output limit of
+3,000 tokens, raised automatically for a reply that reached the limit before its final
+\texttt{CONTRIBUTION:} line.
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+Name in the paper & Model & Provider & Identifier \\
+\midrule
+Claude Haiku & Claude Haiku 4.5 & Anthropic & \texttt{claude-haiku-4-5-20251001} \\
+Gemini Flash-Lite & Gemini 3.5 Flash-Lite & Google & \texttt{gemini-3.5-flash-lite} \\
+GPT Luna & GPT-5.6 Luna & OpenAI & \texttt{gpt-5.6-luna} \\
+Qwen & Qwen3-235B-A22B-Instruct & Alibaba & \texttt{qwen3-235b-a22b-instruct-2507} \\
+Grok & Grok 4.20, non-reasoning & xAI & \texttt{grok-4.20-0309-non-reasoning} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Prompts}
+
+Each round, every seat receives the prompt below, rendered for its own position, the
+current round and the full history, and answers with one contribution. No seat is given a
+persona and the running pool is not printed. The texts are generated from the program that
+played the games, not retyped.
+
+\input{prompts.tex}
+
+\end{document}

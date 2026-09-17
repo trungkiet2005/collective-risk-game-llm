@@ -2,14 +2,14 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{13}
+\begin{thebibliography}{31}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
 %%% customized versions of any of these macros before the \bibliography
 %%% command.  Each of them MUST provide its own final punctuation,
-%%% except for \shownote{} and \showURL{}.  The latter does
-%%% not use final punctuation, in order to avoid confusing it with
+%%% except for \shownote{} and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
 %%% the Web address.
 %%%
 %%% To suppress output of a particular field, define its macro to expand
@@ -35,35 +35,55 @@
 \providecommand\bibinfo[2]{#2}
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
-\makeatletter
-\@ifundefined{NAT@parse@date}{}{\let\NAT@parse@date@orig\NAT@parse@date}
-\@ifundefined{NAT@parse@date}{}{\def\NAT@parse@date#1#2#3#4#5#6@@{\NAT@parse@date@orig#1#2#3#4#5#6@@\def\NAT@tempyear{0000}\def\NAT@tempexlab{{?}}\ifx\NAT@year\NAT@tempyear\ifx\NAT@exlab\NAT@tempexlab\def\NAT@date{[n.\,d.]}\else\edef\NAT@date{[n.\,d.]\NAT@exlab}\fi\fi}}
-\makeatother
 
-\bibitem[Akata et~al\mbox{.}(2023)]%
-        {akata2023playing}
+\bibitem[Akata et~al\mbox{.}(2025)]%
+        {akata2025playing}
 \bibfield{author}{\bibinfo{person}{Elif Akata}, \bibinfo{person}{Lion Schulz},
   \bibinfo{person}{Julian Coda-Forno}, \bibinfo{person}{Seong~Joon Oh},
   \bibinfo{person}{Matthias Bethge}, {and} \bibinfo{person}{Eric Schulz}.}
-  \bibinfo{year}{2023}\natexlab{}.
-\newblock \showarticletitle{Playing repeated games with Large Language Models}.
-\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2305.16867}}
-  (\bibinfo{year}{2023}).
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Playing repeated games with large language models}.
+\newblock \bibinfo{journal}{\emph{Nature Human Behaviour}} \bibinfo{volume}{9},
+  \bibinfo{number}{7} (\bibinfo{year}{2025}), \bibinfo{pages}{1380--1390}.
 \newblock
+\href{https://doi.org/10.1038/s41562-025-02172-y}{doi:\nolinkurl{10.1038/s41562-025-02172-y}}
+
+
+\bibitem[Andreoni(1988)]%
+        {andreoni1988free}
+\bibfield{author}{\bibinfo{person}{James Andreoni}.}
+  \bibinfo{year}{1988}\natexlab{}.
+\newblock \showarticletitle{Why free ride? Strategies and learning in public
+  goods experiments}.
+\newblock \bibinfo{journal}{\emph{Journal of Public Economics}}
+  \bibinfo{volume}{37}, \bibinfo{number}{3} (\bibinfo{year}{1988}),
+  \bibinfo{pages}{291--304}.
+\newblock
+\href{https://doi.org/10.1016/0047-2727(88)90043-6}{doi:\nolinkurl{10.1016/0047-2727(88)90043-6}}
 
 
 \bibitem[{Anonymous}(2026)]%
         {anon-if}
 \bibfield{author}{\bibinfo{person}{{Anonymous}}.}
   \bibinfo{year}{2026}\natexlab{}.
-\newblock \showarticletitle{Capability enables but does not confer risk
+\newblock \bibinfo{title}{Capability enables but does not confer risk
   sensitivity in {LLM} agents}.
-\newblock \bibinfo{journal}{\emph{Manuscript under review}}
-  (\bibinfo{year}{2026}).
 \newblock
+\shownote{Manuscript under review; details withheld for double-blind review}.
 \newblock
-\shownote{Citation withheld for double-blind reviewing; the overlap with the
-  present paper is declared in Section~\ref{sec:related}}.
+
+
+\bibitem[Chen et~al\mbox{.}(2023)]%
+        {chen2023emergence}
+\bibfield{author}{\bibinfo{person}{Yiting Chen}, \bibinfo{person}{Tracy~Xiao
+  Liu}, \bibinfo{person}{You Shan}, {and} \bibinfo{person}{Songfa Zhong}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{The emergence of economic rationality of {GPT}}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
+  Sciences}} \bibinfo{volume}{120}, \bibinfo{number}{51}
+  (\bibinfo{year}{2023}), \bibinfo{pages}{e2316205120}.
+\newblock
+\href{https://doi.org/10.1073/pnas.2316205120}{doi:\nolinkurl{10.1073/pnas.2316205120}}
 
 
 \bibitem[Dafoe et~al\mbox{.}(2020)]%
@@ -73,32 +93,92 @@
   \bibinfo{person}{Kevin~R. McKee}, \bibinfo{person}{Joel~Z. Leibo},
   \bibinfo{person}{Kate Larson}, {and} \bibinfo{person}{Thore Graepel}.}
   \bibinfo{year}{2020}\natexlab{}.
-\newblock \showarticletitle{Open Problems in Cooperative {AI}}.
-\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2012.08630}}
-  (\bibinfo{year}{2020}).
+\newblock \bibinfo{title}{Open Problems in Cooperative {AI}}.
+\newblock
+\showeprint[arxiv]{2012.08630}
+\href{https://doi.org/10.48550/arXiv.2012.08630}{doi:\nolinkurl{10.48550/arXiv.2012.08630}}
+
+
+\bibitem[Dodivers and Rafa{\"\i}(2025)]%
+        {dodivers2025uncovering}
+\bibfield{author}{\bibinfo{person}{{\'E}l{\'e}onore Dodivers} {and}
+  \bibinfo{person}{Isma{\"e}l Rafa{\"\i}}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Uncovering the fairness of {AI}: exploring focal
+  point, inequality aversion, and altruism in {ChatGPT}'s dictator game
+  decisions}.
+\newblock \bibinfo{journal}{\emph{Economics Bulletin}} \bibinfo{volume}{45},
+  \bibinfo{number}{4} (\bibinfo{year}{2025}), \bibinfo{pages}{1818--1825}.
 \newblock
 
 
-\bibitem[Fontana et~al\mbox{.}(2024)]%
-        {fontana2024nicer}
-\bibfield{author}{\bibinfo{person}{Nicol{\'o} Fontana},
-  \bibinfo{person}{Francesco Pierri}, {and} \bibinfo{person}{Luca~Maria
-  Aiello}.} \bibinfo{year}{2024}\natexlab{}.
-\newblock \showarticletitle{Nicer than Humans: How do Large Language Models
-  Behave in the Prisoner's Dilemma?}
-\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2406.13605}}
-  (\bibinfo{year}{2024}).
+\bibitem[Fan et~al\mbox{.}(2024)]%
+        {fan2024can}
+\bibfield{author}{\bibinfo{person}{Caoyun Fan}, \bibinfo{person}{Jindou Chen},
+  \bibinfo{person}{Yaohui Jin}, {and} \bibinfo{person}{Hao He}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Can Large Language Models Serve as Rational Players
+  in Game Theory? A Systematic Analysis}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}}, Vol.~\bibinfo{volume}{38}. \bibinfo{pages}{17960--17967}.
 \newblock
+\href{https://doi.org/10.1609/aaai.v38i16.29751}{doi:\nolinkurl{10.1609/aaai.v38i16.29751}}
 
 
-\bibitem[Horton(2023)]%
+\bibitem[Filippas et~al\mbox{.}(2024)]%
         {horton2023large}
-\bibfield{author}{\bibinfo{person}{John~J. Horton}.}
-  \bibinfo{year}{2023}\natexlab{}.
-\newblock \bibinfo{booktitle}{\emph{Large Language Models as Simulated Economic
-  Agents: What Can We Learn from Homo Silicus?}}
-\newblock \bibinfo{type}{{T}echnical {R}eport} 31122.
-  \bibinfo{institution}{National Bureau of Economic Research}.
+\bibfield{author}{\bibinfo{person}{Apostolos Filippas},
+  \bibinfo{person}{John~J. Horton}, {and} \bibinfo{person}{Benjamin~S.
+  Manning}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Large Language Models as Simulated Economic Agents:
+  What Can We Learn from {Homo Silicus}?}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 25th ACM Conference on Economics
+  and Computation}} \emph{(\bibinfo{series}{EC '24})}.
+  \bibinfo{publisher}{ACM}, \bibinfo{pages}{614--615}.
+\newblock
+\href{https://doi.org/10.1145/3670865.3673513}{doi:\nolinkurl{10.1145/3670865.3673513}}
+
+
+\bibitem[Fontana et~al\mbox{.}(2025)]%
+        {fontana2024nicer}
+\bibfield{author}{\bibinfo{person}{Nicol{\`o} Fontana},
+  \bibinfo{person}{Francesco Pierri}, {and} \bibinfo{person}{Luca~Maria
+  Aiello}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Nicer than Humans: How Do Large Language Models
+  Behave in the Prisoner's Dilemma?}
+\newblock \bibinfo{journal}{\emph{Proceedings of the International AAAI
+  Conference on Web and Social Media}}  \bibinfo{volume}{19}
+  (\bibinfo{year}{2025}), \bibinfo{pages}{522--535}.
+\newblock
+\href{https://doi.org/10.1609/icwsm.v19i1.35829}{doi:\nolinkurl{10.1609/icwsm.v19i1.35829}}
+
+
+\bibitem[Guzman~Piedrahita et~al\mbox{.}(2025)]%
+        {guzmanpiedrahita2025corrupted}
+\bibfield{author}{\bibinfo{person}{David Guzman~Piedrahita},
+  \bibinfo{person}{Yongjin Yang}, \bibinfo{person}{Mrinmaya Sachan},
+  \bibinfo{person}{Giorgia Ramponi}, \bibinfo{person}{Bernhard Sch{\"o}lkopf},
+  {and} \bibinfo{person}{Zhijing Jin}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Corrupted by Reasoning: Reasoning Language Models
+  Become Free-Riders in Public Goods Games}. In
+  \bibinfo{booktitle}{\emph{Conference on Language Modeling (COLM)}}.
+\newblock
+\urldef\tempurl%
+\url{https://openreview.net/forum?id=kH6LOHGjEl}
+\showURL{%
+\tempurl}
+
+
+\bibitem[Huang et~al\mbox{.}(2025)]%
+        {huang2025competing}
+\bibfield{author}{\bibinfo{person}{Jen-tse Huang}, \bibinfo{person}{Eric~John
+  Li}, \bibinfo{person}{Man~Ho Lam}, \bibinfo{person}{Tian Liang},
+  \bibinfo{person}{Wenxuan Wang}, \bibinfo{person}{Youliang Yuan},
+  \bibinfo{person}{Wenxiang Jiao}, \bibinfo{person}{Xing Wang},
+  \bibinfo{person}{Zhaopeng Tu}, {and} \bibinfo{person}{Michael~R. Lyu}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Competing Large Language Models in Multi-Agent
+  Gaming Environments}. In \bibinfo{booktitle}{\emph{International Conference
+  on Learning Representations (ICLR)}}. \bibinfo{pages}{65639--65681}.
 \newblock
 
 
@@ -106,15 +186,37 @@
         {hughes2018inequity}
 \bibfield{author}{\bibinfo{person}{Edward Hughes}, \bibinfo{person}{Joel~Z.
   Leibo}, \bibinfo{person}{Matthew Phillips}, \bibinfo{person}{Karl Tuyls},
-  \bibinfo{person}{Edgar Due{\~n}ez-Guzman},
-  \bibinfo{person}{Antonio~Garc{\'\i}a Casta{\~n}eda}, \bibinfo{person}{Iain
-  Dunning}, \bibinfo{person}{Tina Zhu}, \bibinfo{person}{Kevin McKee},
-  \bibinfo{person}{Raphael Koster}, {et~al\mbox{.}}}
-  \bibinfo{year}{2018}\natexlab{}.
+  \bibinfo{person}{Edgar Due{\~n}ez-Guzman}, \bibinfo{person}{Antonio
+  Garc{\'\i}a~Casta{\~n}eda}, \bibinfo{person}{Iain Dunning},
+  \bibinfo{person}{Tina Zhu}, \bibinfo{person}{Kevin McKee},
+  \bibinfo{person}{Raphael Koster}, \bibinfo{person}{Heather Roff}, {and}
+  \bibinfo{person}{Thore Graepel}.} \bibinfo{year}{2018}\natexlab{}.
 \newblock \showarticletitle{Inequity aversion improves cooperation in
   intertemporal social dilemmas}. In \bibinfo{booktitle}{\emph{Advances in
-  Neural Information Processing Systems (NeurIPS)}}.
+  Neural Information Processing Systems}}, Vol.~\bibinfo{volume}{31}.
+  \bibinfo{publisher}{Curran Associates, Inc.}
 \newblock
+
+
+\bibitem[Leibo et~al\mbox{.}(2021)]%
+        {leibo2021scalable}
+\bibfield{author}{\bibinfo{person}{Joel~Z. Leibo}, \bibinfo{person}{Edgar~A.
+  Due{\~n}ez-Guzman}, \bibinfo{person}{Alexander Vezhnevets},
+  \bibinfo{person}{John~P. Agapiou}, \bibinfo{person}{Peter Sunehag},
+  \bibinfo{person}{Raphael Koster}, \bibinfo{person}{Jayd Matyas},
+  \bibinfo{person}{Charlie Beattie}, \bibinfo{person}{Igor Mordatch}, {and}
+  \bibinfo{person}{Thore Graepel}.} \bibinfo{year}{2021}\natexlab{}.
+\newblock \showarticletitle{Scalable Evaluation of Multi-Agent Reinforcement
+  Learning with {Melting Pot}}. In \bibinfo{booktitle}{\emph{Proceedings of the
+  38th International Conference on Machine Learning}}
+  \emph{(\bibinfo{series}{Proceedings of Machine Learning Research},
+  Vol.~\bibinfo{volume}{139})}. \bibinfo{publisher}{PMLR},
+  \bibinfo{pages}{6187--6199}.
+\newblock
+\urldef\tempurl%
+\url{https://proceedings.mlr.press/v139/leibo21a.html}
+\showURL{%
+\tempurl}
 
 
 \bibitem[Leibo et~al\mbox{.}(2017)]%
@@ -124,9 +226,27 @@
   {and} \bibinfo{person}{Thore Graepel}.} \bibinfo{year}{2017}\natexlab{}.
 \newblock \showarticletitle{Multi-agent Reinforcement Learning in Sequential
   Social Dilemmas}. In \bibinfo{booktitle}{\emph{Proceedings of the 16th
-  International Conference on Autonomous Agents and MultiAgent Systems
-  (AAMAS)}}. \bibinfo{pages}{464--473}.
+  International Conference on Autonomous Agents and Multiagent Systems (AAMAS
+  2017)}}. \bibinfo{publisher}{IFAAMAS}, \bibinfo{pages}{464--473}.
 \newblock
+\urldef\tempurl%
+\url{https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p464.pdf}
+\showURL{%
+\tempurl}
+
+
+\bibitem[Mei et~al\mbox{.}(2024)]%
+        {mei2024turing}
+\bibfield{author}{\bibinfo{person}{Qiaozhu Mei}, \bibinfo{person}{Yutong Xie},
+  \bibinfo{person}{Walter Yuan}, {and} \bibinfo{person}{Matthew~O. Jackson}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{A {Turing} test of whether {AI} chatbots are
+  behaviorally similar to humans}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
+  Sciences}} \bibinfo{volume}{121}, \bibinfo{number}{9} (\bibinfo{year}{2024}),
+  \bibinfo{pages}{e2313925121}.
+\newblock
+\href{https://doi.org/10.1073/pnas.2313925121}{doi:\nolinkurl{10.1073/pnas.2313925121}}
 
 
 \bibitem[Milinski et~al\mbox{.}(2008)]%
@@ -141,30 +261,47 @@
   Sciences}} \bibinfo{volume}{105}, \bibinfo{number}{7} (\bibinfo{year}{2008}),
   \bibinfo{pages}{2291--2294}.
 \newblock
+\href{https://doi.org/10.1073/pnas.0709546105}{doi:\nolinkurl{10.1073/pnas.0709546105}}
 
 
-\bibitem[Park et~al\mbox{.}(2023)]%
-        {park2023generative}
-\bibfield{author}{\bibinfo{person}{Joon~Sung Park}, \bibinfo{person}{Joseph~C.
-  O'Brien}, \bibinfo{person}{Carrie~J. Cai}, \bibinfo{person}{Meredith~Ringel
-  Morris}, \bibinfo{person}{Percy Liang}, {and} \bibinfo{person}{Michael~S.
-  Bernstein}.} \bibinfo{year}{2023}\natexlab{}.
-\newblock \showarticletitle{Generative Agents: Interactive Simulacra of Human
-  Behavior}. In \bibinfo{booktitle}{\emph{Proceedings of the 36th Annual ACM
-  Symposium on User Interface Software and Technology (UIST)}}.
+\bibitem[Omidshafiei et~al\mbox{.}(2019)]%
+        {omidshafiei2019alpha}
+\bibfield{author}{\bibinfo{person}{Shayegan Omidshafiei},
+  \bibinfo{person}{Christos Papadimitriou}, \bibinfo{person}{Georgios
+  Piliouras}, \bibinfo{person}{Karl Tuyls}, \bibinfo{person}{Mark Rowland},
+  \bibinfo{person}{Jean-Baptiste Lespiau}, \bibinfo{person}{Wojciech~M.
+  Czarnecki}, \bibinfo{person}{Marc Lanctot}, \bibinfo{person}{Julien Perolat},
+  {and} \bibinfo{person}{Remi Munos}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{{$\alpha$-Rank}: Multi-Agent Evaluation by
+  Evolution}.
+\newblock \bibinfo{journal}{\emph{Scientific Reports}} \bibinfo{volume}{9},
+  \bibinfo{number}{1} (\bibinfo{year}{2019}), \bibinfo{pages}{9937}.
 \newblock
+\href{https://doi.org/10.1038/s41598-019-45619-9}{doi:\nolinkurl{10.1038/s41598-019-45619-9}}
 
 
-\bibitem[Perolat et~al\mbox{.}(2017)]%
-        {perolat2017multi}
-\bibfield{author}{\bibinfo{person}{Julien Perolat}, \bibinfo{person}{Joel~Z.
-  Leibo}, \bibinfo{person}{Vinicius Zambaldi}, \bibinfo{person}{Charles
-  Beattie}, \bibinfo{person}{Karl Tuyls}, {and} \bibinfo{person}{Thore
-  Graepel}.} \bibinfo{year}{2017}\natexlab{}.
-\newblock \showarticletitle{A multi-agent reinforcement learning model of
-  common-pool resource appropriation}. In \bibinfo{booktitle}{\emph{Advances in
-  Neural Information Processing Systems (NeurIPS)}}.
+\bibitem[Palfrey and Rosenthal(1984)]%
+        {palfrey1984participation}
+\bibfield{author}{\bibinfo{person}{Thomas~R. Palfrey} {and}
+  \bibinfo{person}{Howard Rosenthal}.} \bibinfo{year}{1984}\natexlab{}.
+\newblock \showarticletitle{Participation and the provision of discrete public
+  goods: a strategic analysis}.
+\newblock \bibinfo{journal}{\emph{Journal of Public Economics}}
+  \bibinfo{volume}{24}, \bibinfo{number}{2} (\bibinfo{year}{1984}),
+  \bibinfo{pages}{171--193}.
 \newblock
+\href{https://doi.org/10.1016/0047-2727(84)90023-9}{doi:\nolinkurl{10.1016/0047-2727(84)90023-9}}
+
+
+\bibitem[Payne and Alloui-Cros(2025)]%
+        {payne2025strategic}
+\bibfield{author}{\bibinfo{person}{Kenneth Payne} {and}
+  \bibinfo{person}{Baptiste Alloui-Cros}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{Strategic Intelligence in Large Language Models:
+  Evidence from evolutionary Game Theory}.
+\newblock
+\showeprint[arxiv]{2507.02618}
+\href{https://doi.org/10.48550/arXiv.2507.02618}{doi:\nolinkurl{10.48550/arXiv.2507.02618}}
 
 
 \bibitem[Piatti et~al\mbox{.}(2024)]%
@@ -175,9 +312,11 @@
   \bibinfo{person}{Rada Mihalcea}.} \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{Cooperate or Collapse: Emergence of Sustainable
   Cooperation in a Society of {LLM} Agents}. In
-  \bibinfo{booktitle}{\emph{Advances in Neural Information Processing Systems
-  (NeurIPS)}}.
+  \bibinfo{booktitle}{\emph{Advances in Neural Information Processing
+  Systems}}, Vol.~\bibinfo{volume}{37}. \bibinfo{publisher}{Curran Associates,
+  Inc.}, \bibinfo{pages}{111715--111759}.
 \newblock
+\href{https://doi.org/10.52202/079017-3548}{doi:\nolinkurl{10.52202/079017-3548}}
 
 
 \bibitem[Santos and Pacheco(2011)]%
@@ -190,6 +329,62 @@
   Sciences}} \bibinfo{volume}{108}, \bibinfo{number}{26}
   (\bibinfo{year}{2011}), \bibinfo{pages}{10421--10425}.
 \newblock
+\href{https://doi.org/10.1073/pnas.1015648108}{doi:\nolinkurl{10.1073/pnas.1015648108}}
+
+
+\bibitem[Schaffer(1988)]%
+        {schaffer1988evolutionarily}
+\bibfield{author}{\bibinfo{person}{Mark~E. Schaffer}.}
+  \bibinfo{year}{1988}\natexlab{}.
+\newblock \showarticletitle{Evolutionarily stable strategies for a finite
+  population and a variable contest size}.
+\newblock \bibinfo{journal}{\emph{Journal of Theoretical Biology}}
+  \bibinfo{volume}{132}, \bibinfo{number}{4} (\bibinfo{year}{1988}),
+  \bibinfo{pages}{469--478}.
+\newblock
+\href{https://doi.org/10.1016/S0022-5193(88)80085-7}{doi:\nolinkurl{10.1016/S0022-5193(88)80085-7}}
+
+
+\bibitem[Schmied et~al\mbox{.}(2026)]%
+        {schmied2026llms}
+\bibfield{author}{\bibinfo{person}{Thomas Schmied}, \bibinfo{person}{J{\"o}rg
+  Bornschein}, \bibinfo{person}{Jordi Grau-Moya}, \bibinfo{person}{Markus
+  Wulfmeier}, {and} \bibinfo{person}{Razvan Pascanu}.}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \showarticletitle{{LLMs} are Greedy Agents: Effects of {RL}
+  Fine-tuning on Decision-Making Abilities}. In
+  \bibinfo{booktitle}{\emph{International Conference on Learning
+  Representations (ICLR)}}.
+\newblock
+\urldef\tempurl%
+\url{https://openreview.net/forum?id=weUP6H5Ko9}
+\showURL{%
+\tempurl}
+
+
+\bibitem[Slumbers et~al\mbox{.}(2025)]%
+        {slumbers2025using}
+\bibfield{author}{\bibinfo{person}{Oliver Slumbers}, \bibinfo{person}{Joel~Z.
+  Leibo}, {and} \bibinfo{person}{Marco~A. Janssen}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{Using Large Language Models to Simulate Human
+  Behavioural Experiments: Port of Mars}.
+\newblock
+\showeprint[arxiv]{2506.05555}
+\href{https://doi.org/10.48550/arXiv.2506.05555}{doi:\nolinkurl{10.48550/arXiv.2506.05555}}
+
+
+\bibitem[Stone et~al\mbox{.}(2010)]%
+        {stone2010ad}
+\bibfield{author}{\bibinfo{person}{Peter Stone}, \bibinfo{person}{Gal~A.
+  Kaminka}, \bibinfo{person}{Sarit Kraus}, {and} \bibinfo{person}{Jeffrey~S.
+  Rosenschein}.} \bibinfo{year}{2010}\natexlab{}.
+\newblock \showarticletitle{Ad Hoc Autonomous Agent Teams: Collaboration
+  without Pre-Coordination}. In \bibinfo{booktitle}{\emph{Proceedings of the
+  AAAI Conference on Artificial Intelligence}}, Vol.~\bibinfo{volume}{24}.
+  \bibinfo{pages}{1504--1509}.
+\newblock
+\href{https://doi.org/10.1609/aaai.v24i1.7529}{doi:\nolinkurl{10.1609/aaai.v24i1.7529}}
 
 
 \bibitem[Tavoni et~al\mbox{.}(2011)]%
@@ -203,6 +398,76 @@
   Sciences}} \bibinfo{volume}{108}, \bibinfo{number}{29}
   (\bibinfo{year}{2011}), \bibinfo{pages}{11825--11829}.
 \newblock
+\href{https://doi.org/10.1073/pnas.1102493108}{doi:\nolinkurl{10.1073/pnas.1102493108}}
+
+
+\bibitem[Traulsen and Nowak(2006)]%
+        {traulsen2006evolution}
+\bibfield{author}{\bibinfo{person}{Arne Traulsen} {and}
+  \bibinfo{person}{Martin~A. Nowak}.} \bibinfo{year}{2006}\natexlab{}.
+\newblock \showarticletitle{Evolution of cooperation by multilevel selection}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
+  Sciences}} \bibinfo{volume}{103}, \bibinfo{number}{29}
+  (\bibinfo{year}{2006}), \bibinfo{pages}{10952--10955}.
+\newblock
+\href{https://doi.org/10.1073/pnas.0602530103}{doi:\nolinkurl{10.1073/pnas.0602530103}}
+
+
+\bibitem[Tuyls et~al\mbox{.}(2018)]%
+        {tuyls2018generalised}
+\bibfield{author}{\bibinfo{person}{Karl Tuyls}, \bibinfo{person}{Julien
+  Perolat}, \bibinfo{person}{Marc Lanctot}, \bibinfo{person}{Joel~Z. Leibo},
+  {and} \bibinfo{person}{Thore Graepel}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{A Generalised Method for Empirical Game Theoretic
+  Analysis}. In \bibinfo{booktitle}{\emph{Proceedings of the 17th International
+  Conference on Autonomous Agents and Multiagent Systems (AAMAS 2018)}}.
+  \bibinfo{publisher}{IFAAMAS}, \bibinfo{pages}{77--85}.
+\newblock
+\urldef\tempurl%
+\url{https://ifaamas.org/Proceedings/aamas2018/pdfs/p77.pdf}
+\showURL{%
+\tempurl}
+
+
+\bibitem[Vallinder and Hughes(2025)]%
+        {vallinder2025cultural}
+\bibfield{author}{\bibinfo{person}{Aron Vallinder} {and}
+  \bibinfo{person}{Edward Hughes}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Cultural Evolution of Cooperation among {LLM}
+  Agents: Extended Abstract}. In \bibinfo{booktitle}{\emph{Proceedings of the
+  24th International Conference on Autonomous Agents and Multiagent Systems
+  (AAMAS 2025)}}. \bibinfo{publisher}{IFAAMAS}, \bibinfo{pages}{2771--2773}.
+\newblock
+\urldef\tempurl%
+\url{https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p2771.pdf}
+\showURL{%
+\tempurl}
+
+
+\bibitem[Wellman(2006)]%
+        {wellman2006methods}
+\bibfield{author}{\bibinfo{person}{Michael~P. Wellman}.}
+  \bibinfo{year}{2006}\natexlab{}.
+\newblock \showarticletitle{Methods for Empirical Game-Theoretic Analysis
+  (Extended Abstract)}. In \bibinfo{booktitle}{\emph{Proceedings of the
+  Twenty-First National Conference on Artificial Intelligence (AAAI-06)}}.
+  \bibinfo{publisher}{AAAI Press}, \bibinfo{pages}{1552--1555}.
+\newblock
+
+
+\bibitem[Willis et~al\mbox{.}(2026)]%
+        {willis2026evaluating}
+\bibfield{author}{\bibinfo{person}{Richard Willis}, \bibinfo{person}{Jianing
+  Zhao}, \bibinfo{person}{Yali Du}, {and} \bibinfo{person}{Joel~Z. Leibo}.}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{Evaluating Collective Behaviour of Hundreds of {LLM}
+  Agents}.
+\newblock
+\shownote{Strategic Engineering Workshop on LLMs and Game Theory (SE@AAMAS
+  2026)}.
+\newblock
+\showeprint[arxiv]{2602.16662}
+\href{https://doi.org/10.48550/arXiv.2602.16662}{doi:\nolinkurl{10.48550/arXiv.2602.16662}}
 
 
 \end{thebibliography}

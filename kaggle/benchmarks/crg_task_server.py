@@ -40,6 +40,17 @@ Prompt arms (CRG_TEMPLATE, default "baseline"):
             way. It carries its own checkpoint signature and its own output folder
             (exp_nohint), so it cannot resume or overwrite baseline games.
 
+  neutral   the reviewer-requested demand-effect control. The English baseline with the
+            normative and game-identifying words replaced ("collective-risk social
+            dilemma", "climate account", "must reach", "disaster") and the existing
+            {framing} block switched ON, so the prompt states that only the player's own
+            cash matters. The equal-split hint is KEPT: it is E1's variable, not this
+            arm's. Derived from TEMPLATE_EN span by span (_neutralise), so nothing else
+            can move. English only; output folder exp_neutral.
+  wording   the neutral template with the {framing} block OFF: only the words change,
+            the objective is not stated. Separates the two changes the neutral arm made
+            at once. English only; output folder exp_wording.
+
 Comprehension probe (CRG_PROBE, default "" -- OFF, nothing below happens):
   A comma-separated list of question CATEGORIES from crsd/engine/comprehension.py:
     value   experiment E2. The two expected-value questions (value_defect_ev,
@@ -200,7 +211,13 @@ RESUME = os.environ.get("CRG_RESUME", "1").strip().lower() not in {
 # Same textual shape as every other knob so plan/scripts/launch_shard.py's regex
 # rewriter (make_shard_file) can bake the value into a shard copy.
 TEMPLATE_VARIANT = os.environ.get("CRG_TEMPLATE", "baseline").strip().lower() or "baseline"
-KNOWN_TEMPLATE_VARIANTS = ("baseline", "nohint", "para1", "para2")
+KNOWN_TEMPLATE_VARIANTS = ("baseline", "nohint", "para1", "para2", "neutral", "wording")
+# Variants that render the template's {framing} block ("the only thing that matters to
+# you is your own final cash payoff"). Every arm before "neutral" played with it OFF,
+# so FRAMING is False for all of them and their checkpoint signatures, game rows and
+# turn records are byte-for-byte what they were.
+FRAMING_VARIANTS = ("neutral",)
+FRAMING = TEMPLATE_VARIANT in FRAMING_VARIANTS
 if TEMPLATE_VARIANT not in KNOWN_TEMPLATE_VARIANTS:
     # Fail at import, before a single paid call: a typo'd variant that fell back to
     # baseline would spend the shard's budget re-measuring the control arm.
@@ -490,6 +507,28 @@ CHECKPOINT_SCHEMA_VERSION = 3
 # gpt/claude/deepseek/other Geminis are unaffected. Local CRG_* overrides win.
 _no_overrides = not any(os.environ.get(k) for k in ("CRG_RISKS", "CRG_LANGS", "CRG_REPS"))
 if "gemini-3-flash-preview" in MODEL and _no_overrides:
+    RISKS, LANGS, REPS, REP_START = [0.9], ["en"], 1, 0
+# The name check above went stale without a sound: by 14-09-2026 the server default
+# was gemini-3.7-flash, so every push since then validated over the FULL shard sweep.
+# Measured 17-09-2026 on crg-e6-neutral: a 35-minute validation of 30 games, and two
+# accounts drained before their real run started. CRG_EXPECT_MODEL fixes it by
+# naming what the shard is FOR instead of guessing what the validator is: the launcher
+# bakes in the slug(s) it will pass to `kaggle b t run -m`, and any other model
+# importing this shard is by definition the push validation and gets one game.
+# Empty (the default) changes nothing. Comma-separated for multi-model shards.
+# Compared after normalising punctuation: the server names a model with a provider
+# prefix and its own separators ("anthropic/claude-haiku-4-5@20251001" for the slug
+# "claude-haiku-4-5-20251001"), and a raw substring test would cut the REAL Haiku run
+# down to one game.
+def _model_key(name):
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+_EXPECTED_MODELS = [m.strip() for m in os.environ.get("CRG_EXPECT_MODEL", "").split(",")
+                    if m.strip()]
+IS_PUSH_VALIDATION = bool(_EXPECTED_MODELS) and not any(
+    _model_key(m) in _model_key(MODEL) for m in _EXPECTED_MODELS)
+if IS_PUSH_VALIDATION:
     RISKS, LANGS, REPS, REP_START = [0.9], ["en"], 1, 0
 
 # PHAI tinh SAU guard: guard doi REPS/REP_START, neu tinh truoc thi validation
@@ -813,8 +852,72 @@ Output only your decision as a final line:
 CONTRIBUTION: <one of {contributionOptions}>
 """
 
+# %% ---------- neutral variant: no normative words, objective stated ----------
+# The threat a reviewer raises against every result in the paper: the prompt says the
+# group "must" reach a target in a "climate account" and never says what the player is
+# after, so paying may be instruction following rather than a habit. This arm removes
+# the words that carry a norm or name the game, and turns on the {framing} block that
+# states the player's objective. It keeps the equal-split hint on purpose: the hint is
+# E1's variable, and removing it here too would fold E1's large Qwen/Grok effect into
+# this contrast.
+# Derived span by span from TEMPLATE_EN, like the nohint arm, never retyped. Each span
+# must occur exactly once; the same helper refuses a silent no-op.
+_NEUTRAL_SPANS = (
+    ("in a group experiment that simulates a collective-risk social dilemma.",
+     "in a group experiment."),
+    ('how much to put into a shared "climate account".',
+     "how much to put into a shared account."),
+    ("The group's target: by the end of the game, the combined contributions of all "
+     "{nPlayers} players must reach at least {target}",
+     "The threshold: the outcome depends on whether, by the end of the game, the combined "
+     "contributions of all {nPlayers} players reach at least {target}"),
+    ("the group is hit by a disaster and every player loses all of their remaining money",
+     "every player loses all of their remaining money"),
+    ("- Money put into the climate account is gone for good and is never refunded, "
+     "whether or not the target is reached.",
+     "- Money put into the shared account is gone for good and is never refunded, "
+     "whether or not the threshold is reached."),
+    ("[- The climate account so far holds {groupAccount} of the {target} target.]",
+     "[- The shared account so far holds {groupAccount} of the {target} threshold.]"),
+)
+# Words that must be gone from the neutral template once every span is replaced. Checked
+# at import, so a later edit to the baseline that reintroduces one cannot slip through.
+_NEUTRAL_BANNED = ("climate", "must", "disaster", "social dilemma", "collective-risk",
+                   "target:")
+
+
+def _neutralise(template):
+    """TEMPLATE_EN with the normative words replaced, or a loud failure."""
+    text = template
+    for old, new in _NEUTRAL_SPANS:
+        found = text.count(old)
+        if found != 1:
+            raise SystemExit(
+                "neutral template: expected exactly 1 occurrence of %r in the baseline "
+                "template, found %d -- the baseline wording changed, so the neutral arm "
+                "must be re-derived before it is run." % (old, found))
+        text = text.replace(old, new)
+    lowered = text.lower()
+    left = [w for w in _NEUTRAL_BANNED if w in lowered]
+    if left:
+        raise SystemExit("neutral template still contains %s" % ", ".join(left))
+    if "{framing}: [" not in text:
+        raise SystemExit("neutral template has no {framing} block to switch on")
+    text.encode("ascii")
+    return text
+
+
+TEMPLATE_EN_NEUTRAL = _neutralise(TEMPLATE_EN)
+
 TEMPLATE_SETS = {
     "baseline": {"en": TEMPLATE_EN, "vn": TEMPLATE_VN},
+    "neutral": {"en": TEMPLATE_EN_NEUTRAL},
+    # "wording" plays the SAME neutral template with the {framing} block left OFF (it is
+    # not in FRAMING_VARIANTS). The neutral arm changed two things at once -- the
+    # normative words and the stated own-cash objective -- and on 17-09-2026 it removed
+    # most payment at p=0. This arm isolates the words: baseline -> wording is the
+    # effect of the words, wording -> neutral is the effect of stating the objective.
+    "wording": {"en": TEMPLATE_EN_NEUTRAL},
     "nohint": {"en": TEMPLATE_EN_NOHINT},
     "para1": {"en": TEMPLATE_EN_PARA1},
     "para2": {"en": TEMPLATE_EN_PARA2},
@@ -1001,7 +1104,7 @@ def _assemble(template, language, player_index, current_round, history, risk,
 
     enabled = {
         "persona": False,            # personas_default -> empty -> block dropped
-        "framing": False,
+        "framing": FRAMING,          # ON only for FRAMING_VARIANTS ("neutral")
         "gameLength": N_ROUNDS_KNOWN,
         "history": has_history,
         "showCumulative": False,     # pool hidden (baseline)
@@ -2138,7 +2241,7 @@ def play_game(model_slug, risk, language, rep, model_tag, turns_sink,
                 "sampling_seed": base_seed, "disposition": "neutral",
                 "risk_probability": risk, "language": language,
                 "persona_set": PERSONA_SET, "memory_mode": "full_history",
-                "framing": False, "rep": rep,
+                "framing": FRAMING, "rep": rep,
             }
             if SEAT_MODELS:
                 # Who actually produced this move. Same key as the open-weight arm's
@@ -2171,7 +2274,7 @@ def play_game(model_slug, risk, language, rep, model_tag, turns_sink,
     game_row = {
         "game_id": game_id, "model": model_tag, "language": language,
         "risk_probability": risk, "persona_set": PERSONA_SET,
-        "persona_seats": "N" * N_PLAYERS, "memory_mode": "full_history", "framing": 0,
+        "persona_seats": "N" * N_PLAYERS, "memory_mode": "full_history", "framing": int(FRAMING),
         # float group_total/target + unrounded mean_payoff == crsd summarize_game types.
         "group_total": float(pot), "target": float(TARGET), "target_reached": int(target_met),
         "catastrophe": int(disaster), "mean_payoff": sum(payoffs) / N_PLAYERS,
@@ -2276,7 +2379,7 @@ def _checkpoint_signature(model_tag):
         "base_seed": BASE_SEED,
         "persona_set": PERSONA_SET,
         "memory_mode": "full_history",
-        "framing": False,
+        "framing": FRAMING,
     }
     if SEAT_MODELS:
         # Added ONLY when the group is mixed, so every shard already on disk keeps

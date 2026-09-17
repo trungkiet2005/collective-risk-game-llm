@@ -18,6 +18,14 @@ Ba nhanh, moi nhanh 2 risk x 10 rep = 20 van/model, 5 model = 300 van:
     para2   CRG_TEMPLATE=para2      -> results/exp_para2/
     temp0   CRG_TEMPERATURE=0       -> results/exp_baseline_temp0/
 
+Nhanh thu tu, them 17-09-2026 theo review AAMAS (mot reviewer hoi: "hop tac co phai chi la
+lam theo chu 'must' trong prompt?"). Nhanh nay co TAP RISK RIENG, vi phep thu habit sach
+nhat nam o p = 0 (dong gop o do bi troi hoan toan):
+
+    neutral CRG_TEMPLATE=neutral    -> results/exp_neutral/   p = 0, 0.1, 0.9
+
+    python plan/scripts/launch_e6.py --arms neutral --dry-run
+
 Nhanh temp0 choi DUNG prompt baseline, nen neu khong co TEMP_SUFFIX no se ghi thang vao
 results/exp_baseline/ va tron vao chinh cai luoi ma no phai duoc so sanh voi. Hau to do
 nam trong crg_task_server.py; test hoi quy: crsd/tests/test_e6_robustness.py.
@@ -51,6 +59,8 @@ LAUNCH = REPO / "plan" / "scripts" / "launch_shard.py"
 DL = "D:/tmp/crgdl"
 
 RISKS = ["0.1", "0.9"]        # hai dau doi nghich cua luoi B -- xem docstring
+# Nhanh nao khong co trong day thi dung RISKS.
+ARM_RISKS = {"neutral": ["0", "0.1", "0.9"]}
 LANGS = "en"                  # CHI TIENG ANH (§5.1)
 REPS = 10
 CONCURRENCY = "4"
@@ -96,7 +106,12 @@ ARMS = {
     "para1": ("crg-e6-para1", ["--template", "para1"], "_para1"),
     "para2": ("crg-e6-para2", ["--template", "para2"], "_para2"),
     "temp0": ("crg-e6-temp0", ["--temperature", "0"], "_temp0"),
+    "neutral": ("crg-e6-neutral", ["--template", "neutral"], "_neutral"),
 }
+
+
+def risks_of(arm):
+    return ARM_RISKS.get(arm, RISKS)
 
 
 def label(arm, model, rep_start):
@@ -125,7 +140,7 @@ def have():
     return got
 
 
-def missing_shards(max_cost):
+def missing_shards(max_cost, arms=None):
     """[(arm, model, rep_start, n, $)] -- re truoc.
 
     Chia theo REP chu khong theo risk: mot shard luon chay ca hai muc risk cho cung mot
@@ -134,15 +149,18 @@ def missing_shards(max_cost):
     """
     got = have()
     out = []
-    for arm in ARMS:
+    for arm in (arms or ARMS):
         for m in MODELS:
             done = got.get((arm, TAG[m]), {})
-            # rep con thieu o BAT KY muc risk nao -> phai chay lai ca rep do
+            # rep con thieu o BAT KY muc risk nao -> phai chay lai ca rep do.
+            # games.csv ghi risk dang float ("0.0", "0.1"), nen so bang float.
+            done_f = {float(k): v for k, v in done.items()}
             need = sorted(r for r in range(REPS)
-                          if any(r not in done.get(p, set()) for p in RISKS))
+                          if any(r not in done_f.get(float(p), set())
+                                 for p in risks_of(arm)))
             if not need:
                 continue
-            per_rep = COST[m] * len(RISKS)
+            per_rep = COST[m] * len(risks_of(arm))
             step = max(1, int(max_cost // per_rep) if per_rep else len(need))
             # gom cac rep lien tiep thanh lo, giu nguyen thu tu
             i = 0
@@ -184,7 +202,7 @@ def one(sh, account, phase, wait):
     task, flag, _ = ARMS[arm]
     lab = label(arm, model, rep_start)
     cmd = [sys.executable, str(LAUNCH), "--account", account, "--model", model,
-           "--risks", ",".join(RISKS), "--langs", LANGS,
+           "--risks", ",".join(risks_of(arm)), "--langs", LANGS,
            "--reps", str(n), "--rep-start", str(rep_start),
            "--max-out", MAX_OUT, "--concurrency", CONCURRENCY,
            "--task", task, "--label", lab,
@@ -209,6 +227,9 @@ def preflight():
     bad = []
     srv = (REPO / "kaggle" / "benchmarks" / "crg_task_server.py").read_text(
         encoding="utf-8", errors="replace")
+    if '"neutral"' not in srv or "FRAMING_VARIANTS" not in srv:
+        bad.append("crg_task_server.py CHUA co template neutral -- nhanh neutral se bi "
+                   "tu choi luc import (CRG_TEMPLATE la)")
     if '"para1"' not in srv or "TEMP_SUFFIX" not in srv:
         bad.append("crg_task_server.py CHUA co ho tro E6 (thieu template para1/para2 "
                    "hoac TEMP_SUFFIX) -- nhanh temp0 se ghi de len results/exp_baseline/")
@@ -227,8 +248,15 @@ def main():
     ap.add_argument("--net-wait", type=int, default=300)
     ap.add_argument("--model-cap", type=int, default=MODEL_CAP)
     ap.add_argument("--max-cost", type=float, default=3.0)
+    ap.add_argument("--arms", default="",
+                    help="chi xet cac nhanh nay, vd 'neutral'. Mac dinh: moi nhanh")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+    arms = [a.strip() for a in args.arms.split(",") if a.strip()] or list(ARMS)
+    unknown = [a for a in arms if a not in ARMS]
+    if unknown:
+        print("Nhanh la: %s (co: %s)" % (unknown, ", ".join(ARMS)))
+        return 2
 
     for msg in preflight():
         print("!! " + msg)
@@ -236,21 +264,21 @@ def main():
         print("DUNG. Sua thiet bi truoc khi phong.")
         return 2
 
-    shards = missing_shards(args.max_cost)
+    shards = missing_shards(args.max_cost, arms)
     if not shards:
         print("E6: khong thieu o nao.")
         return 0
-    n_games = sum(s[3] * len(RISKS) for s in shards)
+    n_games = sum(s[3] * len(risks_of(s[0])) for s in shards)
     print("E6: thieu %d van · %d shard · ~$%.2f"
           % (n_games, len(shards), sum(s[4] for s in shards)))
     per = defaultdict(int)
     for arm, m, _, n, _ in shards:
-        per[SHORT[m]] += n * len(RISKS)
+        per[SHORT[m]] += n * len(risks_of(arm))
     print("     van con thieu, theo model: "
           + "  ".join("%s=%d" % (k, v) for k, v in sorted(per.items())))
     per_arm = defaultdict(int)
     for arm, _, _, n, _ in shards:
-        per_arm[arm] += n * len(RISKS)
+        per_arm[arm] += n * len(risks_of(arm))
     print("     theo nhanh: "
           + "  ".join("%s=%d" % (k, v) for k, v in sorted(per_arm.items())))
     if args.dry_run:

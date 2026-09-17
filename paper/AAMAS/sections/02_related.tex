@@ -1,67 +1,62 @@
 %% =====================================================================================
-%% P-2 — Related work. Muc LaTeX DOC LAP.
-%%
-%% BON DOAN, moi doan MOT nhanh, va moi doan ket bang mot cau noi ro bai nay KHAC cho nao.
-%% Khong co doan "X has attracted increasing attention" nao. Khong che bai nao — tac gia
-%% cua chung rat co the la reviewer cua minh (quy tac 10 cua skill).
-%%
-%% ⛔ DOAN 4 LA BAT BUOC, KHONG DUOC CAT DE TIET KIEM CHO. Plan §2: khai bao overlap voi
-%% ban Interface Focus la dieu kien de khong bi desk reject vi trung nop. Reviewer ghet bi
-%% giau, khong ghet overlap duoc khai bao. Neu phai cat cot thi cat doan 1 hoac 2.
-%%
-%% ⚠️ DOUBLE-BLIND: \cite{anon-if} trich NGOI THU BA. Dung viet "our earlier paper",
-%% "we previously showed", hay bat cu thu gi gan hai ban voi nhau.
-%%
-%% NGAN SACH TRANG: 1,2 cot / 16 cot. Khong float.
+%% 2 Related work. Each paragraph ends with how this paper differs.
+%% The last paragraph declares the overlap with a concurrent manuscript. It is required
+%% by the dual-submission policy; do not cut it to save space. Cite it in the third
+%% person only (double-blind).
+%% Claims about other papers were checked against their full text on 2026-09-16.
 %% =====================================================================================
-
 \section{Related work}
 \label{sec:related}
 
-\paragraph{Collective-risk dilemmas.}
-The game we use was introduced to study why groups fail to avert a shared
-catastrophe~\cite{milinski2008collective}: \PanelNplayersWord{} players contribute from private endowments
-towards a threshold, and missing it triggers a loss with a probability the experimenter
-sets. Human groups reach the target reliably only when the probability is high, and
-inequality between players and the ability to communicate both shift the
-outcome~\cite{tavoni2011inequality}. Evolutionary treatments explain the pattern by the
-same threshold structure we exploit here: risk of collective loss turns a defection
-equilibrium into a coordination problem with multiple equilibria, and which one a
-population reaches depends on the risk~\cite{santos2011risk}. That literature establishes
-the game as a place where behaviour \emph{should} move with $p$, which is what makes a
-flat response diagnostic rather than merely disappointing. Our contribution is not a new
-account of human play but a measurement instrument applied to artificial players.
+\paragraph{Collective risk and selection.}
+The collective-risk dilemma was built to study why groups fail to avoid a shared
+disaster~\cite{milinski2008collective}. Human groups reach the target mostly when the risk
+is high, and inequality and communication change the result~\cite{tavoni2011inequality}.
+Games with a threshold have many equilibria~\cite{palfrey1984participation}, human
+contributions decline over the rounds of repeated public goods games~\cite{andreoni1988free},
+and the risk of collective failure can turn a defection trap into a coordination
+problem~\cite{santos2011risk}. Theory also shows that selection on payoff relative to a small
+group favours whoever does better than its neighbours~\cite{schaffer1988evolutionarily},
+while selection between groups can favour cooperation~\cite{traulsen2006evolution}. This
+literature tells us that behaviour \emph{should} move with the risk, so a flat response is
+informative, and we reuse its selection theory to read our mixed tables.
 
-\paragraph{Social dilemmas in multiagent systems.}
-Sequential social dilemmas gave multiagent reinforcement learning a setting in which
-cooperation is a policy property rather than a matrix
-entry~\cite{leibo2017multi,perolat2017multi}, and subsequent work showed that changing the
-learner's objective, inequity aversion for instance, changes which equilibrium a
-population settles into~\cite{hughes2018inequity}. The programme of cooperative AI states
-the design question directly: build agents that can cooperate with agents unlike
-themselves~\cite{dafoe2020open}. Language-model agents enter that programme with a
-property no learned policy has, in that their behaviour is fixed at deployment rather than
-shaped by the population they meet, and the present paper measures what that fixed
-behaviour is.
+\paragraph{Language models in games.}
+Language models have been studied as economic
+subjects~\cite{horton2023large,chen2023emergence,mei2024turing}, in repeated two-player
+games~\cite{akata2025playing,fontana2024nicer}, and in multi-player game
+benchmarks~\cite{huang2025competing}. Models tend to be more cooperative than
+people~\cite{mei2024turing}, an even split can reflect a focal point rather than
+fairness~\cite{dodivers2025uncovering}, and models can hold a correct belief or plan and act
+against it~\cite{fan2024can,schmied2026llms}. In social dilemmas, societies of agents
+over-use a common resource~\cite{piatti2024cooperate}, reasoning models free-ride in public
+goods games~\cite{guzmanpiedrahita2025corrupted}, and agents replace people in a
+collective-risk game~\cite{slumbers2025using}. Closest to us, Willis et al.\ study the same
+collective-risk game with strategies written by three models, map welfare over mixtures of
+selfish and collective strategies, and find that payoff-biased imitation drives larger
+groups to selfish, low-welfare outcomes~\cite{willis2026evaluating}. We differ in three ways.
+We record the turn-by-turn play of deployed models, not code they write. We price that play
+against a computed optimum, with two tests where paying cannot help. And we show that
+whether selection compares tablemates or separate groups decides which model wins, which
+gives one simple route to selfish outcomes.
 
-\paragraph{Language-model agents in games.}
-Language models have been placed in canonical games and read as economic
-subjects~\cite{horton2023large}, played against each other and against scripted strategies
-in two-player repeated games~\cite{akata2023playing,fontana2024nicer}, and embedded in
-societies that manage a shared resource~\cite{piatti2024cooperate} or an open-ended social
-world~\cite{park2023generative}. Two design choices recur. Beyond two players the seats
-usually hold copies of one model, which leaves the agent's response to a \emph{different}
-policy unmeasured; and the reported quantity is usually an outcome, such as whether the
-resource survived, rather than a distance from a computed optimum. We keep the game and
-change both choices: opponents are fixed policies chosen so that the best response can be
-enumerated, and every result is reported against that best response.
+\paragraph{Multiagent evaluation.}
+Sequential social dilemmas made cooperation a property of learned
+policies~\cite{leibo2017multi,hughes2018inequity}, and cooperative AI asks for agents that
+work with partners unlike themselves~\cite{dafoe2020open,stone2010ad}. Melting Pot tests a
+focal population against background agents it has never met~\cite{leibo2021scalable}.
+Empirical game-theoretic analysis treats trained agents as strategies of a
+meta-game~\cite{wellman2006methods,tuyls2018generalised}, and $\alpha$-Rank ranks them by
+evolutionary dynamics~\cite{omidshafiei2019alpha}. Tournaments that mix language models with
+classic strategies report model-specific strategic fingerprints in the prisoner's
+dilemma~\cite{payne2025strategic}, and cooperation evolves differently across base models in
+a donor game~\cite{vallinder2025cultural}. We add a many-player dilemma in which the best
+response to fixed partners can be computed exactly, and real tables of two different models.
 
 \paragraph{Overlap with concurrent work.}
-A concurrent manuscript uses the same game and an overlapping panel to ask whether
-language models reproduce the risk sensitivity of human subjects, and reports the
-single-model baseline that Section~\ref{sec:riskgrid} re-runs and extends~\cite{anon-if}.
-The questions differ: that work asks whether a model is risk-sensitive, and treats the
-answer as a statement about machine behaviour; the present paper asks what a model does
-when the other agents are not copies of itself, and treats the answer as a statement about
-deploying agent populations. The results in Sections~\ref{sec:controls}
-and~\ref{sec:bestresponse}, which carry this paper, have no counterpart there.
+A concurrent manuscript uses the same game and an overlapping set of models to ask whether
+models reproduce the risk sensitivity of human players, and suggests that more capable models
+can respond to risk~\cite{anon-if}. It reports a self-play risk baseline related to part of
+Section~\ref{sec:risk}. The present paper asks how low-cost agents behave against the
+optimum, against fixed partners and against other models; the tests where paying cannot
+help and Sections~\ref{sec:knowing} to~\ref{sec:selection} have no counterpart there.

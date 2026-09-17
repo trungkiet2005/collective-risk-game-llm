@@ -62,6 +62,29 @@ RUN_NOTES = {
                  "them 10-09-2026 de van E2 khong roi vao thu muc baseline); ten "
                  "experiment trong results/ la exp_evprobe, dat bang --experiment."),
     },
+    "exp_neutral": {
+        "source": "Kaggle Benchmarks server-side, task `crg-e6-neutral` (launch_e6.py --arms neutral)",
+        "produced": "2026-09-17",
+        "config": "CRG_TEMPLATE=neutral · CRG_RISKS=0,0.1,0.9 · CRG_LANGS=en · CRG_MAX_OUT=3000 · "
+                  "CRG_CONCURRENCY=4",
+        "note": ("Kiem soat demand effect theo review AAMAS: template baseline, thay dung cac "
+                 "cum co chuan muc hoac goi ten game ('collective-risk social dilemma', "
+                 "'climate account', 'must reach', 'disaster') va BAT khoi {framing} ('the only "
+                 "thing that matters to you is your own final cash payoff'). Giu nguyen mo neo "
+                 "equal-split (do la bien cua E1). Cot framing=1 trong moi dong. p=0 la o quyet "
+                 "dinh: o do dong gop bi troi bat ke niem tin."),
+    },
+    "exp_wording": {
+        "source": "Kaggle Benchmarks server-side, task `crg-e6-wording` (drive_neutral.py --arm wording)",
+        "produced": "2026-09-17",
+        "config": "CRG_TEMPLATE=wording · CRG_RISKS=0,0.1,0.9 · CRG_LANGS=en · CRG_MAX_OUT=3000 · "
+                  "CRG_EXPECT_MODEL=<slug> · Haiku chia 5 shard 2 rep",
+        "note": ("Tach doi exp_neutral: DUNG template neutral (bo 'collective-risk social dilemma', "
+                 "'climate account', 'must reach', 'disaster') nhung KHONG bat khoi {framing}, nen "
+                 "muc tieu 'chi tien cua ban' khong duoc neu. baseline -> wording = hieu ung cua tu "
+                 "ngu; wording -> neutral = hieu ung cua cau muc tieu. framing=0 trong moi dong. "
+                 "Moi shard mot user Kaggle rieng (xem ALIASES trong launch_shard.py)."),
+    },
     "exp_nohint": {
         "source": "Kaggle Benchmarks server-side, task `crg-e1-nohint`",
         "produced": "2026-09-10/11",

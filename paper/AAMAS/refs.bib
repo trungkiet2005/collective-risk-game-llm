@@ -1,13 +1,8 @@
 % =====================================================================================
 % refs.bib — AAMAS 2027 submission.
-%
-% ⚠️ CHUA KIEM CHUNG TUNG MUC. Moi entry duoi day duoc viet tu tri nho ve tai lieu, va
-% volume/page/nam la thu SAI DE NHAT ma reviewer lai kiem de nhat. Truoc khi nop phai
-% chay mot luot doi chieu DOI (skill `citation-management` hoac `/ars-citation-check`) va
-% sua tai cho. Muc nao khong xac minh duoc thi BO, dung de lai ban gan dung.
-%
-% DOUBLE-BLIND: khong duoc co entry nao lam lo danh tinh nhom tac gia. Ban Interface Focus
-% cua chinh chung ta duoc trich o `anon-if` duoi dang ngoi thu ba, khong ten, khong link.
+% Every entry was checked against its source record (Crossref, publisher page, arXiv,
+% proceedings page) on 2026-09-16. Keep it that way: add nothing from memory.
+% DOUBLE-BLIND: `anon-if` cites the concurrent manuscript in the third person.
 % =====================================================================================
 
 @article{milinski2008collective,
@@ -18,8 +13,9 @@
   journal = {Proceedings of the National Academy of Sciences},
   volume  = {105},
   number  = {7},
-  pages   = {2291-2294},
+  pages   = {2291--2294},
   year    = {2008},
+  doi     = {10.1073/pnas.0709546105},
 }
 
 @article{tavoni2011inequality,
@@ -30,8 +26,9 @@
   journal = {Proceedings of the National Academy of Sciences},
   volume  = {108},
   number  = {29},
-  pages   = {11825-11829},
+  pages   = {11825--11829},
   year    = {2011},
+  doi     = {10.1073/pnas.1102493108},
 }
 
 @article{santos2011risk,
@@ -40,77 +37,250 @@
   journal = {Proceedings of the National Academy of Sciences},
   volume  = {108},
   number  = {26},
-  pages   = {10421-10425},
+  pages   = {10421--10425},
   year    = {2011},
+  doi     = {10.1073/pnas.1015648108},
 }
 
-@article{dawes1980social,
-  author  = {Dawes, Robyn M.},
-  title   = {Social dilemmas},
-  journal = {Annual Review of Psychology},
-  volume  = {31},
-  pages   = {169-193},
-  year    = {1980},
+@article{dickinson1985actions,
+  author  = {Dickinson, Anthony},
+  title   = {Actions and habits: the development of behavioural autonomy},
+  journal = {Philosophical Transactions of the Royal Society of London. B, Biological
+             Sciences},
+  volume  = {308},
+  number  = {1135},
+  pages   = {67--78},
+  year    = {1985},
+  doi     = {10.1098/rstb.1985.0010},
 }
 
-@book{ostrom1990governing,
-  author    = {Ostrom, Elinor},
-  title     = {Governing the Commons: The Evolution of Institutions for Collective Action},
-  publisher = {Cambridge University Press},
-  year      = {1990},
+@article{andreoni1988free,
+  author  = {Andreoni, James},
+  title   = {Why free ride? Strategies and learning in public goods experiments},
+  journal = {Journal of Public Economics},
+  volume  = {37},
+  number  = {3},
+  pages   = {291--304},
+  year    = {1988},
+  doi     = {10.1016/0047-2727(88)90043-6},
 }
 
-@incollection{ledyard1995public,
-  author    = {Ledyard, John O.},
-  title     = {Public goods: A survey of experimental research},
-  booktitle = {The Handbook of Experimental Economics},
-  publisher = {Princeton University Press},
-  pages     = {111-194},
-  year      = {1995},
+@article{palfrey1984participation,
+  author  = {Palfrey, Thomas R. and Rosenthal, Howard},
+  title   = {Participation and the provision of discrete public goods: a strategic
+             analysis},
+  journal = {Journal of Public Economics},
+  volume  = {24},
+  number  = {2},
+  pages   = {171--193},
+  year    = {1984},
+  doi     = {10.1016/0047-2727(84)90023-9},
+}
+
+@article{schaffer1988evolutionarily,
+  author  = {Schaffer, Mark E.},
+  title   = {Evolutionarily stable strategies for a finite population and a variable
+             contest size},
+  journal = {Journal of Theoretical Biology},
+  volume  = {132},
+  number  = {4},
+  pages   = {469--478},
+  year    = {1988},
+  doi     = {10.1016/S0022-5193(88)80085-7},
+}
+
+@article{traulsen2006evolution,
+  author  = {Traulsen, Arne and Nowak, Martin A.},
+  title   = {Evolution of cooperation by multilevel selection},
+  journal = {Proceedings of the National Academy of Sciences},
+  volume  = {103},
+  number  = {29},
+  pages   = {10952--10955},
+  year    = {2006},
+  doi     = {10.1073/pnas.0602530103},
 }
 
 @inproceedings{leibo2017multi,
-  author    = {Leibo, Joel Z. and Zambaldi, Vinicius and Lanctot, Marc and Marecki, Janusz
-               and Graepel, Thore},
+  author    = {Leibo, Joel Z. and Zambaldi, Vinicius and Lanctot, Marc and Marecki, Janusz and
+               Graepel, Thore},
   title     = {Multi-agent Reinforcement Learning in Sequential Social Dilemmas},
   booktitle = {Proceedings of the 16th International Conference on Autonomous Agents and
-               MultiAgent Systems (AAMAS)},
-  pages     = {464-473},
+               Multiagent Systems (AAMAS 2017)},
+  publisher = {IFAAMAS},
+  pages     = {464--473},
   year      = {2017},
-}
-
-@inproceedings{perolat2017multi,
-  author    = {Perolat, Julien and Leibo, Joel Z. and Zambaldi, Vinicius and Beattie,
-               Charles and Tuyls, Karl and Graepel, Thore},
-  title     = {A multi-agent reinforcement learning model of common-pool resource
-               appropriation},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2017},
+  url       = {https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p464.pdf},
 }
 
 @inproceedings{hughes2018inequity,
   author    = {Hughes, Edward and Leibo, Joel Z. and Phillips, Matthew and Tuyls, Karl and
-               Due{\~n}ez-Guzman, Edgar and Casta{\~n}eda, Antonio Garc{\'\i}a and
-               Dunning, Iain and Zhu, Tina and McKee, Kevin and Koster, Raphael and others},
+               Due{\~n}ez-Guzman, Edgar and Garc{\'\i}a Casta{\~n}eda, Antonio and
+               Dunning, Iain and Zhu, Tina and McKee, Kevin and Koster, Raphael and
+               Roff, Heather and Graepel, Thore},
   title     = {Inequity aversion improves cooperation in intertemporal social dilemmas},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {31},
+  publisher = {Curran Associates, Inc.},
   year      = {2018},
 }
 
-@article{dafoe2020open,
-  author  = {Dafoe, Allan and Hughes, Edward and Bachrach, Yoram and Collins, Tantum and
-             McKee, Kevin R. and Leibo, Joel Z. and Larson, Kate and Graepel, Thore},
-  title   = {Open Problems in Cooperative {AI}},
-  journal = {arXiv preprint arXiv:2012.08630},
-  year    = {2020},
+@misc{dafoe2020open,
+  author        = {Dafoe, Allan and Hughes, Edward and Bachrach, Yoram and Collins, Tantum and
+                   McKee, Kevin R. and Leibo, Joel Z. and Larson, Kate and Graepel, Thore},
+  title         = {Open Problems in Cooperative {AI}},
+  year          = {2020},
+  eprint        = {2012.08630},
+  archiveprefix = {arXiv},
+  doi           = {10.48550/arXiv.2012.08630},
 }
 
-@article{akata2023playing,
+@inproceedings{leibo2021scalable,
+  author    = {Leibo, Joel Z. and Due{\~n}ez-Guzman, Edgar A. and Vezhnevets, Alexander and
+               Agapiou, John P. and Sunehag, Peter and Koster, Raphael and Matyas, Jayd and
+               Beattie, Charlie and Mordatch, Igor and Graepel, Thore},
+  title     = {Scalable Evaluation of Multi-Agent Reinforcement Learning with {Melting Pot}},
+  booktitle = {Proceedings of the 38th International Conference on Machine Learning},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {139},
+  pages     = {6187--6199},
+  publisher = {PMLR},
+  year      = {2021},
+  url       = {https://proceedings.mlr.press/v139/leibo21a.html},
+}
+
+@inproceedings{stone2010ad,
+  author    = {Stone, Peter and Kaminka, Gal A. and Kraus, Sarit and Rosenschein, Jeffrey S.},
+  title     = {Ad Hoc Autonomous Agent Teams: Collaboration without Pre-Coordination},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {24},
+  number    = {1},
+  pages     = {1504--1509},
+  year      = {2010},
+  doi       = {10.1609/aaai.v24i1.7529},
+}
+
+@inproceedings{wellman2006methods,
+  author    = {Wellman, Michael P.},
+  title     = {Methods for Empirical Game-Theoretic Analysis (Extended Abstract)},
+  booktitle = {Proceedings of the Twenty-First National Conference on Artificial Intelligence
+               (AAAI-06)},
+  publisher = {AAAI Press},
+  pages     = {1552--1555},
+  year      = {2006},
+}
+
+@inproceedings{tuyls2018generalised,
+  author    = {Tuyls, Karl and Perolat, Julien and Lanctot, Marc and Leibo, Joel Z. and
+               Graepel, Thore},
+  title     = {A Generalised Method for Empirical Game Theoretic Analysis},
+  booktitle = {Proceedings of the 17th International Conference on Autonomous Agents and
+               Multiagent Systems (AAMAS 2018)},
+  pages     = {77--85},
+  publisher = {IFAAMAS},
+  year      = {2018},
+  url       = {https://ifaamas.org/Proceedings/aamas2018/pdfs/p77.pdf},
+}
+
+@article{omidshafiei2019alpha,
+  author    = {Omidshafiei, Shayegan and Papadimitriou, Christos and Piliouras, Georgios and
+               Tuyls, Karl and Rowland, Mark and Lespiau, Jean-Baptiste and
+               Czarnecki, Wojciech M. and Lanctot, Marc and Perolat, Julien and Munos, Remi},
+  title     = {{$\alpha$-Rank}: Multi-Agent Evaluation by Evolution},
+  journal   = {Scientific Reports},
+  volume    = {9},
+  number    = {1},
+  pages     = {9937},
+  year      = {2019},
+  doi       = {10.1038/s41598-019-45619-9},
+}
+
+@article{akata2025playing,
   author  = {Akata, Elif and Schulz, Lion and Coda-Forno, Julian and Oh, Seong Joon and
              Bethge, Matthias and Schulz, Eric},
-  title   = {Playing repeated games with Large Language Models},
-  journal = {arXiv preprint arXiv:2305.16867},
-  year    = {2023},
+  title   = {Playing repeated games with large language models},
+  journal = {Nature Human Behaviour},
+  volume  = {9},
+  number  = {7},
+  pages   = {1380--1390},
+  year    = {2025},
+  doi     = {10.1038/s41562-025-02172-y},
+}
+
+@article{fontana2024nicer,
+  author    = {Fontana, Nicol{\`o} and Pierri, Francesco and Aiello, Luca Maria},
+  title     = {Nicer than Humans: How Do Large Language Models Behave in the Prisoner's
+               Dilemma?},
+  journal   = {Proceedings of the International AAAI Conference on Web and Social Media},
+  volume    = {19},
+  pages     = {522--535},
+  year      = {2025},
+  doi       = {10.1609/icwsm.v19i1.35829},
+}
+
+@inproceedings{horton2023large,
+  author    = {Filippas, Apostolos and Horton, John J. and Manning, Benjamin S.},
+  title     = {Large Language Models as Simulated Economic Agents: What Can We Learn from
+               {Homo Silicus}?},
+  booktitle = {Proceedings of the 25th ACM Conference on Economics and Computation},
+  series    = {EC '24},
+  pages     = {614--615},
+  year      = {2024},
+  publisher = {ACM},
+  doi       = {10.1145/3670865.3673513},
+}
+
+@article{mei2024turing,
+  author  = {Mei, Qiaozhu and Xie, Yutong and Yuan, Walter and Jackson, Matthew O.},
+  title   = {A {Turing} test of whether {AI} chatbots are behaviorally similar to humans},
+  journal = {Proceedings of the National Academy of Sciences},
+  volume  = {121},
+  number  = {9},
+  pages   = {e2313925121},
+  year    = {2024},
+  doi     = {10.1073/pnas.2313925121},
+}
+
+@article{chen2023emergence,
+  author    = {Chen, Yiting and Liu, Tracy Xiao and Shan, You and Zhong, Songfa},
+  title     = {The emergence of economic rationality of {GPT}},
+  journal   = {Proceedings of the National Academy of Sciences},
+  volume    = {120},
+  number    = {51},
+  pages     = {e2316205120},
+  year      = {2023},
+  doi       = {10.1073/pnas.2316205120},
+}
+
+@inproceedings{fan2024can,
+  author    = {Fan, Caoyun and Chen, Jindou and Jin, Yaohui and He, Hao},
+  title     = {Can Large Language Models Serve as Rational Players in Game Theory? A
+               Systematic Analysis},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {38},
+  number    = {16},
+  pages     = {17960--17967},
+  year      = {2024},
+  doi       = {10.1609/aaai.v38i16.29751},
+}
+
+@inproceedings{schmied2026llms,
+  author    = {Schmied, Thomas and Bornschein, J{\"o}rg and Grau-Moya, Jordi and
+               Wulfmeier, Markus and Pascanu, Razvan},
+  title     = {{LLMs} are Greedy Agents: Effects of {RL} Fine-tuning on Decision-Making
+               Abilities},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2026},
+  url       = {https://openreview.net/forum?id=weUP6H5Ko9},
+}
+
+@inproceedings{huang2025competing,
+  author    = {Huang, Jen-tse and Li, Eric John and Lam, Man Ho and Liang, Tian and
+               Wang, Wenxuan and Yuan, Youliang and Jiao, Wenxiang and Wang, Xing and
+               Tu, Zhaopeng and Lyu, Michael R.},
+  title     = {Competing Large Language Models in Multi-Agent Gaming Environments},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  pages     = {65639--65681},
+  year      = {2025},
 }
 
 @inproceedings{piatti2024cooperate,
@@ -118,41 +288,79 @@
                Sch{\"o}lkopf, Bernhard and Sachan, Mrinmaya and Mihalcea, Rada},
   title     = {Cooperate or Collapse: Emergence of Sustainable Cooperation in a Society of
                {LLM} Agents},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {37},
+  pages     = {111715--111759},
+  publisher = {Curran Associates, Inc.},
   year      = {2024},
+  doi       = {10.52202/079017-3548},
 }
 
-@techreport{horton2023large,
-  author      = {Horton, John J.},
-  title       = {Large Language Models as Simulated Economic Agents: What Can We Learn
-                 from Homo Silicus?},
-  institution = {National Bureau of Economic Research},
-  number      = {31122},
-  year        = {2023},
+@inproceedings{guzmanpiedrahita2025corrupted,
+  author    = {Guzman Piedrahita, David and Yang, Yongjin and Sachan, Mrinmaya and
+               Ramponi, Giorgia and Sch{\"o}lkopf, Bernhard and Jin, Zhijing},
+  title     = {Corrupted by Reasoning: Reasoning Language Models Become Free-Riders in Public
+               Goods Games},
+  booktitle = {Conference on Language Modeling (COLM)},
+  year      = {2025},
+  url       = {https://openreview.net/forum?id=kH6LOHGjEl},
 }
 
-@inproceedings{park2023generative,
-  author    = {Park, Joon Sung and O'Brien, Joseph C. and Cai, Carrie J. and Morris,
-               Meredith Ringel and Liang, Percy and Bernstein, Michael S.},
-  title     = {Generative Agents: Interactive Simulacra of Human Behavior},
-  booktitle = {Proceedings of the 36th Annual ACM Symposium on User Interface Software and
-               Technology (UIST)},
-  year      = {2023},
+@misc{willis2026evaluating,
+  author        = {Willis, Richard and Zhao, Jianing and Du, Yali and Leibo, Joel Z.},
+  title         = {Evaluating Collective Behaviour of Hundreds of {LLM} Agents},
+  year          = {2026},
+  eprint        = {2602.16662},
+  archiveprefix = {arXiv},
+  doi           = {10.48550/arXiv.2602.16662},
+  note          = {Strategic Engineering Workshop on LLMs and Game Theory (SE@AAMAS 2026)},
 }
 
-@article{fontana2024nicer,
-  author  = {Fontana, Nicol{\'o} and Pierri, Francesco and Aiello, Luca Maria},
-  title   = {Nicer than Humans: How do Large Language Models Behave in the Prisoner's
-             Dilemma?},
-  journal = {arXiv preprint arXiv:2406.13605},
-  year    = {2024},
+@misc{slumbers2025using,
+  author        = {Slumbers, Oliver and Leibo, Joel Z. and Janssen, Marco A.},
+  title         = {Using Large Language Models to Simulate Human Behavioural Experiments: Port
+                   of Mars},
+  year          = {2025},
+  eprint        = {2506.05555},
+  archiveprefix = {arXiv},
+  doi           = {10.48550/arXiv.2506.05555},
 }
 
-@article{anon-if,
-  author  = {{Anonymous}},
-  title   = {Capability enables but does not confer risk sensitivity in {LLM} agents},
-  journal = {Manuscript under review},
-  year    = {2026},
-  note    = {Citation withheld for double-blind reviewing; the overlap with the present
-             paper is declared in Section~\ref{sec:related}},
+@misc{payne2025strategic,
+  author        = {Payne, Kenneth and Alloui-Cros, Baptiste},
+  title         = {Strategic Intelligence in Large Language Models: Evidence from evolutionary
+                   Game Theory},
+  year          = {2025},
+  eprint        = {2507.02618},
+  archiveprefix = {arXiv},
+  doi           = {10.48550/arXiv.2507.02618},
+}
+
+@inproceedings{vallinder2025cultural,
+  author    = {Vallinder, Aron and Hughes, Edward},
+  title     = {Cultural Evolution of Cooperation among {LLM} Agents: Extended Abstract},
+  booktitle = {Proceedings of the 24th International Conference on Autonomous Agents and
+               Multiagent Systems (AAMAS 2025)},
+  pages     = {2771--2773},
+  publisher = {IFAAMAS},
+  year      = {2025},
+  url       = {https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p2771.pdf},
+}
+
+@article{dodivers2025uncovering,
+  author  = {Dodivers, {\'E}l{\'e}onore and Rafa{\"\i}, Isma{\"e}l},
+  title   = {Uncovering the fairness of {AI}: exploring focal point, inequality aversion, and
+             altruism in {ChatGPT}'s dictator game decisions},
+  journal = {Economics Bulletin},
+  volume  = {45},
+  number  = {4},
+  pages   = {1818--1825},
+  year    = {2025},
+}
+
+@misc{anon-if,
+  author = {{Anonymous}},
+  title  = {Capability enables but does not confer risk sensitivity in {LLM} agents},
+  year   = {2026},
+  note   = {Manuscript under review; details withheld for double-blind review},
 }

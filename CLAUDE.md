@@ -265,6 +265,22 @@ Bảng ánh xạ tên → credential nằm ở `ACCOUNTS` trong
 | ✅ **21 sống** | acc1–acc5 · acc06, acc07, acc08, acc09, acc11 · chisboiz · chunaiu · foundnotkiet · hunhtrungkit · **kakagotto** · kit567 · tnkiet · **tonngohan** · trungkiet · trunkdabest · vinhdinhthien |
 | ❌ **4 chết** | `chiboiz` · `chinguyentran` · `trnnguynchis` · `acc10` |
 
+⚠️ **21 nhãn sống KHÔNG phải 21 user Kaggle — chỉ có 17 (đo 17-09-2026).** Bốn cặp nhãn là
+cùng một user, cùng quota 24h, cùng không gian tên task: `acc06 = acc1` (minh2duy),
+`acc07 = acc2` (boymagic), `acc08 = acc3` (trngthtnhi), `acc09 = acc4` (osduyminh). Giao
+hai nhãn của một user cho hai shard **cùng tên task** trong một đợt thì shard sau **push đè**
+file sweep của shard trước (rep_start/reps khác nhau → chạy nhầm rep) và cả hai rút chung
+một quota. Bảng `ALIASES` trong `launch_shard.py`; `drive_neutral.py` từ chối kế hoạch vi phạm.
+Tra user thật của một nhãn: URL `kaggle.com/benchmarks/tasks/<user>/...` trong `shard.log`.
+
+⚠️ **Push validate từng chạy NGUYÊN sweep (sửa 17-09-2026).** Guard "1 ván khi validate"
+cũ so tên `gemini-3-flash-preview`; server đổi mặc định sang `gemini-3.7-flash` (muộn nhất
+14-09) nên guard im lặng hết tác dụng — validate crg-e6-neutral chạy 30 ván suốt 35 phút và
+rút cạn một user. Giờ `launch_shard.py` luôn nướng `CRG_EXPECT_MODEL=<slug -m>` vào shard;
+model nào khác import shard là validate và chỉ chơi 1 ván. Hồi quy:
+`crsd/tests/test_kaggle_push_validation_guard.py` (có bẫy tên Haiku
+`anthropic/claude-haiku-4-5@20251001` ≠ slug, nên so sau khi chuẩn hoá dấu).
+
 Cả 4 account chết **cùng một lỗi**: `403 "missing phone/identity verification"` khi xin
 Model Proxy key. Login và xem model list vẫn được, nên nhìn bằng mắt sẽ tưởng còn dùng
 tốt — chỉ bước xin key mới lộ. `trnnguynchis` hỏng từ 12-08 và tới 11-09 vẫn chưa được

@@ -52,6 +52,15 @@ DL_ROOT = Path("D:/tmp/crgdl")
 # `plan/scripts/probe_accounts.py` trước mỗi đợt lớn, nó là nguồn đúng duy nhất.
 # Các account từng hỏng VẪN nằm trong bảng để probe kiểm lại được: một account bị 403
 # vì chưa xác minh SĐT có thể sống lại sau khi người dùng xác minh.
+#
+# ⚠️ NHÃN ≠ USER KAGGLE. Đo 17-09-2026 từ URL task trong log: bốn cặp nhãn là CÙNG một user
+# (cùng token gốc, cùng quota 24h, cùng không gian tên task):
+#     acc06 = acc1 (minh2duy) · acc07 = acc2 (boymagic) · acc08 = acc3 (trngthtnhi)
+#     acc09 = acc4 (osduyminh)
+# Hai shard CÙNG tên task trên hai nhãn của một user sẽ PUSH ĐÈ nhau: shard sau thay file
+# sweep của shard trước (rep_start/reps khác nhau -> chạy nhầm rep), validate lại lần nữa,
+# và cùng rút một quota. Đừng bao giờ giao hai nhãn trong ALIASES cho cùng một đợt.
+ALIASES = {"acc1": "acc06", "acc2": "acc07", "acc3": "acc08", "acc4": "acc09"}
 ACCOUNTS = {
     **{n: ("token_txt", CRED_ROOT / "kaggle-api" / f"{n}.txt") for n in (
         "chiboiz", "chinguyentran", "chisboiz", "chunaiu", "trnnguynchis",
@@ -228,8 +237,15 @@ def wait_task_idle(handle, env, task, timeout=2400):
     return False
 
 
-def wait_push_complete(handle, env, task, timeout=1800):
-    """Push chạy task 1 lần trên model mặc định để validate; đợi tới Completed."""
+def wait_push_complete(handle, env, task, timeout=5400):
+    """Push chạy task 1 lần trên model mặc định để validate; đợi tới Completed.
+
+    Trần 5400s, không phải 1800s. Đo thật 17-09-2026: 3 push validate CÙNG LÚC (cùng một
+    model mặc định của server) vẫn "Running" sau 38 phút, trong khi các đợt E6 trước chỉ
+    ~25 phút. Hết trần thì vòng retry bên dưới PUSH LẠI một version mới, tức là vứt lần
+    validate đang chạy dở và bắt đầu lại từ đầu, nên trần quá sát làm chậm hẳn chứ không
+    nhanh hơn.
+    """
     deadline = time.time() + timeout
     while time.time() < deadline:
         rc, out = run_cmd(handle, env, ["kaggle", "b", "t", "status", task], timeout=300)
@@ -312,7 +328,11 @@ def main():
         log(h, f"so van moi model = {n_games} (rep {args.rep_start}.."
                f"{int(args.rep_start) + int(args.reps) - 1})")
 
-        overrides = {}
+        # Luon nuong slug se chay that vao shard: model nao KHAC import file nay (tuc buoc
+        # push validate tren model mac dinh cua server) chi choi 1 van. Guard cu so ten
+        # "gemini-3-flash-preview" da im lang het tac dung khi server doi sang
+        # gemini-3.7-flash -> validate chay CA sweep, rut can 2 account (17-09-2026).
+        overrides = {"CRG_EXPECT_MODEL": ",".join(args.model)}
         if args.template:
             overrides["CRG_TEMPLATE"] = args.template
         if args.probe:
