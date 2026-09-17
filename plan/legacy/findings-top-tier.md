@@ -17,23 +17,40 @@ nhánh open-weight. Cách chạy: [runbook-top-tier.md](runbook-top-tier.md).
 
 Đối chiếu paper hiện tại: open-weight panel **+0.97** (P=0.54), `gpt-5.4-nano` **+7.5** (P=0.26).
 
-`reach p=0.1` chia đôi hoàn hảo: **0% cho hai model EV-optimal, 100% cho mọi model null.**
-Không có trường hợp trung gian.
+`reach p=0.1` vẫn chia đôi rõ: **0% cho hai cấu hình EV-like, 100% cho các cấu hình còn lại**.
+Nhưng **magnitude của hiệu ứng contribution không nhị phân**: Grok non-reasoning có hiệu ứng EN
+trung gian (+23.6) và Claude Opus 5 có dịch chuyển EN nhỏ (+8.0). Vì vậy không nên dùng
+"respond / do not respond" như một taxonomy tuyệt đối.
+
+### Cập nhật audit 18-08-2026 — cách diễn giải nên dùng
+
+- Hai cấu hình duy nhất có **near-maximal, threshold-like response** là `gemini-3.1-pro` và
+  `gpt-5.6-sol`.
+- `grok-4.20-non-reasoning` là **intermediate/noisy response** ở EN: hiệu ứng +23.6 nhưng
+  biến thiên giữa replicate lớn; không đạt hành vi EV-like vì vẫn đóng góp 197.2 ở p=0.1.
+- `claude-opus-5` có **small but systematic EN shift** (+8.0); gọi nó hoàn toàn "null" là quá mạnh.
+- `grok-4.20-reasoning`, `gemini-3.1-flash-lite`, và phần lớn open-weight panel vẫn gần null.
+
+**Claim an toàn:** *sufficient capability makes strong risk sensitivity possible, not inevitable*.
+Không viết *"only two models respond to risk"*; viết *"two configurations show near-maximal,
+EV-threshold-like responses, while most others change little and one shows an intermediate noisy effect."*
 
 ---
 
 ## Ba kết luận
 
-### 1. Độ nhạy risk thuộc MODEL, không thuộc bậc năng lực — 2/4 chia đôi
+### 1. Độ nhạy risk mạnh kiểu EV thuộc MODEL, không thuộc bậc năng lực
 
-Bốn model bậc đỉnh từ **bốn nhà cung cấp khác nhau** chia đúng 2–2: `gemini-3.1-pro` và
-`gpt-5.6-sol` chơi tối ưu EV; `claude-opus-5` và `grok-4.20-reasoning` là null.
+Trong bốn **reasoning frontier models** từ bốn nhà cung cấp, `gemini-3.1-pro` và `gpt-5.6-sol`
+cho hành vi EV-like; `grok-4.20-reasoning` gần như null; `claude-opus-5` chỉ dịch chuyển nhỏ.
+Nếu tính cả Grok non-reasoning như một cấu hình frontier riêng, panel có **ba regime**:
+near-EV response, intermediate/noisy response, và small/null response.
 
-Không thể quy cho nhà cung cấp, kiến trúc, hay việc có reasoning hay không — cả 4 đều là
-model reasoning bậc đỉnh. **ĐỪNG viết "frontier models phản ứng với risk".** Chạy một model
-rồi khái quát sẽ cho kết luận sai bất kể chọn model nào.
+Không thể quy cho nhà cung cấp, kiến trúc, hay việc có reasoning hay không. **ĐỪNG viết
+"frontier models phản ứng với risk".** Chạy một model rồi khái quát sẽ cho kết luận sai bất kể
+chọn model nào.
 
-### 2. Năng lực là điều kiện CẦN nhưng KHÔNG ĐỦ
+### 2. Năng lực là điều kiện CẦN nhưng KHÔNG ĐỦ cho strong EV-like sensitivity
 
 - Không model rẻ nào chơi tối ưu EV (`flash-lite` −1.8, `gpt-5.4-nano` +7.5).
 - Một số nhưng không phải tất cả model bậc đỉnh làm được.
@@ -42,7 +59,7 @@ rồi khái quát sẽ cho kết luận sai bất kể chọn model nào.
 
 Claim này chống được phản biện dễ nhất: *"các anh chỉ chưa thử model đủ mạnh."*
 
-### 3. Reasoning tạo ra TÍNH TIẾT KIỆM, không tạo ra độ nhạy risk
+### 3. Reasoning tạo ra TÍNH TIẾT KIỆM, không tạo ra EV-threshold sensitivity
 
 Cặp đối chứng cùng model gốc, chỉ bật/tắt reasoning:
 
@@ -54,10 +71,11 @@ Cặp đối chứng cùng model gốc, chỉ bật/tắt reasoning:
 Bật reasoning kéo đóng góp từ ~200 xuống **đúng 120** — tiết kiệm 80 điểm trên 240. Ở tiếng
 Việt bản non-reasoning chạm **239.4/240**, gần như dốc sạch endowment mọi vòng.
 
-Nhưng **cả hai đều không nhạy risk**: EV-optimal đòi hỏi góp ~0 ở p=0.1, non-reasoning góp
-197, reasoning góp 120. Nên reasoning được dùng để tối ưu *chi phí đạt mục tiêu*, chứ không
-để hỏi *có nên đạt mục tiêu hay không*. Đây là cách phát biểu sắc hơn cho luận điểm
-decoupling mà paper đã có.
+Nhưng **cả hai đều không có EV-threshold sensitivity**: EV-optimal đòi hỏi góp ~0 ở p=0.1,
+non-reasoning góp 197, reasoning góp 120. Bản non-reasoning có một hiệu ứng EN trung gian
+(+23.6), nên không nên gọi nó "hoàn toàn không nhạy risk"; điểm chính là reasoning không biến
+nó thành hành vi quyết định *có nên đạt mục tiêu hay không*. Đây là cách phát biểu sắc hơn cho
+luận điểm decoupling mà paper đã có.
 
 ---
 
@@ -72,8 +90,8 @@ Endowment 40, target 120 (góp 2 × 10 vòng = 20):
 | p=0.9 | chắc chắn **20** | 0.1 × 40 = 4 | hợp tác | 120 ✅ | 119.8 ✅ |
 
 Payoff thực ở p=0.1: `gemini-3.1-pro` 32.0, `gpt-5.6-sol` 31.8 — đều cao hơn 20 nếu hợp tác,
-tức thắng thật chứ không phải may. Ở p=0.5 (điểm bất phân EV), **cả 4 model bậc đỉnh** đều
-chọn hợp tác ở mức tối thiểu đúng 120.
+tức thắng thật chứ không phải may. Ở p=0.5 (điểm bất phân EV), các reasoning frontier models
+đều tập trung quanh mức target; hai EV-like models chọn đúng khoảng 120.
 
 ## Bốn giới hạn phải nói đúng
 
@@ -82,29 +100,39 @@ chọn hợp tác ở mức tối thiểu đúng 120.
 2. **KHÔNG chứng minh được chúng *tính* EV.** `reasoning` trong turns.jsonl chỉ chứa dòng
    `CONTRIBUTION: n`; proxy không trả reasoning channel. Chỉ nói được hành vi **trùng khớp**
    EV-optimal. Muốn bằng chứng cần thiết kế hỏi trực tiếp.
-3. **Phương sai giữa các ván sụp về 0 ở bậc đỉnh** (SD ≈ 0 gần như mọi cell) → khái niệm
-   "uncensored cell" mà paper dùng **không áp dụng được ở đây**. Phép kiểm phải so sánh
-   **giữa** model, không hồi quy **trong** model.
-4. **Hiệu ứng ngôn ngữ cũng là đặc tính từng model — 4 hướng khác nhau.** `gpt-5.4-nano`
-   VN→góp ít hơn nhiều (146.8, lật reach 100%→0%); `gpt-5.6-sol` VN→tối ưu EV suy giảm
-   (+118.2→+74.2, SD 1.6→47.7); `gemini-3.1-pro` VN→không ảnh hưởng (+120.0→+119.6);
-   `grok-non-reasoning` VN→bão hòa ở mức tối đa 239.4. **ĐỪNG gộp thành một "hiệu ứng ngôn ngữ".**
+3. **Nhiều frontier cells có phương sai rất nhỏ, nhưng không phải tất cả.** Gemini Pro,
+   Grok-reasoning và nhiều cell target-level gần deterministic; ngược lại GPT-5.6-sol VN p=0.1
+   và Grok non-reasoning EN có variance lớn. Vì vậy không được khái quát "SD ≈ 0 toàn frontier".
+   Với các cell bị ceiling/floor, phép hồi quy trong-cell vẫn kém thông tin và controlled contrasts
+   giữa model/configuration quan trọng hơn.
+4. **Hiệu ứng ngôn ngữ cũng là đặc tính từng model — nhiều hướng khác nhau.** `gpt-5.4-nano`
+   VN→góp ít hơn nhiều (146.8, lật reach 100%→0%); `gpt-5.6-sol` VN→EV-like sensitivity suy giảm
+   (+118.2→+74.2, SD tăng mạnh); `gemini-3.1-pro` VN→hầu như không ảnh hưởng
+   (+120.0→+119.6); `grok-non-reasoning` VN→bão hòa ở mức tối đa 239.4.
+   **ĐỪNG gộp thành một "hiệu ứng ngôn ngữ".**
 
 ---
 
-## Việc tiếp theo
+## Việc tiếp theo — tối thiểu cần thiết
 
 - [x] ~~Viết lại claim trung tâm của [paper](../paper/main.tex)~~ **XONG 13-08-2026.**
       Title mới: *"capability enables risk sensitivity but does not confer it"*. Panel 13 model /
-      14 cấu hình. Results gộp 9 → 5 mục: (a) null nhánh open-weight + uncensored test,
-      (b) prompt vs incentive, (c) **null vỡ ở bậc đỉnh, 2/6 model**, (d) hai đối chứng
+      14 cấu hình. Results nên diễn giải: (a) null nhánh open-weight + uncensored test,
+      (b) prompt vs incentive, (c) **null vỡ ở bậc đỉnh với 2 strong EV-like configurations,
+      1 intermediate/noisy configuration, phần còn lại small/null**, (d) hai đối chứng
       (capability flash-lite↔pro, reasoning grok on↔off), (e) comprehension.
-      Hình mới `fig10_toptier.pdf` (`paper/make_figures_toptier.py`), bảng 1 thêm 7 dòng
-      commercial + cột `Δ risk (en)`. Đã build sạch, 19 trang.
-- [ ] Chạy `gpt-5.6-luna` / `gpt-5.6-terra` (~$3 + $7): hiệu ứng thuộc **thế hệ 5.6** hay
-      riêng bậc `sol`? Rẻ và trả lời một câu hỏi sạch.
-- [ ] Comprehension cho frontier — vẫn chưa có điểm dữ liệu nào.
-- [ ] Probe lại lab Trung Quốc (Qwen3/DeepSeek/GLM-5) — hiện 503 cả hai proxy.
+      Hình `fig10_toptier.pdf` (`paper/make_figures_toptier.py`) phải dùng wording theo
+      **magnitude/regime**, không dùng binary "respond / not respond".
+- [ ] **Ưu tiên 1:** replicate `grok-4.20-non-reasoning` **EN p=0.1 và p=0.9 chỉ**
+      (thêm khoảng 20–30 games/cell). Đây là uncertainty duy nhất hiện có thể đổi taxonomy
+      intermediate ↔ weak/null. Không cần rerun VN vì đang ceiling ~239.4 ở cả hai risk.
+- [ ] **Ưu tiên 2:** chạy `gpt-5.6-luna` / `gpt-5.6-terra` **EN endpoints p=0.1 và p=0.9 trước**
+      (~$3 + $7 theo estimate cũ): kiểm tra strong effect thuộc cả họ 5.6 hay riêng bậc `sol`.
+      Chỉ mở rộng sang p=0.5/VN nếu endpoint contrast đáng chú ý.
+- [ ] Comprehension cho frontier — hữu ích cho paper rộng hơn nhưng **không cần để xác nhận
+      central-claim reversal**.
+- [ ] Probe lại lab Trung Quốc (Qwen3/DeepSeek/GLM-5) — exploratory; hiện 503 cả hai proxy,
+      không phải blocker cho claim trung tâm.
 
 ## Chi phí thật theo model (~$110.50 / 37 shard)
 
