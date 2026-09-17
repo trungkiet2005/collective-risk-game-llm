@@ -78,7 +78,7 @@ nó tách hẳn hai thứ đó ra (§7.3).
 `paper/AAMAS/main.tex` dựng bằng **`aamas.cls` chính thức** (từ `aamas_2027_template.zip`,
 không sửa style). Bản dựng: **8 trang thân bài, references từ trang 9, 0 lỗi, 0 undefined,
 0 Overfull, 0 font Type 3.** Abstract dạng text để dán lên OpenReview:
-`paper/AAMAS/OPENREVIEW_ABSTRACT.txt` (246 từ; phải khớp từng chữ với `main.tex`).
+`paper/AAMAS/OPENREVIEW_ABSTRACT.txt` (281 từ, không có số kết quả; phải khớp từng chữ với `main.tex`).
 
 Toàn bộ bài nằm trong **một file** `paper/AAMAS/main.tex` (gộp 17-09-2026, thư mục
 `sections/` đã xoá). Cột "Label" để nhảy tới mục trong file.
@@ -116,6 +116,21 @@ cd paper/AAMAS && latexmk -pdf main.tex
 python -m pytest crsd/tests/test_paper_equilibrium.py   # cong chan Menh de 1
 ```
 
+**Supplement** (`paper/AAMAS/supplement/supplement.tex`, 40 trang, dựng lại 17-09-2026). Nó
+`\input` chính `tables/num_*.tex` của bài nên không thể lệch số với bài; mỗi script `supp_*.py`
+có cổng `RuntimeError` so từng giá trị trùng với macro/tabular của bài. Chạy SAU các script ở
+trên (chúng đọc `tables/`):
+
+```bash
+python paper/AAMAS/supplement/make_prompts.py      # prompts.tex (prompt nguyen van)
+python paper/AAMAS/supplement/make_questions.py    # questions.tex (10 cau hoi nguyen van)
+python paper/AAMAS/analysis/supp_selfplay.py       # S5-S7: so van, xo so, luoi risk, prompt controls
+python paper/AAMAS/analysis/supp_probes.py         # S8: cau hoi trong van
+python paper/AAMAS/analysis/supp_scripted.py       # S9: doi thu scripted
+python paper/AAMAS/analysis/supp_groups.py         # S10-S11: ban hai model, chon loc (~2 phut)
+cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
+```
+
 **Luật của thư mục paper:**
 
 1. **Không gõ tay số đo được vào `main.tex`.** Mọi con số là macro do script sinh. Script
@@ -129,6 +144,11 @@ python -m pytest crsd/tests/test_paper_equilibrium.py   # cong chan Menh de 1
    vọng). **Một theme figure**: `analysis/crsd_style.py` (Libertine, bảng màu an toàn mù màu,
    cổng kiểm cỡ chữ ≥ 7 pt, chồng chữ, bề rộng cột).
 4. Không en/em dash, không mã nội bộ (E1..E7, tên file) trong phần người đọc thấy.
+5. **Đoạn văn gần như không có số (17-09-2026, người dùng yêu cầu).** Chỉ giữ luật chơi và
+   tham số thiết kế (6 người, 10 vòng, 40, 120, p* = 1/2). Kết quả đo được nói bằng chữ
+   ("gần như mọi ghế", "ít hơn nhiều") và giá trị nằm ở bảng/figure của bài hoặc ở bảng
+   "Numbers behind the main text" đầu mỗi mục kết quả của supplement. Abstract không có số kết
+   quả. Đổi một chữ định tính thì kiểm lại giá trị trong bảng supplement tương ứng.
 
 **Còn phải làm trước khi nộp:**
 
