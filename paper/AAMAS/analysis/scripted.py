@@ -342,7 +342,7 @@ def figure(d: pd.DataFrame, modal: int) -> None:
     the end of the modal settled round."""
     rows = ["Best response", *cs.MODEL_ORDER]
     cs.use()
-    fig = plt.figure(figsize=cs.figsize("col", height_pt=106))
+    fig = plt.figure(figsize=cs.figsize("col", height_pt=100))
     fig._crsd_width = "col"
     axes = fig.subplots(1, 2, sharey=True)
     norm = mpl.colors.Normalize(0, max(OPTIONS))

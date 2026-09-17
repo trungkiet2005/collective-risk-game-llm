@@ -26,61 +26,73 @@ TYPE: three sizes, nothing below 7 pt (enforced in save()).
     Type 42. Fallbacks, in order: Times New Roman, DejaVu Serif. A fallback prints a
     warning, because a Times figure beside Libertine body text is visible.
 
+THEME: EGTTools (github.com/Socrats/EGTTools, egttools.plotting). Every colour below is
+the default that EGTTools itself draws with, so a figure made here and a figure made by
+an egttools.plotting function (fig_selection uses draw_invasion_diagram) read as one set.
+  seaborn "colorblind"  draw_invasion_diagram's default node palette   -> models
+  viridis               Simplex2D.draw_gradients' default map          -> sequential maps
+  RdBu                  plot_parameter_sweep's map (RdBu_r there; the
+                        sign is flipped here so positive stays blue)   -> signed matrices
+  black / white / gray  stable, unstable and saddle points; #111111 is
+                        Simplex3D's edge colour                        -> neutrals
+
 MEANING TABLE. ONE MEANING PER COLOUR. This is the whole table; if a hue is not in
 it, no figure may use it.
 
   Neutrals (all lettering, rules and references)
-    INK        #17212B  lettering, spines, ticks; THEORY benchmark line (dashed)
-    MUTED      #4B5865  secondary lettering; human reference series (open markers)
-    LINE       #778492  hairline rules, grid (value axis only), scripted opponents
-    REGION     #E6EAEE  shaded parameter region with a theoretical meaning
-    GREY_LIGHT #F4F6F8  inert surface (card with no meaning)
+    INK        #111111  lettering, spines, ticks; THEORY benchmark line (dashed)
+    MUTED      #555555  secondary lettering; human reference series (open markers)
+    LINE       #808080  hairline rules, grid (value axis only), scripted opponents
+                        (matplotlib "gray", EGTTools' saddle-point colour)
+    REGION     #EBEBEB  shaded parameter region with a theoretical meaning
+    GREY_LIGHT #F5F5F5  inert surface (card with no meaning)
     WHITE      #FFFFFF  page
 
-  Models (categorical; ordered dark to light, the order IS the greyscale code)
-    model       colour   L*    luma601  on white  marker  text variant  tint
-    Qwen        #543859  27.9    68     10.06:1    D      (same)        #F8F0F9
-    Haiku       #84442E  36.4    85      7.37:1    o      (same)        #FDEFEB
-    Flash-Lite  #3E6D9F  44.9   101      5.39:1    s      (same)        #EDF2FD
-    Grok        #977C38  53.3   124      4.00:1    v      #8C722E       #F7F1E8
-    Luna        #64A184  61.5   139      3.01:1    ^      #448065       #E9F5EE
-  Hue families are the house plum, rust, blue, ochre and sage; lightness was
-  re-spaced in 8.4 L* steps so the five survive greyscale and colour-blind
-  simulation (numbers below). Grok and Luna are under 4.5:1, so model lettering
-  uses the "text variant" column: same hue, 12 to 4 L* darker.
+  Models (categorical; the first five hues of seaborn "colorblind")
+    model       colour   L*   on white  marker  text variant  tint
+    Flash-Lite  #0173B2  46.3  5.13:1    s      (same)        #E6F1F7
+    Grok        #D55E00  54.2  3.87:1    v      #C35300       #FBEFE6
+    Luna        #029E73  57.8  3.42:1    ^      #00855F       #E6F5F1
+    Qwen        #CC78BC  61.6  3.01:1    D      #A45C96       #FAF2F8
+    Haiku       #DE8F05  65.9  2.61:1    o      #A66700       #FCF4E6
+  Hues follow the providers where the palette allows it (Claude orange, Gemini blue,
+  GPT green, Qwen purple). Four of the five are under 4.5:1, so model lettering uses
+  the "text variant" column: same hue, darkened in CIELAB to 4.6:1.
 
   Maps
-    crsd_div  rust #76321C .. #F6F6F6 .. blue #024B72, symmetric L* 30..97..30.
-              Negative = rust, positive = blue. For signed matrices only.
-    crsd_seq  slate #F4F9FC .. #1D3340, L* 97.6 -> 20.0 in 9.7 steps, chroma <= 14.
-    crsd_pay  units one seat pays in one round: 0 #D3DEE6, 2 #7891A2, 4 #1D3340. Sampled
-              from crsd_seq (anchors 1, 4, 8), so darker always means paying more. Used
-              as three discrete swatches (which move) and as a continuous 0..4 map (mean).
+    crsd_div  RdBu, red #67001F .. #F7F6F6 .. blue #053061. Negative = red,
+              positive = blue. For signed matrices only.
+    crsd_seq  viridis reversed, yellow #FDE725 (L* 91) .. purple #440154 (L* 15), so
+              darker always means more, as the captions say.
+    crsd_pay  units one seat pays in one round: 0 #FDE725, 2 #21908D, 4 #440154, i.e.
+              crsd_seq at 0, 0.5 and 1. Used as three discrete swatches (which move)
+              and as a continuous 0..4 map (mean).
     model ramp  WHITE -> a model's text colour, for a matrix whose rows are models and
               whose cells print their value; hue says which model, lightness says how much.
 
 WHAT THIS PALETTE COSTS (stated, not hidden)
-  1. The diverging map borrows the rust and blue hue families of Haiku and
-     Flash-Lite. It may appear only in matrix panels whose axes name the models
-     and which carry no model-coloured marks.
-  2. Luna sits exactly on the 3:1 floor for graphical marks. Its lines are drawn at
-     full weight with markers; never as a hairline, never as lettering.
-  3. Greyscale identity rests on 8.4 L* steps (min CIEDE2000 6.8 under CIE grey,
-     5.6 under Rec.601 luma). That separates solid marks side by side, not thin
-     lines far apart. Marker shape is therefore mandatory on every model series.
-  4. Grok (luma 124) and LINE (luma 130) are the same grey in mono; scripted
-     opponents drawn in LINE therefore use open markers and no model marker shape.
-  5. A diverging map cannot carry sign in greyscale (mirror pairs differ by
-     dE00 0.0). Every cell of a signed matrix prints its signed value.
+  1. The colorblind hues are separated by hue, not by lightness (L* 46 to 66, and
+     Haiku and Qwen are the same Rec.601 grey). In greyscale the five models are told
+     apart ONLY by marker shape, so a marker is mandatory on every model series.
+  2. Haiku orange is 2.6:1 on white, under the 3:1 guideline for graphical marks. Its
+     lines are drawn at full weight with markers; never as a hairline, never as
+     lettering.
+  3. Haiku orange and Grok vermillion are the closest pair under deuteranopia. They
+     keep different markers (o, v) and never share a panel without them.
+  4. The diverging map borrows the red and blue families of Grok and Flash-Lite. It
+     may appear only in matrix panels whose axes name the models and which carry no
+     model-coloured marks.
+  5. A diverging map cannot carry sign in greyscale. Every cell of a signed matrix
+     prints its signed value.
 
 MEASURED (python crsd_style.py re-derives all of these; do not hand-edit)
   Model palette, minimum pairwise CIEDE2000:
-    normal 25.9 | deuteranopia 15.7 | protanopia 16.8 | tritanopia 16.2
-    CIE-Y greyscale 6.8 | Rec.601 luma greyscale 5.6 | min dE00 to INK 10.9
-  For comparison, the Okabe-Ito set in the previous draft: greyscale 0.6
-  (orange #E69F00 and sky blue #56B4E9 print as the same grey).
-  Heatmap cell text: white below L* 53, INK above. Binding constraint 4.0:1 at
-  L* 53 (both inks), the best any continuous map allows.
+    normal 17.0 | deuteranopia 9.0 | protanopia 9.5 | tritanopia 10.9
+    CIE-Y greyscale 3.3 | Rec.601 luma greyscale 0.6 | min dE00 to INK 22.7
+  Diverging sign under CVD (min mirror-pair dE00): deuteranopia 19.7 | protanopia 16.5 |
+    tritanopia 30.0 | greyscale 0.1 (cost 5)
+  Sequential L* 90.9 -> 14.9, monotone under all three CVD simulations.
+  Heatmap cell text: white below L* 53, INK above.
   CVD simulation: Machado, Oliveira & Fernandes (2009), severity 1.0, applied in
   linear RGB.
 """
@@ -118,11 +130,11 @@ SIZE_SMALL = 7.0
 MIN_TEXT_PT = 7.0
 
 # --------------------------------------------------------------------------- neutrals
-INK = "#17212B"
-MUTED = "#4B5865"
-LINE = "#778492"
-REGION = "#E6EAEE"
-GREY_LIGHT = "#F4F6F8"
+INK = "#111111"
+MUTED = "#555555"
+LINE = "#808080"
+REGION = "#EBEBEB"
+GREY_LIGHT = "#F5F5F5"
 WHITE = "#FFFFFF"
 
 
@@ -140,21 +152,22 @@ class ModelStyle:
 
 
 MODELS = {
-    "Qwen": ModelStyle("Qwen", "#543859", "#543859", "#F8F0F9", "D", 0.86,
+    "Qwen": ModelStyle("Qwen", "#CC78BC", "#A45C96", "#FAF2F8", "D", 0.86,
                        (0, (5.0, 1.5, 1.0, 1.5)), ("qwen",)),
-    "Haiku": ModelStyle("Haiku", "#84442E", "#84442E", "#FDEFEB", "o", 1.00,
+    "Haiku": ModelStyle("Haiku", "#DE8F05", "#A66700", "#FCF4E6", "o", 1.00,
                         "solid", ("haiku", "claude")),
-    "Flash-Lite": ModelStyle("Flash-Lite", "#3E6D9F", "#3E6D9F", "#EDF2FD", "s", 0.90,
+    "Flash-Lite": ModelStyle("Flash-Lite", "#0173B2", "#0173B2", "#E6F1F7", "s", 0.90,
                              (0, (3.5, 1.5)), ("flash-lite", "flash_lite", "gemini")),
-    "Grok": ModelStyle("Grok", "#977C38", "#8C722E", "#F7F1E8", "v", 1.10,
+    "Grok": ModelStyle("Grok", "#D55E00", "#C35300", "#FBEFE6", "v", 1.10,
                        (0, (1.0, 1.3)), ("grok",)),
-    "Luna": ModelStyle("Luna", "#64A184", "#448065", "#E9F5EE", "^", 1.10,
+    "Luna": ModelStyle("Luna", "#029E73", "#00855F", "#E6F5F1", "^", 1.10,
                        (0, (6.0, 1.5, 1.0, 1.5, 1.0, 1.5)), ("luna", "gpt")),
 }
-# Legend / panel order. Alphabetical by provider would scatter the greyscale code;
-# this order follows the paper's model table. Change it only together with that table.
+# Legend / panel order; follows the paper's model table. Change it only together with that table.
 MODEL_ORDER = ("Haiku", "Flash-Lite", "Luna", "Qwen", "Grok")
-LIGHTNESS_ORDER = ("Qwen", "Haiku", "Flash-Lite", "Grok", "Luna")   # dark -> light
+LIGHTNESS_ORDER = ("Flash-Lite", "Grok", "Luna", "Qwen", "Haiku")   # dark -> light
+MARK_CONTRAST_FLOOR = 2.6   # Haiku orange; see palette cost 2
+CVD_DE_FLOOR = 8.0          # min pairwise CIEDE2000 under each colour-vision deficiency
 
 BAND_ALPHA = 0.16        # confidence ribbons: model colour at this alpha, no edge
 LW_DATA = 1.2
@@ -172,22 +185,21 @@ SCRIPTED = dict(color=LINE, lw=0.9, ls="solid", marker="o", ms=3.4, mfc=WHITE,
                 mec=LINE, mew=0.8, zorder=2.2)
 
 # --------------------------------------------------------------------------- maps
-DIV_ANCHORS = ("#76321C", "#955640", "#B37B68", "#CEA293", "#E7CAC1", "#F6F6F6",
-               "#C3D2E4", "#94AECC", "#648CB2", "#2F6B98", "#024B72")
-SEQ_ANCHORS = ("#F4F9FC", "#D3DEE6", "#B3C4D0", "#95AAB9", "#7891A2", "#5D788A",
-               "#456071", "#304959", "#1D3340")
-CMAP_DIV = LinearSegmentedColormap.from_list("crsd_div", DIV_ANCHORS, N=256)
-CMAP_SEQ = LinearSegmentedColormap.from_list("crsd_seq", SEQ_ANCHORS, N=256)
-CMAP_DIV.set_bad(WHITE)   # masked cell = hole in the matrix, never a value colour
-CMAP_SEQ.set_bad(WHITE)
-PAY_COLOURS = {0: SEQ_ANCHORS[1], 2: SEQ_ANCHORS[4], 4: SEQ_ANCHORS[8]}
-CMAP_PAY = LinearSegmentedColormap.from_list(
-    "crsd_pay", [(0.0, PAY_COLOURS[0]), (0.5, PAY_COLOURS[2]), (1.0, PAY_COLOURS[4])], N=256)
+DIV_ANCHORS = tuple(mpl.colors.to_hex(c) for c in mpl.colormaps["RdBu"](np.linspace(0, 1, 11)))
+SEQ_ANCHORS = tuple(mpl.colors.to_hex(c) for c in mpl.colormaps["viridis_r"](np.linspace(0, 1, 9)))
+CMAP_DIV = mpl.colormaps["RdBu"].resampled(256).with_extremes(bad=WHITE)
+CMAP_DIV.name = "crsd_div"
+CMAP_SEQ = mpl.colormaps["viridis_r"].resampled(256).with_extremes(bad=WHITE)
+CMAP_SEQ.name = "crsd_seq"   # masked cell = hole in the matrix, never a value colour
+PAY_COLOURS = {0: SEQ_ANCHORS[0], 2: SEQ_ANCHORS[4], 4: SEQ_ANCHORS[8]}
+CMAP_PAY = CMAP_SEQ.copy()
+CMAP_PAY.name = "crsd_pay"
 HEATMAP_TEXT_SWITCH_L = 53.0   # cell L* below this takes white text
 
 # --------------------------------------------------------------------------- roles
 TEXT_COLOURS = (INK, MUTED, *(m.text for m in MODELS.values()))
-FILL_ONLY = (LINE, REGION, GREY_LIGHT, MODELS["Grok"].colour, MODELS["Luna"].colour,
+FILL_ONLY = (LINE, REGION, GREY_LIGHT,
+             *(m.colour for m in MODELS.values() if m.colour != m.text),
              *(m.tint for m in MODELS.values()))
 
 
@@ -311,12 +323,17 @@ def _audit_roles():
             raise RuntimeError(f"{c} now clears {contrast(c):.2f}:1 on white; either promote "
                                "it into TEXT_COLOURS or stop calling it fill-only")
     for m in MODELS.values():
-        if contrast(m.colour) < 2.995:
-            raise RuntimeError(f"{m.key} colour {m.colour} is below 3:1 for graphical marks")
+        if contrast(m.colour) < MARK_CONTRAST_FLOOR:
+            raise RuntimeError(f"{m.key} colour {m.colour} is below {MARK_CONTRAST_FLOOR}:1 "
+                               "for graphical marks")
     Ls = [lightness(MODELS[k].colour) for k in LIGHTNESS_ORDER]
-    if any(b - a < 8.0 for a, b in zip(Ls, Ls[1:])):
-        raise RuntimeError(f"model lightness steps {np.diff(Ls).round(1)} fall under 8 L*; "
-                           "the greyscale code no longer holds")
+    if Ls != sorted(Ls):
+        raise RuntimeError("LIGHTNESS_ORDER is not dark -> light")
+    for cond in ("deuteranopia", "protanopia", "tritanopia"):
+        labs = [simulate_lab(m.colour, cond) for m in MODELS.values()]
+        worst = min(ciede2000(a, b) for a, b in itertools.combinations(labs, 2))
+        if worst < CVD_DE_FLOOR:
+            raise RuntimeError(f"two model colours are {worst:.1f} dE00 apart under {cond}")
     if sorted(MODEL_ORDER) != sorted(MODELS):
         raise RuntimeError("MODEL_ORDER and MODELS disagree")
     if len({m.marker for m in MODELS.values()}) != len(MODELS):

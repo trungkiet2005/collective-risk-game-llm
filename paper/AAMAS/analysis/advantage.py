@@ -121,7 +121,7 @@ def signed(v: float) -> str:
 
 def draw(edge, reach, width):
     cs.use()
-    height = 188 if width == "col" else 190
+    height = 184 if width == "col" else 190
     fig = plt.figure(figsize=cs.figsize(width, height_pt=height))
     fig._crsd_width = width
     grid = fig.add_gridspec(2, 2, width_ratios=[1, 0.045], wspace=0.04, hspace=0.3)

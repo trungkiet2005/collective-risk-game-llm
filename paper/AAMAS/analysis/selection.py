@@ -37,20 +37,29 @@ Population outcomes weight each model's SELF-PLAY target rate and per-seat expec
 payoff by its stationary mass. Uncertainty: 1000 game-level bootstrap replicates
 (resample the games of every mixed cell and every self-play cell), reported as the share
 of replicates in which the point-estimate winner is still top, and percentile 95% CIs.
+
+EGTTOOLS. The figure is computed and drawn with EGTTools (Fernandez Domingos, Santos &
+Lenaerts 2023): egttools.analytical.StochDynamics recomputes every fixation probability
+and stationary distribution from the same payoff functions, the script refuses to draw
+unless they match its own to 1e-7, and egttools.plotting.draw_invasion_diagram draws the
+graphs.
 """
 from __future__ import annotations
 
 import itertools
 import sys
+import warnings
 from math import comb
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.patches import FancyArrowPatch
 from scipy.special import logsumexp
+from egttools.analytical import StochDynamics
+from egttools.plotting import draw_invasion_diagram
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import crsd_data as cd      # noqa: E402
@@ -358,68 +367,95 @@ def switch_n(P, pi_idx, target="Flash-Lite", beta=BETA):
 
 
 # ============================================================================ figure
-NODE_R = (0.12, 0.42)   # node radius at zero and at full stationary mass (unit pentagon)
-ARROW_GAP = 0.08        # clearance between an arrow tip and the node it enters
-GRAPH_X, GRAPH_Y = (-1.62, 1.62), (-1.68, 1.46)
-GLYPH_FIT = {"o": 1.0, "s": 0.82, "^": 1.0, "v": 1.0, "D": 0.86}   # marker inside the node radius
+NODE_SIZE = 130          # pt^2, draw_invasion_diagram's node_size
+ARROW_HEAD = 7.0         # networkx's default head is drawn for a 10-inch figure, not a column
+MASS_GAP = 0.24          # mass label: horizontal offset from the node centre (layout units)
+EGT_ATOL = 1e-7          # StochDynamics returns 0 once a fixation sum passes 1e7
+# circular_layout puts node 0 at angle 0, so the pentagon spans x = -0.81..1; the margins
+# hold the mass labels left and right of the nodes and the target line at the bottom left
+GRAPH_X, GRAPH_Y = (-1.55, 1.62), (-1.22, 1.14)
+
+
+def blank(ax):
+    ax.axis("off")
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+
+def egt_dynamics(Pp, N, beta=BETA):
+    """Fixation matrix and stationary distribution from egttools' StochDynamics.
+
+    payoffs[x, y](k, 6) is the payoff of an x seat at a table with k x seats and 6 - k
+    y seats, i.e. P[x, y, k]; StochDynamics samples those tables hypergeometrically from a
+    population of N. fp[r, i] is the fixation probability of one i newcomer in r."""
+    payoffs = np.array([[(lambda k, group, *_, x=x, y=y: Pp[x, y, k]) for y in range(K)]
+                        for x in range(K)], dtype=object)
+    dyn = StochDynamics(K, payoffs, pop_size=N, group_size=cd.N_PLAYERS)
+    with warnings.catch_warnings(), np.errstate(over="ignore"):
+        # exp overflow under strong selection, and the near-1 diagonal warning; reducible
+        # chains are caught by stationary() in run_rules instead
+        warnings.simplefilter("ignore", RuntimeWarning)
+        _, fp = dyn.transition_and_fixation_matrix(beta)
+        sd = dyn.calculate_stationary_distribution(beta)
+    return fp, sd
 
 
 def figure(P, point, REACH):
-    """alpha-Rank response graphs, one per rule (row) and risk level (column). Each node is
-    a one-model population; its area grows with the stationary mass. For every pair, one
-    arrow points from the model that is taken over to the model that takes over, i.e. the
-    direction of the larger fixation probability. The number under a graph is the target
-    rate of the selected population."""
+    """Invasion diagrams from egttools.plotting.draw_invasion_diagram, one per risk level
+    (row) and rule (column), styled as EGTTools draws them: plain coloured nodes, black
+    arrows, the stationary mass printed beside every node. An edge A -> B means one B
+    newcomer takes over an A population with more than the neutral probability 1/N
+    (draw_invasion_diagram's rule; a neutral pair would be a dashed line). The line at the
+    bottom left is the target rate of the selected population."""
     cs.use()
-    fig = plt.figure(figsize=cs.figsize("col", height_pt=158))
+    fig = plt.figure(figsize=cs.figsize("col", height_pt=268))
     fig._crsd_width = "col"
-    grid = fig.add_gridspec(2, len(RISKS), hspace=0.0, wspace=0.0)
-    angle = np.pi / 2 - 2 * np.pi * np.arange(K) / K          # first model on top, clockwise
-    pos = {m: np.array([np.cos(a), np.sin(a)]) for m, a in zip(cs.MODEL_ORDER, angle)}
-    span = GRAPH_X[1] - GRAPH_X[0]
-    rules = (("within", N_WITHIN, "Tablemates"), ("across", N_ACROSS, "Across tables"))
-    for ri, (rule, n, label) in enumerate(rules):
-        for pi, p in enumerate(RISKS):
-            ax = fig.add_subplot(grid[ri, pi])
+    rules = (("within", N_WITHIN, f"Tablemates, $N={N_WITHIN}$"),
+             ("across", N_ACROSS, f"Across tables, $N={N_ACROSS}$"))
+    grid = fig.add_gridspec(len(RISKS), len(rules) + 1, hspace=0.0, wspace=0.0,
+                            width_ratios=(0.08, *[1] * len(rules)))
+    off = ~np.eye(K, dtype=bool)
+    for pi, p in enumerate(RISKS):
+        lax = fig.add_subplot(grid[pi, 0])
+        blank(lax)
+        lax.text(0.5, 0.5, f"$p={p:g}$", rotation=90, ha="center", va="center",
+                 fontsize=cs.SIZE_LABEL, color=cs.INK, transform=lax.transAxes)
+        for ri, (rule, n, label) in enumerate(rules):
+            ax = fig.add_subplot(grid[pi, ri + 1])
+            o = point[(rule, BETA, n, pi)]
+            R = rho_within(P[pi], BETA) if rule == "within" else rho_matrix(P[pi], n, BETA)
+            fp, sd = egt_dynamics(P[pi], n)
+            if not (np.allclose(fp.T[off], R[off], rtol=0, atol=EGT_ATOL)
+                    and np.allclose(sd, o["pi"], rtol=0, atol=EGT_ATOL)):
+                raise RuntimeError(f"graph {rule} p={p}: egttools disagrees with this script")
+            G = draw_invasion_diagram(list(M), 1 / n, fp, sd, node_size=NODE_SIZE,
+                                      display_node_labels=False, display_edge_labels=False,
+                                      display_sd_labels=False, edge_width=0.7, node_linewidth=0.0,
+                                      colors=[cs.model(m).colour for m in M], ax=ax)
+            for arrow in ax.patches:
+                arrow.set_mutation_scale(ARROW_HEAD)
+            # Masses beside the nodes rather than above and below (egttools' placement), so
+            # the row height is the pentagon's and the spare column width holds the labels.
+            pos = nx.circular_layout(G)            # the layout draw_invasion_diagram uses
+            for i, m in enumerate(M):
+                x, y = pos[m]
+                right = x > 0
+                ax.text(x + (MASS_GAP if right else -MASS_GAP), y, f"{sd[i]:.2f}",
+                        ha="left" if right else "right", va="center", fontsize=cs.SIZE_SMALL,
+                        color=cs.INK)
+            blank(ax)
             ax.set_aspect("equal")
             ax.set_xlim(*GRAPH_X)
             ax.set_ylim(*GRAPH_Y)
-            ax.axis("off")
-            ax.set_xticks([])
-            ax.set_yticks([])
-            R = rho_within(P[pi], BETA) if rule == "within" else rho_matrix(P[pi], n, BETA)
-            o = point[(rule, BETA, n, pi)]
-            if not np.allclose(stationary(R)[0], o["pi"]):
-                raise RuntimeError(f"graph {rule} p={p}: mass differs from the reported point")
-            rad = {m: NODE_R[0] + (NODE_R[1] - NODE_R[0]) * np.sqrt(o["pi"][MI[m]]) for m in M}
-            for a, b in itertools.combinations(M, 2):
-                ia, ib = MI[a], MI[b]
-                if np.isclose(R[ia, ib], R[ib, ia], rtol=0, atol=1e-12):
-                    continue
-                win, lose = (a, b) if R[ia, ib] > R[ib, ia] else (b, a)
-                u = (pos[win] - pos[lose]) / np.linalg.norm(pos[win] - pos[lose])
-                ax.add_patch(FancyArrowPatch(tuple(pos[lose] + u * (rad[lose] + ARROW_GAP)),
-                                             tuple(pos[win] - u * (rad[win] + ARROW_GAP)),
-                                             arrowstyle="-|>", mutation_scale=5.5, lw=0.7,
-                                             color=cs.LINE, shrinkA=0, shrinkB=0, zorder=1))
-            fig.canvas.draw()
-            pt_per_unit = ax.get_window_extent().width / fig.dpi * cs.POINTS_PER_INCH / span
-            for m in M:
-                st = cs.model(m)
-                ax.plot(*pos[m], marker=st.marker, ms=2 * rad[m] * pt_per_unit * GLYPH_FIT[st.marker],
-                        mfc=st.colour, mec=cs.WHITE, mew=0.7, ls="none", zorder=3)
-            ax.text(0, GRAPH_Y[0] + 0.1, f"Target {100 * o['reach']:.0f}%", ha="center", va="center",
-                    fontsize=cs.SIZE_SMALL, color=cs.INK)
-            if ri == 0:
-                ax.set_title(f"$p={p:g}$", loc="center", fontsize=cs.SIZE_LABEL, fontweight="normal",
-                             pad=1.0)
+            ax.text(GRAPH_X[0], GRAPH_Y[0] + 0.1, f"Target {100 * o['reach']:.0f}%", ha="left",
+                    va="bottom", fontsize=cs.SIZE_SMALL, color=cs.INK)
             if pi == 0:
-                ax.text(GRAPH_X[0] - 0.3, 0, label, rotation=90, ha="center", va="center",
-                        fontsize=cs.SIZE_LABEL, color=cs.INK, clip_on=False)
-    handles = [Line2D([], [], ls="none", marker=cs.model(m).marker, ms=5.2 * cs.model(m).marker_scale,
-                      mfc=cs.model(m).colour, mec=cs.WHITE, mew=0.5, label=cd.show(m))
-               for m in cs.MODEL_ORDER]
-    cs.legend_top(fig, handles, ncols=len(handles), handlelength=0.6, handletextpad=0.3, columnspacing=0.75)
+                ax.set_title(label, loc="center", fontsize=cs.SIZE_LABEL, fontweight="normal",
+                             pad=2.0)
+    handles = [Line2D([], [], ls="none", marker="o", ms=6.0, mfc=cs.model(m).colour, mec="none",
+                      label=cd.show(m)) for m in cs.MODEL_ORDER]
+    # Three per row: the five versioned names do not fit on one line of a column.
+    cs.legend_top(fig, handles, ncols=3, handlelength=0.6, handletextpad=0.3, columnspacing=0.75)
     return fig
 
 

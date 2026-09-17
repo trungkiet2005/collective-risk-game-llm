@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{31}
+\begin{thebibliography}{32}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -122,6 +122,19 @@
   Intelligence}}, Vol.~\bibinfo{volume}{38}. \bibinfo{pages}{17960--17967}.
 \newblock
 \href{https://doi.org/10.1609/aaai.v38i16.29751}{doi:\nolinkurl{10.1609/aaai.v38i16.29751}}
+
+
+\bibitem[Fern{\'a}ndez~Domingos et~al\mbox{.}(2023)]%
+        {fernandezdomingos2023egttools}
+\bibfield{author}{\bibinfo{person}{Elias Fern{\'a}ndez~Domingos},
+  \bibinfo{person}{Francisco~C. Santos}, {and} \bibinfo{person}{Tom Lenaerts}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{{EGTtools}: Evolutionary game dynamics in
+  {Python}}.
+\newblock \bibinfo{journal}{\emph{iScience}} \bibinfo{volume}{26},
+  \bibinfo{number}{4} (\bibinfo{year}{2023}), \bibinfo{pages}{106419}.
+\newblock
+\href{https://doi.org/10.1016/j.isci.2023.106419}{doi:\nolinkurl{10.1016/j.isci.2023.106419}}
 
 
 \bibitem[Filippas et~al\mbox{.}(2024)]%

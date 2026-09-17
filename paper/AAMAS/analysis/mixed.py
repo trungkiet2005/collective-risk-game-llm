@@ -286,8 +286,8 @@ def figure(A, B):
     ax.set_xlim(-6, 106)
     ax.set_xticks([0, 50, 100])
     ax.set_xlabel("Target reached (%)")
-    key(ax, -2, key_y, False, "With 1 Qwen")
-    key(ax, 68, key_y, True, "Alone")
+    key(ax, -2, key_y, False, f"+1 {cd.show('Qwen')}")
+    key(ax, 74, key_y, True, "Alone")   # right of "+1 Qwen3-235B", which is longer than it was
     cs.panel_title(ax, "a", "One late dropout")
 
     # ---- b: per-seat total beside 1 Grok seat (filled) -> 5 Grok seats (open), 2-4 as dots
@@ -304,9 +304,9 @@ def figure(A, B):
     bx.set_xlim(lo, hi)
     bx.set_xticks([10, 15, 20, 25])
     bx.set_xlabel("Units per seat")
-    key(bx, lo + 0.6, key_y, False, "5 Grok seats")
+    key(bx, lo + 0.6, key_y, False, "5 seats")
     key(bx, 21.2, key_y, True, "1 seat")
-    cs.panel_title(bx, "b", "Beside Grok")
+    cs.panel_title(bx, "b", f"Beside {cd.show('Grok')}")
 
     for axis, rows in ((ax, rows_a), (bx, rows_b)):
         cs.row_labels(axis, rows, wrap=True)

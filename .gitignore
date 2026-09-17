@@ -100,3 +100,9 @@ Thumbs.db
 
 # plan/runs = log + ket qua tai ve cua tung shard (nang, khong commit)
 /plan/runs/
+
+# EGTTools = repo ngoai (github.com/Socrats/EGTTools), clone ve de tham khao, khong commit
+/EGTTools/
+
+# codex-chatgpt-web = rac cua launcher Codex (chi co node_modules/electron), khong thuoc project
+/codex-chatgpt-web/

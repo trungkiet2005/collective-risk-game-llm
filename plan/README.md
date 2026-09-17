@@ -80,15 +80,18 @@ không sửa style). Bản dựng: **8 trang thân bài, references từ trang 9
 0 Overfull, 0 font Type 3.** Abstract dạng text để dán lên OpenReview:
 `paper/AAMAS/OPENREVIEW_ABSTRACT.txt` (246 từ; phải khớp từng chữ với `main.tex`).
 
-| Mục | File | Dữ liệu |
+Toàn bộ bài nằm trong **một file** `paper/AAMAS/main.tex` (gộp 17-09-2026, thư mục
+`sections/` đã xoá). Cột "Label" để nhảy tới mục trong file.
+
+| Mục | Label trong `main.tex` | Dữ liệu |
 |---|---|---|
-| 1 Introduction | `sections/01_intro.tex` | — |
-| 2 Related work (có đoạn khai overlap với bản IF) | `sections/02_related.tex` | — |
-| 3 Game, Mệnh đề 1–2, thiết kế, prompt nguyên văn | `sections/03_game.tex` | — |
-| 4 Risk does not change the habit | `sections/04_risk.tex` | baseline, nohint, evprobe, para1/2, temp0 |
-| 5 Answers track the risk; play does not | `sections/05_knowing.tex` | evprobe probes, bestresponse ×4 |
-| 6 Habits in mixed groups + 7 Selection (α-Rank) | `sections/06_groups.tex` | mixed |
-| 8 Discussion, threats, limitations, ethics | `sections/07_discussion.tex` | — |
+| 1 Introduction | `sec:intro` | — |
+| 2 Related work (có đoạn khai overlap với bản IF) | `sec:related` | — |
+| 3 Game, Mệnh đề 1–2, thiết kế, prompt nguyên văn | `sec:game` | — |
+| 4 Risk does not change the default | `sec:risk` | baseline, nohint, evprobe, para1/2, temp0, wording, neutral |
+| 5 Answers track the risk; play does not | `sec:knowing` | evprobe probes, bestresponse ×4 |
+| 6 Defaults in mixed groups + 7 Selection (α-Rank) | `sec:groups`, `sec:selection` | mixed |
+| 8 Discussion, threats, limitations, ethics | `sec:discussion` | — |
 
 **Câu chuyện:** 5 model giá rẻ trả tiền theo **thói quen** (habit = hành vi vẫn tiếp tục khi
 trả tiền đã vô ích: p = 0 hoặc sau khi kết quả đã định), không theo risk; câu trả lời khi được
@@ -115,12 +118,17 @@ python -m pytest crsd/tests/test_paper_equilibrium.py   # cong chan Menh de 1
 
 **Luật của thư mục paper:**
 
-1. **Không gõ tay số đo được vào `sections/`.** Mọi con số là macro do script sinh. Script
+1. **Không gõ tay số đo được vào `main.tex`.** Mọi con số là macro do script sinh. Script
    có guard `RuntimeError` khi dữ liệu không còn khớp câu chữ.
-2. **Một nguồn dữ liệu và tên model**: `analysis/crsd_data.py` (`MODELS`, `SLUG`, payoff kỳ
+2. **Một file, mỗi đoạn một dòng.** Không tách lại `sections/*.tex` rồi `\input`; không ngắt
+   dòng giữa câu ở cột ~90 (viết mỗi đoạn văn, `\caption`, `\Description`, `\item` trên một
+   dòng). Chỉ nội dung **do script sinh** được ở file riêng: `tables/num_*.tex` (macro) và
+   `tables/tab_*.tex` (tabular) — gộp chúng vào `main.tex` thì chạy lại script sẽ không cập
+   nhật bài mà không báo lỗi.
+3. **Một nguồn dữ liệu và tên model**: `analysis/crsd_data.py` (`MODELS`, `SLUG`, payoff kỳ
    vọng). **Một theme figure**: `analysis/crsd_style.py` (Libertine, bảng màu an toàn mù màu,
    cổng kiểm cỡ chữ ≥ 7 pt, chồng chữ, bề rộng cột).
-3. Không en/em dash, không mã nội bộ (E1..E7, tên file) trong phần người đọc thấy.
+4. Không en/em dash, không mã nội bộ (E1..E7, tên file) trong phần người đọc thấy.
 
 **Còn phải làm trước khi nộp:**
 

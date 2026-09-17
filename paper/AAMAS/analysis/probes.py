@@ -256,7 +256,7 @@ def figure(vc: pd.DataFrame, g: pd.DataFrame) -> None:
                              "revisit the caption of fig_knowdo")
 
     cs.use()
-    fig, ax = cs.subplots("col", height_pt=128)
+    fig, ax = cs.subplots("col", height_pt=104)
     best_x, best_y = 1.0, cd.FAIR_TOTAL
     ax.set_xlim(-0.16, 1.2)
     ax.set_ylim(-7, 23.5)
@@ -288,7 +288,8 @@ def figure(vc: pd.DataFrame, g: pd.DataFrame) -> None:
     handles = [Line2D([], [], ls="none", marker=cs.model(m).marker,
                       ms=5.2 * cs.model(m).marker_scale, mfc=cs.model(m).colour, mec=cs.WHITE,
                       mew=0.5, label=cd.show(m)) for m in cs.MODEL_ORDER]
-    cs.legend_top(fig, handles, ncols=len(handles), handlelength=0.6, handletextpad=0.3, columnspacing=0.75)
+    # Three per row: the five versioned names do not fit on one line of a column.
+    cs.legend_top(fig, handles, ncols=3, handlelength=0.6, handletextpad=0.3, columnspacing=0.75)
     pdf = cs.save(fig, cd.FIGURES / "fig_knowdo", title="fig_knowdo")
     print(f"wrote {pdf} (+ .png)")
 

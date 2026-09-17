@@ -5,7 +5,7 @@ Run from the repository root, AFTER selfplay.py (it reads the game counts that s
 
 Writes (and nothing else):
     paper/AAMAS/figures/fig_overview.pdf (+ .png preview)
-Placed by sections/fig_overview.tex as a figure* at text width.
+Placed in main.tex (Introduction, fig:overview) as a figure* at text width.
 
 Every count on the figure is read from tables/num_selfplay.tex, the same macros the prose
 prints, and the four design counts must add up to \\CntGames or the figure is not drawn.

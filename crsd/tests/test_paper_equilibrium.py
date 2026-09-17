@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-r"""Cổng chặn cho MỆNH ĐỀ 1 của paper AAMAS (`paper/AAMAS/sections/03_game.tex`).
+r"""Cổng chặn cho MỆNH ĐỀ 1 của paper AAMAS (`paper/AAMAS/main.tex`, mục 3, `prop:eq`).
 
 VÌ SAO CÓ FILE NÀY. Mệnh đề đó là thứ duy nhất trong bài mà reviewer kiểm được bằng hai
 mươi dòng code, và cả §4 lẫn §6 đều tựa lên nó: mốc `opt(p) = max((1-p)*40, 20)` trong mọi

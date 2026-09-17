@@ -62,16 +62,20 @@ SLUG = {
 }
 MODELS = ["Haiku", "Flash-Lite", "Luna", "Qwen", "Grok"]
 # Reader-facing names. The internal keys above stay short for code, but every figure,
-# table and name-valued macro prints the model with its family: a bare "Luna" hides
-# that it is a GPT model, and one model per provider is how the panel was chosen.
-DISPLAY = {"Haiku": "Claude Haiku", "Flash-Lite": "Gemini Flash-Lite", "Luna": "GPT Luna",
-           "Qwen": "Qwen", "Grok": "Grok"}
+# table and name-valued macro prints the model with its family AND version: a bare
+# "Luna" hides that it is a GPT model, and "Claude Haiku" does not say which Haiku.
+DISPLAY = {"Haiku": "Claude Haiku 4.5", "Flash-Lite": "Gemini 3.5 Flash-Lite",
+           "Luna": "GPT-5.6 Luna", "Qwen": "Qwen3-235B", "Grok": "Grok 4.20"}
+# The same names on two lines, for narrow axes and two-row table headers.
+LINES = {"Haiku": ("Claude", "Haiku 4.5"), "Flash-Lite": ("Gemini 3.5", "Flash-Lite"),
+         "Luna": ("GPT-5.6", "Luna"), "Qwen": ("Qwen3", "235B"), "Grok": ("Grok", "4.20")}
 
 
 def show(name: str, wrap: bool = False) -> str:
-    """Display name for a model key; wrap=True breaks after the family (narrow axes)."""
-    text = DISPLAY.get(name, name)
-    return text.replace(" ", "\n", 1) if wrap else text
+    """Display name for a model key; wrap=True splits it over two lines (narrow axes)."""
+    if wrap and name in LINES:
+        return "\n".join(LINES[name])
+    return DISPLAY.get(name, name)
 
 
 # Macro-safe names (letters only).
