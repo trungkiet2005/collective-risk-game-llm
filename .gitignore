@@ -73,6 +73,8 @@ paper/**/*.toc
 paper/**/*.fls
 paper/**/*.fdb_latexmk
 paper/**/*.synctex.gz
+# Upload bundle, rebuilt by paper/AAMAS/make_submission.py from the committed PDFs.
+paper/AAMAS/submission/
 # .blg là log của bibtex — bỏ. Nhưng .bbl thì TRACK, cố ý: nó là danh mục tài liệu đã dựng
 # sẵn, và arXiv nhận bản nộp không chạy bibtex nên thiếu nó là hỏng lúc nộp.
 paper/**/*.blg
