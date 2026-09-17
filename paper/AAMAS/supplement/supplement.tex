@@ -4,15 +4,18 @@
 %% Nothing the paper's argument depends on lives only here.
 %% Anonymous: no author names, no repository names, no internal run identifiers.
 %%
-%% BUILD (from the repository root):
-%%   python paper/AAMAS/supplement/make_prompts.py
-%%   cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
+%% BUILD: regenerate the prompt include, then compile this file twice with pdflatex.
 %% =====================================================================================
 \documentclass[10pt]{article}
 \usepackage[T1]{fontenc}
+\usepackage{libertine}
+\usepackage{newtxmath}
 \usepackage[scaled=0.86]{beramono}   % monospace with a real bold face for marked spans
 \usepackage[margin=2.2cm]{geometry}
 \usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{longtable}
 \usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage[most]{tcolorbox}
@@ -21,6 +24,7 @@
 \newtcolorbox{promptbox}{breakable, enhanced, colback=white, colframe=black!45,
   boxrule=0.5pt, arc=0pt, left=5pt, right=5pt, top=4pt, bottom=4pt,
   fontupper=\ttfamily\small\raggedright}
+\newtheorem{proposition}{Proposition}
 
 \title{Supplementary Material\\[4pt]\large When Low-Cost Language Models Cooperate by Default:\\
 Incentives, Partners, and Selection in a Collective-Risk Dilemma}
@@ -30,7 +34,10 @@ Incentives, Partners, and Selection in a Collective-Risk Dilemma}
 \begin{document}
 \maketitle
 
-\section{Models}
+\tableofcontents
+\clearpage
+
+\section{Model inventory and protocol}
 
 Every game was played through one model-serving interface, with the same settings for all five models: temperature 0.7 unless a condition states otherwise, and an output limit of 3,000 tokens, raised automatically for a reply that reached the limit before its final \texttt{CONTRIBUTION:} line.
 
@@ -48,7 +55,264 @@ Grok 4.20 & Grok 4.20, non-reasoning & xAI & \texttt{grok-4.20-0309-non-reasonin
 \end{tabular}
 \end{center}
 
-\section{Prompts}
+\section{Formal game-theoretic benchmark}
+\label{sec:supp-game}
+
+This section gives the complete benchmark used to interpret model behaviour. A table has
+$n=6$ seats, each with endowment $e=40$. In round $t\in\{1,\ldots,R\}$, where
+$R=10$, seat $i$ chooses $a_i^t\in A=\{0,2,4\}$. Its total contribution is
+$x_i=\sum_{t=1}^{R}a_i^t$ and the table total is $X=\sum_i x_i$. The target is
+$T=120$. The final payoff is
+\begin{equation}
+ u_i =
+ \begin{cases}
+ e-x_i, & X\ge T,\\
+ e-x_i & X<T \text{ with probability }1-p,\\
+ 0 & X<T \text{ with probability }p.
+ \end{cases}
+ \label{eq:supp-payoff}
+\end{equation}
+The lottery is common to the table. We analyse expected payoff, rather than one draw of
+the lottery, so a missed target has expected multiplier $1-p$. The equal contribution is
+$T/n=20$, or two units per round, and the pivotal probability is
+$p^*=T/(ne)=1/2$.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Symbol & Meaning & Value in the experiments \\
+\midrule
+$n$ & seats per table & $6$ \\
+$R$ & rounds & $10$ \\
+$e$ & initial endowment per seat & $40$ \\
+$A$ & legal action set per round & $\{0,2,4\}$ \\
+$T$ & collective target & $120$ \\
+$p$ & catastrophe probability after a miss & $0$ to $1$ \\
+$x_i$ & total paid by seat $i$ & $0,2,\ldots,40$ \\
+$X$ & table total & $\sum_i x_i$ \\
+$p^*$ & risk level at which fair cooperation is optimal & $1/2$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{proposition}[Pure-strategy benchmark]
+\label{prop:supp-eq}
+For the total-contribution game with $p<1$, a profile is a pure-strategy Nash
+equilibrium if and only if either $x_i=0$ for every seat, or $X=T$ and
+$x_i\le pe$ for every seat. A target-reaching equilibrium exists if and only if
+$p\ge p^*=1/2$. The welfare-optimal total is $X=0$ for $p<p^*$ and $X=T$ for
+$p>p^*$, with per-seat benchmark
+\[
+ \operatorname{opt}(p)=\max\{(1-p)e,\,e-T/n\}.
+\]
+At $p=p^*$, the two totals tie.
+\end{proposition}
+
+\noindent\emph{Proof.}
+If $X<T$ and some seat pays a positive amount, that seat can pay zero and keep
+more money without changing the miss. Thus the only equilibrium that misses is
+$x=0$. If $X>T$, a seat can reduce its contribution by two units while keeping
+the target reached. If $X=T$, the deviation to zero yields $(1-p)e$, whereas
+staying yields $e-x_i$, so staying is optimal exactly when $x_i\le pe$.
+Summing those constraints gives $T\le npe$, or $p\ge T/(ne)$. Finally,
+social payoff is $n(e-X/n)=ne-X$ after success and $(1-p)(ne-X)$ after a miss;
+the best totals are therefore $T$ and zero, compared at $p^*$.
+\hfill$\square$
+
+The repeated implementation has the same total-payment benchmark for fixed
+schedules and for pure strategies that react to the visible history. We do not
+claim subgame perfection. The benchmark is deliberately a diagnostic, not a
+prediction: zero payment is an equilibrium at every risk level, while fair payment
+is both welfare optimal and supportable as an equilibrium only above the pivot.
+
+\subsection{Dominated actions and settled histories}
+
+We mark a payment as dominated when every possible continuation gives the seat a
+lower payoff than paying less. At $p=0$, paying is dominated from the start because
+the catastrophe has no effect on expected payoff. At any risk level, payment is
+dominated after a settled history. A history is settled-success if the visible pool
+has already reached $T$, and settled-failure if even six seats paying four in every
+remaining round cannot reach $T$. In either case, the current payment cannot change
+the outcome. These tests are independent of a model's risk attitude, beliefs about
+the other seats, or ability to compute the running pool. Payment after settlement is
+therefore a direct measure of action inertia.
+
+\subsection{Table ranking and selection}
+
+For seats $i$ and $j$ in the same table, the common outcome multiplier is
+$c=1$ after success and $c=1-p$ after a miss. Hence
+\begin{equation}
+ \mathbb{E}[u_i]-\mathbb{E}[u_j]=c(x_j-x_i).
+ \label{eq:supp-ranking}
+\end{equation}
+For $p<1$, the lowest payer at a table earns the highest expected payoff,
+regardless of whether the table reaches the target. This identity is the reason a
+within-table leaderboard can select under-contributors even when the group objective
+favours reaching the target.
+
+For completeness, the selection analysis uses a Fermi update. If a focal seat with
+policy $k$ and payoff $\pi_k$ meets a comparison seat with policy $\pi_j$, the
+probability of adopting $k$ is
+\begin{equation}
+ q_{k\leftarrow j}=\frac{1}{1+\exp[-\beta(\pi_k-\pi_j)]}.
+ \label{eq:supp-fermi}
+\end{equation}
+Within a table, comparison partners are sampled without replacement from the other
+$n-1$ seats. Across populations, the same rule is applied after drawing comparison
+groups of size $n$ from a population of size $N=30$. We report $\beta=1$ as the
+main selection intensity and $\beta=10$ as a sensitivity check. The model policy
+weights are first estimated from the observed contribution totals, then propagated
+through the comparison process. This separates the exact payoff identity above from
+the empirical question of which model pays least in company.
+
+\section{Experimental design and estimands}
+\label{sec:supp-design}
+
+All games use six seats, ten rounds, endowment 40, target 120, and legal actions
+$\{0,2,4\}$. Unless a condition says otherwise, temperature is 0.7. Each cell has
+ten independent games. The table below is the complete design inventory; counts are
+game counts, not seat counts.
+
+\begin{longtable}{@{}p{0.27\linewidth}p{0.22\linewidth}r p{0.37\linewidth}@{}}
+\caption{Complete experiment inventory.}\label{tab:supp-design}\\
+\toprule
+Design & Risk levels & Games & Purpose \\
+\midrule
+\endfirsthead
+\toprule
+Design & Risk levels & Games & Purpose \\
+\midrule
+\endhead
+Self-play grid & $0,0.1,\ldots,1$ & 550 & Baseline risk response \\
+No hint & $0.1,0.5,0.9$ & 150 & Remove equal-share cues \\
+In-game questions & $0.1,0.5,0.9$ & 150 & Ask rules and value questions \\
+All-zero partners & $0.1,0.3,\ldots,0.9$ & 250 & Test against non-contributors \\
+Fair-share partners & $0.1,0.3,\ldots,0.9$ & 250 & Test exact best response \\
+All-four partners & $0.1,0.3,\ldots,0.9$ & 250 & Test response to over-contribution \\
+Conditional partners & $0.1,0.3,\ldots,0.9$ & 250 & Test response to history-dependent partners \\
+Mixed model tables & $0.1,0.5,0.9$ & 1,500 & Test composition and fragility \\
+Two rewordings & $0.1,0.9$ & 200 & Prompt paraphrase check \\
+Temperature zero & $0.1,0.9$ & 100 & Decoding sensitivity \\
+Neutral wording & $0,0.1,0.9$ & 150 & Remove normative language \\
+Neutral wording plus goal & $0,0.1,0.9$ & 150 & State own-cash objective \\
+\midrule
+Total & & 3,950 & Main corpus \\
+\bottomrule
+\end{longtable}
+
+The self-play grid contains one model at each risk level and ten repetitions. The
+scripted-partner conditions place one model in the focal seat and fill the other five
+seats with the same deterministic policy. Mixed tables use ten model pairs and all
+splits from one to five seats, so the focal model is not confounded with a single
+partner arrangement. The prompt controls preserve the rules, action set, history and
+target while changing only the stated wording described in Section~\ref{sec:supp-prompts}.
+
+\subsection{Primary estimands}
+
+The primary outcome is expected payoff per seat,
+\[
+ \bar u_i=(1-p)(e-x_i)\quad\text{if }X<T,\qquad
+ \bar u_i=e-x_i\quad\text{if }X\ge T.
+\]
+Secondary outcomes are total payment $X$, target reach, exact split, the share of
+decisions equal to each legal action, and payment after a settled history. We also
+report the ratio $\bar u_i/\operatorname{opt}(p)$ and decompose the gap from the
+benchmark into three mutually exclusive categories: payment toward a target that is
+not welfare optimal below the pivot, payment beyond the target, and target failure
+at or above the pivot. Exact split means $a_i^t=2$ for all ten rounds. Target reach
+is computed once per table, never once per seat.
+
+The unit of analysis is the game for game-level outcomes, because seats in one game
+share a history and lottery. Seat-round summaries are used only for action
+distributions and are not treated as independent replicates in uncertainty estimates.
+The main corpus contains 3,950 games, 237,000 seat-round records, and 187,000 model
+seat-round decisions after excluding scripted seats. Two agent-level replies in a
+reworded condition were retained after the documented truncation and parsing check;
+no contribution is imputed from an incomplete reply.
+
+\subsection{Uncertainty and quality checks}
+
+Confidence intervals are 95\% percentile bootstrap intervals over games, with the
+same table-level resampling unit used for paired contrasts. Randomisation tests use
+permutations of game labels within the relevant design and risk level. The main
+analysis uses 5,000 bootstrap or permutation replicates; the selection analysis uses
+1,000 replicates because its outer simulation already includes repeated group draws.
+For a binary outcome, the reported percentage is the mean of game-level indicators,
+not a ratio of pooled seats. Fixed lottery draws are used across repetitions within
+a cell, while agents never observe the draw. This makes the expected-payoff analysis
+comparable across cells without allowing the realised draw to alter play.
+
+Before aggregation, each reply is checked for a final contribution marker, a legal
+integer action, the expected round index, and a consistent seat identifier. The
+parser rejects missing or illegal actions rather than silently coercing them. We
+also check that every game has six seats and ten rounds, that the reconstructed pool
+equals the sum of seat contributions, and that the target and endowment agree with
+the protocol. The analysis never combines the current corpus with legacy result
+files.
+
+\section{Analysis checks and supplementary results}
+\label{sec:supp-checks}
+
+\subsection{Rule knowledge versus action choice}
+
+The probe set contains 4,500 question records: 3,600 rule questions and 900 value
+questions. Rule questions test arithmetic and game-state interpretation, including
+the target, endowment, legal actions and whether the catastrophe is conditional on a
+miss. Value questions ask which action or total maximises the respondent's own
+expected payoff in a stated state. These are scored separately from play. A correct
+answer is an exact match to the keyed answer after normalising whitespace and
+capitalisation; an explanation is not counted as correct if the selected answer is
+wrong. The separation prevents a model's ability to describe the incentive from being
+used as evidence that its policy followed that incentive.
+
+\subsection{Scripted best-response enumeration}
+
+Against a fixed five-seat script, the focal seat's legal total schedules are
+enumerated rather than approximated. There are $3^{10}=59,049$ action sequences,
+including schedules that react to the visible history only through their own fixed
+round index. For each schedule we reconstruct the table total, evaluate
+Equation~\eqref{eq:supp-payoff} in expectation, and retain all maximisers. The
+reported exact-best-response indicator is one when the model's realised schedule is
+one of these maximisers. When a script reaches the target early or makes the target
+unreachable, the enumeration also identifies whether later payments are dominated.
+The minimum-total check records the smallest total among schedules that reach the
+target; it is distinct from the model's own payoff optimum.
+
+\subsection{Mixed tables}
+
+Mixed-table analyses average over all ten ordered model pairs and all seat splits
+from one to five seats. A table is successful if its total reaches 120 by round 10.
+Pairwise payoff differences use Equation~\eqref{eq:supp-ranking}; pairwise success
+rates use the table as the replicate. We do not interpret a model's marginal average
+in a mixed table as a causal effect of its identity, because composition changes both
+the number of seats and the partner histories. The purpose of this design is instead
+to expose interaction patterns hidden by homogeneous self-play.
+
+\subsection{Selection sensitivity}
+
+Selection is simulated from the observed policy totals and the expected payoffs
+implied by the common lottery. The primary within-table population has $N=6$ seats;
+the population comparison has $N=30$ seats. We repeat the analysis at population
+sizes 60 and 120 and at $\beta=10$. The comparison is made either among seats at the
+same table or among independently sampled groups. The latter preserves group-level
+success as the selection signal and is therefore a different mechanism, not a second
+estimate of the within-table process. All selection plots show the resulting policy
+mass and the probability that a newly sampled table reaches the target.
+
+\subsection{Reproducibility boundary}
+
+The manuscript fixes the game rules, prompts, model identifiers, decoding settings,
+risk grid, repetition count, parser, random seeds and analysis definitions. The
+supplement prints the prompt variants and the complete design inventory. Source
+tables and figures are generated from the same analysis outputs used in the main
+text. Exact future reruns may differ if an external model endpoint changes its
+weights, tokenizer, safety layer or availability; this is a property of the serving
+dependency, not an unreported analytical degree of freedom. The claims in the paper
+are therefore tied to the archived responses and the stated protocol.
+
+\section{Prompt variants}
+\label{sec:supp-prompts}
 
 Each round, every seat receives the prompt below, rendered for its own position, the current round and the full history, and answers with one contribution. No seat is given a persona and the running pool is not printed. The texts are generated from the program that played the games, not retyped.
 
