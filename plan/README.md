@@ -153,6 +153,7 @@ cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
 **Còn phải làm trước khi nộp:**
 
 - [x] Kiểm từng mục `refs.bib` với nguồn gốc (16-09-2026; kiểm lại 17-09: sửa claim Tavoni/Willis, thêm pages Schmied, bỏ title khỏi `anon-if`).
+- [ ] 18-09-2026: wave E8 (350 ván, `plan/scripts/launch_e8.py`): `groupgoal` (goal = tổng tiền cả nhóm, p 0/0.1/0.9), `showpool` (in running pool; self-play p=0 + scripted always_0/always_4 ở p=0.9), `evprobe_p0` (câu hỏi giá trị ở p=0). Smoke server-side 4 arm × 1 ván Qwen sạch (parse_failed=0, câu goal/dòng pool có ở 60/60 prompt, pool cộng đúng, probe p=0 đúng 6/6). Đã phóng full. Gom về bằng lệnh launcher in ra (nhớ `--experiment`); `collect_probes.py` cần thêm `--task/--experiment` cho `exp_evprobe_p0`. Tiêu chí đọc chốt TRƯỚC khi xem số: groupgoal hạ trả tiền ở p=0 so với `wording` ≥ 2 đơn vị và P<0.01; showpool so số trả sau khi đã định với Table 5.
 - [x] 17-09-2026: người dùng chốt bản Interface Focus KHÔNG nộp → đã bỏ đoạn "Overlap with concurrent work" và entry `anon-if`; ràng buộc trùng nộp ở aamas2027-plan §2 không còn áp dụng. Đừng thêm lại.
 - [x] 17-09-2026: thêm `analysis/strategy.py` (vòng cuối, luật đơn giản, equilibrium, nước mở của Grok) + Figure 3/6 mới; môi trường vẽ hình: venv Python 3.12 (egttools) + font Libertine G.
 - [x] Audit nộp bài 17-09-2026: claims↔macro, reviewer giả lập, supplement render + ẩn danh, metadata PDF (không ngày giờ, không đường dẫn). Abstract 247 từ.

@@ -139,6 +139,17 @@ def main() -> int:
     conflicts = []
     n_games = 0
 
+    # Ten thu muc server mang hau to noi bo (seat tag bam, probe) KHONG phai ten experiment
+    # trong results/: E2 -> exp_evprobe, E3a -> exp_bestresponse_*, E8 -> exp_showpool_
+    # bestresponse_*, exp_evprobe_p0. Quen --experiment thi cay results/ moc ra mot thu muc
+    # `exp_*_seats-L00000-<hash>` ma khong loader nao doc.
+    internal = sorted({g.parent.name for g, _ in shards
+                       if "_seats-" in g.parent.name or "_probe-" in g.parent.name})
+    if internal and not args.experiment:
+        print(f"!! DUNG: thu muc server {internal} can --experiment <ten trong results/> "
+              f"(xem plan/scripts/launch_e8.py gather_hint)", file=sys.stderr)
+        return 1
+
     for games_p, turns_p in shards:
         experiment = args.experiment or games_p.parent.name
         games = list(csv.DictReader(games_p.open(encoding="utf-8")))

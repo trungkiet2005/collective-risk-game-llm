@@ -1,0 +1,1082 @@
+{
+ "baseline": {
+  "experiment": "exp_baseline",
+  "framing": false,
+  "game_name_suffix": "",
+  "game_names": [
+   "crsd_milinski_p000_risk",
+   "crsd_milinski_low_risk",
+   "crsd_milinski_p030_risk",
+   "crsd_milinski_medium_risk",
+   "crsd_milinski_high_risk"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "d504f79d2d63763a147cffdf99d6cbea9fb4eff689b2c6c85f9a62bf82ffb753",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "59c6f912e5711c809a1c4793529c8dae7eb18da15e2c91497c266f882b547fe6"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en",
+    "vn"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "bestresponse_carry": {
+  "experiment": "exp_baseline_seats-L44444-34a89a50",
+  "framing": false,
+  "game_name_suffix": "_seats-L44444-34a89a50",
+  "game_names": [
+   "crsd_milinski_p000_risk_seats-L44444-34a89a50",
+   "crsd_milinski_low_risk_seats-L44444-34a89a50",
+   "crsd_milinski_p030_risk_seats-L44444-34a89a50",
+   "crsd_milinski_medium_risk_seats-L44444-34a89a50",
+   "crsd_milinski_high_risk_seats-L44444-34a89a50"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "c3609c8691b662323b79d94acab60f989cecaa013807ff2e85408a9ffc6163e0",
+   "totals": [
+    0,
+    100,
+    50,
+    30000
+   ],
+   "turns": "f5e5c8c953be2bcd7d17c17c6480f15ed325e891b51ff40102bd13e90571b484"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "seats": {
+    "max_completion_tokens": {},
+    "models": [
+     "gemini-3.5-flash-lite",
+     "scripted:always_4",
+     "scripted:always_4",
+     "scripted:always_4",
+     "scripted:always_4",
+     "scripted:always_4"
+    ],
+    "tag": "seats-L44444-34a89a50"
+   },
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "bestresponse_cond": {
+  "experiment": "exp_baseline_seats-LCCCCC-5cead3d5",
+  "framing": false,
+  "game_name_suffix": "_seats-LCCCCC-5cead3d5",
+  "game_names": [
+   "crsd_milinski_p000_risk_seats-LCCCCC-5cead3d5",
+   "crsd_milinski_low_risk_seats-LCCCCC-5cead3d5",
+   "crsd_milinski_p030_risk_seats-LCCCCC-5cead3d5",
+   "crsd_milinski_medium_risk_seats-LCCCCC-5cead3d5",
+   "crsd_milinski_high_risk_seats-LCCCCC-5cead3d5"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "3a5ec25e1af239f045cbc7d0d2b9373c2cdf2aa5eeb25c6da1e0db05bd575016",
+   "totals": [
+    0,
+    100,
+    50,
+    30000
+   ],
+   "turns": "ed0f7cb284cba07e3465bbe4d7f5451bab37262b05e300c6700c8bece47beb64"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "seats": {
+    "max_completion_tokens": {},
+    "models": [
+     "gemini-3.5-flash-lite",
+     "scripted:conditional_cooperator",
+     "scripted:conditional_cooperator",
+     "scripted:conditional_cooperator",
+     "scripted:conditional_cooperator",
+     "scripted:conditional_cooperator"
+    ],
+    "tag": "seats-LCCCCC-5cead3d5"
+   },
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "bestresponse_coop": {
+  "experiment": "exp_baseline_seats-L22222-466edccd",
+  "framing": false,
+  "game_name_suffix": "_seats-L22222-466edccd",
+  "game_names": [
+   "crsd_milinski_p000_risk_seats-L22222-466edccd",
+   "crsd_milinski_low_risk_seats-L22222-466edccd",
+   "crsd_milinski_p030_risk_seats-L22222-466edccd",
+   "crsd_milinski_medium_risk_seats-L22222-466edccd",
+   "crsd_milinski_high_risk_seats-L22222-466edccd"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "504936306781b50a2edf7416b8d53eb086e1148f409093926c22891de1ee3ff2",
+   "totals": [
+    0,
+    100,
+    50,
+    30000
+   ],
+   "turns": "553a243cd25f0c974623e83c0b536c6e9b6e1da192ffaebe176a1470bc969e43"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "seats": {
+    "max_completion_tokens": {},
+    "models": [
+     "gemini-3.5-flash-lite",
+     "scripted:always_2",
+     "scripted:always_2",
+     "scripted:always_2",
+     "scripted:always_2",
+     "scripted:always_2"
+    ],
+    "tag": "seats-L22222-466edccd"
+   },
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "bestresponse_defect": {
+  "experiment": "exp_baseline_seats-L00000-c4bff390",
+  "framing": false,
+  "game_name_suffix": "_seats-L00000-c4bff390",
+  "game_names": [
+   "crsd_milinski_p000_risk_seats-L00000-c4bff390",
+   "crsd_milinski_low_risk_seats-L00000-c4bff390",
+   "crsd_milinski_p030_risk_seats-L00000-c4bff390",
+   "crsd_milinski_medium_risk_seats-L00000-c4bff390",
+   "crsd_milinski_high_risk_seats-L00000-c4bff390"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "c254923b75d7d4b4cd4defa5486355d3391bb1f1cc7d622b48399472d5c3fcc7",
+   "totals": [
+    0,
+    100,
+    50,
+    30000
+   ],
+   "turns": "44fcc1e56a1b45cda79c4eb69f161f16b1afa0b924426f7f0b7fac6c123862c5"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "seats": {
+    "max_completion_tokens": {},
+    "models": [
+     "gemini-3.5-flash-lite",
+     "scripted:always_0",
+     "scripted:always_0",
+     "scripted:always_0",
+     "scripted:always_0",
+     "scripted:always_0"
+    ],
+    "tag": "seats-L00000-c4bff390"
+   },
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "evprobe": {
+  "experiment": "exp_baseline_probe-rules-value",
+  "framing": false,
+  "game_name_suffix": "_probe-rules-value",
+  "game_names": [
+   "crsd_milinski_p000_risk_probe-rules-value",
+   "crsd_milinski_low_risk_probe-rules-value",
+   "crsd_milinski_p030_risk_probe-rules-value",
+   "crsd_milinski_medium_risk_probe-rules-value",
+   "crsd_milinski_high_risk_probe-rules-value"
+  ],
+  "offline_game": {
+   "probes": "2628f6803dc4791abe1cf909499c3471adec3a5a949b1f3cefa65615735765ec",
+   "row": "9fd45d84d9a1a7f88f2732cfe6067926d3fc2dd4d0494de3c22c387a31aacc3b",
+   "totals": [
+    0,
+    900,
+    450,
+    270000
+   ],
+   "turns": "fc21f19c90cbf277cf721a110f4d23419a91e448543bf6799db390fb808bac55"
+  },
+  "probe_prompts": {
+   "0|1|0|rules_actions|[]": [
+    "5e798fd10d116bc47e6ed66a98ab5857b0ab9ca22ac5e3871c51378355dd2224",
+    "[0, 2, 4]"
+   ],
+   "0|1|0|rules_endowment|[]": [
+    "2cee1d8fd207fcea8c2e66cf3de263f0934a53a7ab00d13cf57074419562847c",
+    "40"
+   ],
+   "0|1|0|rules_max_contrib|[]": [
+    "18ebaca698cb9a1835700badf69fbce5fb592e2f9d48bd8cd17e995c85f7c34f",
+    "4"
+   ],
+   "0|1|0|rules_min_contrib|[]": [
+    "981a4179784bf5827c7cbc277628f7ba24df7af509dfe4cf4c40b0ec2524ff05",
+    "0"
+   ],
+   "0|1|0|rules_n_rounds|[]": [
+    "2685e34073db759ba23f6d17f74aef9a0cdbe4b3c66790198775b8d27397b902",
+    "10"
+   ],
+   "0|1|0|rules_payoff_disaster|[]": [
+    "a08fbbacf1beee7885bce884057d1f4061bcdefb7eedc530e8ddf81973368826",
+    "0"
+   ],
+   "0|1|0|rules_risk_pct|[]": [
+    "4f4461f08c0a4e4f9992839d6a3aa62d9e7aa340b4a603cf66dd8a2c3efb0eef",
+    "0"
+   ],
+   "0|1|0|rules_target|[]": [
+    "94bcde2de89bd144bd82ce8d9057766ccb755c7348fec1140dee754de6aa63ca",
+    "120"
+   ],
+   "0|1|0|value_compare|[]": [
+    "f8e11116beacc977cfc07db17408a15836710bc060b827464e185444cb58e815",
+    "2"
+   ],
+   "0|1|0|value_defect_ev|[]": [
+    "ce728bf1dac089acd81ddb7c516cb79bf31d7bc046f287a531631599ad2a515e",
+    "40"
+   ],
+   "0|6|0.5|rules_actions|[]": [
+    "83dcc64a441d613f9ba4f3c08ea4da45d946d3db07de154ccaa55ff0f42ba98c",
+    "[0, 2, 4]"
+   ],
+   "0|6|0.5|rules_endowment|[]": [
+    "d2788decf6d7824469b25fca745866f74f7f63309e1ec874d8ec06515dd85bca",
+    "40"
+   ],
+   "0|6|0.5|rules_max_contrib|[]": [
+    "342ebd2bc2c5d60188b8507b12d829774adc4e3dc0a257d9b5b9927180699fa1",
+    "4"
+   ],
+   "0|6|0.5|rules_min_contrib|[]": [
+    "16fb40ac661fcbae681d44368ecb2d0507ed6fa5b2ec8437c200b1fa7bb29547",
+    "0"
+   ],
+   "0|6|0.5|rules_n_rounds|[]": [
+    "6afb4a8ef63ade2400b777a3007bb299dc274d7bca8668dcc02f96e640428df4",
+    "10"
+   ],
+   "0|6|0.5|rules_payoff_disaster|[]": [
+    "6706e9a9715a8567e582079fdfd1a937c45d2bf5ed1edf27acb23020804bd88f",
+    "0"
+   ],
+   "0|6|0.5|rules_risk_pct|[]": [
+    "6d468a8fae0140c475a2341d4ac8691b97b3eff8f1c0b6da756975d8ed18bc1b",
+    "50"
+   ],
+   "0|6|0.5|rules_target|[]": [
+    "7fc4a4ca7b52f781fc736173c99d0a4f22881b406a9ee6445dae990ca6954e80",
+    "120"
+   ],
+   "0|6|0.5|value_compare|[]": [
+    "b9eac2efeaa27a341b8001c5a384bb125171f2b618cbc0ee44b0ff2696c0dd46",
+    "0"
+   ],
+   "0|6|0.5|value_defect_ev|[]": [
+    "fe3b2ffa508e565cf025bc4246381e519bd9360c4b6db58d97a0cc246d3e4fef",
+    "20"
+   ],
+   "2|3|0.1|rules_actions|[]": [
+    "eaa312a89c73befc503aa02d480701982b06531e741d211a8ed5d48653604d54",
+    "[0, 2, 4]"
+   ],
+   "2|3|0.1|rules_endowment|[]": [
+    "602fbcc24c45b72b066682d72f4f6acd1069d265afa86af0c2e2f763daa05746",
+    "40"
+   ],
+   "2|3|0.1|rules_max_contrib|[]": [
+    "cd104ee49d086a00267eb2cd72e52f40f6a73af928fb01ec5367fb5a42badc85",
+    "4"
+   ],
+   "2|3|0.1|rules_min_contrib|[]": [
+    "3e27064adb26038a7f7eb422ed8d3b93c26e92b18ab9f5381ece7c2f118520ee",
+    "0"
+   ],
+   "2|3|0.1|rules_n_rounds|[]": [
+    "725a12effa84a031688873903bc8a22dbf27558e0cccbf3dbcb705641118087e",
+    "10"
+   ],
+   "2|3|0.1|rules_payoff_disaster|[]": [
+    "87f50fdf16b2d2ebe53a1bb1bb4118b82d76830b2bb2e105e62a1e186020eeeb",
+    "0"
+   ],
+   "2|3|0.1|rules_risk_pct|[]": [
+    "5cca19c5f7ea45c6fc9289c17f9cccb46a38b6c491eab971231ec3a0bc37559d",
+    "10"
+   ],
+   "2|3|0.1|rules_target|[]": [
+    "449a449388aff011bb69271ccfa457f1ae0c64261baebb0cfe3ece9ac1496122",
+    "120"
+   ],
+   "2|3|0.1|value_compare|[]": [
+    "7b2347a1958c68365309984d0421a2821b3d1d3ff1051afc108ea347081534fb",
+    "2"
+   ],
+   "2|3|0.1|value_defect_ev|[]": [
+    "12f1285cf0bbcf4ed45c964f4a46e4fba4f4fe83dba196235cc9a3fe022b71b3",
+    "36"
+   ],
+   "5|10|0.9|rules_actions|[]": [
+    "dfba4e260c953e6e7ee8f8f26e31864931e87c013c5109ae578ee80590af4178",
+    "[0, 2, 4]"
+   ],
+   "5|10|0.9|rules_endowment|[]": [
+    "3ab6b0af41aee0c11bbcf13898348cfbba362e9150fd78feb10e3a8fdb57a460",
+    "40"
+   ],
+   "5|10|0.9|rules_max_contrib|[]": [
+    "44e6b798f2a45e23fee531c7801d9b5af878ad4aca7efde3b1b87cb47927ccbf",
+    "4"
+   ],
+   "5|10|0.9|rules_min_contrib|[]": [
+    "f42034029fe34bbfae2aa0cedeaf04704c742590bb82e106248335dfed4bbada",
+    "0"
+   ],
+   "5|10|0.9|rules_n_rounds|[]": [
+    "1f89a4df735d998f3ad0414272e62761b92439437cc41949b23bfadccb83b8a3",
+    "10"
+   ],
+   "5|10|0.9|rules_payoff_disaster|[]": [
+    "345935cab84c75db39778706e949abb346318cec5717e47d392425005ac2fb5e",
+    "0"
+   ],
+   "5|10|0.9|rules_risk_pct|[]": [
+    "244ef1e25b583334497af1997264545d6e6e1edf44d77de187e2ce9dae01545d",
+    "90"
+   ],
+   "5|10|0.9|rules_target|[]": [
+    "7351033e3f050c002f0a65380f16ad879d3f83243046f0d219d39d1c326b5b08",
+    "120"
+   ],
+   "5|10|0.9|value_compare|[]": [
+    "e9b2971ab57ec50df5f94e420fa33448633d91fde892ff8282e300090a9dc857",
+    "1"
+   ],
+   "5|10|0.9|value_defect_ev|[]": [
+    "0dd020c6d146fad222ffd0af11775e68ddb86487db2426efcc960fb02272dca2",
+    "4"
+   ]
+  },
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "probe": {
+    "categories": [
+     "rules",
+     "value"
+    ],
+    "fingerprint": "e8ec48168a13bb74",
+    "max_past_rounds": null,
+    "max_seats": 4,
+    "questions_per_game": 30,
+    "rounds": [
+     1,
+     5,
+     10
+    ],
+    "seats": [
+     0
+    ]
+   },
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "mixed": {
+  "experiment": "exp_baseline_seats-LLLMMM-dd62f8a3",
+  "framing": false,
+  "game_name_suffix": "_seats-LLLMMM-dd62f8a3",
+  "game_names": [
+   "crsd_milinski_p000_risk_seats-LLLMMM-dd62f8a3",
+   "crsd_milinski_low_risk_seats-LLLMMM-dd62f8a3",
+   "crsd_milinski_p030_risk_seats-LLLMMM-dd62f8a3",
+   "crsd_milinski_medium_risk_seats-LLLMMM-dd62f8a3",
+   "crsd_milinski_high_risk_seats-LLLMMM-dd62f8a3"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "48038cd55cdb51bc5fada249d87a9d2b98f57d527842a05e4f870cacfa52829f",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "dbff48ac6edff6f1f218305debbfe2323d4187f564067fe9fb4f41d92a105dc9"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "seats": {
+    "max_completion_tokens": {
+     "gpt-5.6-luna": 6000
+    },
+    "models": [
+     "gemini-3.5-flash-lite",
+     "gemini-3.5-flash-lite",
+     "gemini-3.5-flash-lite",
+     "gpt-5.6-luna",
+     "gpt-5.6-luna",
+     "gpt-5.6-luna"
+    ],
+    "tag": "seats-LLLMMM-dd62f8a3"
+   },
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "neutral": {
+  "experiment": "exp_neutral",
+  "framing": true,
+  "game_name_suffix": "_neutral",
+  "game_names": [
+   "crsd_milinski_p000_risk_neutral",
+   "crsd_milinski_low_risk_neutral",
+   "crsd_milinski_p030_risk_neutral",
+   "crsd_milinski_medium_risk_neutral",
+   "crsd_milinski_high_risk_neutral"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "6ea62d7397251060ef25057989009804793c84e9901acf6f4a7f4030a4cebdee",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "00cc13cc1c989dc4dd7e557a2b2dd118a1024433c61767def1ddaae4f2de2686"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "neutral",
+  "prompts": {
+   "en|0|1|0": "b6a4c5fe04a56c179e66ca1dd26bd9847c7df770dfa83a733a61a49f0e597987",
+   "en|0|6|0.5": "672233ed032948e80becce42eff0fa7d665f687f6c0c596fac05ecb3bd9ac80d",
+   "en|2|3|0.1": "1a8e6b735a08f5066bb3f905f9a77c043646d678a5b6019b45acd9f8a3926a36",
+   "en|5|10|0.9": "30a91f7dc8f39a64fad16c7e681a78eb217c9c4f74f47d44e6985ec2f5d5bf68"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": true,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "94de40f6dbe80c15",
+   "prompt_variant": "neutral",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "nohint": {
+  "experiment": "exp_nohint",
+  "framing": false,
+  "game_name_suffix": "_nohint",
+  "game_names": [
+   "crsd_milinski_p000_risk_nohint",
+   "crsd_milinski_low_risk_nohint",
+   "crsd_milinski_p030_risk_nohint",
+   "crsd_milinski_medium_risk_nohint",
+   "crsd_milinski_high_risk_nohint"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "7cbb3b1d3dae4e311acaab40ad54f022052a6027b317288c1e48d3a9f35d2f37",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "bb47e5061d4b16fe3cd948239ead87cf199010009372969e1746a71cc9a30b78"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "nohint",
+  "prompts": {
+   "en|0|1|0": "66eff0d08798927b042241985694733c699d6e7f9c1e51293310d9c4332da255",
+   "en|0|6|0.5": "03d026c028fd326c7e9a3c299657f86b6c515f97e0efc16180edc06483363d76",
+   "en|2|3|0.1": "0f90493a32ff8c4362569a16028ce090f9c12ac27b3d79a4a90a0699337b2d35",
+   "en|5|10|0.9": "0010dba68f338d031d27aed88e113354c30dc767cd02c82910d2d58334093e45"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f3aadbc7cb318092",
+   "prompt_variant": "nohint",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "para1": {
+  "experiment": "exp_para1",
+  "framing": false,
+  "game_name_suffix": "_para1",
+  "game_names": [
+   "crsd_milinski_p000_risk_para1",
+   "crsd_milinski_low_risk_para1",
+   "crsd_milinski_p030_risk_para1",
+   "crsd_milinski_medium_risk_para1",
+   "crsd_milinski_high_risk_para1"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "445b09c5dc7544a52f52958fb0bf700c9d928ba5ef874d3edbae37668c1cbd1c",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "ec0ad4156a274b9041c8650250c4d87f3e084cadaf4de8b60b8b5f5febc97a42"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "para1",
+  "prompts": {
+   "en|0|1|0": "344f12d0e8da06f520f7cd4159dde1867b2d9e6d5e0c840bb33bb9684a7c8444",
+   "en|0|6|0.5": "afad2aad58ee9750561595992507ba537688f04e79a7f8a91faf630c16051893",
+   "en|2|3|0.1": "17b38e1ab47d1dae51c783b7f37bfa93208d855a23e6eb05444dd6fe2f713e73",
+   "en|5|10|0.9": "7577a8aa76cc2663f5bdc508251544a471231d81d39b2f1354c9099535ff7d76"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "b2cf198909c23c94",
+   "prompt_variant": "para1",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "para2": {
+  "experiment": "exp_para2",
+  "framing": false,
+  "game_name_suffix": "_para2",
+  "game_names": [
+   "crsd_milinski_p000_risk_para2",
+   "crsd_milinski_low_risk_para2",
+   "crsd_milinski_p030_risk_para2",
+   "crsd_milinski_medium_risk_para2",
+   "crsd_milinski_high_risk_para2"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "833506eb331a520f595d31f8b7e0d8bf0bca687f0f143a16d5b0283e85b9d5a5",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "25996e2ee69a753cba9e12cc5e71110cb795606d56a0a7d809374c585093d06e"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "para2",
+  "prompts": {
+   "en|0|1|0": "bd0367bc1366e32ab1e0dfd57e1d62a6ceb9bf3f08d43280baf3fa393b0e3f99",
+   "en|0|6|0.5": "d8ba57a27ca2b50b067b1648c8462764f8c42e1bbc2c96be957e79fec71f8f8d",
+   "en|2|3|0.1": "05d028d0b864dac14674e92adf20e053c7ba7c5579496a2bebf80edd58a40523",
+   "en|5|10|0.9": "e2c741cecb2122eb6f69b0f399c044f0cbe2e6f383772535b596dc693bcc54ab"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "dcbef7d9ab044015",
+   "prompt_variant": "para2",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.7
+  }
+ },
+ "temp0": {
+  "experiment": "exp_baseline_temp0",
+  "framing": false,
+  "game_name_suffix": "_temp0",
+  "game_names": [
+   "crsd_milinski_p000_risk_temp0",
+   "crsd_milinski_low_risk_temp0",
+   "crsd_milinski_p030_risk_temp0",
+   "crsd_milinski_medium_risk_temp0",
+   "crsd_milinski_high_risk_temp0"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "26b0bb9f43c81c4fb42432d040751a719c2ec0acbe0b32458e9121dbbba93243",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "3ac2dd193760e9957f667e94ca76837a210f48eea225954fb951d11ba04477e4"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "baseline",
+  "prompts": {
+   "en|0|1|0": "64228efdef34a62b17e56149bd5d8ac297da693eb679b01b83cf86ba26c8326f",
+   "en|0|6|0.5": "ba95d69d34d434ef63ac0fc82dc2648efc7cb507051cf94d54681cd98aa13fee",
+   "en|2|3|0.1": "21a745ca06c44320c1000d2a2b39189d35b8ef6469bd326f6c7b14c300cd940e",
+   "en|5|10|0.9": "8fe61fc166e4ec2a5d576219fb274d3cad5369293d2e23f29309d6ea750dbbce",
+   "vn|0|1|0": "6214eff123ff02df0e37b591443b3bbc6e7edb226f397484140eba36791afa4d",
+   "vn|0|6|0.5": "4d02dc2413484e2cd974bf97cccc356f9ace8312b90144f5d25fc125a4d3e314",
+   "vn|2|3|0.1": "81add733080a4d726bd9e93c6ae7f9ac6d831ceaf5b7240947ea156d3e56d222",
+   "vn|5|10|0.9": "56d8514ef354364dbd6b9cbd56008e3882e7f50c0f908baaec1c60ca47a64dbc"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "f78785cba0905583",
+   "prompt_variant": "baseline",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.0
+  }
+ },
+ "wording": {
+  "experiment": "exp_wording",
+  "framing": false,
+  "game_name_suffix": "_wording",
+  "game_names": [
+   "crsd_milinski_p000_risk_wording",
+   "crsd_milinski_low_risk_wording",
+   "crsd_milinski_p030_risk_wording",
+   "crsd_milinski_medium_risk_wording",
+   "crsd_milinski_high_risk_wording"
+  ],
+  "offline_game": {
+   "probes": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+   "row": "f534af8d381aa69621ea407ce56d78cec53f0fff2af20d1a0001f69849701f96",
+   "totals": [
+    0,
+    600,
+    300,
+    180000
+   ],
+   "turns": "d1fed888f40f7e26da17e9478d01365cab89cea5bdc3f4e50afe8609d98cfae9"
+  },
+  "probe_prompts": {},
+  "prompt_variant": "wording",
+  "prompts": {
+   "en|0|1|0": "7ed37bafcd1d464626afa7a59c288c3fec5a47962339d934e0e85684d2e720f5",
+   "en|0|6|0.5": "b3679a789d64f2dbbab9af7e43b461fcac18991946bf78abf451793db8567b92",
+   "en|2|3|0.1": "4a9c2aaf1a2897e92718b4a229f990b0a4a812e4bdcbfe549a73f750ef9766dc",
+   "en|5|10|0.9": "87ccb252ea6f3a3368cca22fe1bcfe35cd9e869a8329dbcfdfb250ab91c47f68"
+  },
+  "signature": {
+   "base_seed": 12345,
+   "endowment": 40,
+   "framing": false,
+   "languages": [
+    "en"
+   ],
+   "max_completion_tokens": 6000,
+   "memory_mode": "full_history",
+   "model": "tag",
+   "n_players": 6,
+   "n_rounds": 10,
+   "options": [
+    0,
+    2,
+    4
+   ],
+   "persona_set": "personas_default",
+   "prompt_fingerprint": "0acb8b96bae6989a",
+   "prompt_variant": "wording",
+   "rep_start": 0,
+   "reps": 2,
+   "risks": [
+    0.0,
+    0.1,
+    0.9
+   ],
+   "schema_version": 3,
+   "target": 120,
+   "temperature": 0.7
+  }
+ }
+}

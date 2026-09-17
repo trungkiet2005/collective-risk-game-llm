@@ -38,7 +38,8 @@ if os.environ.get("CRG_TASK_SRC"):
     TASK_SRC = Path(os.environ["CRG_TASK_SRC"])
 # kbench ghi .task.json/.run.json ra CWD -> ghim CWD vao day (xem run_cmd).
 ARTIFACTS = REPO / "kaggle" / "benchmarks" / "artifacts"
-CRED_ROOT = Path("D:/AI_PhD/GameTheory/kaggle_for_research")
+CRED_ROOT = Path(os.environ.get(
+    "CRSD_CRED_ROOT", str(REPO.parents[1] / "infra" / "kaggle_for_research")))
 WORK = REPO / "plan" / "runs"          # log + file shard
 # Kết quả tải về PHẢI nằm ở đường dẫn ngắn: cây thư mục Kaggle sinh ra đã 174 ký tự,
 # đặt trong plan/runs/<label>/ là vượt giới hạn 260 của Windows và download chết.
@@ -72,7 +73,7 @@ ACCOUNTS = {
         "acc06", "acc07", "acc08", "acc09", "acc10", "acc11")},
     # Lô bổ sung 11-09-2026 (kaggle-api-4/). Người dùng thả token vào
     # D:/AI_PhD/kaggle_for_research/ (KHÁC CRED_ROOT) rồi copy vào đây — xem CLAUDE.md.
-    **{n: ("token_txt", CRED_ROOT / "kaggle-api-4" / f"{n}.txt") for n in (
+    **{n: ("token_txt", CRED_ROOT / "kaggle-api" / f"{n}.txt") for n in (
         "kakagotto", "tonngohan")},
     "trungkiet":    ("json", CRED_ROOT / "kaggle.json"),
     "foundnotkiet": ("json", CRED_ROOT / "kaggle (1).json"),

@@ -101,7 +101,17 @@ CONTEXT = {
     "exp_baseline_temp0": "temp0",
     "exp_neutral": "neutral",
     "exp_wording": "wording",
+    "exp_groupgoal": "groupgoal",
+    "exp_showpool": "showpool",
+    "exp_showpool_bestresponse_defect": "pool_all0",
+    "exp_showpool_bestresponse_carry": "pool_all4",
+    "exp_evprobe_p0": "probe_p0",
 }
+# Follow-up arms (launch_e8.py). Deliberately NOT in EXPERIMENTS: build() with no argument
+# must keep loading exactly the dataset every existing table and figure was made from.
+# Load them explicitly once their data exist: build(E8_EXPERIMENTS).
+E8_EXPERIMENTS = ["exp_groupgoal", "exp_showpool", "exp_showpool_bestresponse_defect",
+                  "exp_showpool_bestresponse_carry", "exp_evprobe_p0"]
 SELFPLAY_ARMS = ["exp_baseline", "exp_evprobe", "exp_nohint", "exp_para1", "exp_para2", "exp_neutral", "exp_wording",
                  "exp_baseline_temp0"]
 SCRIPTED = {"all0": "exp_bestresponse_defect", "all2": "exp_bestresponse_coop",
@@ -186,7 +196,7 @@ def build(experiments: Sequence[str] = tuple(EXPERIMENTS)):
                 others = sorted({SLUG[s] for s in llm if s in SLUG and SLUG[s] != m})
                 if exp == "exp_mixed":
                     partner = others[0]
-                elif exp.startswith("exp_bestresponse"):
+                elif "_bestresponse_" in exp:
                     partner = CONTEXT[exp]
                 else:
                     partner = "self"
@@ -212,8 +222,8 @@ def build(experiments: Sequence[str] = tuple(EXPERIMENTS)):
     return out
 
 
-def load_probes() -> pd.DataFrame:
-    probes = pd.read_csv(RESULTS / "exp_evprobe_probes.csv")
+def load_probes(experiment: str = "exp_evprobe") -> pd.DataFrame:
+    probes = pd.read_csv(RESULTS / f"{experiment}_probes.csv")
     probes["model"] = probes["model"].map(SLUG)
     if probes["model"].isna().any():
         raise ValueError("unknown model slug in probe file")

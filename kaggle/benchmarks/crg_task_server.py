@@ -50,6 +50,15 @@ Prompt arms (CRG_TEMPLATE, default "baseline"):
   wording   the neutral template with the {framing} block OFF: only the words change,
             the objective is not stated. Separates the two changes the neutral arm made
             at once. English only; output folder exp_wording.
+  groupgoal the neutral template with the {framing} block ON, but the objective in it is
+            the GROUP's total final cash instead of the player's own. Only that sentence
+            differs from "neutral" (_set_group_objective). English only; output folder
+            exp_groupgoal.
+  showpool  the BASELINE template with its existing {showCumulative} block switched ON:
+            every seat, every round (round 1 included, as in crsd), reads "- The climate
+            account so far holds <pool> of the 120 target.", where <pool> is the sum of
+            all contributions in the completed rounds. English only; output folder
+            exp_showpool (plus the seat tag when CRG_SEAT_MODELS is set).
 
 Comprehension probe (CRG_PROBE, default "" -- OFF, nothing below happens):
   A comma-separated list of question CATEGORIES from crsd/engine/comprehension.py:
@@ -211,13 +220,19 @@ RESUME = os.environ.get("CRG_RESUME", "1").strip().lower() not in {
 # Same textual shape as every other knob so plan/scripts/launch_shard.py's regex
 # rewriter (make_shard_file) can bake the value into a shard copy.
 TEMPLATE_VARIANT = os.environ.get("CRG_TEMPLATE", "baseline").strip().lower() or "baseline"
-KNOWN_TEMPLATE_VARIANTS = ("baseline", "nohint", "para1", "para2", "neutral", "wording")
+KNOWN_TEMPLATE_VARIANTS = ("baseline", "nohint", "para1", "para2", "neutral", "wording",
+                           "groupgoal", "showpool")
 # Variants that render the template's {framing} block ("the only thing that matters to
 # you is your own final cash payoff"). Every arm before "neutral" played with it OFF,
 # so FRAMING is False for all of them and their checkpoint signatures, game rows and
 # turn records are byte-for-byte what they were.
-FRAMING_VARIANTS = ("neutral",)
+FRAMING_VARIANTS = ("neutral", "groupgoal")
 FRAMING = TEMPLATE_VARIANT in FRAMING_VARIANTS
+# Variants that render the {showCumulative} block (the running pool). Every other arm
+# plays with the pool hidden, and SHOW_CUMULATIVE adds keys to signatures, rows and turn
+# records ONLY when it is on, so their bytes do not move.
+SHOW_CUMULATIVE_VARIANTS = ("showpool",)
+SHOW_CUMULATIVE = TEMPLATE_VARIANT in SHOW_CUMULATIVE_VARIANTS
 if TEMPLATE_VARIANT not in KNOWN_TEMPLATE_VARIANTS:
     # Fail at import, before a single paid call: a typo'd variant that fell back to
     # baseline would spend the shard's budget re-measuring the control arm.
@@ -909,6 +924,40 @@ def _neutralise(template):
 
 TEMPLATE_EN_NEUTRAL = _neutralise(TEMPLATE_EN)
 
+# %% ---------- groupgoal variant: neutral wording, the GROUP's cash as the objective ----
+# The neutral arm stated an own-cash objective and removed most payment at p=0. This arm
+# keeps every neutral word and swaps only the objective sentence for the group's total,
+# so neutral -> groupgoal is the effect of whose cash the prompt says matters.
+_OWN_OBJECTIVE = ("You are a participant in a paid economics experiment. The only thing "
+                  "that matters to you is your own final cash payoff. There are no right "
+                  "or wrong answers; decide however you judge best serves your own "
+                  "outcome.")
+_GROUP_OBJECTIVE = ("You are a participant in a paid economics experiment. The only thing "
+                    "that matters to you is the total final cash of the whole group. There "
+                    "are no right or wrong answers; decide however you judge best serves "
+                    "that outcome.")
+
+
+def _set_group_objective(template):
+    """Neutral template with the group objective in its {framing} block, or a loud failure."""
+    found = template.count("{framing}: [" + _OWN_OBJECTIVE + "\n")
+    if found != 1:
+        raise SystemExit(
+            "groupgoal template: expected exactly 1 own-cash framing sentence in the "
+            "neutral template, found %d -- re-derive the arm before it is run." % found)
+    text = template.replace(_OWN_OBJECTIVE, _GROUP_OBJECTIVE)
+    left = [w for w in _NEUTRAL_BANNED if w in text.lower()]
+    if left:
+        raise SystemExit("groupgoal template is not the neutral wording (contains %s)"
+                         % ", ".join(left))
+    if "your own" in text.lower():
+        raise SystemExit("groupgoal template still names the player's own outcome")
+    text.encode("ascii")
+    return text
+
+
+TEMPLATE_EN_GROUPGOAL = _set_group_objective(TEMPLATE_EN_NEUTRAL)
+
 TEMPLATE_SETS = {
     "baseline": {"en": TEMPLATE_EN, "vn": TEMPLATE_VN},
     "neutral": {"en": TEMPLATE_EN_NEUTRAL},
@@ -918,6 +967,10 @@ TEMPLATE_SETS = {
     # most payment at p=0. This arm isolates the words: baseline -> wording is the
     # effect of the words, wording -> neutral is the effect of stating the objective.
     "wording": {"en": TEMPLATE_EN_NEUTRAL},
+    "groupgoal": {"en": TEMPLATE_EN_GROUPGOAL},
+    # "showpool" plays the baseline English wording; SHOW_CUMULATIVE turns on the
+    # template's own pool line. Nothing is retyped.
+    "showpool": {"en": TEMPLATE_EN},
     "nohint": {"en": TEMPLATE_EN_NOHINT},
     "para1": {"en": TEMPLATE_EN_PARA1},
     "para2": {"en": TEMPLATE_EN_PARA2},
@@ -1107,7 +1160,7 @@ def _assemble(template, language, player_index, current_round, history, risk,
         "framing": FRAMING,          # ON only for FRAMING_VARIANTS ("neutral")
         "gameLength": N_ROUNDS_KNOWN,
         "history": has_history,
-        "showCumulative": False,     # pool hidden (baseline)
+        "showCumulative": SHOW_CUMULATIVE,   # pool hidden except SHOW_CUMULATIVE_VARIANTS
         # Harmless on both templates shipped here (the probe tail is inlined, not a
         # block); present so a later block-form question tail cannot render empty.
         "question": bool(question_text),
@@ -1182,7 +1235,7 @@ def extract_reasoning(text):
 #   value_defect_ev  = round((1 - p) * 40)          -> 36 / 20 / 4  at p = .1 / .5 / .9
 #   value_compare    = 1 if 40 - 120/6 > (1-p)*40 else 2 (0 on a tie)
 #                                                   ->  2 /  0 / 1  at p = .1 / .5 / .9
-PROBE_SHOW_CUMULATIVE = False    # baseline: the running pool is hidden from the agent
+PROBE_SHOW_CUMULATIVE = SHOW_CUMULATIVE   # False except the showpool arm
 PROBE_SHOW_INDIVIDUAL = True     # baseline: per-seat contributions ARE shown
 
 # Anchored on a formatted `ANSWER:` line at the start of a line, last match wins --
@@ -2243,6 +2296,8 @@ def play_game(model_slug, risk, language, rep, model_tag, turns_sink,
                 "persona_set": PERSONA_SET, "memory_mode": "full_history",
                 "framing": FRAMING, "rep": rep,
             }
+            if SHOW_CUMULATIVE:
+                turn["show_cumulative"] = True
             if SEAT_MODELS:
                 # Who actually produced this move. Same key as the open-weight arm's
                 # TurnRecord.seat_model, and present ONLY on a mixed run, so every
@@ -2280,6 +2335,8 @@ def play_game(model_slug, risk, language, rep, model_tag, turns_sink,
         "catastrophe": int(disaster), "mean_payoff": sum(payoffs) / N_PLAYERS,
         "rep": rep, "seed": BASE_SEED + rep,
     }
+    if SHOW_CUMULATIVE:
+        game_row["show_cumulative"] = 1
     if SEAT_MODELS:
         # Group composition, seat order preserved, "|"-separated exactly as
         # crsd/dataio/recorder.py writes it -- so games.csv describes the opponents
@@ -2381,6 +2438,9 @@ def _checkpoint_signature(model_tag):
         "memory_mode": "full_history",
         "framing": FRAMING,
     }
+    if SHOW_CUMULATIVE:
+        # Added ONLY when the pool is shown, so every existing signature is unchanged.
+        signature["show_cumulative"] = True
     if SEAT_MODELS:
         # Added ONLY when the group is mixed, so every shard already on disk keeps
         # resuming: a normal run produces exactly the signature it did before this
@@ -2727,6 +2787,8 @@ def collective_risk_baseline(llm) -> dict:
         "out_dir": str(out_dir),
         "checkpoint_dir": str(checkpoint_dir),
     }
+    if SHOW_CUMULATIVE:
+        start_record["show_cumulative"] = True
     if SEAT_MODELS:
         # Only a mixed run says anything about seats, so the banner a supervisor
         # already parses is unchanged for every other sweep.
