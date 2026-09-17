@@ -19,6 +19,8 @@ FIG = HERE / "figures"; FIG.mkdir(exist_ok=True)
 mpl.rcParams.update({
     "font.family": "sans-serif",
     "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
     "savefig.dpi": 300, "savefig.bbox": "tight", "savefig.pad_inches": 0.03,
 })
 

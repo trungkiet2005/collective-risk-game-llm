@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from paper.Interface_Focus.revision._data import (FRONTIER_LABELS, OPEN_LABELS, OUT, RESULTS,  # noqa: E402
+from _data import (FRONTIER_LABELS, OPEN_LABELS, OUT, RESULTS,  # noqa: E402
                    frontier_games, label, open_games)
 
 TARGET = 120.0
@@ -262,22 +262,23 @@ def tab_effects(d: dict) -> str:
     return r"""\begin{table*}[t]
 \centering
 \caption{\textbf{What moves an agent, on one scale.} Change in group contribution
-(of a possible $240$) produced by each manipulation. \emph{Channel} is how the
-manipulation reaches the agent: through the incentive structure of the game, through
-the text of the prompt, or through the model itself. The $\Delta$ column gives the
-largest effect any model shows, with the range across models in the last column; the
-one manipulation that carries information about payoffs is the smallest, for every
-model except the two that solve the game. Every value is recomputed from the raw
-per-game logs by \texttt{paper/revision/r6\_summary\_tables.py}.}
+(of a possible $240$) produced by each manipulation. \emph{Channel} identifies
+whether the change is carried by the game's incentives, the prompt, or the model
+configuration. The final column gives the largest effect and its range across models.
+The risk comparison is the smallest for the models that do not follow the
+expected-value benchmark.}
 \label{tab:effects}
 \footnotesize
-\begin{tabular}{@{}llccll@{}}
+\setlength{\tabcolsep}{1pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}p{.20\textwidth}p{.08\textwidth}p{.09\textwidth}p{.12\textwidth}p{.06\textwidth}p{.22\textwidth}@{}}
 \toprule
-Manipulation & Channel & $\Delta$ contribution & $95\%$ CI & $P$ & Largest effect, and range \\
+Manipulation & Channel & \shortstack{$\Delta$\\contrib.} & \shortstack{$95\%$\\CI} & $P$ & Largest effect, and range \\
 \midrule
 """ + body + r"""
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}
 """
 

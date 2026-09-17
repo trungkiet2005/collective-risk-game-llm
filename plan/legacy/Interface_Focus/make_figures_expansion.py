@@ -23,13 +23,15 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent / "results"
+ROOT = HERE.parents[2] / "results"
 FIG = HERE / "figures"; FIG.mkdir(exist_ok=True)
 
 mpl.rcParams.update({
     "figure.dpi": 150, "savefig.dpi": 300,
     "font.family": "sans-serif",
     "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
     "font.size": 9, "axes.titlesize": 10, "axes.labelsize": 9.5,
     "axes.linewidth": 0.8, "axes.edgecolor": "#3a3a38",
     "axes.spines.top": False, "axes.spines.right": False,

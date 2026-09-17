@@ -57,7 +57,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from paper.Interface_Focus.revision._data import (OUT, RESULTS, ROOT, comprehension_categories,  # noqa: E402
+from _data import (OUT, RESULTS, ROOT, comprehension_categories,  # noqa: E402
                    discover_comprehension, discover_files, discover_games,
                    discover_turns, label, rel_to_root)
 

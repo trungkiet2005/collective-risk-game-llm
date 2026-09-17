@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from paper.Interface_Focus.revision._data import FRONTIER_LABELS, OUT, frontier_games, label   # noqa: E402
+from _data import FRONTIER_LABELS, OUT, frontier_games, label   # noqa: E402
 
 # This is the one analysis that wants the p=0.3/0.7 cells; every other script
 # takes the shared three-level grid so its cross-panel means stay comparable.
@@ -94,7 +94,8 @@ def make_figure(df: pd.DataFrame, summary: dict) -> bool:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    plt.rcParams.update({"font.size": 7.6, "axes.labelsize": 7.6,
+    plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42,
+                         "font.size": 7.6, "axes.labelsize": 7.6,
                          "xtick.labelsize": 7, "ytick.labelsize": 7,
                          "axes.spines.top": False, "axes.spines.right": False})
     fig, (axA, axB) = plt.subplots(1, 2, figsize=(7.1, 2.9))
