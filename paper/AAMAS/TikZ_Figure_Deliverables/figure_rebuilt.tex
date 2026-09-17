@@ -5,32 +5,51 @@
 \usepackage{xcolor}
 \usetikzlibrary{arrows.meta,calc,shapes.geometric}
 
-\definecolor{Navy}{HTML}{001C4A}
-\definecolor{CardFill}{HTML}{F4FAFE}
-\definecolor{CardBorder}{HTML}{B8DCEF}
-\definecolor{GreenDark}{HTML}{008F38}
-\definecolor{Red}{HTML}{E0281B}
-\definecolor{Coin}{HTML}{E8A200}
-\definecolor{SoftGray}{HTML}{EEF1F2}
-\definecolor{MidGray}{HTML}{6F7880}
-\definecolor{Divider}{HTML}{C8D9E4}
-\definecolor{ModelBlue}{HTML}{1F5FBF}
+% Neutrals and model hues from analysis/crsd_style.py. Model hues appear only where a model
+% is named; generic roles (LLM agent, second model, scripted partner) stay off them.
+\definecolor{Ink}{HTML}{111111}
+\definecolor{Muted}{HTML}{555555}
+\definecolor{Line}{HTML}{808080}
+\definecolor{CardFill}{HTML}{F5F5F5}
+\definecolor{CardBorder}{HTML}{D6D6D6}
+\definecolor{Divider}{HTML}{C4C4C4}
+\definecolor{SoftGray}{HTML}{EBEBEB}
+\definecolor{Fail}{HTML}{B2182B}
+\definecolor{HaikuText}{HTML}{A66700}
+\definecolor{FlashText}{HTML}{0173B2}
+\definecolor{LunaText}{HTML}{00855F}
+\definecolor{QwenText}{HTML}{A45C96}
+\definecolor{GrokText}{HTML}{C35300}
+% Blend sources that recolour the raster icons in place (only over neutral backdrops):
+% saturation blend with Slate keeps lightness and hue but cuts saturation to 0.1;
+% with Neutral it removes colour; hue blend with Olive moves the hue, keeping lightness.
+\definecolor{Slate}{rgb}{.45,.5,.55}
+\definecolor{Neutral}{rgb}{.5,.5,.5}
+\definecolor{Olive}{HTML}{8A8A00}
 
-% Coordinates are in 0.1 mm, y grows downward. Icons in icons/ are cropped tight to
-% their visible content, so a given width is the width of the drawing itself.
-\newcommand{\ico}[4]{\node[inner sep=0pt,outer sep=0pt] at ({#2},{#3}) {\includegraphics[width=#4]{icons/#1.png}};}
+% Coordinates keep the original 0.1 mm grid (1916 x 814) but one unit is now 506.295/1916 pt,
+% so the natural width is the ACM text width and the figure is placed without scaling.
+% Font sizes below are therefore printed sizes. Icon widths are scaled by the same factor.
+\newcommand{\icoscale}{0.93219}
+\newcommand{\ico}[4]{\node[inner sep=0pt,outer sep=0pt] at ({#2},{#3}) {\includegraphics[width=\icoscale\dimexpr#4\relax]{icons/#1.png}};}
+\newcommand{\icoR}[6]{%
+  \node[inner sep=0pt,outer sep=0pt] (icoR) at ({#2},{#3}) {\includegraphics[width=\icoscale\dimexpr#4\relax]{icons/#1.png}};
+  \begin{scope}[blend mode=#5]\fill[#6] (icoR.south west) rectangle (icoR.north east);\end{scope}}
+\newcommand{\agent}[4]{\icoR{llm_robot_blue}{#1}{#2}{#3}{saturation}{Slate}}
+\newcommand{\second}[4]{\icoR{llm_robot_purple}{#1}{#2}{#3}{hue}{Olive}}
+\newcommand{\grey}[4]{\icoR{#1}{#2}{#3}{#4}{saturation}{Neutral}}
 \newcommand{\badge}[3]{%
-  \fill[Navy] (#1,#2) circle[radius=19];
-  \node[text=white,font=\bfseries\fontsize{9.5}{9.5}\selectfont] at (#1,#2) {#3};}
+  \fill[Ink] (#1,#2) circle[radius=19];
+  \node[text=white,font=\bfseries\fontsize{8.5}{8.5}\selectfont] at (#1,#2) {#3};}
 \newcommand{\card}[2]{%
-  \path[rounded corners=9pt,draw=CardBorder,line width=.8pt,fill=CardFill] (#1,#2) rectangle ++(330,272);}
+  \path[rounded corners=8.4pt,draw=CardBorder,line width=.8pt,fill=CardFill] (#1,#2) rectangle ++(330,272);}
 
 % Seats for the design cards (LLM model, second model, scripted partner). The gray icon is
 % wider and has gears above and below its body, so 5.6 mm gives it the same body height as a
-% 3.9 mm blue robot.
-\newcommand{\seatB}[2]{\ico{llm_robot_blue}{#1}{#2}{3.9mm}}
-\newcommand{\seatP}[2]{\ico{llm_robot_purple}{#1}{#2}{4.0mm}}
-\newcommand{\seatG}[2]{\ico{scripted_robot_gray}{#1}{#2}{5.6mm}}
+% 3.9 mm robot.
+\newcommand{\seatB}[2]{\agent{#1}{#2}{3.9mm}{}}
+\newcommand{\seatP}[2]{\second{#1}{#2}{4.0mm}{}}
+\newcommand{\seatG}[2]{\grey{scripted_robot_gray}{#1}{#2}{5.6mm}}
 % Six seats around an oval table: #3 upper left, #4 upper right, #5 left, #6 right,
 % #7 lower left, #8 lower right. The upper pair is drawn first so the table hides its feet.
 \newcommand{\sixtable}[8]{%
@@ -40,15 +59,15 @@
   #7{#1-42}{#2+40}#8{#1+42}{#2+40}}
 
 \begin{document}
-\begin{tikzpicture}[x=0.1mm,y=-0.1mm,line cap=round,line join=round,
-  every node/.style={text=Navy,inner sep=0pt,outer sep=0pt},
-  letter/.style={anchor=north west,font=\bfseries\fontsize{19}{19}\selectfont},
-  ptitle/.style={anchor=north west,font=\bfseries\fontsize{14}{15}\selectfont},
-  ctitle/.style={anchor=west,font=\bfseries\fontsize{10}{12}\selectfont},
-  head/.style={anchor=west,font=\bfseries\fontsize{8}{9.6}\selectfont},
-  txt/.style={font=\fontsize{8}{9.6}\selectfont},
-  small/.style={font=\fontsize{7.5}{9}\selectfont},
-  tick/.style={font=\fontsize{7.5}{9}\selectfont},
+\begin{tikzpicture}[x=506.295pt/1916,y=-506.295pt/1916,line cap=round,line join=round,
+  every node/.style={text=Ink,inner sep=0pt,outer sep=0pt},
+  letter/.style={anchor=base west,font=\bfseries\fontsize{10.5}{10.5}\selectfont},
+  ptitle/.style={anchor=base west,font=\bfseries\fontsize{10}{10}\selectfont},
+  ctitle/.style={anchor=west,font=\bfseries\fontsize{8.5}{10}\selectfont},
+  head/.style={anchor=west,font=\bfseries\fontsize{7.5}{9}\selectfont},
+  txt/.style={font=\fontsize{7.5}{9}\selectfont},
+  small/.style={font=\fontsize{7}{8.4}\selectfont},
+  tick/.style={font=\fontsize{7}{8.4}\selectfont},
 ]
 \path[use as bounding box] (0,0) rectangle (1916,814);
 \path[fill=white] (0,0) rectangle (1916,814);
@@ -60,59 +79,59 @@
   \ico{right_arrow}{\x}{405}{4.4mm}}
 
 % ======================== PANEL A: the game ========================
-\node[letter] at (20,12) {a};
-\node[ptitle] at (84,13) {The game};
+\node[letter] at (20,48) {a};
+\node[ptitle] at (58,48) {The game};
 
 % Table ring, pool, six seats of 40 paying into the pool
-\draw[Navy,line width=.75pt] (268,257) circle[radius=130];
-\path[draw=Navy!80,line width=.7pt,fill=SoftGray] (268,257) circle[radius=66];
-\node[font=\bfseries\fontsize{11}{11}\selectfont] at (268,239) {Pool};
-\node[text=GreenDark,font=\bfseries\fontsize{7}{7}\selectfont] at (268,275) {target 120};
+\draw[Ink,line width=.75pt] (268,257) circle[radius=130];
+\path[draw=Ink!80,line width=.7pt,fill=SoftGray] (268,257) circle[radius=74];
+\node[font=\bfseries\fontsize{9.5}{9.5}\selectfont] at (268,239) {Pool};
+\node[font=\bfseries\fontsize{7}{7}\selectfont] at (268,275) {target 120};
 \foreach \a in {90,30,-30,-90,-150,150}{
-  \draw[-{Stealth[length=4pt,width=4pt]},Navy,line width=1pt]
-    ($(268,257)+({97*cos(\a)},{-97*sin(\a)})$) -- ($(268,257)+({72*cos(\a)},{-72*sin(\a)})$);
-  \ico{llm_robot_blue}{268+130*cos(\a)}{257-130*sin(\a)}{5.4mm}}
+  \draw[-{Stealth[length=4pt,width=4pt]},Ink,line width=1pt]
+    ($(268,257)+({99*cos(\a)},{-99*sin(\a)})$) -- ($(268,257)+({80*cos(\a)},{-80*sin(\a)})$);
+  \agent{268+130*cos(\a)}{257-130*sin(\a)}{5.4mm}{}}
 \foreach \x/\y in {268/80,268/436,438/192,438/322,98/192,98/322}
-  \node[font=\bfseries\fontsize{9}{9}\selectfont] at (\x,\y) {40};
+  \node[font=\bfseries\fontsize{8.5}{8.5}\selectfont] at (\x,\y) {40};
 
 % Rules
-\ico{players_group}{46}{478}{4.4mm}
+\grey{players_group}{46}{478}{4.4mm}
 \node[txt,anchor=west] at (78,478) {6 players, 10 rounds, 40 units each};
-\ico{coin_stack}{46}{513}{2.5mm}
+\grey{coin_stack}{46}{513}{2.5mm}
 \node[txt,anchor=west] at (78,513) {Pay 0, 2 or 4 each round};
-\ico{check_green}{46}{548}{3.2mm}
+\grey{check_green}{46}{548}{3.2mm}
 \node[txt,anchor=west] at (78,548) {Pool reaches 120: keep the rest};
 \ico{lightning_red}{46}{583}{2.1mm}
 \node[txt,anchor=west] at (78,583) {Pool misses: lose all with probability $p$};
 
 % Best total per seat against risk (Proposition 1)
-\draw[black,line width=.75pt] (120,735) -- (480,735);
-\draw[black,line width=.75pt] (120,735) -- (120,640);
+\draw[Ink,line width=.75pt] (120,743) -- (480,743);
+\draw[Ink,line width=.75pt] (120,743) -- (120,640);
 \foreach \x/\lab in {120/0,300/0.5,480/1}{
-  \draw[black,line width=.65pt] (\x,735) -- (\x,742);
-  \node[tick] at (\x,752) {\lab};}
+  \draw[Ink,line width=.65pt] (\x,743) -- (\x,750);
+  \node[tick] at (\x,763) {\lab};}
 \foreach \y/\lab in {735/0,655/20}{
-  \draw[black,line width=.65pt] (113,\y) -- (120,\y);
+  \draw[Ink,line width=.65pt] (113,\y) -- (120,\y);
   \node[tick,anchor=east] at (107,\y) {\lab};}
-\draw[GreenDark,dashed,line width=1.3pt] (120,733) -- (300,733) -- (300,655) -- (480,655);
-\node[text=ModelBlue,font=\bfseries\fontsize{8.5}{9}\selectfont] at (210,714) {keep};
-\node[text=ModelBlue,font=\bfseries\fontsize{8.5}{9}\selectfont] at (390,634) {pay fair share};
+\draw[Ink,dash pattern=on 4.5pt off 2pt,line width=1.2pt,line cap=butt] (120,735) -- (300,735) -- (300,655) -- (480,655);
+\node[font=\bfseries\fontsize{8}{9}\selectfont] at (210,714) {keep};
+\node[font=\bfseries\fontsize{8}{9}\selectfont] at (390,634) {pay fair share};
 \node[txt,rotate=90] at (48,690) {best total};
-\node[txt] at (300,789) {risk $p$};
+\node[txt] at (300,793) {risk $p$};
 
 % ======================== PANEL B: designs ========================
-\node[letter] at (560,12) {b};
-\node[ptitle] at (620,13) {Four designs};
+\node[letter] at (560,48) {b};
+\node[ptitle] at (598,48) {Four designs};
 
-% The five models
-\foreach \cx/\logo/\w/\name in {
-    642/logo_claude/3.7mm/{Claude\\Haiku 4.5},
-    777/logo_gemini/3.6mm/{Gemini 3.5\\Flash-Lite},
-    912/logo_gpt/3.7mm/{GPT-5.6\\Luna},
-    1047/logo_qwen/3.9mm/{Qwen3-235B},
-    1182/logo_grok/3.4mm/{Grok 4.20}}{
+% The five models, lettered in their crsd_style text colours
+\foreach \cx/\logo/\w/\col/\name in {
+    630/logo_claude/3.7mm/HaikuText/{Claude\\Haiku 4.5},
+    770/logo_gemini/3.6mm/FlashText/{Gemini 3.5\\Flash-Lite},
+    910/logo_gpt/3.7mm/LunaText/{GPT-5.6\\Luna},
+    1055/logo_qwen/3.9mm/QwenText/{Qwen3-235B},
+    1195/logo_grok/3.4mm/GrokText/{Grok 4.20}}{
   \ico{\logo}{\cx}{90}{\w}
-  \node[anchor=north,align=center,font=\fontsize{7}{8}\selectfont] at (\cx,117) {\name};}
+  \node[anchor=north,align=center,text=\col,font=\fontsize{7}{8}\selectfont] at (\cx,117) {\name};}
 
 % Four cards
 \card{575}{182}\card{919}{182}\card{575}{468}\card{919}{468}
@@ -126,7 +145,7 @@
 % Card 2: prompt tests
 \node[ctitle] at (935,214) {Prompt tests};
 \sixtable{1084}{306}{\seatB}{\seatB}{\seatB}{\seatB}{\seatB}{\seatB}
-\ico{question_bubble}{944}{296}{3.0mm}
+\grey{question_bubble}{944}{296}{3.0mm}
 \ico{document}{1225}{318}{2.8mm}
 \node[txt,anchor=west] at (935,394) {In-game questions,};
 \node[txt,anchor=west] at (935,424) {rewording, goal stated};
@@ -144,63 +163,63 @@
 \node[txt,anchor=west] at (935,710) {then selection};
 
 % Legend
-\ico{llm_robot_blue}{600}{776}{3.2mm}
+\agent{600}{776}{3.2mm}{}
 \node[small,anchor=west] at (622,776) {LLM agent};
-\ico{llm_robot_purple}{790}{776}{3.3mm}
+\second{790}{776}{3.3mm}{}
 \node[small,anchor=west] at (812,776) {second model};
-\ico{scripted_robot_gray}{1000}{776}{4.6mm}
+\grey{scripted_robot_gray}{1000}{776}{4.6mm}
 \node[small,anchor=west] at (1030,776) {scripted partner};
 
 % ======================== PANEL C: findings ========================
-\node[letter] at (1290,12) {c};
-\node[ptitle] at (1350,13) {What we find};
+\node[letter] at (1290,48) {c};
+\node[ptitle] at (1326,48) {What we find};
 
 % Finding 1: flat payment, even where paying is dominated
 \badge{1312}{92}{1}
 \node[head] at (1342,92) {Same payment at every risk, even at $p=0$};
-\draw[black,line width=.75pt] (1420,205) -- (1740,205);
-\draw[black,line width=.75pt] (1420,205) -- (1420,118);
+\draw[Ink,line width=.75pt] (1420,207) -- (1740,207);
+\draw[Ink,line width=.75pt] (1420,207) -- (1420,114);
 \foreach \x/\lab in {1420/0,1580/0.5,1740/1}{
-  \draw[black,line width=.65pt] (\x,205) -- (\x,212);
-  \node[tick] at (\x,221) {\lab};}
-\foreach \y/\lab in {205/0,135/20}{
-  \draw[black,line width=.65pt] (1413,\y) -- (1420,\y);
+  \draw[Ink,line width=.65pt] (\x,207) -- (\x,214);
+  \node[tick] at (\x,227) {\lab};}
+\foreach \y/\lab in {199/0,129/20}{
+  \draw[Ink,line width=.65pt] (1413,\y) -- (1420,\y);
   \node[tick,anchor=east] at (1402,\y) {\lab};}
-\draw[GreenDark,dashed,line width=1.3pt] (1420,203) -- (1580,203) -- (1580,139) -- (1740,139);
-\draw[ModelBlue,line width=1.6pt] (1420,131) -- (1740,131);
-\fill[Red] (1424,131) circle[radius=9];
-\node[small,rotate=90] at (1354,162) {total paid};
-\node[small] at (1580,251) {risk $p$};
-\draw[ModelBlue,line width=1.6pt] (1768,140) -- (1806,140);
+\draw[Ink,dash pattern=on 4.5pt off 2pt,line width=1.2pt,line cap=butt] (1420,199) -- (1580,199) -- (1580,133) -- (1740,133);
+\draw[Muted,line width=1.6pt] (1420,125) -- (1740,125);
+\fill[Fail] (1424,125) circle[radius=9];
+\node[small,rotate=90] at (1354,160) {total paid};
+\node[small] at (1580,252) {risk $p$};
+\draw[Muted,line width=1.6pt] (1768,140) -- (1806,140);
 \node[small,anchor=west] at (1816,140) {models};
-\draw[GreenDark,dashed,line width=1.3pt] (1768,178) -- (1806,178);
+\draw[Ink,dash pattern=on 4.5pt off 2pt,line width=1.2pt,line cap=butt] (1768,178) -- (1806,178);
 \node[small,anchor=west] at (1816,178) {best};
 
 % Finding 2: answers move with risk, payments do not
 \badge{1312}{282}{2}
 \node[head] at (1342,282) {Answers track the risk; payments do not};
-\node[small,anchor=west,text=MidGray,font=\itshape\fontsize{7.5}{9}\selectfont] at (1342,350) {says};
-\node[small,anchor=west,text=MidGray,font=\itshape\fontsize{7.5}{9}\selectfont] at (1342,402) {pays};
+\node[small,anchor=west,text=Muted,font=\itshape\fontsize{7}{8.4}\selectfont] at (1342,350) {says};
+\node[small,anchor=west,text=Muted,font=\itshape\fontsize{7}{8.4}\selectfont] at (1342,402) {pays};
 \draw[Divider,dashed,line width=.8pt] (1638,302) -- (1638,420);
 \foreach \cx/\p/\ans in {1510/0.1/keep,1765/0.9/pay}{
   \node[txt] at (\cx,314) {$p=\p$};
-  \path[draw=Navy,fill=white,line width=.8pt,rounded corners=4pt]
+  \path[draw=Ink,fill=white,line width=.8pt,rounded corners=4pt]
     (\cx-45,344) -- (\cx-45,332) -- (\cx+45,332) -- (\cx+45,368) -- (\cx-45,368) -- (\cx-45,356)
     [sharp corners] -- (\cx-61,350) -- cycle;
-  \node[font=\fontsize{8.5}{9}\selectfont] at (\cx,350) {\ans};
-  \ico{coin_stack}{\cx-20}{402}{2.6mm}
-  \node[font=\bfseries\fontsize{9}{9}\selectfont] at (\cx+15,402) {20};}
+  \node[font=\fontsize{8}{9}\selectfont] at (\cx,350) {\ans};
+  \grey{coin_stack}{\cx-20}{402}{2.6mm}
+  \node[font=\bfseries\fontsize{8.5}{8.5}\selectfont] at (\cx+15,402) {20};}
 
 % Finding 3: one late dropout at a table of exact fair-share players
 \badge{1312}{458}{3}
 \node[head] at (1342,458) {One late dropout breaks a fair-share table};
 \foreach \k in {0,...,4}{
-  \ico{llm_robot_blue}{1345+45*\k}{502}{3.8mm}
-  \node[font=\bfseries\fontsize{7.5}{7.5}\selectfont] at (1345+45*\k,541) {20};}
+  \agent{1345+45*\k}{502}{3.8mm}{}
+  \node[font=\bfseries\fontsize{7}{7}\selectfont] at (1345+45*\k,541) {20};}
 \ico{llm_robot_red}{1570}{502}{3.9mm}
-\node[text=Red,font=\bfseries\fontsize{7.5}{7.5}\selectfont] at (1570,541) {18};
-\node[anchor=west,font=\boldmath\bfseries\fontsize{8.5}{9}\selectfont] at (1618,494) {pool $118<120$};
-\node[anchor=west,text=Red,font=\bfseries\fontsize{8}{9}\selectfont] at (1618,528) {target missed};
+\node[text=Fail,font=\bfseries\fontsize{7}{7}\selectfont] at (1570,541) {18};
+\node[anchor=west,font=\boldmath\bfseries\fontsize{8}{9}\selectfont] at (1618,494) {pool $118<120$};
+\node[anchor=west,text=Fail,font=\bfseries\fontsize{7.5}{9}\selectfont] at (1618,528) {target missed};
 
 % Finding 4: tablemate scoring versus scoring across tables
 \badge{1312}{588}{4}
@@ -210,20 +229,20 @@
 \node[txt] at (1765,620) {across tables};
 % one table: the smallest payer earns most and is selected
 \path[draw=gray!35,fill=gray!18,line width=.6pt] (1350,700) rectangle (1590,709);
-\foreach \k in {0,...,4}{\ico{llm_robot_blue}{1370+40*\k}{680}{3.4mm}}
+\foreach \k in {0,...,4}{\agent{1370+40*\k}{680}{3.4mm}{}}
 \ico{llm_robot_red}{1570}{680}{3.5mm}
-\node[star,star points=5,star point ratio=2.3,fill=Coin,minimum size=9pt] at (1570,646) {};
-\node[text=Red,font=\bfseries\fontsize{8}{9}\selectfont] at (1470,750) {target reached 47\%};
+\node[star,star points=5,star point ratio=2.3,fill=Ink,minimum size=8.4pt] at (1570,646) {};
+\node[text=Fail,font=\bfseries\fontsize{7.5}{9}\selectfont] at (1470,750) {target reached 47\%};
 \node[small] at (1470,779) {at $p=0.9$};
 % two tables: the table that reaches the target is selected
-\node[star,star points=5,star point ratio=2.3,fill=Coin,minimum size=9pt] at (1645,664) {};
+\node[star,star points=5,star point ratio=2.3,fill=Ink,minimum size=8.4pt] at (1645,664) {};
 \path[draw=gray!35,fill=gray!18,line width=.6pt] (1669,678) rectangle (1861,684);
-\foreach \k in {0,...,5}{\ico{llm_robot_blue}{1685+32*\k}{662}{2.7mm}}
-\ico{check_green}{1885}{664}{2.6mm}
+\foreach \k in {0,...,5}{\agent{1685+32*\k}{662}{2.7mm}{}}
+\grey{check_green}{1885}{664}{2.6mm}
 \path[draw=gray!35,fill=gray!18,line width=.6pt] (1669,724) rectangle (1861,730);
 \foreach \k in {0,...,5}{\ico{llm_robot_red}{1685+32*\k}{708}{2.8mm}}
-\draw[Red,line width=1.4pt] (1876,701) -- (1894,719) (1894,701) -- (1876,719);
-\node[text=GreenDark,font=\bfseries\fontsize{8}{9}\selectfont] at (1765,750) {target reached 100\%};
+\draw[Fail,line width=1.4pt] (1876,701) -- (1894,719) (1894,701) -- (1876,719);
+\node[font=\bfseries\fontsize{7.5}{9}\selectfont] at (1765,750) {target reached 100\%};
 \node[small] at (1765,779) {at $p=0.9$};
 
 \end{tikzpicture}

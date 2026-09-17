@@ -27,7 +27,6 @@ import sys
 import numpy as np
 import pandas as pd
 from matplotlib.lines import Line2D
-from matplotlib.patches import FancyArrowPatch
 
 import crsd_data as cd
 import crsd_style as cs
@@ -214,7 +213,7 @@ def main() -> None:
     print(f"\nwrote {path}")
     for k, v in M.items.items():
         print(f"  \\{k} = {v}")
-    figure(vc, g)
+    figure(vc, g, S)
 
 
 # ------------------------------------------------------------------ figure
@@ -245,7 +244,28 @@ def shifts(vc: pd.DataFrame, g: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def figure(vc: pd.DataFrame, g: pd.DataFrame) -> None:
+DODGE = 0.028            # horizontal offset between models, in units of p
+
+
+def knowdo_data(vc: pd.DataFrame, S: pd.DataFrame) -> pd.DataFrame:
+    """Per model and p: the share of value_compare answers saying A (paying) is higher,
+    per-game shares with a game-level bootstrap CI, joined to what Player_1 paid (S)."""
+    rows = []
+    for k, m in enumerate(cs.MODEL_ORDER):
+        for i, p in enumerate(RISKS):
+            share = vc[(vc["model"] == m) & (vc["p"] == p)].groupby("gid")["ans"].apply(
+                lambda a: (a == ANS_FAIR).mean())
+            if len(share) != 10:
+                raise AssertionError(f"{m} p={p}: {len(share)} probed games")
+            a_lo, a_hi = cd.boot_ci(share, offset=500 + 10 * i + k)
+            rows.append(dict(model=m, p=p, pay_ans=share.mean(), a_lo=a_lo, a_hi=a_hi))
+    D = pd.DataFrame(rows).merge(S[["model", "p", "tot", "tot_lo", "tot_hi"]], on=["model", "p"])
+    if len(D) != len(cs.MODEL_ORDER) * len(RISKS):
+        raise AssertionError("figure rows do not cover every model x p")
+    return D
+
+
+def figure(vc: pd.DataFrame, g: pd.DataFrame, S: pd.DataFrame) -> None:
     D = shifts(vc, g)
     print("\nfigure data (shift from p=0.1 to p=0.9 with 95% CI):")
     print(D.round(2).to_string(index=False))
@@ -255,41 +275,44 @@ def figure(vc: pd.DataFrame, g: pd.DataFrame) -> None:
         raise AssertionError("an answering model no longer flips its answer with flat play; "
                              "revisit the caption of fig_knowdo")
 
+    K = knowdo_data(vc, S)
+    print("\nfigure data (share of answers saying paying wins, Player_1 total; 95% CI):")
+    print(K.round(3).to_string(index=False))
+    t = K[K["model"].isin(THREE)]
+    lo, hi = t[t["p"] == RISKS[0]].set_index("model"), t[t["p"] == RISKS[-1]].set_index("model")
+    if (hi["pay_ans"] - lo["pay_ans"]).min() < 0.7:
+        raise RuntimeError("the three answering models no longer flip their answer")
+    if (hi["tot"] - lo["tot"]).abs().max() > 2.0:
+        raise RuntimeError("the three answering models no longer pay the same at both risks")
+
     cs.use()
-    fig, ax = cs.subplots("col", height_pt=104)
-    best_x, best_y = 1.0, cd.FAIR_TOTAL
-    ax.set_xlim(-0.16, 1.2)
-    ax.set_ylim(-7, 23.5)
-    ax.grid(False)
-    ax.axhline(0, color=cs.LINE, lw=0.6, zorder=1)
-    ax.axvline(0, color=cs.LINE, lw=0.6, zorder=1)
-    # a best responder answers correctly and pays 0 at p=0.1 but the fair share at p=0.9
-    ax.plot([best_x], [best_y], marker="*", ms=10, color=cs.INK, mec=cs.WHITE, mew=0.6,
-            ls="none", zorder=4)
-    ax.annotate("Best response", (best_x, best_y), xytext=(-7, 0), textcoords="offset points",
-                ha="right", va="center", fontsize=cs.SIZE_SMALL, color=cs.MUTED)
-    ax.add_patch(FancyArrowPatch((1.085, 1.2), (1.085, best_y - 1.2), arrowstyle="<|-|>",
-                                 mutation_scale=7, lw=0.9, color=cs.MUTED, shrinkA=0, shrinkB=0,
-                                 zorder=2))
-    ax.text(1.115, best_y / 2, "gap", rotation=90, ha="left", va="center",
-            fontsize=cs.SIZE_SMALL, color=cs.MUTED, fontstyle="italic")
-    for r in D.itertuples():
-        st = cs.model(r.model)
-        ax.plot([r.x_lo, r.x_hi], [r.dy, r.dy], color=st.colour, lw=0.8, zorder=2.8,
-                solid_capstyle="butt")
-        ax.plot([r.dx, r.dx], [r.y_lo, r.y_hi], color=st.colour, lw=0.8, zorder=2.8,
-                solid_capstyle="butt")
-        ax.plot([r.dx], [r.dy], marker=st.marker, ms=6.0 * st.marker_scale, mfc=st.colour,
-                mec=cs.WHITE, mew=0.7, ls="none", zorder=3)
-    ax.set_xticks([0, 0.5, 1], ["0", "0.5", "1"])
-    ax.set_yticks([-5, 0, 5, 10, 15, 20])
-    ax.set_xlabel("Shift in answers toward paying")
-    ax.set_ylabel("Shift in units paid")
-    handles = [Line2D([], [], ls="none", marker=cs.model(m).marker,
-                      ms=5.2 * cs.model(m).marker_scale, mfc=cs.model(m).colour, mec=cs.WHITE,
-                      mew=0.5, label=cd.show(m)) for m in cs.MODEL_ORDER]
-    # Three per row: the five versioned names do not fit on one line of a column.
-    cs.legend_top(fig, handles, ncols=3, handlelength=0.6, handletextpad=0.3, columnspacing=0.75)
+    fig, axes = cs.subplots("col", height_pt=120, ncols=2)
+    dodge = {m: (j - (len(cs.MODEL_ORDER) - 1) / 2) * DODGE for j, m in enumerate(cs.MODEL_ORDER)}
+    step_x = [0.0, cd.PSTAR, cd.PSTAR, 1.0]
+    panels = (
+        (axes[0], "pay_ans", "a_lo", "a_hi", [0, 0, 1, 1], (-0.08, 1.08), [0, 0.5, 1],
+         ["0", "0.5", "1"], "a", "What it says", "Share saying paying wins"),
+        (axes[1], "tot", "tot_lo", "tot_hi", [0, 0, cd.FAIR_TOTAL, cd.FAIR_TOTAL], (-2.5, 42),
+         [0, 20, 40], ["0", "20", "40"], "b", "What it pays", "Units paid"),
+    )
+    for ax, col, lo_c, hi_c, step_y, ylim, yt, ytl, letter, title, ylab in panels:
+        cs.region(ax, 0.0, cd.PSTAR)
+        cs.theory_line(ax, step_x, step_y)
+        for m in cs.MODEL_ORDER:
+            d = K[K["model"] == m].sort_values("p")
+            y = d[col].to_numpy()
+            cs.plot_model(ax, d["p"].to_numpy() + dodge[m], y, m, lw=0.9,
+                          yerr=(y - d[lo_c].to_numpy(), d[hi_c].to_numpy() - y))
+        ax.set_xlim(0.0, 1.0)
+        ax.set_ylim(*ylim)
+        ax.set_xticks(RISKS, [f"{p:g}" for p in RISKS])
+        ax.set_yticks(yt, ytl)
+        cs.panel_title(ax, letter, title)
+        ax.set_ylabel(ylab, labelpad=3.0)
+    fig.supxlabel("Catastrophe probability $p$", fontsize=cs.SIZE_LABEL)
+    optimum = {k: v for k, v in cs.THEORY.items() if k != "zorder"}
+    handles = cs.model_handles() + [Line2D([], [], label="Optimum", **optimum)]
+    cs.legend_top(fig, handles, ncols=3, handlelength=1.4, handletextpad=0.3, columnspacing=0.8)
     pdf = cs.save(fig, cd.FIGURES / "fig_knowdo", title="fig_knowdo")
     print(f"wrote {pdf} (+ .png)")
 

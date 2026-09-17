@@ -153,6 +153,8 @@ cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
 **Còn phải làm trước khi nộp:**
 
 - [x] Kiểm từng mục `refs.bib` với nguồn gốc (16-09-2026; kiểm lại 17-09: sửa claim Tavoni/Willis, thêm pages Schmied, bỏ title khỏi `anon-if`).
+- [x] 17-09-2026: người dùng chốt bản Interface Focus KHÔNG nộp → đã bỏ đoạn "Overlap with concurrent work" và entry `anon-if`; ràng buộc trùng nộp ở aamas2027-plan §2 không còn áp dụng. Đừng thêm lại.
+- [x] 17-09-2026: thêm `analysis/strategy.py` (vòng cuối, luật đơn giản, equilibrium, nước mở của Grok) + Figure 3/6 mới; môi trường vẽ hình: venv Python 3.12 (egttools) + font Libertine G.
 - [x] Audit nộp bài 17-09-2026: claims↔macro, reviewer giả lập, supplement render + ẩn danh, metadata PDF (không ngày giờ, không đường dẫn). Abstract 247 từ.
 - [x] Chuyển sang template AAMAS 2027 chính thức.
 - [ ] Mọi tác giả có tài khoản OpenReview trước **17-09** (AoE).

@@ -6,6 +6,7 @@ Run from the repository root:
 Reads results/exp_mixed, results/exp_baseline and results/exp_evprobe through crsd_data
 (read-only; never Legacy_Results/, never writes under results/). Writes
     paper/AAMAS/figures/fig_selection.pdf (+ .png preview)
+    paper/AAMAS/supplement/figures/fig_invasion.pdf (+ .png preview)
     paper/AAMAS/tables/num_selection.tex
 
 PAYOFFS ARE EXPECTED PAYOFFS over the catastrophe lottery:
@@ -38,8 +39,13 @@ payoff by its stationary mass. Uncertainty: 1000 game-level bootstrap replicates
 (resample the games of every mixed cell and every self-play cell), reported as the share
 of replicates in which the point-estimate winner is still top, and percentile 95% CIs.
 
-EGTTOOLS. The figure is computed and drawn with EGTTools (Fernandez Domingos, Santos &
-Lenaerts 2023): egttools.analytical.StochDynamics recomputes every fixation probability
+FIG_SELECTION. Stationary mass per rule and risk level (bars, with the population's
+self-play target rate), and the gradient of selection
+    G(x) = x (1 - x) N / (N - 1) tanh(beta / 2 (f_X(i) - f_Y(i))),  x = i / N,
+for Qwen against Flash-Lite, from the same fitness() the fixation probabilities use.
+
+EGTTOOLS. The supplement's invasion diagrams (fig_invasion) are computed and drawn with
+EGTTools (Fernandez Domingos, Santos & Lenaerts 2023): egttools.analytical.StochDynamics recomputes every fixation probability
 and stationary distribution from the same payoff functions, the script refuses to draw
 unless they match its own to 1e-7, and egttools.plotting.draw_invasion_diagram draws the
 graphs.
@@ -57,6 +63,7 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 from scipy.special import logsumexp
 from egttools.analytical import StochDynamics
 from egttools.plotting import draw_invasion_diagram
@@ -400,7 +407,7 @@ def egt_dynamics(Pp, N, beta=BETA):
     return fp, sd
 
 
-def figure(P, point, REACH):
+def invasion_figure(P, point, REACH):
     """Invasion diagrams from egttools.plotting.draw_invasion_diagram, one per risk level
     (row) and rule (column), styled as EGTTools draws them: plain coloured nodes, black
     arrows, the stationary mass printed beside every node. An edge A -> B means one B
@@ -457,6 +464,151 @@ def figure(P, point, REACH):
     # Three per row: the five versioned names do not fit on one line of a column.
     cs.legend_top(fig, handles, ncols=3, handlelength=0.6, handletextpad=0.3, columnspacing=0.75)
     return fig
+
+
+GRAD_PAIR = ("Qwen", "Flash-Lite")
+GRAD_RISKS = (0.5, 0.9)
+BAR_HATCH = {"Haiku": "....", "Luna": "///", "Grok": "xxx"}
+BAR_LABEL_MIN = 0.2      # print the mass inside a bar segment at least this wide
+VISIBLE_MASS = 0.005     # narrower segments are invisible at column width; they stay out of the key
+
+
+def gradient(Pp, x, y, N, beta=BETA):
+    """Gradient of selection for x invading y at population size N, on x = 0, 1/N, ..., 1."""
+    fx, fy = fitness(Pp, x, y, N)
+    i = np.arange(1, N)
+    g = (i / N) * ((N - i) / (N - 1)) * np.tanh(0.5 * beta * (fx - fy))
+    return np.r_[0.0, i / N, 1.0], np.r_[0.0, g, 0.0]
+
+
+def fixed_points(x, g):
+    """(position, stable) for the two monomorphic ends and every interior sign change."""
+    pts = []
+    gi = g[1:-1]
+    if gi[0] != 0:
+        pts.append((0.0, bool(gi[0] < 0)))
+    for k in range(1, len(gi)):
+        if np.sign(gi[k - 1]) != np.sign(gi[k]) and gi[k - 1] != 0:
+            x0, x1 = x[k], x[k + 1]
+            pts.append((x0 + (x1 - x0) * gi[k - 1] / (gi[k - 1] - gi[k]), bool(gi[k - 1] > 0)))
+    if gi[-1] != 0:
+        pts.append((1.0, bool(gi[-1] > 0)))
+    return pts
+
+
+def selection_figure(P, point):
+    """a, b: stationary mass per risk level for the two rules, with the population's
+    self-play target rate at the right of each bar. c, d: gradient of selection for Qwen
+    beside Flash-Lite; N = 30 solid with stable (filled) and unstable (open) fixed points,
+    N = 6 dashed with its discrete states. Returns the figure and every number drawn."""
+    rules = ((N_WITHIN, "within", f"Tablemates, $N={N_WITHIN}$"),
+             (N_ACROSS, "across", f"Across tables, $N={N_ACROSS}$"))
+    drawn = dict(mass={}, target={}, fixed={}, gradient={})
+    shown = [m for m in cs.MODEL_ORDER
+             if any(point[(r, BETA, n, pi)]["pi"][MI[m]] >= VISIBLE_MASS
+                    for n, r, _ in rules for pi in range(len(RISKS)))]
+    cs.use()
+    fig = plt.figure(figsize=cs.figsize("col", height_pt=192))
+    fig._crsd_width = "col"
+    outer = fig.add_gridspec(2, 1, height_ratios=(0.62, 1.0))
+    top = outer[0].subgridspec(1, 2, wspace=0.12)
+    bars = [fig.add_subplot(top[0, j]) for j in range(2)]
+    bottom = outer[1].subgridspec(1, 2, wspace=0.08)
+    gax = [fig.add_subplot(bottom[0, j]) for j in range(2)]
+
+    for j, (n, rule, label) in enumerate(rules):
+        ax = bars[j]
+        for row, p in enumerate(RISKS):
+            o = point[(rule, BETA, n, RISKS.index(p))]
+            left = 0.0
+            for m in cs.MODEL_ORDER:
+                w = float(o["pi"][MI[m]])
+                drawn["mass"][(rule, p, m)] = w
+                if w <= 0:
+                    continue
+                st = cs.model(m)
+                ax.barh(row, w, left=left, height=0.74, color=st.colour, ec=cs.WHITE, lw=0.5,
+                        zorder=2, hatch=BAR_HATCH.get(m, ""), hatchcolor=cs.WHITE)
+                if w >= BAR_LABEL_MIN:
+                    ax.text(left + w / 2, row, f"{w:.2f}", ha="center", va="center",
+                            fontsize=cs.SIZE_SMALL, color=cs.cell_ink(st.colour), zorder=3,
+                            bbox=dict(fc=st.colour, ec="none", pad=0.0))
+                left += w
+            drawn["target"][(rule, p)] = cd.pct(o["reach"])
+            ax.text(1.04, row, f"{cd.pct(o['reach'])}%", ha="left", va="center",
+                    fontsize=cs.SIZE_SMALL, color=cs.INK, clip_on=False)
+        ax.set_ylim(2.55, -0.55)
+        ax.set_xlim(0, 1.0)
+        ax.set_xticks([0, 1], ["0", "1"])
+        ax.tick_params(axis="y", length=0)
+        ax.spines["left"].set_visible(False)
+        ax.grid(False)
+        ax.set_yticks(range(len(RISKS)), [f"$p={p:g}$" for p in RISKS] if j == 0 else [])
+        cs.panel_title(ax, "ab"[j], label)
+
+    handles = [Patch(fc=cs.model(m).colour, ec=cs.WHITE, lw=0.4, hatch=BAR_HATCH.get(m, ""),
+                     hatchcolor=cs.WHITE, label=cd.show(m)) for m in shown]
+    fig.legend(handles=handles, loc="outside upper center", ncols=2, handlelength=1.4,
+               handleheight=0.7, handletextpad=0.3, columnspacing=1.2)
+
+    a, b = MI[GRAD_PAIR[0]], MI[GRAD_PAIR[1]]
+    curves = {(p, n): gradient(P[RISKS.index(p)], a, b, n)
+              for p in GRAD_RISKS for n, _, _ in rules}
+    ylim = 1.25 * max(np.abs(g).max() for _, g in curves.values())
+    for j, p in enumerate(GRAD_RISKS):
+        ax = gax[j]
+        ax.axhline(0, color=cs.INK, lw=cs.LW_RULE, zorder=1)
+        for n, _, _ in rules:
+            x, g = curves[(p, n)]
+            drawn["gradient"][(p, n)] = (x, g)
+            if n == N_WITHIN:
+                ax.plot(x, g, color=cs.MUTED, lw=0.9, ls=(0, (3.0, 1.5)), marker="s", ms=2.6,
+                        mfc=cs.MUTED, mec=cs.MUTED, mew=0.6, zorder=3, clip_on=False)
+                continue
+            ax.plot(x, g, color=cs.INK, lw=1.2, zorder=3.2)
+            drawn["fixed"][p] = fixed_points(x, g)
+            for xs, stable in drawn["fixed"][p]:
+                ax.plot([xs], [0], marker="o", ms=5.0, ls="none", zorder=5, clip_on=False,
+                        mfc=cs.INK if stable else cs.WHITE, mec=cs.INK, mew=0.9)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(-ylim, ylim)
+        ax.set_xticks([0, 0.5, 1], ["0", "0.5", "1"])
+        ax.grid(False)
+        cs.panel_title(ax, "cd"[j], f"$p={p:g}$")
+        if j == 0:
+            ax.set_ylabel("Gradient $G(x)$")
+        else:
+            ax.tick_params(axis="y", labelleft=False)
+    fig.supxlabel(f"Share of {cd.show(GRAD_PAIR[0])} beside {cd.show(GRAD_PAIR[1])}",
+                  fontsize=cs.SIZE_LABEL)
+    x6, g6 = curves[(GRAD_RISKS[0], N_WITHIN)]
+    gax[0].annotate(f"$N={N_WITHIN}$", (x6[3], g6[3]), xytext=(0, 5), textcoords="offset points",
+                    ha="center", va="bottom", fontsize=cs.SIZE_SMALL, color=cs.MUTED)
+    x30, g30 = curves[(GRAD_RISKS[0], N_ACROSS)]
+    kmin = int(np.argmin(g30))
+    gax[0].annotate(f"$N={N_ACROSS}$", (x30[kmin], g30[kmin]), xytext=(6, -2),
+                    textcoords="offset points", ha="left", va="top", fontsize=cs.SIZE_SMALL,
+                    color=cs.INK)
+    return fig, drawn
+
+
+def check_drawn(drawn, mac):
+    """The bars and target labels must print the numbers the paper's macros state."""
+    masses = {("within", 0.1, "Qwen"): "SelWithinQwenMassLow",
+              ("within", 0.5, "Qwen"): "SelWithinQwenMassMid",
+              ("within", 0.9, "Qwen"): "SelWithinQwenMassHigh",
+              ("across", 0.5, "Flash-Lite"): "SelAcrossFlashMassMid",
+              ("across", 0.9, "Flash-Lite"): "SelAcrossFlashMassHigh"}
+    for key, name in masses.items():
+        if cd.fmt(drawn["mass"][key], 2) != mac.items[name]:
+            raise RuntimeError(f"fig_selection bar {key} is {drawn['mass'][key]:.4f} "
+                               f"but {name} = {mac.items[name]}")
+    targets = {("within", 0.5): "SelWithinReachMid", ("within", 0.9): "SelWithinReachHigh",
+               ("across", 0.9): "SelAcrossReachHigh"}
+    for key, name in targets.items():
+        if drawn["target"][key] != mac.items[name]:
+            raise RuntimeError(f"fig_selection target {key} is {drawn['target'][key]}% "
+                               f"but {name} = {mac.items[name]}")
 
 
 # ============================================================================ main
@@ -547,8 +699,22 @@ def main():
         if key[:3] in RULES and o["n_unit"] != 1:
             raise RuntimeError(f"reducible chain for a reported rule {key}")
 
-    fig = figure(P, point, REACH)
+    fig, drawn = selection_figure(P, point)
+    check_drawn(drawn, mac)
+    print("\nfig_selection: stationary mass drawn (within N=6, across N=30) and target rate")
+    for (rule, p), t in drawn["target"].items():
+        print(f"  {rule:6} p={p:.1f} " + " ".join(f"{m}={drawn['mass'][(rule, p, m)]:.3f}"
+                                                  for m in cs.MODEL_ORDER) + f" | target {t}%")
+    for (p, n), (x, g) in drawn["gradient"].items():
+        tail = (" | fixed points " + ", ".join(f"{xs:.3f} {'stable' if st else 'unstable'}"
+                                               for xs, st in drawn["fixed"][p])
+                if n == N_ACROSS else " | states " + " ".join(f"{v:+.3f}" for v in g))
+        print(f"  G(x) Qwen beside Flash-Lite p={p:.1f} N={n}: min {g.min():+.3f} "
+              f"max {g.max():+.3f}" + tail)
     pdf = cs.save(fig, cd.FIGURES / "fig_selection", title="fig_selection")
+    print(f"wrote {pdf.relative_to(cd.REPO)} (+ .png)")
+    fig = invasion_figure(P, point, REACH)
+    pdf = cs.save(fig, cd.PAPER / "supplement" / "figures" / "fig_invasion", title="fig_invasion")
     print(f"wrote {pdf.relative_to(cd.REPO)} (+ .png)")
     if len(beaten) > 3:
         raise RuntimeError(

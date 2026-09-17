@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{32}
+\begin{thebibliography}{34}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -62,15 +62,18 @@
 \href{https://doi.org/10.1016/0047-2727(88)90043-6}{doi:\nolinkurl{10.1016/0047-2727(88)90043-6}}
 
 
-\bibitem[{Anonymous}(2026)]%
-        {anon-if}
-\bibfield{author}{\bibinfo{person}{{Anonymous}}.}
-  \bibinfo{year}{2026}\natexlab{}.
-\newblock \bibinfo{title}{Concurrent manuscript on risk sensitivity in {LLM}
-  agents}.
+\bibitem[Celiktemel et~al\mbox{.}(2026)]%
+        {celiktemel2026group}
+\bibfield{author}{\bibinfo{person}{Luis Celiktemel}, \bibinfo{person}{Edward
+  Eichhorn}, \bibinfo{person}{Levin Brinkmann}, \bibinfo{person}{Robin
+  Schimmelpfennig}, \bibinfo{person}{Aron Vallinder}, \bibinfo{person}{Yaomin
+  Jiang}, \bibinfo{person}{Edward Hughes}, {and} \bibinfo{person}{Iyad
+  Rahwan}.} \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{Group Selection Promotes Prosocial Prompts in
+  Populations of {LLM} Agents}.
 \newblock
-\shownote{Manuscript under review; details withheld for double-blind review}.
-\newblock
+\showeprint[arxiv]{2606.23343}
+\href{https://doi.org/10.48550/arXiv.2606.23343}{doi:\nolinkurl{10.48550/arXiv.2606.23343}}
 
 
 \bibitem[Chen et~al\mbox{.}(2023)]%
@@ -122,19 +125,6 @@
   Intelligence}}, Vol.~\bibinfo{volume}{38}. \bibinfo{pages}{17960--17967}.
 \newblock
 \href{https://doi.org/10.1609/aaai.v38i16.29751}{doi:\nolinkurl{10.1609/aaai.v38i16.29751}}
-
-
-\bibitem[Fern{\'a}ndez~Domingos et~al\mbox{.}(2023)]%
-        {fernandezdomingos2023egttools}
-\bibfield{author}{\bibinfo{person}{Elias Fern{\'a}ndez~Domingos},
-  \bibinfo{person}{Francisco~C. Santos}, {and} \bibinfo{person}{Tom Lenaerts}.}
-  \bibinfo{year}{2023}\natexlab{}.
-\newblock \showarticletitle{{EGTtools}: Evolutionary game dynamics in
-  {Python}}.
-\newblock \bibinfo{journal}{\emph{iScience}} \bibinfo{volume}{26},
-  \bibinfo{number}{4} (\bibinfo{year}{2023}), \bibinfo{pages}{106419}.
-\newblock
-\href{https://doi.org/10.1016/j.isci.2023.106419}{doi:\nolinkurl{10.1016/j.isci.2023.106419}}
 
 
 \bibitem[Filippas et~al\mbox{.}(2024)]%
@@ -209,6 +199,18 @@
   Neural Information Processing Systems}}, Vol.~\bibinfo{volume}{31}.
   \bibinfo{publisher}{Curran Associates, Inc.}
 \newblock
+
+
+\bibitem[Kumar et~al\mbox{.}(2026)]%
+        {kumar2026cooperative}
+\bibfield{author}{\bibinfo{person}{Shivani Kumar}, \bibinfo{person}{Adarsh
+  Bharathwaj}, {and} \bibinfo{person}{David Jurgens}.}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{Cooperative Profiles Predict Multi-Agent {LLM} Team
+  Performance in {AI} for Science Workflows}.
+\newblock
+\showeprint[arxiv]{2604.20658}
+\href{https://doi.org/10.48550/arXiv.2604.20658}{doi:\nolinkurl{10.48550/arXiv.2604.20658}}
 
 
 \bibitem[Leibo et~al\mbox{.}(2021)]%
@@ -412,6 +414,37 @@
   (\bibinfo{year}{2011}), \bibinfo{pages}{11825--11829}.
 \newblock
 \href{https://doi.org/10.1073/pnas.1102493108}{doi:\nolinkurl{10.1073/pnas.1102493108}}
+
+
+\bibitem[Terrucha et~al\mbox{.}(2024)]%
+        {terrucha2024art}
+\bibfield{author}{\bibinfo{person}{In{\^e}s Terrucha}, \bibinfo{person}{Elias
+  Fern{\'a}ndez~Domingos}, \bibinfo{person}{Francisco~C. Santos},
+  \bibinfo{person}{Pieter Simoens}, {and} \bibinfo{person}{Tom Lenaerts}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{The art of compensation: How hybrid teams solve
+  collective-risk dilemmas}.
+\newblock \bibinfo{journal}{\emph{PLOS ONE}} \bibinfo{volume}{19},
+  \bibinfo{number}{2} (\bibinfo{year}{2024}), \bibinfo{pages}{e0297213}.
+\newblock
+\href{https://doi.org/10.1371/journal.pone.0297213}{doi:\nolinkurl{10.1371/journal.pone.0297213}}
+
+
+\bibitem[Tewolde et~al\mbox{.}(2026)]%
+        {tewolde2026coopeval}
+\bibfield{author}{\bibinfo{person}{Emanuel Tewolde}, \bibinfo{person}{Xiao
+  Zhang}, \bibinfo{person}{David Guzman~Piedrahita}, \bibinfo{person}{Vincent
+  Conitzer}, {and} \bibinfo{person}{Zhijing Jin}.}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \showarticletitle{{CoopEval}: Benchmarking Cooperation-Sustaining
+  Mechanisms and {LLM} Agents in Social Dilemmas}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 43rd International Conference on
+  Machine Learning (ICML)}}.
+\newblock
+\urldef\tempurl%
+\url{https://arxiv.org/abs/2604.15267}
+\showURL{%
+\tempurl}
 
 
 \bibitem[Traulsen and Nowak(2006)]%

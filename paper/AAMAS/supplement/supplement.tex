@@ -37,7 +37,9 @@
 \usepackage{tocloft}
 \setlength{\cftsecnumwidth}{2.6em}      % room for "S10"
 \setlength{\cftsubsecnumwidth}{3.4em}   % room for "S10.6"
+\usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
+\externaldocument[main-]{../main}
 
 \setlist[itemize]{label=\textnormal{$\bullet$},leftmargin=*,itemsep=1pt,topsep=2pt}
 
@@ -65,6 +67,7 @@
 %% Numbers that only the supplement quotes.
 \input{tables/snum_selfplay.tex}
 \input{tables/snum_scripted.tex}
+\input{../tables/num_strategy.tex}
 \InputIfFileExists{tables/snum_probes.tex}{}{}
 \InputIfFileExists{tables/snum_groups.tex}{}{}
 
@@ -108,6 +111,7 @@ Section 5.1, asking the agent & Section~\ref{sec:questions}: every question word
 Section 5.2, fixed partners & Section~\ref{sec:scripted} \\
 Section 6, mixed groups & Section~\ref{sec:mixed} \\
 Section 7, selection & Section~\ref{sec:selection}: method, payoff functions, all selection settings \\
+Sections 4 and 6, last round, equilibria, rules, responses to openings & Section~\ref{sec:strategy} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -585,7 +589,7 @@ The second value question asks how much cash a player ends with, on average, if 
 \section{One model beside scripted partners}
 \label{sec:scripted}
 
-This section supports Section 5.2 of the paper, including its Figure 4 and Table 5. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
+This section supports Section 5.2 of the paper, including its Table 5; Figure~\ref{fig:scr-heat} shows the same games round by round. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
 
 \subsection{Numbers behind the main text}
 
@@ -612,6 +616,15 @@ Gemini 3.5 Flash-Lite in the same seat: games reaching the target, of 50 & \ScrF
 \end{center}
 
 \subsection{What the models pay}
+
+Figure~\ref{fig:scr-heat} shows, round by round, what each model pays beside partners who always pay 0 or always pay 4, the two kinds for which paying nothing is the best response. Look for the round at which each row turns light: Gemini 3.5 Flash-Lite and Claude Haiku 4.5 stop once the outcome is settled, GPT-5.6 Luna stops earlier, and Qwen3-235B and Grok 4.20 keep paying.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.62\textwidth]{../figures/fig_scripted.pdf}
+\caption{One model beside five scripted partners, pooled over five risk levels (50 games per row). A cell is the mean payment in one round; the top row is the best response, 0 in every round. The dashed rule follows round 6, after which the outcome is settled in most games.}
+\label{fig:scr-heat}
+\end{figure}
 
 Table~\ref{tab:scr-totals} gives the mean total of the model's seat for every kind of partner and risk level, with the best response below each block. The last column is what a best responder would change: 20 units between low and high risk beside fair-share partners, and nothing beside the other two. No model comes close. Beside partners who always pay 0 or always pay 4, every model pays well above the best response of 0, and Qwen3-235B and Grok 4.20 pay the most, even though these partners make every unit a loss.
 
@@ -697,7 +710,7 @@ Table~\ref{tab:scr-fair} shows the most common sequence of moves beside the two 
 \section{Two models at one table}
 \label{sec:mixed}
 
-This section supports Section 6 of the paper and its Figures 5 and 6. Every pair of models shares a table, with one to five seats for the first-named model, at $p=0.1$, $0.5$ and $0.9$, with ten games per cell: 150 games per pair and \MixGames{} in all. ``Alone'' means self-play of the same model at the same three risk levels, pooling the base grid and the rerun, which use the same prompt (20 games per model and risk level).
+This section supports Section 6 of the paper and its Figures~\ref{main-fig:advantage} and~\ref{main-fig:mixed}. Every pair of models shares a table, with one to five seats for the first-named model, at $p=0.1$, $0.5$ and $0.9$, with ten games per cell: 150 games per pair and \MixGames{} in all. ``Alone'' means self-play of the same model at the same three risk levels, pooling the base grid and the rerun, which use the same prompt (20 games per model and risk level).
 
 \subsection{Numbers behind the main text}
 
@@ -722,7 +735,7 @@ Share of the shortfall below 2 per round that comes after the pool reaches 120, 
 
 \subsection{Who earns more at a shared table}
 
-Table~\ref{tab:mix-edge} gives the numbers behind the upper triangle of Figure 5 of the paper. By Proposition 2, the seat that pays less earns more at the same table, so the payoff gap mirrors the payment gap. Every model earns clearly more than Grok 4.20, and no interval of those gaps comes near zero. Among the other four models the gaps are small; Qwen3-235B is slightly ahead of all three, because it pays slightly less.
+Table~\ref{tab:mix-edge} gives the numbers behind the upper triangle of Figure~\ref{main-fig:advantage} of the paper. By Proposition 2, the seat that pays less earns more at the same table, so the payoff gap mirrors the payment gap. Every model earns clearly more than Grok 4.20, and no interval of those gaps comes near zero. Among the other four models the gaps are small; Qwen3-235B is slightly ahead of all three, because it pays slightly less.
 
 \begin{table}[h]
 \caption{Two models at one table (150 games per pair, pooled over seat splits and risk levels). Top: expected payoff per seat of the row model minus that of the column model in the same games, with its interval below. Bottom: units paid per seat, row minus column.}
@@ -733,7 +746,7 @@ Table~\ref{tab:mix-edge} gives the numbers behind the upper triangle of Figure 5
 
 \subsection{Which tables reach the target}
 
-Table~\ref{tab:mix-pairs} gives the numbers behind the lower triangle of Figure 5. Table~\ref{tab:mix-reach} splits each pair by how many seats the first model holds and by risk level. Tables that mix Qwen3-235B with Gemini 3.5 Flash-Lite or GPT-5.6 Luna fail at almost every split, and only improve when Qwen3-235B holds a single seat. Tables with Grok 4.20 reach the target in the great majority of games, with two exceptions: five GPT-5.6 Luna seats beside one Grok 4.20 seat, and four or five Qwen3-235B seats beside Grok 4.20. Success barely changes with the risk level, as the self-play results would predict.
+Table~\ref{tab:mix-pairs} gives the numbers behind the lower triangle of Figure~\ref{main-fig:advantage}. Table~\ref{tab:mix-reach} splits each pair by how many seats the first model holds and by risk level. Tables that mix Qwen3-235B with Gemini 3.5 Flash-Lite or GPT-5.6 Luna fail at almost every split, and only improve when Qwen3-235B holds a single seat. Tables with Grok 4.20 reach the target in the great majority of games, with two exceptions: five GPT-5.6 Luna seats beside one Grok 4.20 seat, and four or five Qwen3-235B seats beside Grok 4.20. Success barely changes with the risk level, as the self-play results would predict.
 
 \begin{table}[h]
 \caption{Games reaching the target: count out of 150 for each pair, and out of 60 for self-play on the diagonal (the base grid and the rerun at $p=0.1$, $0.5$ and $0.9$).}
@@ -765,7 +778,7 @@ Before round 10, a pool of exactly 108 means that the fair share from every seat
 
 \subsection{Slack and generous partners}
 
-Table~\ref{tab:mix-slack} gives the numbers behind Figure 6 of the paper and extends it. Part (a) shows that one Qwen3-235B seat breaks tables of Gemini 3.5 Flash-Lite and GPT-5.6 Luna but not tables of Claude Haiku 4.5 or Grok 4.20, and, in the last column, that only Grok 4.20 pays enough to carry five Qwen3-235B seats to the target most of the time. Part (b) shows that the more Grok 4.20 seats a table holds, the less Claude Haiku 4.5, Gemini 3.5 Flash-Lite and GPT-5.6 Luna pay, while Qwen3-235B pays slightly more. Part (c) shows that this under-matching happens only beside Grok 4.20: beside five seats of any other model, each model pays close to the fair share.
+Table~\ref{tab:mix-slack} gives the numbers behind Figure~\ref{main-fig:mixed} of the paper and extends it. Part (a) shows that one Qwen3-235B seat breaks tables of Gemini 3.5 Flash-Lite and GPT-5.6 Luna but not tables of Claude Haiku 4.5 or Grok 4.20, and, in the last column, that only Grok 4.20 pays enough to carry five Qwen3-235B seats to the target most of the time. Part (b) shows that the more Grok 4.20 seats a table holds, the less Claude Haiku 4.5, Gemini 3.5 Flash-Lite and GPT-5.6 Luna pay, while Qwen3-235B pays slightly more. Part (c) shows that this under-matching happens only beside Grok 4.20: beside five seats of any other model, each model pays close to the fair share.
 
 \begin{table}[h]
 \caption{Slack at mixed tables, pooled over risk levels, with 95\% intervals. (a) Games reaching the target: six seats of the model (60 games), five seats and one Qwen3-235B seat (30 games), and one seat beside five Qwen3-235B seats (30 games). (b) Units paid per seat of the model beside one to five Grok 4.20 seats (30 games each), and beside five seats of another model (90 games). (c) Units paid by a single seat beside five seats of each other model (30 games each).}
@@ -787,7 +800,7 @@ Table~\ref{tab:mix-timing} asks when the payment falls short beside Grok 4.20. T
 \section{Selection among models}
 \label{sec:selection}
 
-This section supports Section 7 of the paper and its Figure 7. It gives the method in full, the payoffs that feed it, and every selection setting we computed.
+This section supports Section 7 of the paper and its Figure~\ref{main-fig:selection}. It gives the method in full, the payoffs that feed it, and every selection setting we computed.
 
 \subsection{Method}
 
@@ -803,9 +816,15 @@ The fitness of each type is its payoff averaged over these tables, as in Equatio
 \[
 \rho_{B\to A}=\left(1+\sum_{j=1}^{N-1}\prod_{i=1}^{j}e^{-\beta\,(f_A(i)-f_B(i))}\right)^{-1}.
 \]
-We write the transition from a population of $B$ to a population of $A$ as $B\to A$, the direction of the arrows in Figure 7 of the paper. A takeover is favoured by selection when $\rho_{B\to A}>1/N$, the probability for a neutral newcomer.
+We write the transition from a population of $B$ to a population of $A$ as $B\to A$, the direction of the arrows in Figure~\ref{fig:invasion}. A takeover is favoured by selection when $\rho_{B\to A}>1/N$, the probability for a neutral newcomer.
 
-\paragraph{$\alpha$-Rank.} In the limit where a new model enters rarely, the population almost always holds a single model. From a population of one model, a newcomer of each of the four other models arrives with equal probability and takes over with the probability above. These transitions form a Markov chain over the five one-model populations, and its stationary distribution is the \emph{stationary mass} of each model. The population's target rate and payoff per seat are the self-play target rates and payoffs weighted by these masses. Figure 7 of the paper is drawn with EGTtools, and the analysis code checks that EGTtools and its own implementation give the same fixation probabilities and masses to within $10^{-7}$. For the two strongest-selection settings at $N=60$ and $N=120$ at $p=0.1$, the eigenvector method sees two unit eigenvalues because some transition probabilities are too small to represent; an exact computation in log space gives the same masses.
+\paragraph{$\alpha$-Rank.} In the limit where a new model enters rarely, the population almost always holds a single model. From a population of one model, a newcomer of each of the four other models arrives with equal probability and takes over with the probability above. These transitions form a Markov chain over the five one-model populations, and its stationary distribution is the \emph{stationary mass} of each model. The population's target rate and payoff per seat are the self-play target rates and payoffs weighted by these masses. The masses in Figure~\ref{main-fig:selection} of the paper and the invasion diagrams in Figure~\ref{fig:invasion} are computed with EGTtools, and the analysis code checks that EGTtools and its own implementation give the same fixation probabilities and masses to within $10^{-7}$. For the two strongest-selection settings at $N=60$ and $N=120$ at $p=0.1$, the eigenvector method sees two unit eigenvalues because some transition probabilities are too small to represent; an exact computation in log space gives the same masses.
+
+\paragraph{Gradient of selection.} For a population with $i$ agents of type $A$ out of $N$, the expected change in the share $x=i/N$ of type $A$ in one step of the pairwise comparison rule is
+\[
+G(x)=x\,(1-x)\,\frac{N}{N-1}\,\tanh\!\left(\frac{\beta}{2}\,\bigl(f_A(i)-f_B(i)\bigr)\right).
+\]
+Where $G>0$ selection pushes the share of $A$ up, and where $G<0$ it pushes it down. A zero of $G$ at which the sign changes from positive to negative is stable, and one at which it changes from negative to positive is unstable. Figure~\ref{main-fig:selection} of the paper draws $G$ with $A$ Qwen3-235B and $B$ Gemini 3.5 Flash-Lite.
 
 \paragraph{Uncertainty.} Each of \SupSelBootReps{} bootstrap replicates resamples the games of every mixed cell and every self-play cell, rebuilds all payoff functions and repeats the whole analysis. We report how often the winner of the point estimate stays on top, and percentile intervals for the population's target rate and payoff.
 
@@ -869,18 +888,27 @@ Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the popula
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{figures/sfig_mass_beta.pdf}
-\caption{Stationary mass of the five models as the selection intensity $\beta$ grows from 0.01 to 100. Top: comparison within a table ($N=6$). Bottom: comparison across tables ($N=30$). The dashed line marks $\beta=1$, the setting of Figure 7 of the paper.}
+\caption{Stationary mass of the five models as the selection intensity $\beta$ grows from 0.01 to 100. Top: comparison within a table ($N=6$). Bottom: comparison across tables ($N=30$). The dashed line marks $\beta=1$, the setting of Figure~\ref{main-fig:selection} of the paper.}
 \label{fig:mass-beta}
 \end{figure}
 
 Table~\ref{tab:sel-boot} gives the bootstrap check for the two settings of the paper, with self-play from the grid and the rerun together and from the grid alone. The winners are the same in both cases and stay on top in the large majority of replicates. Some intervals for the target rate are wide, because a population's target rate depends on which model wins and the models differ sharply in self-play success.
 
 \begin{table}[h]
-\caption{Bootstrap check of the two settings of Figure 7 ($\beta=1$; within a table $N=6$, across tables $N=30$), over \SupSelBootReps{} replicates: the winner of the point estimate, the share of replicates in which it stays on top, and the population's target rate and payoff per seat with 95\% intervals.}
+\caption{Bootstrap check of the two settings of Figure~\ref{main-fig:selection} ($\beta=1$; within a table $N=6$, across tables $N=30$), over \SupSelBootReps{} replicates: the winner of the point estimate, the share of replicates in which it stays on top, and the population's target rate and payoff per seat with 95\% intervals.}
 \label{tab:sel-boot}
 \centering\small
 \input{tables/s_sel_boot.tex}
 \end{table}
+
+Figure~\ref{main-fig:selection} of the paper shows the stationary masses and the gradient of selection for one pair. Figure~\ref{fig:invasion} gives the full invasion diagrams behind those masses, for every pair of models at the three risk levels and both kinds of comparison. Each arrow marks a takeover that selection favours.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/fig_invasion.pdf}
+\caption{Invasion diagrams ($\alpha$-Rank, $\beta=1$), computed and drawn with EGTtools. A node is a one-model population, with its stationary mass beside it. An arrow from A to B means that one B newcomer takes over an A population with more than the neutral probability $1/N$. Left: $N=6$, comparison with tablemates. Right: $N=30$, comparison mostly across tables. Bottom left of each graph: the self-play target rate, weighted by mass.}
+\label{fig:invasion}
+\end{figure}
 
 \subsection{Facts about single tables}
 
@@ -891,6 +919,56 @@ Table~\ref{tab:sel-facts} checks, cell by cell, the two table-level facts that t
 \label{tab:sel-facts}
 \centering\small
 \input{tables/s_sel_facts.tex}
+\end{table}
+
+%% =====================================================================================
+\section{Strategies, the last round and equilibrium benchmarks}
+\label{sec:strategy}
+
+This section supports four statements in Sections 4 and 6 of the paper: how Qwen3-235B and GPT-5.6 Luna play the last round, how the models compare with the equilibria of Proposition 1, how each model's moves can be described by a simple rule, and how partners respond to Grok 4.20's opening move. All tables use the games played with the base prompt.
+
+\subsection{The last round}
+
+Table~\ref{tab:strat-endgame} splits the last move of every seat by the state of the pool before round 10. Qwen3-235B pays nothing about as often when its payment is needed as when the others' fair shares already reach the target, and it almost never stops in rounds 7 to 9 once the target is met, so its skip follows the round number rather than the pool. GPT-5.6 Luna almost never skips when its payment is needed and skips about half the time when it is not. In self-play, GPT-5.6 Luna tables that reach round 10 ahead of the fair pace reach the target in \StratLunaAheadReach{}\% of \StratLunaAheadN{} games, against \StratLunaOnPaceReach{}\% of \StratLunaOnPaceN{} games exactly on pace: when every seat reasons that another will pay, too many skip.
+
+\begin{table}[h]
+\caption{Share of seats paying nothing in round 10, by the state of the pool after round 9, and in rounds 7 to 9 once the pool has reached 120, with 95\% bootstrap intervals over games in the table file.}
+\label{tab:strat-endgame}
+\centering\small
+\input{tables/s_strat_endgame.tex}
+\end{table}
+
+\subsection{Play against the equilibria of Proposition 1}
+
+For $p<1$ the worst Nash equilibrium is that nobody pays, which leaves $(1-p)\,40$ per seat; every target-reaching equilibrium leaves 20. Table~\ref{tab:strat-equilibrium} counts the self-play games whose expected payoff per seat falls below the worst equilibrium. Above the pivot this happens in most games of Qwen3-235B, which misses the target after paying, and of Grok 4.20, which overpays, and never for Gemini 3.5 Flash-Lite or Claude Haiku 4.5.
+
+\begin{table}[h]
+\caption{Self-play games on the risk grid whose expected payoff per seat is below that of the worst Nash equilibrium.}
+\label{tab:strat-equilibrium}
+\centering\small
+\input{tables/s_strat_equilibrium.tex}
+\end{table}
+
+\subsection{Simple rules describe the moves}
+
+Table~\ref{tab:strat-rules} compares each model's moves with named rules and with a small decision tree fitted by cross-validation. For every model one rule predicts most decisions, and the tree adds little. Removing the risk level from the tree's inputs does not lower its accuracy for any model, which is the sense in which the paper calls the play a default. A rule close to the risk-neutral optimum predicts far fewer moves than the best rule for every model.
+
+\begin{table}[h]
+\caption{How well named rules and a fitted tree predict each model's moves.}
+\label{tab:strat-rules}
+\centering\small
+\input{tables/s_strat_rules.tex}
+\end{table}
+
+\subsection{Responses to Grok 4.20's opening move}
+
+Grok 4.20 chooses its first move before any history exists, and that move varies across the repetitions of a cell. Within each cell of the two-model tables, Table~\ref{tab:strat-opening} relates a partner's payments to Grok 4.20's mean opening move. After a higher opening, GPT-5.6 Luna pays less in every round while the pool is still short. Claude Haiku 4.5 does not change its payment in that phase and Gemini 3.5 Flash-Lite changes it only slightly; both pay less in total mainly because the target is reached sooner. Qwen3-235B pays more.
+
+\begin{table}[h]
+\caption{Change in a partner seat's payment per unit of Grok 4.20's mean opening move, within cells of the two-model tables, with 95\% bootstrap intervals over games.}
+\label{tab:strat-opening}
+\centering\small
+\input{tables/s_strat_opening.tex}
 \end{table}
 
 \end{document}
