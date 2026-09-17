@@ -548,7 +548,7 @@ def main():
     # ---------------------------------------------------------------- robustness
     arms = [("Base", BASE), ("Rerun", "exp_evprobe"), ("No hint", "exp_nohint"),
             ("Para.\\,1", "exp_para1"), ("Para.\\,2", "exp_para2"), ("Temp.\\,0", "exp_baseline_temp0"),
-            ("Wording", "exp_wording"), ("Neutral", "exp_neutral")]
+            ("Wording", "exp_wording"), ("Goal", "exp_neutral")]
     ru = {e: units[(units.exp == e) & units.p.isin(ENDPOINTS)] for _, e in arms}
     rg = {e: games[(games.exp == e) & games.p.isin(ENDPOINTS)] for _, e in arms}
     for e, d in ru.items():
@@ -591,6 +591,21 @@ def main():
     ]
     for j, (name, _) in enumerate(arms):
         tab.append(name + " & " + " & ".join(row[j] for row in rob_rows) + r" \\")
+    # Bottom block: the goal test at single risk levels (10 games per entry). The prose says
+    # in words that stating the goal stops payment at p = 0 for some models and that only
+    # GPT-5.6 Luna then separates low from high risk; these rows are where the values live.
+    by_risk = [("Base $p{=}0$", BASE, 0.0), ("Wording $p{=}0$", "exp_wording", 0.0),
+               ("Goal $p{=}0$", "exp_neutral", 0.0), ("Goal $p{=}0.1$", "exp_neutral", 0.1),
+               ("Goal $p{=}0.9$", "exp_neutral", 0.9)]
+    tab.append(r"\midrule")
+    for name, e, pp in by_risk:
+        cells = []
+        for m in MODELS:
+            d = units[(units.exp == e) & (units.model == m) & (units.p == pp)]
+            if len(d) != 10:
+                raise RuntimeError(f"{e} {m} p={pp}: expected 10 games, found {len(d)}")
+            cells.append(rnd(d.own.mean(), 1))
+        tab.append(name + " & " + " & ".join(cells) + r" \\")
     tab += [r"\bottomrule", r"\end{tabular}"]
     (cd.TABLES / "tab_robust.tex").write_text("\n".join(tab) + "\n", encoding="utf-8")
 

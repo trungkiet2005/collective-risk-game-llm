@@ -1,30 +1,69 @@
 %% =====================================================================================
-%% Supplementary material for "When Low-Cost Language Models Cooperate by Default:
-%% Incentives, Partners, and Selection in a Collective-Risk Dilemma".
-%% Nothing the paper's argument depends on lives only here.
-%% Anonymous: no author names, no repository names, no internal run identifiers.
+%% Supplementary material for "Cooperation by Default: LLM Agents in the Collective-Risk Dilemma". AAMAS 2027 allows supplementary material only as a separate file, and reviewers need not read it, so nothing the paper's argument depends on may live only here. Its job is to hold every value the main text states in words, the full proofs, the instruments word for word and the methods.
+%% Anonymous: no author names, no repository names, no internal run identifiers, no experiment codes.
+%% One source line per paragraph (no hard wrapping). Never hand-type a measured number: numbers come from ../tables/num_*.tex (the paper's own macros) and tables/*.tex (tabulars and Sup* macros written by the analysis scripts).
 %%
-%% BUILD: regenerate the prompt include, then compile this file twice with pdflatex.
+%% BUILD (from the repository root):
+%%   python paper/AAMAS/supplement/make_prompts.py
+%%   python paper/AAMAS/supplement/make_questions.py
+%%   python paper/AAMAS/analysis/supp_selfplay.py
+%%   python paper/AAMAS/analysis/supp_probes.py
+%%   python paper/AAMAS/analysis/supp_scripted.py
+%%   python paper/AAMAS/analysis/supp_groups.py        (a few minutes: selection bootstrap)
+%%   cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
 %% =====================================================================================
 \documentclass[10pt]{article}
 \usepackage[T1]{fontenc}
-\usepackage{libertine}
-\usepackage{newtxmath}
-\usepackage[scaled=0.86]{beramono}   % monospace with a real bold face for marked spans
-\usepackage[margin=2.2cm]{geometry}
-\usepackage{booktabs}
 \usepackage{amsmath}
+\usepackage{amsthm}                   % before newtxmath, which would otherwise clash over \openbox
+\usepackage[tt=false]{libertine}
+\usepackage[libertine]{newtxmath}
+\usepackage[scaled=0.86]{beramono}   % monospace with a real bold face for marked spans
+\usepackage[letterpaper,left=0.75in,right=0.75in,top=0.9in,bottom=0.9in]{geometry}
+\usepackage{booktabs}
 \usepackage{array}
-\usepackage{longtable}
+\usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage[most]{tcolorbox}
+\usepackage[section]{placeins}
+\usepackage[font=small,labelfont=bf,skip=4pt]{caption}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{2.6em}      % room for "S10"
+\setlength{\cftsubsecnumwidth}{3.4em}   % room for "S10.6"
 \usepackage[hidelinks]{hyperref}
+
+\setlist[itemize]{label=\textnormal{$\bullet$},leftmargin=*,itemsep=1pt,topsep=2pt}
 
 \newtcolorbox{promptbox}{breakable, enhanced, colback=white, colframe=black!45,
   boxrule=0.5pt, arc=0pt, left=5pt, right=5pt, top=4pt, bottom=4pt,
   fontupper=\ttfamily\small\raggedright}
+
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
 \newtheorem{proposition}{Proposition}
+\renewcommand{\theproposition}{\arabic{proposition}}
+\newtheorem{lemma}{Proposition}
+\renewcommand{\thelemma}{S\arabic{lemma}}
+\newcommand{\popt}{p^{*}}
+\setlength{\parskip}{3pt}
+
+%% The paper's own numbers, so the supplement cannot disagree with it.
+\input{../tables/num_selfplay.tex}
+\input{../tables/num_probes.tex}
+\input{../tables/num_scripted.tex}
+\input{../tables/num_mixed.tex}
+\input{../tables/num_selection.tex}
+\input{../tables/num_advantage.tex}
+%% Numbers that only the supplement quotes.
+\input{tables/snum_selfplay.tex}
+\input{tables/snum_scripted.tex}
+\InputIfFileExists{tables/snum_probes.tex}{}{}
+\InputIfFileExists{tables/snum_groups.tex}{}{}
+
+%% A two-column "claim | value" table for the numbers behind a main-text section.
+\newenvironment{claims}{\small\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.74\textwidth}>{\raggedleft\arraybackslash}p{0.2\textwidth}@{}}\toprule Statement in the paper, made precise & Value \\\midrule}{\bottomrule\end{tabular}}
 
 \title{Supplementary Material\\[4pt]\large When Low-Cost Language Models Cooperate by Default:\\
 Incentives, Partners, and Selection in a Collective-Risk Dilemma}
@@ -34,15 +73,180 @@ Incentives, Partners, and Selection in a Collective-Risk Dilemma}
 \begin{document}
 \maketitle
 
-\tableofcontents
+\noindent This document supports the paper. The paper states its results in words and keeps its numbers in tables and figures; this supplement gives the values behind every statement, the full proofs, every prompt and question word for word, and the methods. Section numbers here start with S; ``Section 4'' without an S means a section of the paper.
+
+\setcounter{tocdepth}{2}
+{\small\tableofcontents}
+
 \clearpage
+%% =====================================================================================
+\section{How to read this supplement}
+\label{sec:guide}
 
-\section{Model inventory and protocol}
+Table~\ref{tab:guide} maps each part of the paper to the sections here. Every results section (Sections~\ref{sec:selfplay} to~\ref{sec:selection}) opens with a short table called ``Numbers behind the main text'', which lists each statement the paper makes in words, stated precisely, beside its value. The tables and figures that follow give the full breakdown by model, risk level and condition.
 
-Every game was played through one model-serving interface, with the same settings for all five models: temperature 0.7 unless a condition states otherwise, and an output limit of 3,000 tokens, raised automatically for a reply that reached the limit before its final \texttt{CONTRIBUTION:} line.
+\begin{table}[h]
+\caption{Where to find what.}
+\label{tab:guide}
+\centering\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.32\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}@{}}
+\toprule
+Part of the paper & In this supplement \\
+\midrule
+Section 3.1, rules and Propositions 1 and 2 & Section~\ref{sec:game}: full proofs, the ten-round game, the loss decomposition, risk aversion, best responses to scripted partners \\
+Section 3.2, models, prompts, protocol & Sections~\ref{sec:models} and~\ref{sec:prompts}: model identifiers, how replies are read, every prompt word for word \\
+Section 3.2, designs and measures & Section~\ref{sec:design}: games per design, the lottery draws, statistical methods, reproducibility \\
+Section 4, self-play across risk & Section~\ref{sec:selfplay} \\
+Section 4, prompt and decoding changes & Section~\ref{sec:controls} \\
+Section 5.1, asking the agent & Section~\ref{sec:questions}: every question word for word, and all answers \\
+Section 5.2, fixed partners & Section~\ref{sec:scripted} \\
+Section 6, mixed groups & Section~\ref{sec:mixed} \\
+Section 7, selection & Section~\ref{sec:selection}: method, payoff functions, all selection settings \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{center}
-\begin{tabular}{llll}
+\paragraph{Conventions.} The unit of analysis is the game, because the seats of one game share a history and a lottery. Payoffs are expected payoffs over the catastrophe lottery (Section~\ref{sec:lottery}). A seat's \emph{total} is what it paid over the ten rounds, out of 40. Intervals are 95\% percentile bootstrap intervals over games, written [lower, upper]. Models always appear in the same order: Claude Haiku 4.5, Gemini 3.5 Flash-Lite, GPT-5.6 Luna, Qwen3-235B, Grok 4.20.
+
+%% =====================================================================================
+\section{The game and its benchmarks}
+\label{sec:game}
+
+\subsection{Rules and notation}
+
+Six players each start with an endowment $e=40$. In each of $R=10$ rounds, every player chooses privately and at the same time a contribution $a_i^t\in\{0,2,4\}$ to a shared pool, and after each round every seat's contribution is shown to all. A player's total is $x_i=\sum_{t=1}^{R}a_i^t\in\{0,2,\dots,40\}$ and the pool is $X=\sum_{i=1}^{6}x_i$. If $X\ge T=120$, every player keeps $e-x_i$. If $X<T$, a single lottery for the whole table destroys all savings with probability $p$, and otherwise every player keeps $e-x_i$. For a risk-neutral player the expected payoff is therefore
+\begin{equation}
+\label{eq:ev}
+u_i(x)=\begin{cases} e-x_i & \text{if } X\ge T,\\ (1-p)\,(e-x_i) & \text{if } X<T.\end{cases}
+\end{equation}
+The fair share is $T/6=20$ per player, or 2 per round, and the pivot is $\popt=T/(6e)=\tfrac12$. All results below assume $p<1$. At $p=1$ a missed target leaves every player with nothing whatever it paid, so many profiles that miss the target become weak equilibria and the characterisation changes.
+
+\subsection{Proposition 1 and its proof}
+
+\begin{proposition}
+Consider the game in which each player picks a total $x_i\in\{0,2,\dots,40\}$, with payoffs \eqref{eq:ev} and $p<1$. A profile is a Nash equilibrium if and only if $x=0$, or $X=T$ and $x_i\le pe$ for every $i$. A target-reaching equilibrium exists if and only if $p\ge\popt$. The welfare-optimal outcome is $x=0$ for $p<\popt$ and $X=T$ for $p>\popt$, and both are optimal at $p=\popt$, so the best attainable payoff per player is $\mathrm{opt}(p)=\max\{(1-p)e,\;e-T/6\}$.
+\end{proposition}
+
+\begin{proof}
+We check the three cases $X<T$, $X>T$ and $X=T$ in turn.
+
+\emph{Case $X<T$.} Suppose some player has $x_i>0$. If it pays nothing instead, the pool is still below $T$ and its payoff rises from $(1-p)(e-x_i)$ to $(1-p)e$, which is strictly more because $p<1$. So a profile that misses the target can be an equilibrium only if $x=0$. Conversely, $x=0$ is an equilibrium: a single player can raise the pool to at most $40<T$, so any deviation $x_i'>0$ yields $(1-p)(e-x_i')<(1-p)e$.
+
+\emph{Case $X>T$.} Totals are even and $T$ is even, so $X\ge T+2$. Some player has $x_i>0$ and can pay 2 less. The pool stays at or above $T$, and its payoff rises by 2. No such profile is an equilibrium.
+
+\emph{Case $X=T$.} Paying more lowers a player's payoff, since the target is met anyway. Paying less makes the pool miss the target, and the best such deviation is to pay nothing, which yields $(1-p)e$. So player $i$ has no profitable deviation if and only if $e-x_i\ge(1-p)e$, that is $x_i\le pe$.
+
+\emph{Existence.} If $p\ge\popt$, then $pe\ge20$ and the profile in which every player pays 20 is an equilibrium. If $p<\popt$, then $pe<20$, every equilibrium total is below 20, and six of them cannot add up to $T=120$.
+
+\emph{Welfare.} Total welfare is $6e-X$ when $X\ge T$ and $(1-p)(6e-X)$ when $X<T$. Over profiles that reach the target it is largest at $X=T$, with value $6e-T$; over profiles that miss it, it is largest at $X=0$, with value $(1-p)\,6e$. The first is larger if and only if $p>T/(6e)=\popt$, and they are equal at $\popt$. Dividing by six gives $\mathrm{opt}(p)$.
+\end{proof}
+
+The statement is also checked by exhaustive search over every symmetric profile and several thousand random asymmetric profiles at eleven risk levels, as part of the released tests.
+
+\subsection{The ten-round game}
+
+In the ten-round game a pure strategy maps every history of past contributions to a contribution in $\{0,2,4\}$, and payoffs still depend only on the totals through \eqref{eq:ev}.
+
+\begin{lemma}
+\label{prop:repeated}
+Let $p<1$. The totals $x$ reached on the path of a pure-strategy Nash equilibrium of the ten-round game are exactly the equilibrium profiles of Proposition~1. Each of them is reached by an equilibrium in which every player follows a fixed schedule that ignores the history.
+\end{lemma}
+
+\begin{proof}
+\emph{Every profile of Proposition~1 is reached.} Let each player follow any fixed schedule of contributions in $\{0,2,4\}$ that adds up to $x_i$; one exists because $x_i\le40$. The other players' totals then do not depend on what player $i$ does, so whatever strategy $i$ uses, it ends with some total $x_i'$ against fixed totals of the others. Its payoff is the payoff of the one-shot totals game, which by Proposition~1 is at most the payoff of $x_i$. No deviation is profitable.
+
+\emph{Only such profiles are reached.} Fix a pure equilibrium and its path totals $x$.
+
+(i) The strategy ``always pay 0'' guarantees at least $(1-p)e$ against anything, since it earns $e$ if the target is met and $(1-p)e$ otherwise. In equilibrium every player therefore earns at least $(1-p)e$.
+
+(ii) If $X<T$, a player earns $(1-p)(e-x_i)$, which is at least $(1-p)e$ only if $x_i=0$. So $x=0$.
+
+(iii) If $X\ge T$, a player earns $e-x_i\ge(1-p)e$, so $x_i\le pe$.
+
+(iv) It remains to rule out $X>T$. Let $\tau$ be the first round after which the path pool is at least $T$. If some player $i$ pays a positive amount in a round after $\tau$, let $t'$ be the last such round for that player, and let $i$ follow its strategy up to round $t'-1$ and pay 0 from round $t'$ on. The target is already met after round $\tau$ and contributions cannot be negative, so it stays met whatever the others do later, and $i$'s total falls by at least 2: a profitable deviation. Otherwise nobody pays after $\tau$, so the pool after round $\tau$ equals $X\ge T+2$. Some player $i$ pays $a_i^\tau\ge2$ in round $\tau$. Let $i$ pay $a_i^\tau-2$ in round $\tau$ and 0 afterwards. Decisions within a round are simultaneous, so the others' round-$\tau$ contributions are unchanged, the pool after round $\tau$ is $X-2\ge T$, and $i$ gains 2. Either way the profile is not an equilibrium, so $X=T$.
+
+Together, (ii) to (iv) give exactly the conditions of Proposition~1.
+\end{proof}
+
+We claim nothing about subgame perfection: the fixed schedules above need not be optimal after histories that are off the path.
+
+\subsection{Proposition 2 and its proof}
+
+\begin{proposition}
+For two seats $i$ and $j$ in the same game, $u_i-u_j=c\,(x_j-x_i)$, with $c=1$ if the target was reached and $c=1-p$ otherwise.
+\end{proposition}
+
+\begin{proof}
+Both seats face the same pool $X$. If $X\ge T$, $u_i-u_j=(e-x_i)-(e-x_j)=x_j-x_i$. If $X<T$, $u_i-u_j=(1-p)\big((e-x_i)-(e-x_j)\big)=(1-p)(x_j-x_i)$.
+\end{proof}
+
+The lottery is drawn once per table, so the same ordering holds for realised payoffs: if the catastrophe strikes, both seats get 0, and otherwise the seat that paid less keeps more. The analysis code checks the identity against the game engine's own accounts in all \MixGames{} mixed games, with a largest error below $10^{-12}$.
+
+\subsection{The optimum and the three ways to lose}
+\label{sec:loss}
+
+For a game at risk $p$, a model's loss is $\mathrm{opt}(p)-\bar u$, where $\bar u$ is the mean expected payoff of its seats. In self-play all six seats hold the same model, so $\bar u = e-X/6$ if the target is reached and $(1-p)(e-X/6)$ otherwise. The paper splits the loss of each game into three non-negative parts that add up to it:
+\begin{align*}
+\text{paying past 120} &= \begin{cases}(X-T)/6 & \text{if } X\ge T,\\ 0 & \text{otherwise;}\end{cases}\\
+\text{paying below } \popt &= \begin{cases}\mathrm{opt}(p)-(e-T/6) & \text{if } p<\popt \text{ and } X\ge T,\\ \mathrm{opt}(p)-\bar u & \text{if } p<\popt \text{ and } X<T,\\ 0 & \text{if } p\ge\popt;\end{cases}\\
+\text{missing the target} &= \begin{cases}\mathrm{opt}(p)-\bar u & \text{if } p\ge\popt \text{ and } X<T,\\ 0 & \text{otherwise.}\end{cases}
+\end{align*}
+Below the pivot, a game that reaches the target loses the difference between keeping everything and paying the fair share, plus any overpayment. At or above the pivot, a game that reaches the target loses only its overpayment, and a game that misses loses everything it could have kept beyond the lottery. The shares reported in the paper are sums of each part over a model's games divided by its total loss.
+
+\subsection{How much risk aversion would explain paying at low risk}
+\label{sec:crra}
+
+Take a player with constant relative risk aversion $\gamma$, whose utility of final cash $w$ is $w^{1-\gamma}/(1-\gamma)$ for $\gamma<1$, and compare two plans: pay the fair share and reach the target, which leaves 20 for certain, or pay nothing and miss, which leaves 40 with probability $1-p$ and 0 otherwise. The player prefers the certain 20 if and only if $20^{1-\gamma}\ge(1-p)\,40^{1-\gamma}$, that is
+\[
+\gamma \;\ge\; 1-\log_2\frac{1}{1-p}.
+\]
+At $p=0.1$ this needs $\gamma$ of at least \GridCrraLow{}. For $\gamma\ge1$ the utility of 0 is unbounded below, so any positive risk makes the certain 20 preferable; this is why the paper speaks of strong risk aversion. At $p=0$ the two plans leave 20 and 40 for certain, and no increasing utility prefers 20.
+
+\subsection{Scripted partners and their best responses}
+\label{sec:br}
+
+In the scripted design, seat 1 holds the model and seats 2 to 6 follow one of four fixed rules (Table~\ref{tab:scripts}). The model is not told that its partners are scripted.
+
+\begin{table}[h]
+\caption{The four kinds of scripted partner.}
+\label{tab:scripts}
+\centering\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.44\textwidth}>{\raggedright\arraybackslash}p{0.33\textwidth}@{}}
+\toprule
+Name & Rule for each scripted seat & Partners' pool over ten rounds \\
+\midrule
+Always 0 & Pays 0 in every round & 0 \\
+Always 2 & Pays 2 in every round (the fair share) & 100 \\
+Always 4 & Pays 4 in every round & 200 \\
+Copy the group & Pays 2 in round 1; afterwards pays the allowed amount nearest to the average of the other five seats' contributions in the previous round, ties going to the lower amount & 100, whatever the model does (see text) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Best responses.} Beside partners who always pay 0, the pool is at most 40, so the target cannot be reached and the model earns $(1-p)(40-x_1)$: the best response is to pay nothing. Beside partners who always pay 4, the target is reached whatever the model does and it earns $40-x_1$: again the best response is to pay nothing. Beside partners who always pay 2, the target is reached if and only if $x_1\ge20$, so the model compares 20 for certain with $(1-p)\,40$ from paying nothing: the best response is 0 below $\popt$, 20 above it, and both at $\popt$. A partner who copies the group averages four scripted seats paying 2 and the model's last move $a\in\{0,2,4\}$, which gives $(8+a)/5\in\{1.6,\,2,\,2.4\}$, and the nearest allowed amount is always 2. These partners therefore never leave 2, and their best response is the same as for partners who always pay 2. The analysis code confirms all four best responses by trying every one of the \SupScrSequences{} possible sequences of the model's own moves at each risk level (Table~\ref{tab:scr-best}).
+
+\begin{table}[h]
+\caption{Best response of the model's seat to each kind of partner, found by trying every sequence of its own moves. Top: the best total over ten rounds. Bottom: the expected payoff it earns. Beside partners who always pay 2 or copy the group, any sequence that adds up to 20 is a best response above $\popt$.}
+\label{tab:scr-best}
+\centering\small
+\input{tables/s_scr_best.tex}
+\end{table}
+
+\paragraph{When the outcome is settled.} Paying is dominated once the history shows that more payment cannot change the outcome. Beside partners who always pay 4, the outcome is settled after the first round in which the pool reaches 120. The partners alone add 20 per round, so this happens after round 6 at the latest, and after round 5 if the model paid 4 in each of the first five rounds. Beside partners who always pay 0, the outcome is settled after the first round $t$ in which the pool plus 24 per remaining round, the most six seats could still add, stays below 120. The pool then equals the model's own total, which is at most $4t$, so this happens after round 6 unless the model paid 4 in each of the first six rounds, and after round 7 in that case. Table~\ref{tab:scr-settled} in Section~\ref{sec:scripted} gives the observed settlement rounds.
+
+%% =====================================================================================
+\section{Models and protocol}
+\label{sec:models}
+
+\subsection{Models}
+
+Every game was played through one model-serving interface, with the same settings for all five models (Table~\ref{tab:models}).
+
+\begin{table}[h]
+\caption{The five models. The paper uses the names in the first column.}
+\label{tab:models}
+\centering\small
+\begin{tabular}{@{}llll@{}}
 \toprule
 Name in the paper & Model & Provider & Identifier \\
 \midrule
@@ -53,269 +257,634 @@ Qwen3-235B & Qwen3-235B-A22B-Instruct-2507 & Alibaba & \texttt{qwen3-235b-a22b-i
 Grok 4.20 & Grok 4.20, non-reasoning & xAI & \texttt{grok-4.20-0309-non-reasoning} \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\section{Formal game-theoretic benchmark}
-\label{sec:supp-game}
+\subsection{How a round is played}
 
-This section gives the complete benchmark used to interpret model behaviour. A table has
-$n=6$ seats, each with endowment $e=40$. In round $t\in\{1,\ldots,R\}$, where
-$R=10$, seat $i$ chooses $a_i^t\in A=\{0,2,4\}$. Its total contribution is
-$x_i=\sum_{t=1}^{R}a_i^t$ and the table total is $X=\sum_i x_i$. The target is
-$T=120$. The final payoff is
-\begin{equation}
- u_i =
- \begin{cases}
- e-x_i, & X\ge T,\\
- e-x_i & X<T \text{ with probability }1-p,\\
- 0 & X<T \text{ with probability }p.
- \end{cases}
- \label{eq:supp-payoff}
-\end{equation}
-The lottery is common to the table. We analyse expected payoff, rather than one draw of
-the lottery, so a missed target has expected multiplier $1-p$. The equal contribution is
-$T/n=20$, or two units per round, and the pivotal probability is
-$p^*=T/(ne)=1/2$.
+In each round every seat that holds a model receives its own prompt in a separate call with no memory of earlier calls. The prompt contains the rules, the seat's position, the current round, the seat's remaining money and every seat's contribution in every earlier round, listed by fixed position (Section~\ref{sec:prompts}). The six calls of a round see the same history, so decisions are simultaneous. The running pool is not printed. No seat is given a persona, and all prompts are in English.
 
-\begin{center}
-\small
-\begin{tabular}{@{}lll@{}}
-\toprule
-Symbol & Meaning & Value in the experiments \\
-\midrule
-$n$ & seats per table & $6$ \\
-$R$ & rounds & $10$ \\
-$e$ & initial endowment per seat & $40$ \\
-$A$ & legal action set per round & $\{0,2,4\}$ \\
-$T$ & collective target & $120$ \\
-$p$ & catastrophe probability after a miss & $0$ to $1$ \\
-$x_i$ & total paid by seat $i$ & $0,2,\ldots,40$ \\
-$X$ & table total & $\sum_i x_i$ \\
-$p^*$ & risk level at which fair cooperation is optimal & $1/2$ \\
-\bottomrule
-\end{tabular}
-\end{center}
+Sampling uses temperature 0.7, or 0 in the temperature-zero condition, and an output limit of 3,000 tokens. Each call carries a sampling seed derived from the game, the seat and the round. The service accepts the seed but does not guarantee identical text, so replaying a game does not reproduce its transcripts (Section~\ref{sec:repro}).
 
-\begin{proposition}[Pure-strategy benchmark]
-\label{prop:supp-eq}
-For the total-contribution game with $p<1$, a profile is a pure-strategy Nash
-equilibrium if and only if either $x_i=0$ for every seat, or $X=T$ and
-$x_i\le pe$ for every seat. A target-reaching equilibrium exists if and only if
-$p\ge p^*=1/2$. The welfare-optimal total is $X=0$ for $p<p^*$ and $X=T$ for
-$p>p^*$, with per-seat benchmark
-\[
- \operatorname{opt}(p)=\max\{(1-p)e,\,e-T/n\}.
-\]
-At $p=p^*$, the two totals tie.
-\end{proposition}
+\subsection{How replies are read}
+\label{sec:parse}
 
-\noindent\emph{Proof.}
-If $X<T$ and some seat pays a positive amount, that seat can pay zero and keep
-more money without changing the miss. Thus the only equilibrium that misses is
-$x=0$. If $X>T$, a seat can reduce its contribution by two units while keeping
-the target reached. If $X=T$, the deviation to zero yields $(1-p)e$, whereas
-staying yields $e-x_i$, so staying is optimal exactly when $x_i\le pe$.
-Summing those constraints gives $T\le npe$, or $p\ge T/(ne)$. Finally,
-social payoff is $n(e-X/n)=ne-X$ after success and $(1-p)(ne-X)$ after a miss;
-the best totals are therefore $T$ and zero, compared at $p^*$.
-\hfill$\square$
+The move is read from the last line of the reply that starts with \texttt{CONTRIBUTION:} and carries one of the allowed amounts. A reply without such a line falls back to the last allowed amount it names. Two situations trigger a new request, with a fresh sampling seed, up to three times: a reply that names no allowed amount at all, and a reply whose length reached the output limit. A reply that reached the limit is asked again with a four times larger limit, up to 8,000 tokens, because asking again with the same limit cuts the reply at the same place; such a reply is never read by the fallback, since any number in it may come from unfinished reasoning. A reply that is still unusable after the retries is counted as unreadable. The data record, for every seat and game, how many replies were unreadable or lacked a \texttt{CONTRIBUTION:} line. Across all \CntDecisions{} model decisions there are \CntParseFail{} such replies, both under the first rewording (Table~\ref{tab:design}), so every other move comes from a \texttt{CONTRIBUTION:} line and the fallback plays no role in the results.
 
-The repeated implementation has the same total-payment benchmark for fixed
-schedules and for pure strategies that react to the visible history. We do not
-claim subgame perfection. The benchmark is deliberately a diagnostic, not a
-prediction: zero payment is an equilibrium at every risk level, while fair payment
-is both welfare optimal and supportable as an equilibrium only above the pivot.
+In-game questions are read the same way from a final \texttt{ANSWER:} line (Section~\ref{sec:questions}). An unreadable answer counts as wrong.
 
-\subsection{Dominated actions and settled histories}
+%% =====================================================================================
+\section{Prompts, word for word}
+\label{sec:prompts}
 
-We mark a payment as dominated when every possible continuation gives the seat a
-lower payoff than paying less. At $p=0$, paying is dominated from the start because
-the catastrophe has no effect on expected payoff. At any risk level, payment is
-dominated after a settled history. A history is settled-success if the visible pool
-has already reached $T$, and settled-failure if even six seats paying four in every
-remaining round cannot reach $T$. In either case, the current payment cannot change
-the outcome. These tests are independent of a model's risk attitude, beliefs about
-the other seats, or ability to compute the running pool. Payment after settlement is
-therefore a direct measure of action inertia.
-
-\subsection{Table ranking and selection}
-
-For seats $i$ and $j$ in the same table, the common outcome multiplier is
-$c=1$ after success and $c=1-p$ after a miss. Hence
-\begin{equation}
- \mathbb{E}[u_i]-\mathbb{E}[u_j]=c(x_j-x_i).
- \label{eq:supp-ranking}
-\end{equation}
-For $p<1$, the lowest payer at a table earns the highest expected payoff,
-regardless of whether the table reaches the target. This identity is the reason a
-within-table leaderboard can select under-contributors even when the group objective
-favours reaching the target.
-
-For completeness, the selection analysis uses a Fermi update. If a focal seat with
-policy $k$ and payoff $\pi_k$ meets a comparison seat with policy $\pi_j$, the
-probability of adopting $k$ is
-\begin{equation}
- q_{k\leftarrow j}=\frac{1}{1+\exp[-\beta(\pi_k-\pi_j)]}.
- \label{eq:supp-fermi}
-\end{equation}
-Within a table, comparison partners are sampled without replacement from the other
-$n-1$ seats. Across populations, the same rule is applied after drawing comparison
-groups of size $n$ from a population of size $N=30$. We report $\beta=1$ as the
-main selection intensity and $\beta=10$ as a sensitivity check. The model policy
-weights are first estimated from the observed contribution totals, then propagated
-through the comparison process. This separates the exact payoff identity above from
-the empirical question of which model pays least in company.
-
-\section{Experimental design and estimands}
-\label{sec:supp-design}
-
-All games use six seats, ten rounds, endowment 40, target 120, and legal actions
-$\{0,2,4\}$. Unless a condition says otherwise, temperature is 0.7. Each cell has
-ten independent games. The table below is the complete design inventory; counts are
-game counts, not seat counts.
-
-\begin{longtable}{@{}p{0.27\linewidth}p{0.22\linewidth}r p{0.37\linewidth}@{}}
-\caption{Complete experiment inventory.}\label{tab:supp-design}\\
-\toprule
-Design & Risk levels & Games & Purpose \\
-\midrule
-\endfirsthead
-\toprule
-Design & Risk levels & Games & Purpose \\
-\midrule
-\endhead
-Self-play grid & $0,0.1,\ldots,1$ & 550 & Baseline risk response \\
-No hint & $0.1,0.5,0.9$ & 150 & Remove equal-share cues \\
-In-game questions & $0.1,0.5,0.9$ & 150 & Ask rules and value questions \\
-All-zero partners & $0.1,0.3,\ldots,0.9$ & 250 & Test against non-contributors \\
-Fair-share partners & $0.1,0.3,\ldots,0.9$ & 250 & Test exact best response \\
-All-four partners & $0.1,0.3,\ldots,0.9$ & 250 & Test response to over-contribution \\
-Conditional partners & $0.1,0.3,\ldots,0.9$ & 250 & Test response to history-dependent partners \\
-Mixed model tables & $0.1,0.5,0.9$ & 1,500 & Test composition and fragility \\
-Two rewordings & $0.1,0.9$ & 200 & Prompt paraphrase check \\
-Temperature zero & $0.1,0.9$ & 100 & Decoding sensitivity \\
-Neutral wording & $0,0.1,0.9$ & 150 & Remove normative language \\
-Neutral wording plus goal & $0,0.1,0.9$ & 150 & State own-cash objective \\
-\midrule
-Total & & 3,950 & Main corpus \\
-\bottomrule
-\end{longtable}
-
-The self-play grid contains one model at each risk level and ten repetitions. The
-scripted-partner conditions place one model in the focal seat and fill the other five
-seats with the same deterministic policy. Mixed tables use ten model pairs and all
-splits from one to five seats, so the focal model is not confounded with a single
-partner arrangement. The prompt controls preserve the rules, action set, history and
-target while changing only the stated wording described in Section~\ref{sec:supp-prompts}.
-
-\subsection{Primary estimands}
-
-The primary outcome is expected payoff per seat,
-\[
- \bar u_i=(1-p)(e-x_i)\quad\text{if }X<T,\qquad
- \bar u_i=e-x_i\quad\text{if }X\ge T.
-\]
-Secondary outcomes are total payment $X$, target reach, exact split, the share of
-decisions equal to each legal action, and payment after a settled history. We also
-report the ratio $\bar u_i/\operatorname{opt}(p)$ and decompose the gap from the
-benchmark into three mutually exclusive categories: payment toward a target that is
-not welfare optimal below the pivot, payment beyond the target, and target failure
-at or above the pivot. Exact split means $a_i^t=2$ for all ten rounds. Target reach
-is computed once per table, never once per seat.
-
-The unit of analysis is the game for game-level outcomes, because seats in one game
-share a history and lottery. Seat-round summaries are used only for action
-distributions and are not treated as independent replicates in uncertainty estimates.
-The main corpus contains 3,950 games, 237,000 seat-round records, and 187,000 model
-seat-round decisions after excluding scripted seats. Two agent-level replies in a
-reworded condition were retained after the documented truncation and parsing check;
-no contribution is imputed from an incomplete reply.
-
-\subsection{Uncertainty and quality checks}
-
-Confidence intervals are 95\% percentile bootstrap intervals over games, with the
-same table-level resampling unit used for paired contrasts. Randomisation tests use
-permutations of game labels within the relevant design and risk level. The main
-analysis uses 5,000 bootstrap or permutation replicates; the selection analysis uses
-1,000 replicates because its outer simulation already includes repeated group draws.
-For a binary outcome, the reported percentage is the mean of game-level indicators,
-not a ratio of pooled seats. Fixed lottery draws are used across repetitions within
-a cell, while agents never observe the draw. This makes the expected-payoff analysis
-comparable across cells without allowing the realised draw to alter play.
-
-Before aggregation, each reply is checked for a final contribution marker, a legal
-integer action, the expected round index, and a consistent seat identifier. The
-parser rejects missing or illegal actions rather than silently coercing them. We
-also check that every game has six seats and ten rounds, that the reconstructed pool
-equals the sum of seat contributions, and that the target and endowment agree with
-the protocol. The analysis never combines the current corpus with legacy result
-files.
-
-\section{Analysis checks and supplementary results}
-\label{sec:supp-checks}
-
-\subsection{Rule knowledge versus action choice}
-
-The probe set contains 4,500 question records: 3,600 rule questions and 900 value
-questions. Rule questions test arithmetic and game-state interpretation, including
-the target, endowment, legal actions and whether the catastrophe is conditional on a
-miss. Value questions ask which action or total maximises the respondent's own
-expected payoff in a stated state. These are scored separately from play. A correct
-answer is an exact match to the keyed answer after normalising whitespace and
-capitalisation; an explanation is not counted as correct if the selected answer is
-wrong. The separation prevents a model's ability to describe the incentive from being
-used as evidence that its policy followed that incentive.
-
-\subsection{Scripted best-response enumeration}
-
-Against a fixed five-seat script, the focal seat's legal total schedules are
-enumerated rather than approximated. There are $3^{10}=59,049$ action sequences,
-including schedules that react to the visible history only through their own fixed
-round index. For each schedule we reconstruct the table total, evaluate
-Equation~\eqref{eq:supp-payoff} in expectation, and retain all maximisers. The
-reported exact-best-response indicator is one when the model's realised schedule is
-one of these maximisers. When a script reaches the target early or makes the target
-unreachable, the enumeration also identifies whether later payments are dominated.
-The minimum-total check records the smallest total among schedules that reach the
-target; it is distinct from the model's own payoff optimum.
-
-\subsection{Mixed tables}
-
-Mixed-table analyses average over all ten ordered model pairs and all seat splits
-from one to five seats. A table is successful if its total reaches 120 by round 10.
-Pairwise payoff differences use Equation~\eqref{eq:supp-ranking}; pairwise success
-rates use the table as the replicate. We do not interpret a model's marginal average
-in a mixed table as a causal effect of its identity, because composition changes both
-the number of seats and the partner histories. The purpose of this design is instead
-to expose interaction patterns hidden by homogeneous self-play.
-
-\subsection{Selection sensitivity}
-
-Selection is simulated from the observed policy totals and the expected payoffs
-implied by the common lottery. The primary within-table population has $N=6$ seats;
-the population comparison has $N=30$ seats. We repeat the analysis at population
-sizes 60 and 120 and at $\beta=10$. The comparison is made either among seats at the
-same table or among independently sampled groups. The latter preserves group-level
-success as the selection signal and is therefore a different mechanism, not a second
-estimate of the within-table process. All selection plots show the resulting policy
-mass and the probability that a newly sampled table reaches the target.
-
-\subsection{Reproducibility boundary}
-
-The manuscript fixes the game rules, prompts, model identifiers, decoding settings,
-risk grid, repetition count, parser, random seeds and analysis definitions. The
-supplement prints the prompt variants and the complete design inventory. Source
-tables and figures are generated from the same analysis outputs used in the main
-text. Exact future reruns may differ if an external model endpoint changes its
-weights, tokenizer, safety layer or availability; this is a property of the serving
-dependency, not an unreported analytical degree of freedom. The claims in the paper
-are therefore tied to the archived responses and the stated protocol.
-
-\section{Prompt variants}
-\label{sec:supp-prompts}
-
-Each round, every seat receives the prompt below, rendered for its own position, the current round and the full history, and answers with one contribution. No seat is given a persona and the running pool is not printed. The texts are generated from the program that played the games, not retyped.
+Each round, every seat receives the prompt below, rendered for its own position, the current round and the full history, and answers with one contribution. The texts are generated from the program that played the games, not retyped, for one example state.
 
 \input{prompts.tex}
+
+%% =====================================================================================
+\section{Designs, data and statistics}
+\label{sec:design}
+
+\subsection{Games in each design}
+
+Table~\ref{tab:design} counts the games of every design. Every model plays the same number of games in every design, and every cell (one condition, one risk level, one model or pair of models) holds \CntReps{} games, numbered by a repetition index from 1 to 10.
+
+\begin{table}[h]
+\caption{Games per design. \emph{Games per model} counts the games in which a model holds at least one seat; in the design with two models at one table each model sits in four of the ten pairs. \emph{Model decisions} counts one decision per model seat per round (the scripted seats are not counted). \emph{Unreadable replies} are replies that gave no readable move after the retries of Section~\ref{sec:parse}.}
+\label{tab:design}
+\centering\small
+\input{tables/s_design_counts.tex}
+\end{table}
+
+In the design with two models at one table, the ten pairs are all unordered pairs of the five models. The first-named model of a pair holds one to five seats and the second model holds the rest. Each model's seats form one contiguous block. The block positions are the same in every game of a cell (one pair, one split, one risk level) and the order of the two blocks alternates across cells, so every model holds every seat equally often only when cells are pooled.
+
+\subsection{The lottery and why the paper uses expected payoffs}
+\label{sec:lottery}
+
+In the game engine, the catastrophe lottery of a game is one uniform draw that depends only on the repetition index, and a missed game ends in catastrophe if the draw is below $p$. The whole data set therefore uses the same ten draws, in every cell, model and design (Table~\ref{tab:lottery}), and all ten fall below \LotMaxDraw{}. As a result, every missed game at $p\ge0.5$ ended in catastrophe, and missed games at low risk ended in catastrophe more often than the risk implies: in the self-play grid, \SupLotMissed{} games missed the target and \LotRealCat{} of them ended in catastrophe, against \LotExpCat{} expected from their risk levels. Realised payoffs would therefore punish models that miss the target more than chance would. The agents never see the draw, so their play is not affected, and every payoff in the paper is the expected payoff \eqref{eq:ev} given the contributions.
+
+\begin{table}[h]
+\caption{The ten lottery draws. A missed game ends in catastrophe when its risk $p$ exceeds the draw; the third column gives the risk levels of the self-play grid at which that happens. The last three columns count missed games in the self-play grid by repetition, and the catastrophes realised and expected (the sum of $p$ over those games).}
+\label{tab:lottery}
+\centering\small
+\input{tables/s_lottery.tex}
+\end{table}
+
+\subsection{Statistical methods}
+\label{sec:stats}
+
+\begin{itemize}
+\item \textbf{Unit.} The game. Seats of one game share a history and a lottery, so they are not independent. A model's value in a game is the mean over the seats it holds.
+\item \textbf{Intervals.} 95\% percentile bootstrap over games with 5,000 resamples. When a quantity pools several risk levels, games are resampled within each risk level, so each level keeps its weight. For a ratio, such as the share of $\mathrm{opt}(p)$ lost, numerator and denominator are resampled together.
+\item \textbf{Tests.} Two-sided permutation tests on the difference in means, with 5,000 permutations, reporting $(h+1)/(n+1)$ for $h$ permuted differences at least as large as the observed one out of $n$. When two conditions are compared over several risk levels, condition labels are permuted within each risk level. The paper marks a prompt change in bold when the shift is at least 2 units and $P<0.01$.
+\item \textbf{Exact sign-flip tests.} For Qwen3-235B against its tablemates in each cell of ten games, the one-sided $P$ is the share of all $2^{10}$ sign patterns of the per-game payoff gaps whose mean is at most the observed mean.
+\item \textbf{Variance shares.} For the scripted design, the variance of a model's total over the three fixed-amount partner kinds, five risk levels and ten games is split with balanced two-way sums of squares into partner kind, risk, their interaction and a residual.
+\item \textbf{Selection.} Uncertainty comes from 1,000 bootstrap replicates that resample the games of every mixed cell and every self-play cell before the whole selection analysis is recomputed (Section~\ref{sec:selection}).
+\item \textbf{Seeds.} Every resampling uses a fixed random seed, so rerunning the analysis code reproduces every number in the paper and in this supplement exactly.
+\end{itemize}
+
+\subsection{Reproducibility}
+\label{sec:repro}
+
+We release the prompts, configurations, seeds and code. The design is reproducible: the lottery draws and the seat layouts depend only on the repetition index and the cell. Model text is not. The model service accepts a sampling seed but does not return identical text for it, and even temperature zero is not deterministic: a ten-game cell at temperature zero contained \RobTempZeroDistinct{} distinct game records on average, against \RobTempZeroBaseDistinct{} at temperature 0.7, where two games count as the same only if all six seats made the same ten moves. Replaying a cell is therefore a new sample of the same design, not a copy of the old one.
+
+%% =====================================================================================
+\section{Self-play across risk}
+\label{sec:selfplay}
+
+This section supports the first three paragraphs of Section 4 of the paper, its Table 3 and its Figure 2. All six seats hold the same model, with the base prompt, at eleven risk levels from 0 to 1 and ten games per level, so each model plays 110 games and fills 660 seats.
+
+\subsection{Numbers behind the main text}
+
+\begin{center}
+\begin{claims}
+Largest gap between the mean total above and below the pivot ($p\ge0.5$ against $0<p<0.5$), over the four models other than Grok 4.20 & \GridStepMaxOther{} \\
+\quad the same gap for Grok 4.20 & \GridStepGrok{} \\
+Smallest coefficient of relative risk aversion that prefers a certain fair share to paying nothing at $p=0.1$ (Section~\ref{sec:crra}) & \GridCrraLow{} \\
+Gemini 3.5 Flash-Lite seats that play the exact split, whole grid (\%) & \GridFlashExactPct{} \\
+Models whose mean total at $p=0$ is above half the fair share & \GridZeroModelsPaying{} \\
+Seats that pay anything at $p=0$ & \GridZeroPaying{} of \GridZeroSeats{} \\
+GPT-5.6 Luna's mean total at $p=0$ & \GridZeroLuna{} \\
+Grok 4.20: mean round in which the pool reaches 120; units per seat paid after that & \GridGrokSecuredRound{}; \GridGrokWaste{} \\
+Qwen3-235B: decisions paying 2 in rounds 1 to 9 (\%); seats paying 0 in round 10 (\%) & \GridQwenRoundsOneNinePct{}; \GridQwenLastZeroPct{} \\
+Qwen3-235B: games reaching the target, of 110 & \GridQwenReach{} \\
+Qwen3-235B: games reaching it had every seat repeated its round-9 move (\%) & \GridQwenFixReachPct{} \\
+Qwen3-235B: games whose pool before round 10 is short of 120 by more than the 4 units one seat can add, of 110; most common pool before round 10 & \SupQwenShortBeyondOne{}; \SupQwenModalPoolNine{} \\
+GPT-5.6 Luna: games missing the target at $p>0$, of \GridLunaGames{} & \GridLunaMiss{} \\
+All models: missed games at $p>0$ that were on the fair pace through round 9 & \GridMissOnPace{} of \GridMissTotal{} \\
+Claude Haiku 4.5: seats paying 0 in round 10 when the pool already holds 120 (\%, \SupHaikuStopGames{} games); when it does not (\%, \SupHaikuStopOtherGames{} games) & \GridHaikuStopPct{}; \GridHaikuStopOtherPct{} \\
+Share of the attainable payoff the panel loses (\%) & \GridLossPanelPct{} [\SupGridLostPanelLo, \SupGridLostPanelHi] \\
+\quad Gemini 3.5 Flash-Lite; Qwen3-235B; Grok 4.20 (\%) & \GridFlashLossPct{}; \GridQwenLossPct{}; \GridGrokLossPct{} \\
+\end{claims}
+\end{center}
+
+\subsection{What a seat pays at each risk level}
+
+Table~\ref{tab:grid-total} gives the mean seat total in each cell of the grid, under the optimum. Outside $p=0$, every cell of Claude Haiku 4.5, Gemini 3.5 Flash-Lite, GPT-5.6 Luna and Qwen3-235B lies close to the fair share of 20, whether the optimum is 0 or 20. Grok 4.20 pays far more at every level, and its highest values are at zero risk and at the highest risk levels, so its payment does not rise steadily with the risk.
+
+\begin{table}[h]
+\caption{Mean seat total (units out of 40) in self-play, ten games per cell. The top row is the optimum of Proposition 1.}
+\label{tab:grid-total}
+\centering\small
+\input{tables/s_grid_total.tex}
+\end{table}
+
+Means can hide a mixture of very different seats, so Figure~\ref{fig:seat-totals} shows the whole distribution of seat totals. Gemini 3.5 Flash-Lite puts almost every seat on exactly 20, at every risk level. GPT-5.6 Luna does the same except at zero risk, where every seat pays 0. Claude Haiku 4.5 spreads around 20, Qwen3-235B concentrates just below 20, which is its habit of skipping the last payment, and Grok 4.20 spreads from 20 to the full 40.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/sfig_seat_totals.pdf}
+\caption{Distribution of seat totals in self-play. In each panel a row is one risk level and a column one possible total; the colour gives the share of that cell's 60 seats with that total. Outlined cells mark the optimal total at that risk level (both 0 and 20 at $p=0.5$).}
+\label{fig:seat-totals}
+\end{figure}
+
+\subsection{Outcomes at each risk level}
+
+Table~\ref{tab:grid-outcomes} gives three outcomes for every cell. Gemini 3.5 Flash-Lite and Grok 4.20 reach the target at every risk level, and so does Claude Haiku 4.5 at every positive level. Qwen3-235B almost never does. The share of the attainable payoff that is lost shows the cost of the default at low risk: the three fair-share models lose close to half of it at $p=0.1$, where the optimum is to keep everything, and almost nothing above the pivot.
+
+\begin{table}[h]
+\caption{Self-play outcomes by risk level, ten games per cell. (a) Games reaching the target. (b) Seats paying 2 in all ten rounds. (c) Share of the attainable expected payoff $\mathrm{opt}(p)$ lost; the Panel row pools the five models. \emph{All} pools the grid and matches Table 3 of the paper.}
+\label{tab:grid-outcomes}
+\centering\small
+\textbf{(a)} Target reached (\% of games)\par\smallskip
+\input{tables/s_grid_reach.tex}\par\bigskip
+\textbf{(b)} Exact split (\% of seats)\par\smallskip
+\input{tables/s_grid_exact.tex}\par\bigskip
+\textbf{(c)} Share of $\mathrm{opt}(p)$ lost (\%)\par\smallskip
+\input{tables/s_grid_lost.tex}
+\end{table}
+
+\subsection{Where the payoff goes}
+
+Table~\ref{tab:grid-models} adds intervals to Table 3 of the paper and splits each model's loss into the three parts defined in Section~\ref{sec:loss}. Claude Haiku 4.5 and Gemini 3.5 Flash-Lite lose almost only by paying below the pivot. GPT-5.6 Luna loses mostly there too, and the rest by missing the target above the pivot. Grok 4.20 loses mostly by paying past 120. Qwen3-235B loses in two nearly equal ways, paying below the pivot and missing above it.
+
+\begin{table}[h]
+\caption{Self-play summary with intervals. At $p=0$: mean seat total with its interval and the number of seats paying anything. \emph{Payoff lost}: share of $\mathrm{opt}(p)$ lost over the grid, with a bootstrap interval that resamples games within each risk level. \emph{Share of the loss}: the three parts of Section~\ref{sec:loss} as shares of each model's total loss.}
+\label{tab:grid-models}
+\centering\small
+\input{tables/s_grid_models.tex}
+\end{table}
+
+\subsection{The end of the game}
+
+Table~\ref{tab:endgame} describes the last rounds, which is where the models differ most. Qwen3-235B pays 2 in almost every decision of rounds 1 to 9 and 0 in almost every round-10 decision, so its tables almost always end just short of 120. Had every seat repeated its round-9 move, all of them would have reached the target. Claude Haiku 4.5 stops in round 10 mostly when the pool already holds 120, which shows that the pool can be worked out from the history in the prompt. Grok 4.20 reaches 120 around round 7 and keeps paying. All of GPT-5.6 Luna's missed games at positive risk were on the fair pace until the last round.
+
+\begin{table}[h]
+\caption{End-of-game behaviour in self-play (110 games per model; ``n/a'' marks a case with no games). The pool after round 9 is what the seats could have added up before deciding in round 10. \emph{On fair pace}: the pool reached at least $12t$ after every round $t$ up to 9. The last row replays each game with every seat's round-10 move replaced by its round-9 move.}
+\label{tab:endgame}
+\centering\small
+\input{tables/s_endgame.tex}
+\end{table}
+
+%% =====================================================================================
+\section{Prompt and decoding controls}
+\label{sec:controls}
+
+This section supports the last two paragraphs of Section 4 of the paper and its Table 4. Section~\ref{sec:prompts} gives every prompt. All conditions are self-play; the rerun repeats the base prompt, with in-game questions asked in separate calls that never enter the game.
+
+\subsection{Numbers behind the main text}
+
+\begin{center}
+\begin{claims}
+No hint, Qwen3-235B: games reaching the target (\%), rerun then no hint & \NoCueQwenReachBase{}; \NoCueQwenReach{} \\
+No hint, Qwen3-235B: expected payoff per seat, rerun then no hint & \NoCueQwenPayBase{}; \NoCueQwenPay{} \\
+No hint, GPT-5.6 Luna: seats playing the exact split (\%), rerun then no hint & \NoCueLunaExactBasePct{}; \NoCueLunaExactPct{} \\
+No hint: Gemini 3.5 Flash-Lite seats playing the exact split; Grok 4.20 seats paying 4 in every round (\%) & \NoCueFlashExactPct{}; \NoCueGrokAllFourPct{} \\
+Rewordings and temperature zero: largest change in mean total among the four models other than Grok 4.20 & \RobFlatMaxShift{} \\
+Grok 4.20: mean total on the base grid; under the second rewording ($p=0.1$ and $0.9$) & \RobGrokBase{}; \RobGrokParaTwo{} \\
+Qwen3-235B seats paying 0 in round 10 across prompts, lowest to highest (\%) & \RobQwenLastZeroNoHint{} to \RobQwenLastZeroParaTwo{} \\
+Grok 4.20: mean total at $p=0.9$ minus at $p=0.1$, base grid ($P$) & \RobGrokRiskBase{} (\SupGrokStepBaseP) \\
+\quad at temperature zero ($P$) & \SupGrokStepTempZero{} (\SupGrokStepTempZeroP) \\
+\quad in the rerun; under the second rewording & \RobGrokRiskRerun{}; \RobGrokRiskParaTwo{} \\
+Neutral wording, $p=0$: models whose mean total is above half the fair share; seats paying anything & \WorZeroModelsPaying{}; \WorZeroPaying{} of \WorZeroSeats{} \\
+Goal stated, $p=0$: seats paying anything & \NeuZeroPaying{} of \NeuZeroSeats{} \\
+Goal stated, $p=0$: mean total of Claude Haiku 4.5; Gemini 3.5 Flash-Lite; Qwen3-235B & \NeuZeroHaiku{}; \NeuZeroFlashLite{}; \NeuZeroQwen{} \\
+\quad the same models on the base grid & \GridZeroHaiku{}; \GridZeroFlashLite{}; \GridZeroQwen{} \\
+Goal stated, $p=0.1$: mean total of Claude Haiku 4.5; Gemini 3.5 Flash-Lite & \NeuLowHaiku{}; \NeuLowFlashLite{} \\
+Goal stated, GPT-5.6 Luna: mean total at $p=0.1$; at $p=0.9$ & \NeuLowLuna{}; \NeuHighLuna{} \\
+Goal stated, Qwen3-235B: mean total at $p=0.1$; at $p=0.9$; games reaching the target & \NeuLowQwen{}; \NeuHighQwen{}; \NeuReachQwen{} of \NeuGamesQwen{} \\
+Distinct game records per ten-game cell, temperature zero against 0.7 & \RobTempZeroDistinct{} against \RobTempZeroBaseDistinct{} \\
+\end{claims}
+\end{center}
+
+\subsection{Every change against the base grid}
+
+Table~\ref{tab:controls-shift} gives, for every model and condition, the mean seat total at $p=0.1$ and $0.9$ with its shift from the base grid, the interval of the shift and the permutation test. These are the tests behind the bold entries of Table 4 in the paper. The four models other than Grok 4.20 barely move under the rerun, the rewordings and temperature zero. The large shifts come from removing the hint (Qwen3-235B and Grok 4.20 pay more), the second rewording (Grok 4.20 pays about the fair share), neutral wording (Grok 4.20 pays more) and the stated goal (GPT-5.6 Luna and Qwen3-235B pay less).
+
+\begin{table}[h]
+\caption{Mean seat total pooled over $p=0.1$ and $0.9$ (20 games per entry) and its shift from the base grid, with a bootstrap interval that resamples games within each risk level and a permutation $P$ that permutes condition labels within each risk level. Bold: shift of at least 2 units with $P<0.01$, as in Table 4 of the paper. A printed shift can differ by 0.1 from the difference of the printed means, because both are rounded separately.}
+\label{tab:controls-shift}
+\centering\small
+\input{tables/s_controls_shift.tex}
+\end{table}
+
+\subsection{The goal test at each risk level}
+
+Table~\ref{tab:controls-goal} separates the three risk levels of the goal test. At $p=0$, neutral wording leaves most payment in place, while the stated goal removes almost all of it for Claude Haiku 4.5 and Gemini 3.5 Flash-Lite and most of it for Qwen3-235B; Grok 4.20 keeps paying. At $p=0.1$, the stated goal leaves Claude Haiku 4.5 and Gemini 3.5 Flash-Lite at the fair share. GPT-5.6 Luna and Qwen3-235B drop far below it, although most of their seats still pay something, and only GPT-5.6 Luna returns to the fair share at $p=0.9$. Qwen3-235B never reaches the target under the goal. The seat counts show how widespread a change is: a low mean can come from a few large payers or from many small ones.
+
+\begin{table}[h]
+\caption{Base grid, neutral wording and goal stated at $p=0$, $0.1$ and $0.9$ (ten games per entry): mean seat total, games reaching the target, and seats paying anything (of 60). $P$: permutation test on the mean total, neutral wording against goal stated.}
+\label{tab:controls-goal}
+\centering\small
+\input{tables/s_controls_goal.tex}
+\end{table}
+
+\subsection{How each model's signature changes}
+
+Each model has a signature on the base grid: Qwen3-235B skips the last payment, Gemini 3.5 Flash-Lite and GPT-5.6 Luna play the exact split, and Grok 4.20 often pays 4 in every round. Table~\ref{tab:controls-detail} follows these signatures across conditions. The averages in Table~\ref{tab:controls-shift} are stable, but the signatures are not. Qwen3-235B's last-round drop ranges from less than half of its seats to all of them. GPT-5.6 Luna plays the exact split far less often under neutral wording and the stated goal. Grok 4.20's rise with risk appears on the base grid and at temperature zero but not in the rerun of the same prompt, which is why the paper does not read it as a response to risk.
+
+\begin{table}[h]
+\caption{Model signatures by condition, at $p=0.1$ and $0.9$ pooled (20 games per model). \emph{Exact split}: seats paying 2 in all ten rounds. \emph{Total at 0.9 minus at 0.1}: Grok 4.20's mean seat total, with a permutation $P$. \emph{Distinct games}: game records per ten-game cell that differ in at least one move, averaged over cells.}
+\label{tab:controls-detail}
+\centering\small
+\input{tables/s_controls_detail.tex}
+\end{table}
+
+\subsection{Removing the hint}
+
+The no-hint prompt was played at $p=0.1$, $0.5$ and $0.9$, the same levels as the rerun, so Table~\ref{tab:nohint} compares the two directly. Without the hint, no model pays less on average, and two pay more. The hint mainly bought precision: fewer seats play the exact split without it, and Grok 4.20 moves almost entirely to paying 4 in every round. Qwen3-235B now pays enough to reach the target, but earns less, because it overpays.
+
+\begin{table}[h]
+\caption{No hint against the rerun of the base prompt at $p=0.1$, $0.5$ and $0.9$ (30 games per model in each). $P$: permutation test permuting condition labels within each risk level; panel rows also permute within each model.}
+\label{tab:nohint}
+\centering\small
+\input{tables/s_nohint.tex}
+\end{table}
+
+%% =====================================================================================
+\section{In-game questions}
+\label{sec:questions}
+
+This section supports Section 5.1 of the paper. In the rerun games, seat 1 was asked ten questions in rounds 1, 5 and 10, about the state it had just decided on. Each question is a separate call that sees the decision prompt of that round with its final instruction replaced by the question, and its answer never enters the game. The answer is read from a final \texttt{ANSWER:} line; an unreadable answer would count as wrong. Each model answers 90 questions of each kind: 30 games, three rounds each.
+
+\subsection{Numbers behind the main text}
+
+\begin{center}
+\begin{claims}
+Games with questions; questions asked; rule questions & \ProbeGames{}; \ProbeQuestions{}; \ProbeRuleQuestions{} \\
+Rule questions answered correctly (\%) & \ProbeRulePct{} \\
+Value comparison answered correctly (\%): Claude Haiku 4.5; Gemini 3.5 Flash-Lite; GPT-5.6 Luna & \ProbeCorrectHaikuPct{}; \ProbeCorrectFlashPct{}; \ProbeCorrectLunaPct{} \\
+\quad Qwen3-235B; Grok 4.20 & \ProbeCorrectQwenPct{}; \ProbeCorrectGrokPct{} \\
+These three models at $p=0.1$, rounds 1 and 5: answers saying that paying nothing pays more (\%) & \ProbeThreeLowKeepPct{} \\
+The same seats' mean total at $p=0.1$; at $p=0.9$ & \ProbeThreeLowContrib{}; \ProbeThreeHighContrib{} \\
+\quad change, with interval & \ProbeThreeRiskShift{} [\ProbeThreeRiskShiftLo, \ProbeThreeRiskShiftHi] \\
+Qwen3-235B: answers saying that paying nothing pays more, all risk levels (\%) & \ProbeQwenKeepPct{} \\
+Grok 4.20: the same answer in round 1, all risk levels (\%) & \ProbeGrokRoundOneKeepPct{} \\
+GPT-5.6 Luna: games whose value answer changes across rounds, of 30 & \ProbeLunaSwitchGames{} \\
+\end{claims}
+\end{center}
+
+\input{questions.tex}
+
+\subsection{Rule questions}
+
+Every rule question was answered correctly by every model in every round (Table~\ref{tab:probe-rules}). These questions ask for numbers printed in the prompt, so they show that the agents read the rules, not that they can use them.
+
+\begin{table}[h]
+\caption{Rule questions: share answered correctly (\%), with the number of answers in brackets.}
+\label{tab:probe-rules}
+\centering\small
+\input{tables/s_probe_rules.tex}
+\end{table}
+
+\subsection{The value comparison}
+
+Table~\ref{tab:probe-value} counts every answer to the value comparison. Claude Haiku 4.5 and Gemini 3.5 Flash-Lite give the correct answer at every risk level, including ``equal'' at $p=0.5$. GPT-5.6 Luna is correct most of the time. Qwen3-235B answers that paying nothing is better in all 90 answers, so it is correct only at $p=0.1$. Grok 4.20 leans the same way.
+
+\begin{table}[h]
+\caption{The value comparison of Section 5.1 of the paper: number of answers of each kind, of 30 per model and risk level, and share correct. A: pay 2 in every round and reach the target; B: pay nothing and miss it.}
+\label{tab:probe-value}
+\centering\small
+\input{tables/s_probe_value.tex}
+\end{table}
+
+Figure~\ref{fig:answers} and Table~\ref{tab:probe-rounds} split the same answers by round. Claude Haiku 4.5, Gemini 3.5 Flash-Lite and Qwen3-235B give the same answer in all three rounds of almost every game. GPT-5.6 Luna drifts in round 10 at $p=0.5$. Grok 4.20 changes the most: it says that paying nothing is better in round 1 at every risk level, and moves toward the correct answer later in the game.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/sfig_answers.pdf}
+\caption{Answers to the value comparison by model, risk level and round (ten answers per bar).}
+\label{fig:answers}
+\end{figure}
+
+\begin{table}[h]
+\caption{Value comparison by round: share of answers saying that B (paying nothing) is better, ten answers per entry; and the number of games whose answer is not the same in rounds 1, 5 and 10.}
+\label{tab:probe-rounds}
+\centering\small
+\input{tables/s_probe_rounds.tex}
+\end{table}
+
+\subsection{Answers against play}
+
+Table~\ref{tab:knowdo} gives the numbers behind Figure 3 of the paper: for each model and risk level, the share of value answers saying that paying nothing is better and the total that the questioned seat pays in the same games, each with an interval. The \emph{Shift} rows are the changes from $p=0.1$ to $p=0.9$ that the figure plots. For the three models that answer well, the answer moves by close to its full range while the payment does not move.
+
+\begin{table}[h]
+\caption{Answers and play of the questioned seat (ten games per risk level). \emph{Shift}: drop in the share saying B from $p=0.1$ to $p=0.9$, and change in the units paid, with intervals that resample the games at the two risk levels independently.}
+\label{tab:knowdo}
+\centering\small
+\input{tables/s_knowdo.tex}
+\end{table}
+
+\subsection{The second value question}
+
+The second value question asks how much cash a player ends with, on average, if it pays nothing and the group misses the target. The intended answer is $(1-p)\,40$ for the whole game. The question can also be read as starting from the moment it is asked, with the money the seat still holds, which gives $(1-p)$ times that money. Table~\ref{tab:probe-defect} shows that this second reading is the most common error: Claude Haiku 4.5 gives it in most of its round-5 answers, when it has already paid part of its endowment. Answers of 40, the cash kept if no disaster strikes, come only from Qwen3-235B at $p=0.1$, where they are almost all of its answers, and a few answers are 0, the cash left if the disaster strikes. Because a wrong answer can come from a reasonable reading rather than from a wrong computation, the paper does not use this question.
+
+\begin{table}[h]
+\caption{The second value question, by model and risk level (30 answers per entry). \emph{Correct (\%)}: overall and in rounds 1, 5 and 10. \emph{Wrong answers}, as shares of all answers: 40; 0; \emph{Cash left}, which is $(1-p)$ times the seat's money at the time of asking, rounded; and any other number.}
+\label{tab:probe-defect}
+\centering\small
+\input{tables/s_probe_defect.tex}
+\end{table}
+
+%% =====================================================================================
+\section{One model beside scripted partners}
+\label{sec:scripted}
+
+This section supports Section 5.2 of the paper. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
+
+\subsection{Numbers behind the main text}
+
+\begin{center}
+\begin{claims}
+Games beside partners who always pay 0 or always pay 4 & \ScrDominatedGames{} \\
+\quad of which the model pays nothing, which is the best response & \ScrBestResponseDominated{} \\
+\quad smallest total the model pays in those games & \ScrMinTotalDominated{} \\
+Scripted games of any kind in which the model pays nothing & \SupScrGamesTotalZero{} of \ScrGames{} \\
+Scripted games that are exactly optimal (expected payoff equal to the best response) & \ScrOptimalGames{} of \ScrGames{} \\
+\quad total paid in every one of them & 20 \\
+Share of the variation in the total explained by the partner kind, for Claude Haiku 4.5, Gemini 3.5 Flash-Lite, GPT-5.6 Luna and Qwen3-235B (\%) & \ScrOpponentShareMin{} to \ScrOpponentShareMax{} \\
+\quad explained by risk and its interaction with the partner kind, largest of the four (\%) & \ScrRiskShareMax{} \\
+\quad explained by risk and interaction for an exact best responder (\%) & \ScrBestResponderRiskShare{} \\
+Largest change in a model's mean total between low and high risk beside fair-share partners & \SupScrFairChangeMax{} \\
+Grok 4.20: share explained by the partner kind; by risk and interaction (\%) & \ScrGrokOpponentShare{}; \ScrGrokRiskShare{} \\
+Grok 4.20: games opening with a payment of 4, of 200 & \ScrGrokOpenFour{} \\
+Grok 4.20: share of the variation explained by its opening move (\%) & \ScrGrokFirstMoveShare{} \\
+Units paid after the outcome is settled, per game: GPT-5.6 Luna; Qwen3-235B; Grok 4.20 & \ScrWasteLuna{}; \ScrWasteQwen{}; \ScrWasteGrok{} \\
+Qwen3-235B's mean total beside partners who always pay 0; always pay 2 & \ScrQwenDefectPay{}; \ScrQwenFairPay{} \\
+Qwen3-235B beside partners who always pay 2: games missing the target, of 50; shortfall & \ScrQwenFairMiss{}; \ScrQwenFairShort{} \\
+Gemini 3.5 Flash-Lite in the same seat: games reaching the target, of 50 & \ScrFlashFairReach{} \\
+\end{claims}
+\end{center}
+
+\subsection{What the models pay}
+
+Table~\ref{tab:scr-totals} gives the mean total of the model's seat for every kind of partner and risk level, with the best response below each block. The last column is what a best responder would change: 20 units between low and high risk beside fair-share partners, and nothing beside the other two. No model comes close. Beside partners who always pay 0 or always pay 4, every model pays well above the best response of 0, and Qwen3-235B and Grok 4.20 pay the most, even though these partners make every unit a loss.
+
+\begin{table}[h]
+\caption{Mean total paid by the model's seat (ten games per entry). \emph{All risks}: the mean over the five risk levels. Last column: the mean at $p=0.7$ and $0.9$ minus the mean at $p=0.1$ and $0.3$. The best-response row gives the best total; ``0 or 20'' marks the tie at $\popt$.}
+\label{tab:scr-totals}
+\centering\small
+\input{tables/s_scr_totals.tex}
+\end{table}
+
+Figure~\ref{fig:scr-rounds} shows the same games round by round beside the two kinds of fair-share partner, where the best response switches at $\popt$. Gemini 3.5 Flash-Lite and GPT-5.6 Luna pay 2 in every round at every risk level. Qwen3-235B pays 2 for nine rounds and 0 in the last, at every risk level, and Grok 4.20 pays more than 2 in every round. None of the rows changes between the low-risk and high-risk panels.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/sfig_scripted_rounds.pdf}
+\caption{Mean payment in each round beside partners who always pay 2 (top) and partners who copy the group (bottom), at low risk ($p=0.1$ and $0.3$, left) and high risk ($p=0.7$ and $0.9$, right); 20 games per row. The top row of each panel is the best response. Above $\popt$ any sequence that adds up to 20 is a best response, and the row shows their round-by-round average, which is 2.}
+\label{fig:scr-rounds}
+\end{figure}
+
+\subsection{Outcomes and distance from the best response}
+
+Table~\ref{tab:scr-outcomes} turns payments into outcomes. Beside partners who always pay 4, every model reaches the target in every game, so the whole gap to the best response is money paid for nothing; it ranges from small for GPT-5.6 Luna to most of the endowment for Grok 4.20. Beside fair-share partners, the three models that pay the exact split reach the target in almost every game and are exactly optimal in many high-risk games, while Qwen3-235B almost never reaches the target.
+
+\begin{table}[h]
+\caption{Outcomes by kind of partner, pooled over five risk levels (50 games per model). \emph{Expected payoff} is the model seat's; \emph{Gap to best response} is the best-response payoff minus it; \emph{Exactly optimal} counts games with no gap. For the best-response rows beside fair-share partners, the target count is 20 or 30 depending on how the tie at $\popt$ is broken.}
+\label{tab:scr-outcomes}
+\centering\small
+\input{tables/s_scr_outcomes.tex}
+\end{table}
+
+Beside partners who always pay 0, the target cannot be reached, and every unit a model pays is a unit that a partner paying nothing keeps. Table~\ref{tab:scr-free} shows this cost at each risk level. It shrinks as the risk rises only because the lottery is more likely to destroy what the partner kept.
+
+\begin{table}[h]
+\caption{Beside partners who always pay 0: expected payoff of one of these partners minus the model seat's expected payoff (ten games per risk level, 50 over all risks). Here it equals the gap to the best response in Table~\ref{tab:scr-outcomes}.}
+\label{tab:scr-free}
+\centering\small
+\input{tables/s_scr_free.tex}
+\end{table}
+
+\subsection{Partner versus risk}
+
+Table~\ref{tab:scr-variance} splits the variation in what a model pays beside the three fixed-amount partners. For an exact best responder in the same games, risk and its interaction with the partner explain half of the variation; this uses a payment of 20 at the tie $p=\popt$, and breaking the tie toward 0 would raise the share further. For four models the partner kind explains most of the variation and risk almost none. Grok 4.20 is different: most of its variation is residual, which Table~\ref{tab:scr-grok} traces to its first move.
+
+\begin{table}[h]
+\caption{Share of the variation in the model seat's total explained by the partner kind, the risk and their interaction, over partners who always pay 0, 2 or 4 (150 games per model; balanced two-way sums of squares). \emph{Risk and interaction} is computed before rounding, so it can differ by 1 from the sum of the two rounded columns.}
+\label{tab:scr-variance}
+\centering\small
+\input{tables/s_scr_variance.tex}
+\end{table}
+
+In round 1 there is no history, so every kind of partner produces the same prompt, and the first move is sampled before the model can learn anything about its partners. Four models open with 2 in all \SupScrOthersOpenTwo{} of their games. Grok 4.20 opens with 4 in about half of its games and then mostly repeats its opening, repeating a 4 in \SupScrGrokRepeatFour{} and a 2 in \SupScrGrokRepeatTwo{} of the ten rounds on average (Table~\ref{tab:scr-grok}).
+
+\begin{table}[h]
+\caption{Top: Grok 4.20's opening move and its mean ten-round total after each opening, by kind of partner (50 games each). No model ever opens with 0. Bottom: share of the variation in each model's total explained on its own by the opening move, by the partner kind (all four kinds) and by the risk (one-way sums of squares over 200 games). Because this uses all four kinds and one-way shares, the partner share can differ slightly from Table~\ref{tab:scr-variance}.}
+\label{tab:scr-grok}
+\centering\small
+\input{tables/s_scr_grok.tex}
+\end{table}
+
+\subsection{Paying after the outcome is settled}
+
+Table~\ref{tab:scr-settled} separates what a model pays before the history settles the outcome from what it pays afterwards, beside partners who always pay 0 or always pay 4. Payment before settlement can reflect a model that does not yet know its partners. Payment afterwards cannot help under any belief about the partners. Gemini 3.5 Flash-Lite, Claude Haiku 4.5 and GPT-5.6 Luna stop almost completely once the outcome is settled, and GPT-5.6 Luna never pays after settlement. Qwen3-235B and Grok 4.20 keep paying in almost every game.
+
+\begin{table}[h]
+\caption{Top: after which round the outcome is settled, over all 250 games with each kind of partner. Bottom: units the model seat pays per game before and after settlement (50 games per entry), the interval for the units paid after, and the number of games with no payment after settlement.}
+\label{tab:scr-settled}
+\centering\small
+\input{tables/s_scr_settled.tex}
+\end{table}
+
+\subsection{Fair-share partners}
+
+Table~\ref{tab:scr-fair} shows the most common sequence of moves beside the two kinds of fair-share partner. Gemini 3.5 Flash-Lite plays the exact split in every game. Qwen3-235B's most common sequence pays 2 for nine rounds and 0 in the last, which leaves the table exactly one payment of 2 short of the target, and this sequence accounts for almost all of its games. Grok 4.20 splits between the exact split and paying 4 in every round.
+
+\begin{table}[h]
+\caption{Beside partners who always pay 2 (top) or copy the group (bottom), pooled over five risk levels (50 games per model): games reaching the target, mean total, the most common sequence of the model's own moves and the number of games that play it, and, among games that miss the target, the most common shortfall and how many games have it. Empty cells: no game missed.}
+\label{tab:scr-fair}
+\centering\small
+\input{tables/s_scr_fair.tex}
+\end{table}
+
+%% =====================================================================================
+\section{Two models at one table}
+\label{sec:mixed}
+
+This section supports Section 6 of the paper and its Figures 5 and 6. Every pair of models shares a table, with one to five seats for the first-named model, at $p=0.1$, $0.5$ and $0.9$, with ten games per cell: 150 games per pair and \MixGames{} in all. ``Alone'' means self-play of the same model at the same three risk levels, pooling the base grid and the rerun, which use the same prompt (20 games per model and risk level).
+
+\subsection{Numbers behind the main text}
+
+\begin{center}
+\begin{claims}
+Largest payoff gap per seat between two models at one table; it is Grok 4.20 against GPT-5.6 Luna & \AdvMaxAbs{} \\
+Pair with the lowest target rate; games reaching the target (\%) & \AdvPairLowReachName{}; \AdvPairLowReachPct{} \\
+Round 10 with the pool at 108: decisions paying 0 (\%), Qwen3-235B; Gemini 3.5 Flash-Lite & \MixQwenPotZeroPct{}; \MixFlashPotZeroPct{} \\
+Target reached, of 30: five Gemini 3.5 Flash-Lite seats and one Qwen3-235B seat & \MixFlashQwenReach{} \\
+\quad Gemini 3.5 Flash-Lite alone (\%) & \MixFlashAloneReach{} \\
+Target reached, of 30: five GPT-5.6 Luna seats and one Qwen3-235B seat & \MixLunaQwenReach{} \\
+\quad GPT-5.6 Luna alone (\%) & \MixLunaAloneReach{} \\
+Target reached, of 30: five Claude Haiku 4.5 seats and one Qwen3-235B seat; the same with Grok 4.20 & \MixHaikuQwenReach{}; \MixGrokQwenReach{} \\
+Missed tables with a Qwen3-235B seat; of which reaching 120 had it paid 2 instead of 0 in round 10 & \MixMissWithQwen{}; \SupMixQwenPivotalFixed{} (\MixQwenPivotalFix\%) \\
+Target reached, of 30: five Qwen3-235B seats and one Grok 4.20 seat; and one Claude Haiku 4.5 seat & \MixGrokRescuesQwen{}; \MixHaikuRescuesQwen{} \\
+GPT-5.6 Luna: units per seat beside five Grok 4.20 seats; beside five seats of another model & \MixLunaBesideFiveGrok{}; \MixLunaBesideOthers{} \\
+Units per seat beside five Grok 4.20 seats: Gemini 3.5 Flash-Lite; Claude Haiku 4.5 & \MixFlashBesideFiveGrok{}; \MixHaikuBesideFiveGrok{} \\
+Qwen3-235B: units per seat in all tables with Grok 4.20; in all tables with other models & \MixQwenBesideGrok{}; \MixQwenBesideOthers{} \\
+Share of the shortfall below 2 per round that comes after the pool reaches 120, beside Grok 4.20 (\%): Claude Haiku 4.5; Gemini 3.5 Flash-Lite; GPT-5.6 Luna; Qwen3-235B & \SupMixTimingHaikuAfterPct{}; \SupMixTimingFlashAfterPct{}; \SupMixTimingLunaAfterPct{}; \SupMixTimingQwenAfterPct{} \\
+\end{claims}
+\end{center}
+
+\subsection{Who earns more at a shared table}
+
+Table~\ref{tab:mix-edge} gives the numbers behind the upper triangle of Figure 5 of the paper. By Proposition 2, the seat that pays less earns more at the same table, so the payoff gap mirrors the payment gap. Every model earns clearly more than Grok 4.20, and no interval of those gaps comes near zero. Among the other four models the gaps are small; Qwen3-235B is slightly ahead of all three, because it pays slightly less.
+
+\begin{table}[h]
+\caption{Two models at one table (150 games per pair, pooled over seat splits and risk levels). Top: expected payoff per seat of the row model minus that of the column model in the same games, with its interval below. Bottom: units paid per seat, row minus column.}
+\label{tab:mix-edge}
+\centering\small
+\input{tables/s_mix_edge.tex}
+\end{table}
+
+\subsection{Which tables reach the target}
+
+Table~\ref{tab:mix-pairs} gives the numbers behind the lower triangle of Figure 5. Table~\ref{tab:mix-reach} splits each pair by how many seats the first model holds and by risk level. Tables that mix Qwen3-235B with Gemini 3.5 Flash-Lite or GPT-5.6 Luna fail at almost every split, and only improve when Qwen3-235B holds a single seat. Tables with Grok 4.20 reach the target in the great majority of games, with two exceptions: five GPT-5.6 Luna seats beside one Grok 4.20 seat, and four or five Qwen3-235B seats beside Grok 4.20. Success barely changes with the risk level, as the self-play results would predict.
+
+\begin{table}[h]
+\caption{Games reaching the target: count out of 150 for each pair, and out of 60 for self-play on the diagonal (the base grid and the rerun at $p=0.1$, $0.5$ and $0.9$).}
+\label{tab:mix-pairs}
+\centering\small
+\input{tables/s_mix_pairs.tex}
+\end{table}
+
+\begin{table}[h]
+\caption{Games reaching the target (\%). (a) By the number of seats the first-named model holds, pooled over risk levels (30 games per entry; \emph{All}: 150). (b) By risk level, pooled over seat splits (50 games per entry), with self-play at the same risk levels (20 games per entry).}
+\label{tab:mix-reach}
+\centering\small
+\textbf{(a)} By seats held by the first model\par\smallskip
+\input{tables/s_mix_reach.tex}\par\bigskip
+\textbf{(b)} By risk level\par\smallskip
+\input{tables/s_mix_reach_p.tex}
+\end{table}
+
+\subsection{The last round}
+
+Before round 10, a pool of exactly 108 means that the fair share from every seat completes the target, and that no single seat can do it alone. Table~\ref{tab:mix-lastround} counts what each model pays in that situation, over all mixed tables. Qwen3-235B pays nothing in almost every such decision, while the other models rarely do. Almost every mixed table that missed the target and held a Qwen3-235B seat would have reached it had that seat paid 2 instead of 0 in round 10.
+
+\begin{table}[h]
+\caption{Top: round-10 decisions at mixed tables whose pool after round 9 is exactly 108, by model: share paying 0, number of decisions and number of games. Bottom: missed mixed tables, those with a Qwen3-235B seat, and those among them that reach 120 when Qwen3-235B's round-10 zeros are replaced by 2.}
+\label{tab:mix-lastround}
+\centering\small
+\input{tables/s_mix_lastround.tex}
+\end{table}
+
+\subsection{Slack and generous partners}
+
+Table~\ref{tab:mix-slack} gives the numbers behind Figure 6 of the paper and extends it. Part (a) shows that one Qwen3-235B seat breaks tables of Gemini 3.5 Flash-Lite and GPT-5.6 Luna but not tables of Claude Haiku 4.5 or Grok 4.20, and, in the last column, that only Grok 4.20 pays enough to carry five Qwen3-235B seats to the target most of the time. Part (b) shows that the more Grok 4.20 seats a table holds, the less Claude Haiku 4.5, Gemini 3.5 Flash-Lite and GPT-5.6 Luna pay, while Qwen3-235B pays slightly more. Part (c) shows that this under-matching happens only beside Grok 4.20: beside five seats of any other model, each model pays close to the fair share.
+
+\begin{table}[h]
+\caption{Slack at mixed tables, pooled over risk levels, with 95\% intervals. (a) Games reaching the target: six seats of the model (60 games), five seats and one Qwen3-235B seat (30 games), and one seat beside five Qwen3-235B seats (30 games). (b) Units paid per seat of the model beside one to five Grok 4.20 seats (30 games each), and beside five seats of another model (90 games). (c) Units paid by a single seat beside five seats of each other model (30 games each).}
+\label{tab:mix-slack}
+\centering\small
+\input{tables/s_mix_slack.tex}
+\end{table}
+
+Table~\ref{tab:mix-timing} asks when the payment falls short beside Grok 4.20. The shortfall of a seat in a round is how far its payment falls below 2. Claude Haiku 4.5, Gemini 3.5 Flash-Lite and Qwen3-235B fall short mostly after the pool has reached 120, which fits stopping once the outcome is settled. GPT-5.6 Luna falls short mostly before, so it pays less from the start of the game.
+
+\begin{table}[h]
+\caption{Shortfall below 2 per seat and round beside one to five Grok 4.20 seats (150 games per model, pooled over seat splits and risk levels), before and after the round in which the pool reaches 120. \emph{Per round}: mean over games of the mean shortfall per seat and round; \emph{Games}: games with at least one round in that phase. Right: units short per seat per game before and after, and the share that comes after.}
+\label{tab:mix-timing}
+\centering\small
+\input{tables/s_mix_timing.tex}
+\end{table}
+
+%% =====================================================================================
+\section{Selection among models}
+\label{sec:selection}
+
+This section supports Section 7 of the paper and its Figure 7. It gives the method in full, the payoffs that feed it, and every selection setting we computed.
+
+\subsection{Method}
+
+\paragraph{Payoff functions.} For two models $A$ and $B$ and a risk level $p$, $\pi_A(k)$ is the mean over games of the mean expected payoff of the $A$ seats at a table with $k$ seats of $A$ and $6-k$ seats of $B$. For $1\le k\le5$ it comes from the mixed tables (ten games per value). For $k=6$ it is $A$'s self-play payoff at the same risk level (20 games, pooling the base grid and the rerun). Tables~\ref{tab:sel-payoff-01} to~\ref{tab:sel-payoff-09} list every value.
+
+\paragraph{Fitness.} A population holds $N$ agents, $i$ of type $A$ and $N-i$ of type $B$, and tables of six are drawn at random without replacement. An $A$ agent sits with $k-1$ other $A$ agents among its five tablemates with the hypergeometric probability $\mathcal{H}(k-1;N-1,i-1)$, and a $B$ agent sits with $k$ $A$ agents with probability $\mathcal{H}(k;N-1,i)$, where
+\[
+\mathcal{H}(k;\,M,\,m)=\binom{m}{k}\binom{M-m}{5-k}\Big/\binom{M}{5}.
+\]
+The fitness of each type is its payoff averaged over these tables, as in Equation (2) of the paper. With $N=6$ the whole population is a single table, so the $A$ agents earn exactly $\pi_A(i)$ and the $B$ agents $\pi_B(6-i)$.
+
+\paragraph{Fixation.} Under the pairwise comparison rule, an agent copies another with probability $1/(1+e^{-\beta\Delta f})$, where $\Delta f$ is the other agent's fitness minus its own. The probability that one $A$ newcomer takes over a population of $B$ is
+\[
+\rho_{A\to B}=\left(1+\sum_{j=1}^{N-1}\prod_{i=1}^{j}e^{-\beta\,(f_A(i)-f_B(i))}\right)^{-1}.
+\]
+A takeover is favoured by selection when $\rho_{A\to B}>1/N$, the probability for a neutral newcomer.
+
+\paragraph{$\alpha$-Rank.} In the limit where a new model enters rarely, the population almost always holds a single model. From a population of one model, a newcomer of each of the four other models arrives with equal probability and takes over with the probability above. These transitions form a Markov chain over the five one-model populations, and its stationary distribution is the \emph{stationary mass} of each model. The population's target rate and payoff per seat are the self-play target rates and payoffs weighted by these masses. Figure 7 of the paper is drawn with EGTtools, and the analysis code checks that EGTtools and its own implementation give the same fixation probabilities and masses to within $10^{-7}$. For the two strongest-selection settings at $N=60$ and $N=120$ at $p=0.1$, the eigenvector method sees two unit eigenvalues because some transition probabilities are too small to represent; an exact computation in log space gives the same masses.
+
+\paragraph{Uncertainty.} Each of \SupSelBootReps{} bootstrap replicates resamples the games of every mixed cell and every self-play cell, rebuilds all payoff functions and repeats the whole analysis. We report how often the winner of the point estimate stays on top, and percentile intervals for the population's target rate and payoff.
+
+\subsection{Numbers behind the main text}
+
+\begin{center}
+\begin{claims}
+Within a table ($N=6$, $\beta=1$): Qwen3-235B's mass at $p=0.1$; $0.5$; $0.9$ & \SelWithinQwenMassLow{}; \SelWithinQwenMassMid{}; \SelWithinQwenMassHigh{} \\
+Within a table: population target rate at $p=0.5$; $0.9$ (\%) & \SelWithinReachMid{}; \SelWithinReachHigh{} \\
+\quad a model picked at random (\%) & \SelUniformReachMid{}; \SelUniformReachHigh{} \\
+\quad stronger selection, $\beta=\SelBetaExtra$ (\%) & \SelStrongWithinReachMid{}; \SelStrongWithinReachHigh{} \\
+Across tables ($N=30$, $\beta=1$): Gemini 3.5 Flash-Lite's mass at $p=0.5$; $0.9$ & \SelAcrossFlashMassMid{}; \SelAcrossFlashMassHigh{} \\
+Across tables at $p=0.9$: population target rate (\%); payoff per seat & \SelAcrossReachHigh{}; \SelAcrossPayHigh{} \\
+Across tables at $p=0.1$: model with the largest mass & \SelAcrossWinnerLow{} \\
+Winners unchanged for $\beta=\SelBetaExtra$, for $N$ of \SelNExtra{}, and with grid-only self-play & yes \\
+Smallest share of bootstrap replicates in which the winner stays on top (\%): pooled self-play; grid only & \SelBootMinPct{}; \SupSelBaseBootMinPct{} \\
+Weak selection ($\beta=\SelWeakBeta$), within a table: largest mass of any model & \SelWeakWithinMaxMass{} \\
+Weak selection, across tables: model with the largest mass at $p=0.5$; $0.9$ & \SelWeakAcrossTopMid{}; \SelWeakAcrossTopHigh{} \\
+Across tables: smallest population from which Gemini 3.5 Flash-Lite stays the winner at $p=0.9$; at $p=0.5$ & \SelSwitchN{}; \SupSelSwitchNMid{} \\
+Cells (pair, split, risk) in which a single seat beside five Grok 4.20 seats earns more than they do & \SelGrokLosesCells{} of 12 \\
+Cells with Qwen3-235B seats; Qwen3-235B significantly below its tablemates; significantly above & \SelQwenCells{}; \SelQwenBelowCells{}; \SelQwenAboveCells{} \\
+\end{claims}
+\end{center}
+
+\subsection{Payoff functions}
+
+Tables~\ref{tab:sel-payoff-01} to~\ref{tab:sel-payoff-09} give $\pi_X(k)$ for every ordered pair of models. Reading along a row shows how a model's payoff changes as its own share of the table grows. Two patterns drive the selection results. Beside Qwen3-235B, Gemini 3.5 Flash-Lite and GPT-5.6 Luna earn little whenever the target is missed, which is at almost every split. And Grok 4.20 earns less than its tablemates, because it pays the most.
+
+\begin{table}[h]
+\caption{Payoff functions at $p=0.1$: mean expected payoff per seat of the model in the first column at a table with $k$ of its seats beside $6-k$ seats of the model in the second column (ten games per entry for $k\le5$; $k=6$ is self-play, 20 games, and is the same for every partner).}
+\label{tab:sel-payoff-01}
+\centering\small
+\input{tables/s_sel_payoff_p01.tex}
+\end{table}
+
+\begin{table}[h]
+\caption{Payoff functions at $p=0.5$, as in Table~\ref{tab:sel-payoff-01}.}
+\label{tab:sel-payoff-05}
+\centering\small
+\input{tables/s_sel_payoff_p05.tex}
+\end{table}
+
+\begin{table}[h]
+\caption{Payoff functions at $p=0.9$, as in Table~\ref{tab:sel-payoff-01}.}
+\label{tab:sel-payoff-09}
+\centering\small
+\input{tables/s_sel_payoff_p09.tex}
+\end{table}
+
+\subsection{Every selection setting}
+
+Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for both kinds of comparison, three selection intensities and three population sizes. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. Within a table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to zero. Across tables, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both comparisons as soon as selection is more than very weak.
+
+\begin{table}[h]
+\caption{Stationary mass of each model under each selection setting, with the population's self-play target rate and expected payoff per seat. \emph{Random model}: every model equally weighted.}
+\label{tab:sel-mass}
+\centering\small
+\input{tables/s_sel_mass.tex}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/sfig_mass_beta.pdf}
+\caption{Stationary mass of the five models as the selection intensity $\beta$ grows from 0.01 to 100. Top: comparison within a table ($N=6$). Bottom: comparison across tables ($N=30$). The dashed line marks $\beta=1$, the setting of Figure 7 of the paper.}
+\label{fig:mass-beta}
+\end{figure}
+
+Table~\ref{tab:sel-boot} gives the bootstrap check for the two settings of the paper, with self-play from the grid and the rerun together and from the grid alone. The winners are the same in both cases and stay on top in the large majority of replicates. Some intervals for the target rate are wide, because a population's target rate depends on which model wins and the models differ sharply in self-play success.
+
+\begin{table}[h]
+\caption{Bootstrap check of the two settings of Figure 7 ($\beta=1$; within a table $N=6$, across tables $N=30$), over \SupSelBootReps{} replicates: the winner of the point estimate, the share of replicates in which it stays on top, and the population's target rate and payoff per seat with 95\% intervals.}
+\label{tab:sel-boot}
+\centering\small
+\input{tables/s_sel_boot.tex}
+\end{table}
+
+\subsection{Facts about single tables}
+
+Table~\ref{tab:sel-facts} checks, cell by cell, the two table-level facts that the selection results rest on. A single seat of any model beside five Grok 4.20 seats earns more than they do in every cell. Qwen3-235B is significantly ahead of its tablemates in most cells and significantly behind in one, which is about what chance allows among so many tests. Part (c) shows how large the population must be before comparison across tables favours Gemini 3.5 Flash-Lite: a population only slightly larger than one table is enough.
+
+\begin{table}[h]
+\caption{(a) Expected payoff of a single seat of each model beside five Grok 4.20 seats (ten games per risk level). (b) Qwen3-235B's expected payoff per seat against its tablemates in each cell of ten games, exact one-sided sign-flip tests in both directions. (c) The across-table winner as the population size $N$ grows from 6 to 120.}
+\label{tab:sel-facts}
+\centering\small
+\input{tables/s_sel_facts.tex}
+\end{table}
 
 \end{document}
