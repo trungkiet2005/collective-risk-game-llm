@@ -1,5 +1,5 @@
 %% =====================================================================================
-%% Supplementary material for "Cooperation by Default: LLM Agents in the Collective-Risk Dilemma". AAMAS 2027 allows supplementary material only as a separate file, and reviewers need not read it, so nothing the paper's argument depends on may live only here. Its job is to hold every value the main text states in words, the full proofs, the instruments word for word and the methods.
+%% Supplementary material for "When Low-Cost Language Models Cooperate by Default: Incentives, Partners, and Selection in a Collective-Risk Dilemma". AAMAS 2027 allows supplementary material only as a separate file, and reviewers need not read it, so nothing the paper's argument depends on may live only here. Its job is to hold every value the main text states in words, the full proofs, the instruments word for word and the methods.
 %% Anonymous: no author names, no repository names, no internal run identifiers, no experiment codes.
 %% One source line per paragraph (no hard wrapping). Never hand-type a measured number: numbers come from ../tables/num_*.tex (the paper's own macros) and tables/*.tex (tabulars and Sup* macros written by the analysis scripts).
 %%
@@ -13,6 +13,9 @@
 %%   cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
 %% =====================================================================================
 \documentclass[10pt]{article}
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amsthm}                   % before newtxmath, which would otherwise clash over \openbox
@@ -27,6 +30,9 @@
 \usepackage{xcolor}
 \usepackage[most]{tcolorbox}
 \usepackage[section]{placeins}
+\usepackage{needspace}
+\let\plainsubsection\subsection
+\renewcommand{\subsection}{\FloatBarrier\needspace{8\baselineskip}\plainsubsection}
 \usepackage[font=small,labelfont=bf,skip=4pt]{caption}
 \usepackage{tocloft}
 \setlength{\cftsecnumwidth}{2.6em}      % room for "S10"
@@ -141,7 +147,7 @@ We check the three cases $X<T$, $X>T$ and $X=T$ in turn.
 \emph{Welfare.} Total welfare is $6e-X$ when $X\ge T$ and $(1-p)(6e-X)$ when $X<T$. Over profiles that reach the target it is largest at $X=T$, with value $6e-T$; over profiles that miss it, it is largest at $X=0$, with value $(1-p)\,6e$. The first is larger if and only if $p>T/(6e)=\popt$, and they are equal at $\popt$. Dividing by six gives $\mathrm{opt}(p)$.
 \end{proof}
 
-The statement is also checked by exhaustive search over every symmetric profile and several thousand random asymmetric profiles at eleven risk levels, as part of the released tests.
+The statement is also checked by exhaustive search over every symmetric profile and several thousand random asymmetric profiles at eleven risk levels, as part of the tests that will be released with the final version.
 
 \subsection{The ten-round game}
 
@@ -286,7 +292,7 @@ Each round, every seat receives the prompt below, rendered for its own position,
 
 \subsection{Games in each design}
 
-Table~\ref{tab:design} counts the games of every design. Every model plays the same number of games in every design, and every cell (one condition, one risk level, one model or pair of models) holds \CntReps{} games, numbered by a repetition index from 1 to 10.
+Table~\ref{tab:design} counts the games of every design. Every model plays the same number of games in every design, and every cell (one condition, one risk level, one model or pair of models) holds \CntReps{} games, numbered by a repetition index from 1 to 10. The scripted-partner and two-model designs use the base prompt.
 
 \begin{table}[h]
 \caption{Games per design. \emph{Games per model} counts the games in which a model holds at least one seat; in the design with two models at one table each model sits in four of the ten pairs. \emph{Model decisions} counts one decision per model seat per round (the scripted seats are not counted). \emph{Unreadable replies} are replies that gave no readable move after the retries of Section~\ref{sec:parse}.}
@@ -325,7 +331,7 @@ In the game engine, the catastrophe lottery of a game is one uniform draw that d
 \subsection{Reproducibility}
 \label{sec:repro}
 
-We release the prompts, configurations, seeds and code. The design is reproducible: the lottery draws and the seat layouts depend only on the repetition index and the cell. Model text is not. The model service accepts a sampling seed but does not return identical text for it, and even temperature zero is not deterministic: a ten-game cell at temperature zero contained \RobTempZeroDistinct{} distinct game records on average, against \RobTempZeroBaseDistinct{} at temperature 0.7, where two games count as the same only if all six seats made the same ten moves. Replaying a cell is therefore a new sample of the same design, not a copy of the old one.
+The prompts, configurations, seeds and code will be released with the final version. The design is reproducible: the lottery draws and the seat layouts depend only on the repetition index and the cell. Model text is not. The model service accepts a sampling seed but does not return identical text for it, and even temperature zero is not deterministic: a ten-game cell at temperature zero contained \RobTempZeroDistinct{} distinct game records on average, against \RobTempZeroBaseDistinct{} at temperature 0.7, where two games count as the same only if all six seats made the same ten moves. Replaying a cell is therefore a new sample of the same design, not a copy of the old one.
 
 %% =====================================================================================
 \section{Self-play across risk}
@@ -481,7 +487,7 @@ Each model has a signature on the base grid: Qwen3-235B skips the last payment, 
 
 \subsection{Removing the hint}
 
-The no-hint prompt was played at $p=0.1$, $0.5$ and $0.9$, the same levels as the rerun, so Table~\ref{tab:nohint} compares the two directly. Without the hint, no model pays less on average, and two pay more. The hint mainly bought precision: fewer seats play the exact split without it, and Grok 4.20 moves almost entirely to paying 4 in every round. Qwen3-235B now pays enough to reach the target, but earns less, because it overpays.
+The no-hint prompt was played at $p=0.1$, $0.5$ and $0.9$, the same levels as the rerun, so Table~\ref{tab:nohint} compares the two directly. Without the hint, no model pays significantly less on average, and two pay more. The hint mainly bought precision: fewer seats play the exact split without it, and Grok 4.20 moves almost entirely to paying 4 in every round. Qwen3-235B now pays enough to reach the target, but earns less, because it overpays.
 
 \begin{table}[h]
 \caption{No hint against the rerun of the base prompt at $p=0.1$, $0.5$ and $0.9$ (30 games per model in each). $P$: permutation test permuting condition labels within each risk level; panel rows also permute within each model.}
@@ -566,7 +572,7 @@ Table~\ref{tab:knowdo} gives the numbers behind Figure 3 of the paper: for each 
 
 \subsection{The second value question}
 
-The second value question asks how much cash a player ends with, on average, if it pays nothing and the group misses the target. The intended answer is $(1-p)\,40$ for the whole game. The question can also be read as starting from the moment it is asked, with the money the seat still holds, which gives $(1-p)$ times that money. Table~\ref{tab:probe-defect} shows that this second reading is the most common error: Claude Haiku 4.5 gives it in most of its round-5 answers, when it has already paid part of its endowment. Answers of 40, the cash kept if no disaster strikes, come only from Qwen3-235B at $p=0.1$, where they are almost all of its answers, and a few answers are 0, the cash left if the disaster strikes. Because a wrong answer can come from a reasonable reading rather than from a wrong computation, the paper does not use this question.
+The second value question asks how much cash a player ends with, on average, if it pays nothing and the group misses the target. The intended answer is $(1-p)\,40$ for the whole game. The question can also be read as starting from the moment it is asked, with the money the seat still holds, which gives $(1-p)$ times that money. Table~\ref{tab:probe-defect} shows that this second reading is the most common error: Claude Haiku 4.5 gives it in most of its round-5 answers, when it has already paid part of its endowment. Answers of 40, the cash kept if no disaster strikes, come only from Qwen3-235B at $p=0.1$, where they are almost all of its answers. Answers of 0, the cash left if the disaster strikes, come mostly from GPT-5.6 Luna at $p=0.5$ and $0.9$ and from Grok 4.20 at $p=0.9$, and Grok 4.20 gives other wrong answers to about a quarter of the questions at $p=0.1$. Because a wrong answer can come from a reasonable reading rather than from a wrong computation, the paper does not use this question.
 
 \begin{table}[h]
 \caption{The second value question, by model and risk level (30 answers per entry). \emph{Correct (\%)}: overall and in rounds 1, 5 and 10. \emph{Wrong answers}, as shares of all answers: 40; 0; \emph{Cash left}, which is $(1-p)$ times the seat's money at the time of asking, rounded; and any other number.}
@@ -579,7 +585,7 @@ The second value question asks how much cash a player ends with, on average, if 
 \section{One model beside scripted partners}
 \label{sec:scripted}
 
-This section supports Section 5.2 of the paper. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
+This section supports Section 5.2 of the paper, including its Figure 4 and Table 5. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
 
 \subsection{Numbers behind the main text}
 
@@ -616,7 +622,7 @@ Table~\ref{tab:scr-totals} gives the mean total of the model's seat for every ki
 \input{tables/s_scr_totals.tex}
 \end{table}
 
-Figure~\ref{fig:scr-rounds} shows the same games round by round beside the two kinds of fair-share partner, where the best response switches at $\popt$. Gemini 3.5 Flash-Lite and GPT-5.6 Luna pay 2 in every round at every risk level. Qwen3-235B pays 2 for nine rounds and 0 in the last, at every risk level, and Grok 4.20 pays more than 2 in every round. None of the rows changes between the low-risk and high-risk panels.
+Figure~\ref{fig:scr-rounds} shows the same games round by round beside the two kinds of fair-share partner, where the best response switches at $\popt$. Gemini 3.5 Flash-Lite and GPT-5.6 Luna pay almost exactly 2 in every round at every risk level. Qwen3-235B pays 2 for nine rounds and 0 in the last, at every risk level, and Grok 4.20 pays more than 2 in every round. None of the rows changes between the low-risk and high-risk panels.
 
 \begin{figure}[h]
 \centering
@@ -795,9 +801,9 @@ The fitness of each type is its payoff averaged over these tables, as in Equatio
 
 \paragraph{Fixation.} Under the pairwise comparison rule, an agent copies another with probability $1/(1+e^{-\beta\Delta f})$, where $\Delta f$ is the other agent's fitness minus its own. The probability that one $A$ newcomer takes over a population of $B$ is
 \[
-\rho_{A\to B}=\left(1+\sum_{j=1}^{N-1}\prod_{i=1}^{j}e^{-\beta\,(f_A(i)-f_B(i))}\right)^{-1}.
+\rho_{B\to A}=\left(1+\sum_{j=1}^{N-1}\prod_{i=1}^{j}e^{-\beta\,(f_A(i)-f_B(i))}\right)^{-1}.
 \]
-A takeover is favoured by selection when $\rho_{A\to B}>1/N$, the probability for a neutral newcomer.
+We write the transition from a population of $B$ to a population of $A$ as $B\to A$, the direction of the arrows in Figure 7 of the paper. A takeover is favoured by selection when $\rho_{B\to A}>1/N$, the probability for a neutral newcomer.
 
 \paragraph{$\alpha$-Rank.} In the limit where a new model enters rarely, the population almost always holds a single model. From a population of one model, a newcomer of each of the four other models arrives with equal probability and takes over with the probability above. These transitions form a Markov chain over the five one-model populations, and its stationary distribution is the \emph{stationary mass} of each model. The population's target rate and payoff per seat are the self-play target rates and payoffs weighted by these masses. Figure 7 of the paper is drawn with EGTtools, and the analysis code checks that EGTtools and its own implementation give the same fixation probabilities and masses to within $10^{-7}$. For the two strongest-selection settings at $N=60$ and $N=120$ at $p=0.1$, the eigenvector method sees two unit eigenvalues because some transition probabilities are too small to represent; an exact computation in log space gives the same masses.
 
@@ -851,7 +857,7 @@ Tables~\ref{tab:sel-payoff-01} to~\ref{tab:sel-payoff-09} give $\pi_X(k)$ for ev
 
 \subsection{Every selection setting}
 
-Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for both kinds of comparison, three selection intensities and three population sizes. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. Within a table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to zero. Across tables, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both comparisons as soon as selection is more than very weak.
+Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for both kinds of comparison, three selection intensities and three population sizes. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. Within a table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to almost zero. Across tables, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both comparisons as soon as selection is more than very weak.
 
 \begin{table}[h]
 \caption{Stationary mass of each model under each selection setting, with the population's self-play target rate and expected payoff per seat. \emph{Random model}: every model equally weighted.}

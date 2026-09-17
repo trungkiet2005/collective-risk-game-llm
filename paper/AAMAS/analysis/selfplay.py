@@ -491,7 +491,7 @@ def main():
     # Closed form: a CRRA player u(x)=x^(1-g)/(1-g) prefers a certain fair-share payoff of 20
     # to keeping 40 with probability 1-p only if g >= 1 - log2(1/(1-p)). Printed at p = 0.1.
     crra_low = 1.0 - math.log2(1.0 / (1.0 - 0.1))
-    M.add("GridCrraLow", f"{math.floor(crra_low * 100) / 100:.2f}")
+    M.add("GridCrraLow", f"{math.ceil(crra_low * 100) / 100:.2f}")
     print(f"CRRA coefficient needed to prefer a certain 20 at p=0.1: {crra_low:.3f}")
     print(f"Misses at p>0: {len(miss)}; on fair pace through round 9: {int(on_pace.sum())}; by model "
           f"{miss.models.map(lambda t: t[0]).value_counts().to_dict()}")

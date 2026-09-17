@@ -152,7 +152,8 @@ cd paper/AAMAS/supplement && latexmk -pdf supplement.tex
 
 **Còn phải làm trước khi nộp:**
 
-- [x] Kiểm từng mục `refs.bib` với nguồn gốc (16-09-2026).
+- [x] Kiểm từng mục `refs.bib` với nguồn gốc (16-09-2026; kiểm lại 17-09: sửa claim Tavoni/Willis, thêm pages Schmied, bỏ title khỏi `anon-if`).
+- [x] Audit nộp bài 17-09-2026: claims↔macro, reviewer giả lập, supplement render + ẩn danh, metadata PDF (không ngày giờ, không đường dẫn). Abstract 247 từ.
 - [x] Chuyển sang template AAMAS 2027 chính thức.
 - [ ] Mọi tác giả có tài khoản OpenReview trước **17-09** (AoE).
 - [ ] Đăng ký abstract **01-10** (dán `OPENREVIEW_ABSTRACT.txt`), nộp full paper **08-10**.

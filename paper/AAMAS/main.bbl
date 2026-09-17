@@ -66,8 +66,8 @@
         {anon-if}
 \bibfield{author}{\bibinfo{person}{{Anonymous}}.}
   \bibinfo{year}{2026}\natexlab{}.
-\newblock \bibinfo{title}{Capability enables but does not confer risk
-  sensitivity in {LLM} agents}.
+\newblock \bibinfo{title}{Concurrent manuscript on risk sensitivity in {LLM}
+  agents}.
 \newblock
 \shownote{Manuscript under review; details withheld for double-blind review}.
 \newblock
@@ -367,7 +367,7 @@
 \newblock \showarticletitle{{LLMs} are Greedy Agents: Effects of {RL}
   Fine-tuning on Decision-Making Abilities}. In
   \bibinfo{booktitle}{\emph{International Conference on Learning
-  Representations (ICLR)}}.
+  Representations (ICLR)}}. \bibinfo{pages}{127538--127571}.
 \newblock
 \urldef\tempurl%
 \url{https://openreview.net/forum?id=weUP6H5Ko9}
