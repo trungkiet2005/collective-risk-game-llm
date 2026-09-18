@@ -1,0 +1,82 @@
+name: Publication figures and anonymous PDFs
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'paper/AAMAS/**'
+      - 'crsd/tests/test_publication_figures.py'
+      - '.github/workflows/publication-figures.yml'
+permissions:
+  contents: read
+concurrency:
+  group: publication-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'submission/publication-figures-20260918'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      OMP_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+      HEAD_REF: ${{ github.head_ref }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c
+        with:
+          python-version: '3.11'
+      - name: Install analysis and TeX dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends texlive-latex-extra texlive-fonts-extra texlive-science texlive-plain-generic cm-super poppler-utils
+          python -m pip install 'numpy==2.3.5' 'pandas==2.3.3' 'matplotlib==3.10.8' 'scipy==1.16.3' 'pytest==9.1.1' 'egttools==0.1.14.2' 'pymupdf==1.28.2' 'kaggle-benchmarks==0.6.1'
+      - name: Current manuscript tests
+        run: python -m pytest crsd/tests --ignore=crsd/tests/test_revision_analyses.py --ignore=crsd/tests/test_revision_loaders.py -o addopts='' -q
+      - name: Render figures, compile both PDFs, and check packaging gates
+        run: python paper/AAMAS/build_publication.py
+      - name: Commit only generated publication files to this reviewed branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- paper/AAMAS/main.tex paper/AAMAS/main.pdf paper/AAMAS/REPRODUCE.md results/DATA_CARD.md paper/AAMAS/supplement/supplement.pdf
+          for name in fig_knowdo fig_mixed; do
+            git add -- "paper/AAMAS/figures/$name.tex" "paper/AAMAS/figures/$name.pdf" "paper/AAMAS/figures/$name.png" "paper/AAMAS/figures/${name}_proof.png"
+          done
+          git add -- paper/AAMAS/figures/publication_figures_manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Build checked TikZ publication figures and anonymous PDFs'
+            git push origin "HEAD:$HEAD_REF"
+          fi
+      - name: Upload reviewable PDFs, sources and proofs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: publication-figures-and-submission
+          if-no-files-found: error
+          path: |
+            paper/AAMAS/submission/main.pdf
+            paper/AAMAS/submission/supplementary_material.zip
+            paper/AAMAS/figures/fig_knowdo.tex
+            paper/AAMAS/figures/fig_knowdo.pdf
+            paper/AAMAS/figures/fig_knowdo.png
+            paper/AAMAS/figures/fig_knowdo_proof.png
+            paper/AAMAS/figures/fig_mixed.tex
+            paper/AAMAS/figures/fig_mixed.pdf
+            paper/AAMAS/figures/fig_mixed.png
+            paper/AAMAS/figures/fig_mixed_proof.png
+            paper/AAMAS/figures/publication_figures_manifest.json
+      - name: Retain compiler diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: publication-build-diagnostics
+          if-no-files-found: ignore
+          path: |
+            paper/AAMAS/main.log
+            paper/AAMAS/supplement/supplement.log
+            paper/AAMAS/figures/fig_knowdo.log
+            paper/AAMAS/figures/fig_mixed.log
