@@ -157,8 +157,9 @@ from contributing the fair share equals `(1-p)*40` from contributing zero. The p
 attainable benchmark and derived welfare metrics are:
 
 ```text
-optimal_payoff(p) = max((1-p) * endowment, target / n_players)
-welfare_gap = optimal_payoff(p) - observed mean_payoff
+optimal_payoff(p) = max((1-p) * endowment, endowment - target / n_players)
+expected_payoff = (endowment - group_total / n_players) * (1 if target_reached else 1-p)
+welfare_gap = optimal_payoff(p) - expected_payoff
 welfare_loss_pct = 100 * welfare_gap / optimal_payoff(p)
 ```
 
