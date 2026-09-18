@@ -1,5 +1,9 @@
 # CLAUDE.md — quy ước làm việc trong repo CRSD-LLM
 
+## AAMAS analysis update, 18 September 2026
+
+Read [paper/AAMAS/REPRODUCE.md](paper/AAMAS/REPRODUCE.md) for the current figure and validation commands. Figure 3 shows low-to-high-risk answer and contribution contrasts; Figure 5 shows both comparison intervals and all five Grok compositions. Selection is a rare-mutation Fermi process with population size varied, not an isolated scoring-rule intervention. The Qwen repair changes all of its last-round zeros, not one seat. Do not restore the older interpretations from planning notes. Missing group-goal, printed-pool and zero-risk-probe controls remain untested.
+
 Tài liệu trạng thái/lộ trình nằm ở [PROJECT.md](PROJECT.md). File này chỉ ghi các
 quy ước bắt buộc khi sửa code.
 

@@ -26,7 +26,6 @@ import sys
 
 import numpy as np
 import pandas as pd
-from matplotlib.lines import Line2D
 
 import crsd_data as cd
 import crsd_style as cs
@@ -36,6 +35,7 @@ RISKS = (0.1, 0.5, 0.9)
 ROUNDS = (1, 5, 10)
 ANS_EQUAL, ANS_FAIR, ANS_KEEP = 0, 1, 2
 THREE = ("Haiku", "Flash-Lite", "Luna")
+FIGURE_TEXT_PT = cs.SIZE_LABEL + 0.05  # still at least 8 pt after TeX's 72/72.27 scale
 
 
 def thousands(n: int) -> str:
@@ -220,15 +220,21 @@ def main() -> None:
 def shifts(vc: pd.DataFrame, g: pd.DataFrame) -> pd.DataFrame:
     """Per model, from p = 0.1 to p = 0.9: the drop in the share of answers saying that
     keeping pays more (x; a correct answerer moves by +1) and the rise in what the
-    questioned seat pays (y; a best responder beside fair-share partners moves by +20).
+    questioned seat pays (y). Self-play is not a fixed-partner best-response test.
     95% CIs resample the ten games at each risk level independently."""
     lo_p, hi_p = RISKS[0], RISKS[-1]
     rows = []
     for k, m in enumerate(cs.MODEL_ORDER):
-        share = {p: vc[(vc["model"] == m) & (vc["p"] == p)].groupby("gid")["keep"].mean().to_numpy()
+        shares = {p: vc[(vc["model"] == m) & (vc["p"] == p)].groupby("gid")["keep"].mean()
                  for p in (lo_p, hi_p)}
-        paid = {p: g[(g["model"] == m) & (g["p"] == p)]["p1_total"].to_numpy(float)
-                for p in (lo_p, hi_p)}
+        totals = {p: g[(g["model"] == m) & (g["p"] == p)]["p1_total"]
+                  for p in (lo_p, hi_p)}
+        for p in (lo_p, hi_p):
+            if not totals[p].index.is_unique or set(shares[p].index) != set(totals[p].index):
+                raise RuntimeError(f"{m} p={p}: answers and contributions must match by game")
+        # Resample the same game for the answer and contribution, regardless of row order.
+        share = {p: s.to_numpy(float) for p, s in shares.items()}
+        paid = {p: totals[p].reindex(shares[p].index).to_numpy(float) for p in shares}
         if any(len(v) != 10 for v in (*share.values(), *paid.values())):
             raise AssertionError(f"{m}: expected ten games at p={lo_p} and p={hi_p}")
         rng = cd.rng(900 + k)
@@ -242,9 +248,6 @@ def shifts(vc: pd.DataFrame, g: pd.DataFrame) -> pd.DataFrame:
                          x_lo=np.percentile(bx, 2.5), x_hi=np.percentile(bx, 97.5),
                          y_lo=np.percentile(by, 2.5), y_hi=np.percentile(by, 97.5)))
     return pd.DataFrame(rows)
-
-
-DODGE = 0.028            # horizontal offset between models, in units of p
 
 
 def knowdo_data(vc: pd.DataFrame, S: pd.DataFrame) -> pd.DataFrame:
@@ -285,38 +288,47 @@ def figure(vc: pd.DataFrame, g: pd.DataFrame, S: pd.DataFrame) -> None:
     if (hi["tot"] - lo["tot"]).abs().max() > 2.0:
         raise RuntimeError("the three answering models no longer pay the same at both risks")
 
+    # Two aligned forest plots show the contrast directly. The answer benchmark
+    # applies ONLY to the stated A/B question, not to best responses in self-play.
     cs.use()
-    fig, axes = cs.subplots("col", height_pt=120, ncols=2)
-    dodge = {m: (j - (len(cs.MODEL_ORDER) - 1) / 2) * DODGE for j, m in enumerate(cs.MODEL_ORDER)}
-    step_x = [0.0, cd.PSTAR, cd.PSTAR, 1.0]
-    panels = (
-        (axes[0], "pay_ans", "a_lo", "a_hi", [0, 0, 1, 1], (-0.08, 1.08), [0, 0.5, 1],
-         ["0", "0.5", "1"], "a", "What it says", "Share saying paying wins"),
-        (axes[1], "tot", "tot_lo", "tot_hi", [0, 0, cd.FAIR_TOTAL, cd.FAIR_TOTAL], (-2.5, 42),
-         [0, 20, 40], ["0", "20", "40"], "b", "What it pays", "Units paid"),
-    )
-    for ax, col, lo_c, hi_c, step_y, ylim, yt, ytl, letter, title, ylab in panels:
-        cs.region(ax, 0.0, cd.PSTAR)
-        cs.theory_line(ax, step_x, step_y)
-        for m in cs.MODEL_ORDER:
-            d = K[K["model"] == m].sort_values("p")
-            y = d[col].to_numpy()
-            # These are three discrete risk conditions, not a continuous sweep.
-            # Keep the markers and intervals, but do not imply unmeasured values
-            # between them with connecting lines.
-            cs.plot_model(ax, d["p"].to_numpy() + dodge[m], y, m, lw=0.0,
-                          yerr=(y - d[lo_c].to_numpy(), d[hi_c].to_numpy() - y))
-        ax.set_xlim(0.0, 1.0)
-        ax.set_ylim(*ylim)
-        ax.set_xticks(RISKS, [f"{p:g}" for p in RISKS])
-        ax.set_yticks(yt, ytl)
+    fig, axes = cs.subplots("col", height_pt=150, ncols=2, sharey=True)
+    fig.get_layout_engine().set(wspace=0.35)
+    labels = ("Haiku 4.5", "Flash-Lite", "GPT Luna", "Qwen3-235B", "Grok 4.20")
+    for ax, col, low, high, letter, title, xlabel in (
+        (axes[0], "dx", "x_lo", "x_hi", "a", "Answers switch", "Drop in Pr(B)"),
+        (axes[1], "dy", "y_lo", "y_hi", "b", "Play stays flat", "Change in units"),
+    ):
+        ax.grid(False)
+        ax.spines[["left", "right", "top"]].set_visible(False)
+        ax.tick_params(axis="both", labelsize=FIGURE_TEXT_PT, length=0)
+        ax.set_yticks(range(len(labels)), labels)
+        # A light, alternating row band carries the model identity across the two
+        # panels. It makes paired reading possible without inventing a comparison
+        # line between the independently estimated contrasts.
+        for row in range(1, len(labels), 2):
+            ax.axhspan(row - 0.46, row + 0.46, color=cs.GREY_LIGHT, zorder=0)
+        ax.set_ylim(len(labels) - 0.45, -0.68)
+        ax.axvline(0, **cs.THEORY_SECONDARY)
+        for row, m in enumerate(cs.MODEL_ORDER):
+            d = D.set_index("model").loc[m]
+            style = cs.model(m)
+            ax.errorbar(d[col], row, xerr=[[d[col] - d[low]], [d[high] - d[col]]],
+                        fmt=style.marker, color=style.colour, ms=cs.MARKER_SIZE * style.marker_scale,
+                        mec=cs.WHITE, mew=cs.MARKER_EDGE, elinewidth=cs.LW_DATA,
+                        capsize=2, zorder=3)
         cs.panel_title(ax, letter, title)
-        ax.set_ylabel(ylab, labelpad=3.0)
-    fig.supxlabel("Catastrophe probability $p$", fontsize=cs.SIZE_LABEL)
-    optimum = {k: v for k, v in cs.THEORY.items() if k != "zorder"}
-    handles = cs.model_handles() + [Line2D([], [], label="Optimum", **optimum)]
-    cs.legend_top(fig, handles, ncols=3, handlelength=1.4, handletextpad=0.3, columnspacing=0.8)
-    pdf = cs.save(fig, cd.FIGURES / "fig_knowdo", title="fig_knowdo")
+        ax.set_xlabel(xlabel, fontsize=FIGURE_TEXT_PT, labelpad=4)
+    axes[0].set_xlim(-0.13, 1.15)
+    axes[0].set_xticks([0, 0.5, 1], ["0", "0.5", "1"])
+    axes[0].axvline(1, **cs.THEORY)
+    extent = max(abs(D["y_lo"].min()), abs(D["y_hi"].max()), 2)
+    limit = 2 * np.ceil(1.15 * extent / 2)
+    axes[1].set_xlim(-limit, limit)
+    axes[1].set_xticks([-limit, 0, limit])
+    # Machine-readable source for the plotted estimates, distinct from rounded tables.
+    D.to_csv(cd.FIGURES / "fig_knowdo.csv", index=False, float_format="%.10g")
+    cs.check_text(fig, min_pt=FIGURE_TEXT_PT)
+    pdf = cs.save(fig, cd.FIGURES / "fig_knowdo", title="fig_knowdo", proofs=True)
     print(f"wrote {pdf} (+ .png)")
 
 

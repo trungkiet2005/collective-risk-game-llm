@@ -2,10 +2,12 @@
 
 Run from the repository root:
     python paper/AAMAS/analysis/mixed.py
+    python paper/AAMAS/analysis/mixed.py --figure-only  # leaves macros untouched
 
 Reads results/exp_mixed, results/exp_baseline and results/exp_evprobe through crsd_data
 (read-only; never Legacy_Results/, never writes under results/). Writes
     paper/AAMAS/figures/fig_mixed.pdf (+ .png preview)
+    paper/AAMAS/figures/fig_mixed.csv (plotted estimates and bootstrap provenance)
     paper/AAMAS/tables/num_mixed.tex
 
 DESIGN, CHECKED BEFORE ANYTHING IS COUNTED
@@ -31,13 +33,14 @@ DEFINITIONS USED BY THE TIMING SPLIT
 """
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
+from matplotlib.lines import Line2D
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import crsd_data as cd      # noqa: E402
@@ -242,88 +245,143 @@ def pivotal(mg):
 
 
 # ============================================================================ figure
-SAME_X = 1.0      # a shift smaller than this draws a dot inside a ring instead of an arrow
+# Keep the shared model hues, text variants and marker shapes. Filled/open marks
+# encode the two independent conditions in A, not a time sequence or causal effect.
+# The local 8 pt floor is stricter than the shared style's 7 pt default.
+FIGURE_HEIGHT_PT = 159.5
+# A PDF point is 1/72 inch; the manuscript's column width is in 1/72.27 inch.
+# Compensate for inclusion at columnwidth, with a small rounding margin.
+FIGURE_TEXT_PT = cs.SIZE_LABEL * 72.27 / cs.POINTS_PER_INCH + 0.02
 
 
-def dumbbell(ax, y, x_from, x_to, name, ci_to=None, mids=()):
-    """Filled marker = before, open marker = after, arrow = the change. `mids` are the
-    intermediate steps, drawn as small dots on the shaft."""
+def interval(ax, x, y, lo, hi, name, *, filled=True, horizontal=False):
+    """Draw an existing estimate and its game-level bootstrap CI, without offsets
+    to the measured value. A zero-width interval remains zero-width."""
     st = cs.model(name)
-    if ci_to is not None and ci_to[1] - ci_to[0] > 1e-9:
-        ax.plot(ci_to, [y, y], color=st.colour, lw=0.8, alpha=0.55, zorder=2, solid_capstyle="butt")
-    same = abs(x_to - x_from) < SAME_X
-    if not same:
-        ax.add_patch(FancyArrowPatch((x_from, y), (x_to, y), arrowstyle="-|>", mutation_scale=7,
-                                     lw=1.1, color=st.colour, shrinkA=4.2, shrinkB=4.6, zorder=2.5))
-    for xm in mids:
-        ax.plot([xm], [y], marker="o", ms=2.2, color=st.colour, mec="none", ls="none", zorder=2.6)
-    ms = 5.4 * st.marker_scale
-    ax.plot([x_from], [y], marker=st.marker, ms=ms * (0.55 if same else 1.0), mfc=st.colour,
-            mec=cs.WHITE, mew=0.0 if same else 0.6, ls="none", zorder=3.1 if same else 3)
-    ax.plot([x_to], [y], marker=st.marker, ms=ms, mfc="none" if same else cs.WHITE, mec=st.colour,
-            mew=1.1, ls="none", zorder=3)
-
-
-def key(ax, x, y, filled, text):
-    ax.plot([x], [y], marker="o", ms=4.6, mfc=cs.INK if filled else cs.WHITE, mec=cs.INK, mew=0.9,
-            ls="none", zorder=3, clip_on=False)
-    ax.annotate(text, (x, y), xytext=(4, 0), textcoords="offset points", ha="left", va="center",
-                fontsize=cs.SIZE_SMALL, color=cs.INK)
+    value = x if horizontal else y
+    err = np.array([[value - lo], [hi - value]])
+    ax.errorbar(
+        x, y, **({"xerr": err} if horizontal else {"yerr": err}),
+        fmt=st.marker, ms=4.4 * st.marker_scale,
+        mfc=st.colour if filled else cs.WHITE, mec=st.colour, mew=0.85,
+        ecolor=st.colour, elinewidth=cs.LW_DATA, capsize=2.0,
+        capthick=0.8, zorder=3,
+    )
 
 
 def figure(A, B):
     cs.use()
-    fig = plt.figure(figsize=cs.figsize("col", height_pt=118))
+    fig = plt.figure(figsize=cs.figsize("col", height_pt=FIGURE_HEIGHT_PT))
     fig._crsd_width = "col"
-    ax, bx = fig.subplots(1, 2)
-    key_y = -0.95          # the empty row above the first model holds the key
+    ax, bx = fig.subplots(1, 2, gridspec_kw={"width_ratios": [1, 1.25], "wspace": 0.35})
 
-    # ---- a: target reached, six seats of X (filled) -> five X seats + one Qwen seat (open)
+    # ---- a: two separate conditions, with intervals for both, even at 100%.
     rows_a = list(PANEL_A)
     for i, x in enumerate(rows_a):
         r = A.loc[x]
-        dumbbell(ax, i, 100 * r.alone, 100 * r.q, x, ci_to=(100 * r.q_ci[0], 100 * r.q_ci[1]))
-    ax.set_xlim(-6, 106)
+        interval(ax, 100 * r.alone, i - 0.17, *(100 * np.array(r.alone_ci)),
+                 x, horizontal=True)
+        interval(ax, 100 * r.q, i + 0.17, *(100 * np.array(r.q_ci)),
+                 x, horizontal=True, filled=False)
+    ax.set_xlim(-9, 109)
     ax.set_xticks([0, 50, 100])
-    ax.set_xlabel("Target reached (%)")
-    key(ax, -2, key_y, False, f"+1 {cd.show('Qwen')}")
-    key(ax, 74, key_y, True, "Alone")   # right of "+1 Qwen3-235B", which is longer than it was
-    cs.panel_title(ax, "a", "One late dropout")
+    ax.set_xlabel("Target reached (%)", fontsize=FIGURE_TEXT_PT)
+    cs.row_labels(ax, rows_a, wrap=True)
+    ax.set_ylim(len(rows_a) - 0.5, -0.5)
+    ax.spines["left"].set_visible(False)
+    ax.tick_params(axis="y", length=0)
+    ax.grid(False)
+    ax.xaxis.grid(True)
+    condition_handles = [
+        Line2D([], [], marker="o", ls="none", ms=4.4, mec=cs.INK,
+               mfc=cs.INK if filled else cs.WHITE, mew=0.85, label=label)
+        for filled, label in ((True, "Self-play"), (False, "+1 Qwen3-235B"))
+    ]
+    ax.legend(handles=condition_handles, loc="lower center", bbox_to_anchor=(0.5, 1.01),
+              fontsize=FIGURE_TEXT_PT, handlelength=1, labelspacing=0.35)
 
-    # ---- b: per-seat total beside 1 Grok seat (filled) -> 5 Grok seats (open), 2-4 as dots
-    rows_b = list(PANEL_B)
-    for i, m in enumerate(rows_b):
+    # ---- b: every composition has its own x position and uncertainty. Lines only
+    # join measured means; no fit, interpolation of data, or causal arrows.
+    for m in PANEL_B:
         d = B[B.model == m].sort_values("grok")
         if list(d.grok) != [1, 2, 3, 4, 5]:
             raise RuntimeError(f"{m}: Grok seat counts {list(d.grok)}")
-        v = d.own.to_numpy(float)
-        dumbbell(bx, i, v[0], v[-1], m, ci_to=(d.lo.iloc[-1], d.hi.iloc[-1]), mids=v[1:-1])
-    bx.axvline(cd.FAIR_TOTAL, **{k: w for k, w in cs.THEORY_SECONDARY.items() if k != "marker"})
-    lo = min(8.0, float(np.floor(B.lo.min())))
-    hi = max(26.0, float(np.ceil(B.hi.max())))
-    bx.set_xlim(lo, hi)
-    bx.set_xticks([10, 15, 20, 25])
-    bx.set_xlabel("Units per seat")
-    key(bx, lo + 0.6, key_y, False, "5 seats")
-    key(bx, 21.2, key_y, True, "1 seat")
-    cs.panel_title(bx, "b", f"Beside {cd.show('Grok')}")
+        st = cs.model(m)
+        bx.plot(d.grok, d.own, color=st.colour, lw=cs.LW_DATA, ls=st.dash, zorder=2)
+        for r in d.itertuples():
+            interval(bx, r.grok, r.own, r.lo, r.hi, m)
+    bx.axhline(cd.FAIR_TOTAL, **cs.THEORY_SECONDARY)
+    bx.set_xlim(0.65, 5.35)
+    bx.set_xticks(range(1, 6))
+    bx.set_ylim(min(8.0, float(np.floor(B.lo.min())) - 1),
+                max(26.0, float(np.ceil(B.hi.max())) + 1))
+    bx.set_yticks([10, 15, 20, 25])
+    bx.set_xlabel("Grok 4.20 seats", fontsize=FIGURE_TEXT_PT)
+    handles = [Line2D([], [], color=cs.model(m).colour, marker=cs.model(m).marker,
+                      ls=cs.model(m).dash, lw=cs.LW_DATA,
+                      ms=4.0 * cs.model(m).marker_scale, label=m) for m in PANEL_B]
+    bx.legend(handles=handles, ncols=2, loc="lower center", bbox_to_anchor=(0.5, 1.01),
+              fontsize=FIGURE_TEXT_PT, handlelength=1.1, columnspacing=0.7, labelspacing=0.35)
 
-    for axis, rows in ((ax, rows_a), (bx, rows_b)):
-        cs.row_labels(axis, rows, wrap=True)
-        axis.set_ylim(len(rows) - 0.5, -1.3)
-        axis.grid(False)
-        axis.xaxis.grid(True)
-        axis.spines["left"].set_visible(False)
-        axis.tick_params(axis="y", length=0)
+    for axis, letter, title in ((ax, "a", "One Qwen seat"), (bx, "b", "Units per seat")):
+        axis.set_title(f"{letter}   {title}", loc="left", y=1.38,
+                       fontsize=cs.SIZE_TITLE, weight="bold")
+        axis.tick_params(labelsize=FIGURE_TEXT_PT)
+        axis.set_axisbelow(True)
+    cs.check_text(fig, min_pt=FIGURE_TEXT_PT)
     return fig
+
+
+def save_figure(A, B):
+    fig = figure(A, B)
+    pdf = cs.save(fig, cd.FIGURES / "fig_mixed", proofs=True,
+                  title="Mixed groups: target success and contributions by composition")
+    rows = []
+    for off, m in enumerate(PANEL_A):
+        r = A.loc[m]
+        for condition, value, ci, n, seed_offset, experiments in (
+            ("self_play", r.alone, r.alone_ci, r.n_alone, 100 + off, ";".join(SELF_EXPS)),
+            ("one_Qwen_seat", r.q, r.q_ci, r.n_q, 200 + off, "exp_mixed"),
+        ):
+            rows.append(dict(panel="a", model=cd.show(m), condition=condition,
+                             grok_seats=None, estimate=100 * value, ci_low=100 * ci[0],
+                             ci_high=100 * ci[1], unit="percent_games_reaching_target",
+                             n_games=int(n), bootstrap_seed=cd.SEED + seed_offset,
+                             experiments=experiments))
+    for r in B.itertuples():
+        rows.append(dict(panel="b", model=cd.show(r.model), condition="beside_Grok",
+                         grok_seats=r.grok, estimate=r.own, ci_low=r.lo, ci_high=r.hi,
+                         unit="mean_units_per_focal_seat_per_game", n_games=r.n,
+                         bootstrap_seed=cd.SEED + 300 + 10 * PANEL_B.index(r.model) + r.grok,
+                         experiments="exp_mixed"))
+    provenance = pd.DataFrame(rows)
+    provenance["grok_seats"] = provenance.grok_seats.astype("Int64")
+    provenance["risk_levels"] = ";".join(map(str, RISKS))
+    provenance["games_per_risk"] = provenance.n_games // len(RISKS)
+    provenance["bootstrap_draws"] = cd.N_BOOT
+    provenance["ci_method"] = "percentile_2.5_97.5;pooled_games;not_risk_stratified"
+    provenance.to_csv(cd.FIGURES / "fig_mixed.csv", index=False)
+    print(f"wrote {pdf.relative_to(cd.REPO)} (+ .png, greyscale/CVD proof, .csv)")
+    print(f"figure gates passed: {cs.COL_W_PT:.4f} x {FIGURE_HEIGHT_PT} PDF pt; "
+          f"text >= {FIGURE_TEXT_PT:.2f} PDF pt "
+          f"({FIGURE_TEXT_PT * cs.POINTS_PER_INCH / 72.27:.3f} after placement); "
+          "text overlap, marker bounds, PDF width and fonts; "
+          "8 condition estimates and 20 composition estimates, all with 95% bootstrap CIs")
 
 
 # ============================================================================ main
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--figure-only", action="store_true",
+                        help="regenerate the figure and provenance without writing macros")
+    args = parser.parse_args()
     mg, mu, su = load()
     check_design(mg, mu, su)
     A = panel_a(mg, mu, su)
     B = panel_b(mu)
+    if args.figure_only:
+        save_figure(A, B)
+        return
     bes = beside(mu)
     split = timing_split(mg)
     zero, n_miss, n_miss_q, fix_share = pivotal(mg)
@@ -369,9 +427,7 @@ def main():
     for k, v in mac.items.items():
         print(f"  \\{k} = {v}")
 
-    fig = figure(A, B)
-    pdf = cs.save(fig, cd.FIGURES / "fig_mixed", title="fig_mixed")
-    print(f"wrote {pdf.relative_to(cd.REPO)} (+ .png)")
+    save_figure(A, B)
 
 
 if __name__ == "__main__":

@@ -538,7 +538,7 @@ Every rule question was answered correctly by every model in every round (Table~
 
 \subsection{The value comparison}
 
-Table~\ref{tab:probe-value} counts every answer to the value comparison. Claude Haiku 4.5 and Gemini 3.5 Flash-Lite give the correct answer at every risk level, including ``equal'' at $p=0.5$. GPT-5.6 Luna is correct most of the time. Qwen3-235B answers that paying nothing is better in all 90 answers, so it is correct only at $p=0.1$. Grok 4.20 leans the same way.
+Table~\ref{tab:probe-value} counts every answer to the value comparison. Claude Haiku 4.5 is always correct and Gemini 3.5 Flash-Lite is almost always correct; both always answer ``equal'' at $p=0.5$. GPT-5.6 Luna is correct most of the time. Qwen3-235B answers that paying nothing is better in all 90 answers, so it is correct only at $p=0.1$. Grok 4.20 leans the same way.
 
 \begin{table}[h]
 \caption{The value comparison of Section 5.1 of the paper: number of answers of each kind, of 30 per model and risk level, and share correct. A: pay 2 in every round and reach the target; B: pay nothing and miss it.}
@@ -724,7 +724,7 @@ Target reached, of 30: five Gemini 3.5 Flash-Lite seats and one Qwen3-235B seat 
 Target reached, of 30: five GPT-5.6 Luna seats and one Qwen3-235B seat & \MixLunaQwenReach{} \\
 \quad GPT-5.6 Luna alone (\%) & \MixLunaAloneReach{} \\
 Target reached, of 30: five Claude Haiku 4.5 seats and one Qwen3-235B seat; the same with Grok 4.20 & \MixHaikuQwenReach{}; \MixGrokQwenReach{} \\
-Missed tables with a Qwen3-235B seat; of which reaching 120 had it paid 2 instead of 0 in round 10 & \MixMissWithQwen{}; \SupMixQwenPivotalFixed{} (\MixQwenPivotalFix\%) \\
+Missed tables containing Qwen3-235B; of which reaching 120 after replacing all its round-10 zeros by 2, other actions fixed & \MixMissWithQwen{}; \SupMixQwenPivotalFixed{} (\MixQwenPivotalFix\%) \\
 Target reached, of 30: five Qwen3-235B seats and one Grok 4.20 seat; and one Claude Haiku 4.5 seat & \MixGrokRescuesQwen{}; \MixHaikuRescuesQwen{} \\
 GPT-5.6 Luna: units per seat beside five Grok 4.20 seats; beside five seats of another model & \MixLunaBesideFiveGrok{}; \MixLunaBesideOthers{} \\
 Units per seat beside five Grok 4.20 seats: Gemini 3.5 Flash-Lite; Claude Haiku 4.5 & \MixFlashBesideFiveGrok{}; \MixHaikuBesideFiveGrok{} \\
@@ -767,7 +767,7 @@ Table~\ref{tab:mix-pairs} gives the numbers behind the lower triangle of Figure~
 
 \subsection{The last round}
 
-Before round 10, a pool of exactly 108 means that the fair share from every seat completes the target, and that no single seat can do it alone. Table~\ref{tab:mix-lastround} counts what each model pays in that situation, over all mixed tables. Qwen3-235B pays nothing in almost every such decision, while the other models rarely do. Almost every mixed table that missed the target and held a Qwen3-235B seat would have reached it had that seat paid 2 instead of 0 in round 10.
+Before round 10, a pool of exactly 108 means that the fair share from every seat completes the target, and that no single seat can do it alone. Table~\ref{tab:mix-lastround} counts what each model pays in that situation, over all mixed tables. Qwen3-235B pays nothing in almost every such decision, while the other models rarely do. Replacing all Qwen3-235B round-10 zeros by 2 would bring \SupMixQwenPivotalFixed{} of the \MixMissWithQwen{} failed tables containing it to the target. This arithmetic repair holds every other recorded action fixed; it does not show that changing one seat suffices or predict responses to an actual intervention.
 
 \begin{table}[h]
 \caption{Top: round-10 decisions at mixed tables whose pool after round 9 is exactly 108, by model: share paying 0, number of decisions and number of games. Bottom: missed mixed tables, those with a Qwen3-235B seat, and those among them that reach 120 when Qwen3-235B's round-10 zeros are replaced by 2.}
@@ -818,13 +818,13 @@ The fitness of each type is its payoff averaged over these tables, as in Equatio
 \]
 We write the transition from a population of $B$ to a population of $A$ as $B\to A$, the direction of the arrows in Figure~\ref{fig:invasion}. A takeover is favoured by selection when $\rho_{B\to A}>1/N$, the probability for a neutral newcomer.
 
-\paragraph{$\alpha$-Rank.} In the limit where a new model enters rarely, the population almost always holds a single model. From a population of one model, a newcomer of each of the four other models arrives with equal probability and takes over with the probability above. These transitions form a Markov chain over the five one-model populations, and its stationary distribution is the \emph{stationary mass} of each model. The population's target rate and payoff per seat are the self-play target rates and payoffs weighted by these masses. The masses in Figure~\ref{main-fig:selection} of the paper and the invasion diagrams in Figure~\ref{fig:invasion} are computed with EGTtools, and the analysis code checks that EGTtools and its own implementation give the same fixation probabilities and masses to within $10^{-7}$. For the two strongest-selection settings at $N=60$ and $N=120$ at $p=0.1$, the eigenvector method sees two unit eigenvalues because some transition probabilities are too small to represent; an exact computation in log space gives the same masses.
+\paragraph{Rare-mutation Fermi selection.} In the limit where a new model enters rarely, the population almost always holds a single model. From a population of one model, a newcomer of each of the four other models arrives with equal probability and takes over with the probability above. These transitions form a Markov chain over the five one-model populations, and its stationary distribution is the \emph{stationary mass} of each model. The population's target rate and payoff per seat are the self-play target rates and payoffs weighted by these masses. The masses in Figure~\ref{main-fig:selection} of the paper and the invasion diagrams in Figure~\ref{fig:invasion} are computed with EGTtools, and the analysis code checks that EGTtools and its own implementation give the same fixation probabilities and masses to within $10^{-7}$. For the two strongest-selection settings at $N=60$ and $N=120$ at $p=0.1$, the eigenvector method sees two unit eigenvalues because some transition probabilities are too small to represent; an exact computation in log space gives the same masses. We report this finite-intensity, frequency-dependent process, not an infinite-intensity ranking or group reproduction. Changing $N$ changes both sampling probabilities and the fixation path.
 
 \paragraph{Gradient of selection.} For a population with $i$ agents of type $A$ out of $N$, the expected change in the share $x=i/N$ of type $A$ in one step of the pairwise comparison rule is
 \[
 G(x)=x\,(1-x)\,\frac{N}{N-1}\,\tanh\!\left(\frac{\beta}{2}\,\bigl(f_A(i)-f_B(i)\bigr)\right).
 \]
-Where $G>0$ selection pushes the share of $A$ up, and where $G<0$ it pushes it down. A zero of $G$ at which the sign changes from positive to negative is stable, and one at which it changes from negative to positive is unstable. Figure~\ref{main-fig:selection} of the paper draws $G$ with $A$ Qwen3-235B and $B$ Gemini 3.5 Flash-Lite.
+Where $G>0$ selection pushes the share of $A$ up, and where $G<0$ it pushes it down. A zero of $G$ at which the sign changes from positive to negative is stable, and one at which it changes from negative to positive is unstable. This population-level gradient is distinct from the table-composition payoffs plotted in Figure~\ref{main-fig:selection} of the paper.
 
 \paragraph{Uncertainty.} Each of \SupSelBootReps{} bootstrap replicates resamples the games of every mixed cell and every self-play cell, rebuilds all payoff functions and repeats the whole analysis. We report how often the winner of the point estimate stays on top, and percentile intervals for the population's target rate and payoff.
 
@@ -901,12 +901,12 @@ Table~\ref{tab:sel-boot} gives the bootstrap check for the two settings of the p
 \input{tables/s_sel_boot.tex}
 \end{table}
 
-Figure~\ref{main-fig:selection} of the paper shows the stationary masses and the gradient of selection for one pair. Figure~\ref{fig:invasion} gives the full invasion diagrams behind those masses, for every pair of models at the three risk levels and both kinds of comparison. Each arrow marks a takeover that selection favours.
+Figure~\ref{main-fig:selection} of the paper shows the stationary masses and the table-composition payoffs for one pair. Figure~\ref{fig:invasion} gives the full invasion diagrams behind those masses, for every pair of models at the three risk levels and both kinds of comparison. Each arrow marks a takeover that selection favours.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.62\textwidth]{figures/fig_invasion.pdf}
-\caption{Invasion diagrams ($\alpha$-Rank, $\beta=1$), computed and drawn with EGTtools. A node is a one-model population, with its stationary mass beside it. An arrow from A to B means that one B newcomer takes over an A population with more than the neutral probability $1/N$. Left: $N=6$, comparison with tablemates. Right: $N=30$, comparison mostly across tables. Bottom left of each graph: the self-play target rate, weighted by mass.}
+\caption{Invasion diagrams (rare-mutation Fermi selection, $\beta=1$), computed and drawn with EGTtools. A node is a one-model population, with its stationary mass beside it. An arrow from A to B means that one B newcomer takes over an A population with more than the neutral probability $1/N$. Left: one table, $N=6$. Right: larger randomly mixed population, $N=30$. Bottom left: self-play target rate weighted by mass.}
 \label{fig:invasion}
 \end{figure}
 
@@ -922,6 +922,15 @@ Table~\ref{tab:sel-facts} checks, cell by cell, the two table-level facts that t
 \end{table}
 
 %% =====================================================================================
+\subsection{Single entrants, candidate sets and welfare}
+\label{sec:selection-sensitivity}
+
+The following post-hoc checks reuse the observed payoffs without new model calls. We compare each single entrant's payoff with both resident self-play and its actual tablemates, then compute fixation along the full composition path. These are different comparisons: a favourable initial payoff gap alone does not determine fixation or stationary mass. We also remove each model in turn and rebuild the mutation chain over the retained strategies. This checks dependence on the candidate set, not on the prompt. Every risk and both population sizes are reported, with no new uncertainty intervals.
+
+At $p=0.5$, reaching the target is not required for optimal welfare: zero contribution also earns 20 per seat in expectation. We therefore report stationary-mass-weighted expected payoff and its share of the welfare optimum as well as target rate. The outcomes describe one-model populations in the rare-mutation limit, not the success of mixed groups during invasion.
+
+\input{tables/s_review_selection.tex}
+
 \section{Strategies, the last round and equilibrium benchmarks}
 \label{sec:strategy}
 
@@ -962,7 +971,7 @@ Table~\ref{tab:strat-rules} compares each model's moves with named rules and wit
 
 \subsection{Responses to Grok 4.20's opening move}
 
-Grok 4.20 chooses its first move before any history exists, and that move varies across the repetitions of a cell. Within each cell of the two-model tables, Table~\ref{tab:strat-opening} relates a partner's payments to Grok 4.20's mean opening move. After a higher opening, GPT-5.6 Luna pays less in every round while the pool is still short. Claude Haiku 4.5 does not change its payment in that phase and Gemini 3.5 Flash-Lite changes it only slightly; both pay less in total mainly because the target is reached sooner. Qwen3-235B pays more.
+Grok 4.20 chooses its first move before any history exists, and that move varies across repetitions of a cell. Table~\ref{tab:strat-opening} relates a partner's payments to Grok 4.20's mean opening move within each cell. Higher openings are associated with lower payments by GPT-5.6 Luna while the pool is short. Claude Haiku 4.5's payment in that phase barely changes and Gemini 3.5 Flash-Lite's changes only slightly; both pay less in total mainly through earlier target completion. Qwen3-235B pays more. This is an observational association, not a randomised opening intervention or proof of an internal reasoning mechanism.
 
 \begin{table}[h]
 \caption{Change in a partner seat's payment per unit of Grok 4.20's mean opening move, within cells of the two-model tables, with 95\% bootstrap intervals over games.}

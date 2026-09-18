@@ -116,7 +116,7 @@
 \draw[Ink,dash pattern=on 4.5pt off 2pt,line width=1.2pt,line cap=butt] (120,735) -- (300,735) -- (300,655) -- (480,655);
 \node[font=\bfseries\fontsize{8}{9}\selectfont] at (210,714) {keep};
 \node[font=\bfseries\fontsize{8}{9}\selectfont] at (390,634) {pay fair share};
-\node[txt,rotate=90] at (48,690) {best total};
+\node[txt,rotate=90] at (48,690) {equal-share benchmark};
 \node[txt] at (300,793) {risk $p$};
 
 % ======================== PANEL B: designs ========================
@@ -176,7 +176,7 @@
 
 % Finding 1: flat payment, even where paying is dominated
 \badge{1312}{92}{1}
-\node[head] at (1342,92) {Same payment at every risk, even at $p=0$};
+\node[head] at (1342,92) {Near-flat payments for most models};
 \draw[Ink,line width=.75pt] (1420,207) -- (1740,207);
 \draw[Ink,line width=.75pt] (1420,207) -- (1420,114);
 \foreach \x/\lab in {1420/0,1580/0.5,1740/1}{
@@ -221,12 +221,12 @@
 \node[anchor=west,font=\boldmath\bfseries\fontsize{8}{9}\selectfont] at (1618,494) {pool $118<120$};
 \node[anchor=west,text=Fail,font=\bfseries\fontsize{7.5}{9}\selectfont] at (1618,528) {target missed};
 
-% Finding 4: tablemate scoring versus scoring across tables
+% Finding 4: one-table population versus larger randomly mixed population
 \badge{1312}{588}{4}
-\node[head] at (1342,588) {The scoring rule decides who is selected};
+\node[head] at (1342,588) {Population size changes who is selected};
 \draw[Divider,dashed,line width=.8pt] (1618,606) -- (1618,790);
-\node[txt] at (1470,620) {vs tablemates};
-\node[txt] at (1765,620) {across tables};
+\node[txt] at (1470,620) {one table ($N=6$)};
+\node[txt] at (1765,620) {larger pool ($N=30$)};
 % one table: the smallest payer earns most and is selected
 \path[draw=gray!35,fill=gray!18,line width=.6pt] (1350,700) rectangle (1590,709);
 \foreach \k in {0,...,4}{\agent{1370+40*\k}{680}{3.4mm}{}}
