@@ -1,8 +1,8 @@
 """Rebuild the publication figures and both anonymous PDFs from stored evidence.
 
 No network, model inference, dataset filtering, or statistical re-estimation.
-The idempotent source migrations keep captions and the data card consistent with
-Figure 3's percentage-point axis and the existing expected-payoff analysis.
+Idempotent source migrations keep captions and documentation consistent with
+Figure 3's percentage-point axis and the expected-payoff analysis.
 """
 from pathlib import Path
 import subprocess
@@ -14,12 +14,12 @@ ROOT = HERE.parents[1]
 
 def replace_once(path, old, new):
     text = path.read_text(encoding='utf-8')
-    if old in text:
-        if text.count(old) != 1:
-            raise ValueError(f'ambiguous migration in {path}')
-        path.write_text(text.replace(old, new), encoding='utf-8')
-    elif new not in text:
+    # A replacement may contain the old heading; check the finished state first.
+    if new in text:
+        return
+    if old not in text or text.count(old) != 1:
         raise ValueError(f'source has changed; review migration in {path}')
+    path.write_text(text.replace(old, new), encoding='utf-8')
 
 
 def migrate_sources():
@@ -29,6 +29,12 @@ def migrate_sources():
     replace_once(HERE / 'main.tex',
         'correct-answer benchmark of one; Qwen and Grok move little.',
         'correct-answer benchmark of 100 percentage points; Qwen and Grok move little.')
+    replace_once(HERE / 'main.tex',
+        'p = 1 is excluded on purpose: at p = 1 every profile that misses the target is a weak equilibrium.',
+        'p = 1 is checked separately: a failed pool is an equilibrium only when no player can reach the target while retaining positive cash.')
+    replace_once(HERE / 'main.tex',
+        'all symmetric profiles plus 6,000 asymmetric ones at 11 risk levels',
+        'all symmetric profiles plus 3,000 sampled profiles at each of ten risks below one; the certainty boundary is checked separately')
     replace_once(ROOT / 'results/DATA_CARD.md',
         'optimal_payoff(p) = max((1-p) * endowment, target / n_players)\nwelfare_gap = optimal_payoff(p) - observed mean_payoff',
         'optimal_payoff(p) = max((1-p) * endowment, endowment - target / n_players)\nexpected_payoff = (endowment - group_total / n_players) * (1 if target_reached else 1-p)\nwelfare_gap = optimal_payoff(p) - expected_payoff')
