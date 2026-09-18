@@ -40,9 +40,8 @@ payoff by its stationary mass. Uncertainty: 1000 game-level bootstrap replicates
 of replicates in which the point-estimate winner is still top, and percentile 95% CIs.
 
 FIG_SELECTION. Stationary mass per rule and risk level (bars, with the population's
-self-play target rate), and the gradient of selection
-    G(x) = x (1 - x) N / (N - 1) tanh(beta / 2 (f_X(i) - f_Y(i))),  x = i / N,
-for Qwen against Flash-Lite, from the same fitness() the fixation probabilities use.
+self-play target rate), and the expected payoff of a Qwen3-235B or Gemini 3.5
+Flash-Lite seat as the number of Qwen3-235B seats changes in the same table.
 
 EGTTOOLS. The supplement's invasion diagrams (fig_invasion) are computed and drawn with
 EGTTools (Fernandez Domingos, Santos & Lenaerts 2023): egttools.analytical.StochDynamics recomputes every fixation probability
@@ -466,44 +465,21 @@ def invasion_figure(P, point, REACH):
     return fig
 
 
-GRAD_PAIR = ("Qwen", "Flash-Lite")
-GRAD_RISKS = (0.5, 0.9)
+COMP_PAIR = ("Qwen", "Flash-Lite")
+COMP_RISKS = (0.5, 0.9)
 BAR_HATCH = {"Haiku": "....", "Luna": "///", "Grok": "xxx"}
 BAR_LABEL_MIN = 0.2      # print the mass inside a bar segment at least this wide
 VISIBLE_MASS = 0.005     # narrower segments are invisible at column width; they stay out of the key
 
 
-def gradient(Pp, x, y, N, beta=BETA):
-    """Gradient of selection for x invading y at population size N, on x = 0, 1/N, ..., 1."""
-    fx, fy = fitness(Pp, x, y, N)
-    i = np.arange(1, N)
-    g = (i / N) * ((N - i) / (N - 1)) * np.tanh(0.5 * beta * (fx - fy))
-    return np.r_[0.0, i / N, 1.0], np.r_[0.0, g, 0.0]
-
-
-def fixed_points(x, g):
-    """(position, stable) for the two monomorphic ends and every interior sign change."""
-    pts = []
-    gi = g[1:-1]
-    if gi[0] != 0:
-        pts.append((0.0, bool(gi[0] < 0)))
-    for k in range(1, len(gi)):
-        if np.sign(gi[k - 1]) != np.sign(gi[k]) and gi[k - 1] != 0:
-            x0, x1 = x[k], x[k + 1]
-            pts.append((x0 + (x1 - x0) * gi[k - 1] / (gi[k - 1] - gi[k]), bool(gi[k - 1] > 0)))
-    if gi[-1] != 0:
-        pts.append((1.0, bool(gi[-1] > 0)))
-    return pts
-
-
 def selection_figure(P, point):
     """a, b: stationary mass per risk level for the two rules, with the population's
-    self-play target rate at the right of each bar. c, d: gradient of selection for Qwen
-    beside Flash-Lite; N = 30 solid with stable (filled) and unstable (open) fixed points,
-    N = 6 dashed with its discrete states. Returns the figure and every number drawn."""
+    self-play target rate at the right of each bar. c, d: expected payoff of a Qwen or
+    Flash-Lite seat by the number of Qwen seats at the same table. Returns the figure and
+    every number drawn."""
     rules = ((N_WITHIN, "within", f"Tablemates, $N={N_WITHIN}$"),
              (N_ACROSS, "across", f"Across tables, $N={N_ACROSS}$"))
-    drawn = dict(mass={}, target={}, fixed={}, gradient={})
+    drawn = dict(mass={}, target={}, composition={})
     shown = [m for m in cs.MODEL_ORDER
              if any(point[(r, BETA, n, pi)]["pi"][MI[m]] >= VISIBLE_MASS
                     for n, r, _ in rules for pi in range(len(RISKS)))]
@@ -528,7 +504,7 @@ def selection_figure(P, point):
                     continue
                 st = cs.model(m)
                 ax.barh(row, w, left=left, height=0.74, color=st.colour, ec=cs.WHITE, lw=0.5,
-                        zorder=2, hatch=BAR_HATCH.get(m, ""), hatchcolor=cs.WHITE)
+                        zorder=2, hatch=BAR_HATCH.get(m, ""))
                 if w >= BAR_LABEL_MIN:
                     ax.text(left + w / 2, row, f"{w:.2f}", ha="center", va="center",
                             fontsize=cs.SIZE_SMALL, color=cs.cell_ink(st.colour), zorder=3,
@@ -547,48 +523,40 @@ def selection_figure(P, point):
         cs.panel_title(ax, "ab"[j], label)
 
     handles = [Patch(fc=cs.model(m).colour, ec=cs.WHITE, lw=0.4, hatch=BAR_HATCH.get(m, ""),
-                     hatchcolor=cs.WHITE, label=cd.show(m)) for m in shown]
-    fig.legend(handles=handles, loc="outside upper center", ncols=2, handlelength=1.4,
-               handleheight=0.7, handletextpad=0.3, columnspacing=1.2)
-
-    a, b = MI[GRAD_PAIR[0]], MI[GRAD_PAIR[1]]
-    curves = {(p, n): gradient(P[RISKS.index(p)], a, b, n)
-              for p in GRAD_RISKS for n, _, _ in rules}
-    ylim = 1.25 * max(np.abs(g).max() for _, g in curves.values())
-    for j, p in enumerate(GRAD_RISKS):
+                     label=cd.show(m)) for m in shown]
+    q, f = MI[COMP_PAIR[0]], MI[COMP_PAIR[1]]
+    x = np.arange(N_WITHIN + 1)
+    for j, p in enumerate(COMP_RISKS):
         ax = gax[j]
-        ax.axhline(0, color=cs.INK, lw=cs.LW_RULE, zorder=1)
-        for n, _, _ in rules:
-            x, g = curves[(p, n)]
-            drawn["gradient"][(p, n)] = (x, g)
-            if n == N_WITHIN:
-                ax.plot(x, g, color=cs.MUTED, lw=0.9, ls=(0, (3.0, 1.5)), marker="s", ms=2.6,
-                        mfc=cs.MUTED, mec=cs.MUTED, mew=0.6, zorder=3, clip_on=False)
-                continue
-            ax.plot(x, g, color=cs.INK, lw=1.2, zorder=3.2)
-            drawn["fixed"][p] = fixed_points(x, g)
-            for xs, stable in drawn["fixed"][p]:
-                ax.plot([xs], [0], marker="o", ms=5.0, ls="none", zorder=5, clip_on=False,
-                        mfc=cs.INK if stable else cs.WHITE, mec=cs.INK, mew=0.9)
-        ax.set_xlim(0, 1)
-        ax.set_ylim(-ylim, ylim)
-        ax.set_xticks([0, 0.5, 1], ["0", "0.5", "1"])
-        ax.grid(False)
+        pi = RISKS.index(p)
+        q_pay = np.array([np.nan if k == 0 else P[pi, q, f, k] for k in x])
+        f_pay = np.array([P[pi, f, f, 6] if k == 0 else
+                          (np.nan if k == N_WITHIN else P[pi, f, q, 6 - k]) for k in x])
+        drawn["composition"][(p, COMP_PAIR[0])] = q_pay
+        drawn["composition"][(p, COMP_PAIR[1])] = f_pay
+        qm, fm = cs.model(COMP_PAIR[0]), cs.model(COMP_PAIR[1])
+        ax.plot(x, q_pay, color=qm.colour, lw=cs.LW_DATA, marker=qm.marker, ms=4.0,
+                mfc=qm.colour, mec=cs.WHITE, mew=0.5, label=cd.show(COMP_PAIR[0]), zorder=3)
+        ax.plot(x, f_pay, color=fm.colour, lw=cs.LW_DATA, marker=fm.marker, ms=4.0,
+                mfc=fm.colour, mec=cs.WHITE, mew=0.5, label=cd.show(COMP_PAIR[1]), zorder=3)
+        ax.axhline(cd.FAIR_TOTAL, color=cs.INK, lw=cs.LW_THEORY,
+                   ls=(0, (4.5, 2.0)), zorder=2)
+        ax.set_xlim(0, N_WITHIN)
+        ax.set_ylim(0, 42)
+        ax.set_xticks(range(N_WITHIN + 1))
+        ax.set_yticks([0, 20, 40] if j == 0 else [])
+        ax.grid(axis="y", color=cs.LINE, alpha=0.18, lw=0.6)
         cs.panel_title(ax, "cd"[j], f"$p={p:g}$")
         if j == 0:
-            ax.set_ylabel("Gradient $G(x)$")
+            ax.set_ylabel("Expected payoff per seat")
         else:
             ax.tick_params(axis="y", labelleft=False)
-    fig.supxlabel(f"Share of {cd.show(GRAD_PAIR[0])} beside {cd.show(GRAD_PAIR[1])}",
+    fig.supxlabel(f"Number of {cd.show(COMP_PAIR[0])} seats in the table",
                   fontsize=cs.SIZE_LABEL)
-    x6, g6 = curves[(GRAD_RISKS[0], N_WITHIN)]
-    gax[0].annotate(f"$N={N_WITHIN}$", (x6[3], g6[3]), xytext=(0, 5), textcoords="offset points",
-                    ha="center", va="bottom", fontsize=cs.SIZE_SMALL, color=cs.MUTED)
-    x30, g30 = curves[(GRAD_RISKS[0], N_ACROSS)]
-    kmin = int(np.argmin(g30))
-    gax[0].annotate(f"$N={N_ACROSS}$", (x30[kmin], g30[kmin]), xytext=(6, -2),
-                    textcoords="offset points", ha="left", va="top", fontsize=cs.SIZE_SMALL,
-                    color=cs.INK)
+    handles += [Line2D([], [], color=cs.INK, lw=cs.LW_THEORY, ls=(0, (4.5, 2.0)),
+                        label="Fair-share payoff")]
+    fig.legend(handles=handles, loc="outside upper center", ncols=2, handlelength=1.4,
+               handletextpad=0.3, columnspacing=1.2)
     return fig, drawn
 
 
@@ -705,12 +673,11 @@ def main():
     for (rule, p), t in drawn["target"].items():
         print(f"  {rule:6} p={p:.1f} " + " ".join(f"{m}={drawn['mass'][(rule, p, m)]:.3f}"
                                                   for m in cs.MODEL_ORDER) + f" | target {t}%")
-    for (p, n), (x, g) in drawn["gradient"].items():
-        tail = (" | fixed points " + ", ".join(f"{xs:.3f} {'stable' if st else 'unstable'}"
-                                               for xs, st in drawn["fixed"][p])
-                if n == N_ACROSS else " | states " + " ".join(f"{v:+.3f}" for v in g))
-        print(f"  G(x) Qwen beside Flash-Lite p={p:.1f} N={n}: min {g.min():+.3f} "
-              f"max {g.max():+.3f}" + tail)
+    for p in COMP_RISKS:
+        q_pay = drawn["composition"][(p, COMP_PAIR[0])]
+        f_pay = drawn["composition"][(p, COMP_PAIR[1])]
+        print(f"  payoff curves Qwen/Flash-Lite p={p:.1f}: "
+              f"Qwen {np.round(q_pay, 2).tolist()} | Flash-Lite {np.round(f_pay, 2).tolist()}")
     pdf = cs.save(fig, cd.FIGURES / "fig_selection", title="fig_selection")
     print(f"wrote {pdf.relative_to(cd.REPO)} (+ .png)")
     fig = invasion_figure(P, point, REACH)

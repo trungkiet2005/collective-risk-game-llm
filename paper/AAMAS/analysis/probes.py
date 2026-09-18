@@ -301,7 +301,10 @@ def figure(vc: pd.DataFrame, g: pd.DataFrame, S: pd.DataFrame) -> None:
         for m in cs.MODEL_ORDER:
             d = K[K["model"] == m].sort_values("p")
             y = d[col].to_numpy()
-            cs.plot_model(ax, d["p"].to_numpy() + dodge[m], y, m, lw=0.9,
+            # These are three discrete risk conditions, not a continuous sweep.
+            # Keep the markers and intervals, but do not imply unmeasured values
+            # between them with connecting lines.
+            cs.plot_model(ax, d["p"].to_numpy() + dodge[m], y, m, lw=0.0,
                           yerr=(y - d[lo_c].to_numpy(), d[hi_c].to_numpy() - y))
         ax.set_xlim(0.0, 1.0)
         ax.set_ylim(*ylim)
