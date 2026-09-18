@@ -4,7 +4,8 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - 'paper/AAMAS/**'
-      - 'crsd/tests/test_publication_figures.py'
+      - 'crsd/tests/**'
+      - 'plan/scripts/audit_e8*'
       - '.github/workflows/publication-figures.yml'
 permissions:
   contents: read
@@ -13,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'submission/publication-figures-20260918'
+    if: github.event.pull_request.head.repo.full_name == github.repository && (github.head_ref == 'submission/publication-figures-20260918' || github.head_ref == 'submission/e8-acceptance-20260918')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
