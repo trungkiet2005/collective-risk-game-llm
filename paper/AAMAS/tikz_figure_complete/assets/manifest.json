@@ -1,0 +1,389 @@
+{
+  "source_image_size_px": [
+    1672,
+    941
+  ],
+  "method": "pixel extraction; fitted-background alpha matting; no generated image content",
+  "assets": [
+    {
+      "file": "group_game.png",
+      "kind": "group",
+      "description": "Main game: six robots, table, and coins",
+      "source_crop_xyxy": [
+        48,
+        166,
+        487,
+        600
+      ],
+      "foreground_source_bounds_xyxy": [
+        54,
+        173,
+        479,
+        596
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 433,
+      "height_px": 431
+    },
+    {
+      "file": "group_self_play.png",
+      "kind": "group",
+      "description": "Self-play: six blue robots and table",
+      "source_crop_xyxy": [
+        904,
+        371,
+        1186,
+        588
+      ],
+      "foreground_source_bounds_xyxy": [
+        912,
+        374,
+        1182,
+        586
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 278,
+      "height_px": 220
+    },
+    {
+      "file": "group_prompt_tests.png",
+      "kind": "group",
+      "description": "Prompt tests: six multicolour robots and table",
+      "source_crop_xyxy": [
+        1307,
+        372,
+        1590,
+        590
+      ],
+      "foreground_source_bounds_xyxy": [
+        1314,
+        373,
+        1582,
+        589
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 276,
+      "height_px": 224
+    },
+    {
+      "file": "group_scripted_partners.png",
+      "kind": "group",
+      "description": "Scripted partners: one blue robot, five grey robots, and table; no Fixed labels",
+      "source_crop_xyxy": [
+        917,
+        666,
+        1170,
+        870
+      ],
+      "foreground_source_bounds_xyxy": [
+        928,
+        669,
+        1161,
+        870
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 241,
+      "height_px": 209
+    },
+    {
+      "file": "group_mixed_tables.png",
+      "kind": "group",
+      "description": "Mixed tables: original six-robot composition and table",
+      "source_crop_xyxy": [
+        1305,
+        673,
+        1593,
+        897
+      ],
+      "foreground_source_bounds_xyxy": [
+        1305,
+        673,
+        1587,
+        893
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 290,
+      "height_px": 228
+    },
+    {
+      "file": "logo_claude.png",
+      "kind": "logo",
+      "description": "Claude symbol only",
+      "source_crop_xyxy": [
+        907,
+        158,
+        973,
+        219
+      ],
+      "foreground_source_bounds_xyxy": [
+        912,
+        163,
+        968,
+        218
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 64,
+      "height_px": 63
+    },
+    {
+      "file": "logo_gpt.png",
+      "kind": "logo",
+      "description": "GPT symbol only",
+      "source_crop_xyxy": [
+        1057,
+        157,
+        1126,
+        220
+      ],
+      "foreground_source_bounds_xyxy": [
+        1061,
+        162,
+        1117,
+        219
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 64,
+      "height_px": 65
+    },
+    {
+      "file": "logo_gemini.png",
+      "kind": "logo",
+      "description": "Gemini symbol only",
+      "source_crop_xyxy": [
+        1211,
+        157,
+        1277,
+        222
+      ],
+      "foreground_source_bounds_xyxy": [
+        1217,
+        162,
+        1270,
+        220
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 61,
+      "height_px": 66
+    },
+    {
+      "file": "logo_qwen.png",
+      "kind": "logo",
+      "description": "Qwen symbol only",
+      "source_crop_xyxy": [
+        1374,
+        158,
+        1446,
+        231
+      ],
+      "foreground_source_bounds_xyxy": [
+        1376,
+        165,
+        1437,
+        229
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 69,
+      "height_px": 72
+    },
+    {
+      "file": "logo_grok.png",
+      "kind": "logo",
+      "description": "Grok symbol only",
+      "source_crop_xyxy": [
+        1528,
+        162,
+        1584,
+        222
+      ],
+      "foreground_source_bounds_xyxy": [
+        1531,
+        170,
+        1578,
+        221
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 55,
+      "height_px": 59
+    },
+    {
+      "file": "icon_players.png",
+      "kind": "open",
+      "description": "Players / people icon",
+      "source_crop_xyxy": [
+        538,
+        123,
+        626,
+        187
+      ],
+      "foreground_source_bounds_xyxy": [
+        541,
+        126,
+        622,
+        183
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 89,
+      "height_px": 65
+    },
+    {
+      "file": "icon_rounds.png",
+      "kind": "icon",
+      "description": "Calendar / rounds icon",
+      "source_crop_xyxy": [
+        542,
+        197,
+        620,
+        271
+      ],
+      "foreground_source_bounds_xyxy": [
+        549,
+        201,
+        615,
+        270
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 74,
+      "height_px": 77
+    },
+    {
+      "file": "icon_endowment.png",
+      "kind": "icon",
+      "description": "Coin stack / endowment icon",
+      "source_crop_xyxy": [
+        545,
+        283,
+        619,
+        355
+      ],
+      "foreground_source_bounds_xyxy": [
+        550,
+        286,
+        614,
+        352
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 72,
+      "height_px": 74
+    },
+    {
+      "file": "icon_contribution.png",
+      "kind": "icon",
+      "description": "Lightning coin / contribution icon",
+      "source_crop_xyxy": [
+        542,
+        362,
+        619,
+        442
+      ],
+      "foreground_source_bounds_xyxy": [
+        545,
+        365,
+        617,
+        437
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 80,
+      "height_px": 80
+    },
+    {
+      "file": "icon_target.png",
+      "kind": "icon",
+      "description": "Target and arrow icon",
+      "source_crop_xyxy": [
+        538,
+        449,
+        620,
+        525
+      ],
+      "foreground_source_bounds_xyxy": [
+        542,
+        451,
+        612,
+        521
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 78,
+      "height_px": 78
+    },
+    {
+      "file": "icon_risk.png",
+      "kind": "icon",
+      "description": "Blue risk die",
+      "source_crop_xyxy": [
+        539,
+        535,
+        619,
+        619
+      ],
+      "foreground_source_bounds_xyxy": [
+        545,
+        538,
+        611,
+        615
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 74,
+      "height_px": 85
+    },
+    {
+      "file": "icon_success.png",
+      "kind": "icon",
+      "description": "Green success check",
+      "source_crop_xyxy": [
+        115,
+        715,
+        192,
+        791
+      ],
+      "foreground_source_bounds_xyxy": [
+        120,
+        720,
+        188,
+        787
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 76,
+      "height_px": 75
+    },
+    {
+      "file": "icon_catastrophe.png",
+      "kind": "icon",
+      "description": "Red catastrophe / lightning icon",
+      "source_crop_xyxy": [
+        370,
+        715,
+        450,
+        793
+      ],
+      "foreground_source_bounds_xyxy": [
+        375,
+        720,
+        443,
+        788
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 76,
+      "height_px": 76
+    },
+    {
+      "file": "icon_no_catastrophe.png",
+      "kind": "icon",
+      "description": "Brown no-catastrophe die",
+      "source_crop_xyxy": [
+        638,
+        712,
+        710,
+        790
+      ],
+      "foreground_source_bounds_xyxy": [
+        640,
+        717,
+        706,
+        789
+      ],
+      "transparent_padding_px": 4,
+      "width_px": 74,
+      "height_px": 80
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "pdf_pages": 1,
+  "page_size_mm": [
+    187.999,
+    105.999
+  ],
+  "text_spans": 62,
+  "selectable_fixed_labels": 5,
+  "missing_expected_labels": [],
+  "out_of_page_text": [],
+  "text_text_bbox_intersections": [],
+  "text_opaque_image_intersections": [],
+  "transparent_png_assets": 19,
+  "embedded_raster_images": 19,
+  "font_resources_with_Unicode_maps": 5,
+  "effective_native_icon_dpi_at_output_size": [
+    226.8,
+    281.4
+  ],
+  "notes": [
+    "Text extraction and font-map checks are performed on actual text objects, without OCR.",
+    "Image intersections use the embedded alpha masks, not just rectangular image boxes.",
+    "Full layouts and extracted-asset edges also received visual inspection.",
+    "Icons remain raster extracts; vector paths, backgrounds, and labels are supplied by TikZ."
+  ]
+}

@@ -1,0 +1,208 @@
+% Reconstructed from the supplied figure; original raster icons are in assets/.
+% Compile with pdfLaTeX: pdflatex -interaction=nonstopmode -halt-on-error figure.tex
+% All headings, labels, numbers, and mathematical symbols are real PDF text.
+% Canvas: 188 x 106 mm. Coordinates below are millimetres, y increases downward.
+\documentclass[tikz,border=0pt]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\pdfmapfile{+SourceSansThree.map}% MiKTeX has not registered this map globally
+\usepackage{sourcesanspro}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\input{glyphtounicode}
+\pdfgentounicode=1
+\pdfcompresslevel=9
+\pdfobjcompresslevel=2
+\pdfinfo{/Title (Collective-risk game and four experimental designs)
+         /Subject (TikZ reconstruction with selectable text and extracted transparent icons)
+         /Creator (pdfLaTeX and TikZ)}
+
+% Flat, print-friendly colours. Edit these definitions to restyle the figure.
+\definecolor{Ink}{HTML}{102033}
+\definecolor{Muted}{HTML}{415166}
+\definecolor{Blue}{HTML}{0867B3}
+\definecolor{Green}{HTML}{008B64}
+\definecolor{BlueLine}{HTML}{38AFE0}
+\definecolor{GreenLine}{HTML}{24B887}
+\definecolor{PanelWash}{HTML}{F3FAFE}
+\definecolor{ModelWash}{HTML}{F5FAFD}
+\definecolor{ClaudeWash}{HTML}{FFF0DF}
+\definecolor{GPTWash}{HTML}{E5F8ED}
+\definecolor{GeminiWash}{HTML}{E6F4FE}
+\definecolor{QwenWash}{HTML}{F0E8FB}
+\definecolor{GrokWash}{HTML}{FFF7DB}
+\definecolor{ClaudeLine}{HTML}{E5AE75}
+\definecolor{GPTLine}{HTML}{70CA99}
+\definecolor{GeminiLine}{HTML}{79BFEA}
+\definecolor{QwenLine}{HTML}{BC94E4}
+\definecolor{GrokLine}{HTML}{DDC065}
+\definecolor{SelfWash}{HTML}{E7F5FD}
+\definecolor{PromptWash}{HTML}{FFF0E1}
+\definecolor{ScriptWash}{HTML}{F0E7FB}
+\definecolor{MixedWash}{HTML}{FFF7DE}
+\definecolor{Orange}{HTML}{C5510A}
+\definecolor{Purple}{HTML}{7832B1}
+\definecolor{Gold}{HTML}{B07808}
+\definecolor{SuccessWash}{HTML}{DCF8E8}
+\definecolor{FailureWash}{HTML}{FFE6E4}
+\definecolor{SurvivalWash}{HTML}{FFF5D7}
+\definecolor{SuccessLine}{HTML}{58C588}
+\definecolor{FailureLine}{HTML}{EA9691}
+\definecolor{SurvivalLine}{HTML}{E2C56B}
+\definecolor{FixedFill}{HTML}{65706F}
+
+\newcommand{\fsize}[1]{\fontsize{#1}{\dimexpr #1pt*6/5\relax}\selectfont}
+\newcommand{\card}[6]{%
+  \path[rounded corners=1.25mm,fill=#5,draw=#6,line width=.36pt]
+    (#1,#2) rectangle (#3,#4);}
+% #1 filename stem, #2 x centre, #3 y centre, #4 max width, #5 max height.
+\newcommand{\asset}[5]{%
+  \node[inner sep=0pt,outer sep=0pt] at (#2,#3)
+    {\includegraphics[width=#4mm,height=#5mm,keepaspectratio]{assets/#1.png}};}
+% A small typographic badge; no raster text is used for these five labels.
+\newcommand{\fixedbadge}[2]{%
+  \node[rounded corners=.65mm,fill=FixedFill,text=white,inner xsep=.65mm,
+        inner ysep=.42mm,outer sep=0pt,font=\fsize{5.8}]
+        at (#1,#2) {Fixed};}
+% Header block for an experimental-design card.
+\newcommand{\designhead}[7]{%
+  \path[fill=#4] (#1,#2) circle[radius=4.2mm];
+  \node[text=white,font=\fsize{16}\bfseries,inner sep=0pt] at (#1,#2) {#3};
+  \node[text=Ink,font=\fsize{8.5}\bfseries,inner sep=0pt,align=center]
+    at (#5,{#2-1.50}) {#6};
+  \node[text=Muted,font=\fsize{7.4},inner sep=0pt,align=center]
+    at (#5,{#2+1.80}) {#7};}
+
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=-1mm,text=Ink,
+                    every node/.style={outer sep=0pt}]
+  \path[use as bounding box] (0,0) rectangle (188,106);
+
+  % -------------------- (a) THE GAME --------------------
+  \path[rounded corners=1.8mm,fill=white] (1,1) rectangle (92,105);
+  \begin{scope}
+    \clip[rounded corners=1.8mm] (1,1) rectangle (92,105);
+    \fill[Blue] (1,1) rectangle (92,10.1);
+  \end{scope}
+  \path[rounded corners=1.8mm,draw=BlueLine,line width=.55pt]
+    (1,1) rectangle (92,105);
+  \node[anchor=west,text=white,font=\fsize{15.8}\bfseries,inner sep=0pt]
+    at (3.5,5.55) {(a)\quad The game};
+
+  \card{3}{12}{55.5}{72}{PanelWash}{GeminiLine}
+  \card{57.5}{12}{90}{72}{white}{GeminiLine}
+  \asset{group_game}{29.25}{41.7}{48.5}{51}
+
+  % Six rule icons and their selectable labels.
+  \asset{icon_players}{62.8}{18.5}{8.6}{8.2}
+  \asset{icon_rounds}{62.8}{28.0}{7.7}{8.2}
+  \asset{icon_endowment}{62.8}{37.5}{7.7}{8.2}
+  \asset{icon_contribution}{62.8}{47.0}{7.7}{8.2}
+  \asset{icon_target}{62.8}{56.5}{7.7}{8.2}
+  \asset{icon_risk}{62.8}{66.0}{7.7}{8.4}
+  \foreach \y/\label in {18.5/{6 players},28.0/{10 rounds},37.5/{40 each},
+                          47.0/{pay 0 / 2 / 4},56.5/{target 120}} {
+    \node[anchor=west,inner sep=0pt,font=\fsize{8.4}]
+      at (68.2,\y) {\label};
+  }
+  \node[anchor=west,inner sep=0pt,font=\fsize{7.4}]
+    at (68.2,64.8) {miss $\to$ lose all};
+  \node[anchor=west,inner sep=0pt,text=Muted,font=\fsize{6.8}]
+    at (68.2,68.0) {(probability $p$)};
+
+  % Outcomes: corrected parent heading. The original put 'Target reached'
+  % under 'if total < 120'. Here 'miss' has its own explicit condition.
+  \card{3}{74}{90}{103}{PanelWash}{GeminiLine}
+  \node[anchor=west,font=\fsize{9.2}\bfseries,inner sep=0pt]
+    at (4.4,77.3) {Outcomes};
+  \node[anchor=east,font=\fsize{6.8},text=Muted,inner sep=0pt]
+    at (88.7,77.3) {Miss: total $<120$};
+
+  \card{4}{80}{31.667}{101.5}{SuccessWash}{SuccessLine}
+  \card{32.667}{80}{60.333}{101.5}{FailureWash}{FailureLine}
+  \card{61.333}{80}{89}{101.5}{SurvivalWash}{SurvivalLine}
+  \asset{icon_success}{17.8335}{85.0}{7.7}{7.7}
+  \asset{icon_catastrophe}{46.5}{85.0}{7.7}{7.7}
+  \asset{icon_no_catastrophe}{75.1665}{85.0}{7.7}{7.7}
+
+  \node[font=\fsize{7.4}\bfseries,inner sep=0pt] at (17.8335,91.1) {Target reached};
+  \node[font=\fsize{7.0}\bfseries,inner sep=0pt] at (46.5,91.1) {Miss + catastrophe};
+  \node[font=\fsize{7.0}\bfseries,inner sep=0pt] at (75.1665,91.1) {Miss + no catastrophe};
+  \node[font=\fsize{6.8},text=Muted,inner sep=0pt] at (17.8335,94.6) {total $\geq120$};
+  \node[font=\fsize{6.8},text=Muted,inner sep=0pt] at (46.5,94.6) {probability $p$};
+  \node[font=\fsize{6.8},text=Muted,inner sep=0pt] at (75.1665,94.6) {probability $1-p$};
+  \node[font=\fsize{7.4},inner sep=0pt] at (17.8335,98.3) {keep remainder};
+  \node[font=\fsize{7.4},inner sep=0pt] at (46.5,98.3) {lose all};
+  \node[font=\fsize{7.4},inner sep=0pt] at (75.1665,98.3) {keep money};
+
+  % -------------------- (b) FOUR DESIGNS --------------------
+  \path[rounded corners=1.8mm,fill=white] (94,1) rectangle (187,105);
+  \begin{scope}
+    \clip[rounded corners=1.8mm] (94,1) rectangle (187,105);
+    \fill[Green] (94,1) rectangle (187,10.1);
+  \end{scope}
+  \path[rounded corners=1.8mm,draw=GreenLine,line width=.55pt]
+    (94,1) rectangle (187,105);
+  \node[anchor=west,text=white,font=\fsize{15.8}\bfseries,inner sep=0pt]
+    at (96.5,5.55) {(b)\quad Four designs};
+
+  % Model names are transcribed from the supplied image, not independently
+  % verified release names. Logos are extracted symbols without raster labels.
+  \card{96}{12}{185}{33}{ModelWash}{GeminiLine}
+  \node[anchor=west,font=\fsize{9.0}\bfseries,inner sep=0pt]
+    at (97.4,14.55) {Models we study};
+  \card{97.4}{17.4}{113.7}{31.8}{ClaudeWash}{ClaudeLine}
+  \card{115.0}{17.4}{131.3}{31.8}{GPTWash}{GPTLine}
+  \card{132.6}{17.4}{148.9}{31.8}{GeminiWash}{GeminiLine}
+  \card{150.2}{17.4}{166.5}{31.8}{QwenWash}{QwenLine}
+  \card{167.8}{17.4}{184.1}{31.8}{GrokWash}{GrokLine}
+  \asset{logo_claude}{105.55}{21.05}{6.6}{6.5}
+  \asset{logo_gpt}{123.15}{21.05}{6.6}{6.5}
+  \asset{logo_gemini}{140.75}{21.05}{6.6}{6.5}
+  \asset{logo_qwen}{158.35}{21.05}{6.6}{6.5}
+  \asset{logo_grok}{175.95}{21.05}{6.6}{6.5}
+  \node[font=\fsize{7.3}\bfseries,inner sep=0pt] at (105.55,26.15) {Claude};
+  \node[font=\fsize{7.3}\bfseries,inner sep=0pt] at (105.55,29.1) {Haiku 4.5};
+  \node[font=\fsize{7.3}\bfseries,inner sep=0pt] at (123.15,26.15) {GPT-5.6};
+  \node[font=\fsize{7.3}\bfseries,inner sep=0pt] at (123.15,29.1) {Luna};
+  \node[font=\fsize{7.1}\bfseries,inner sep=0pt] at (140.75,26.15) {Gemini 3.5};
+  \node[font=\fsize{7.1}\bfseries,inner sep=0pt] at (140.75,29.1) {Flash-Lite};
+  \node[font=\fsize{7.0}\bfseries,inner sep=0pt] at (158.35,27.65) {Qwen3-235B};
+  \node[font=\fsize{7.3}\bfseries,inner sep=0pt] at (175.95,27.65) {Grok 4.20};
+
+  % Design cards use consistent geometry, title baselines, and artwork height.
+  \card{96}{35}{139.5}{68}{SelfWash}{GeminiLine}
+  \card{141.5}{35}{185}{68}{PromptWash}{ClaudeLine}
+  \card{96}{70}{139.5}{103}{ScriptWash}{QwenLine}
+  \card{141.5}{70}{185}{103}{MixedWash}{GrokLine}
+
+  \designhead{101.4}{40.4}{1}{Blue}{121.6}{Self-play}{same model $\times 6$}
+  \designhead{146.9}{40.4}{2}{Orange}{167.1}{Prompt tests}{prompt variants}
+  \designhead{101.4}{75.4}{3}{Purple}{121.6}{Scripted partners}{fixed partners}
+  \designhead{146.9}{75.4}{4}{Gold}{167.1}{Mixed tables}{two models}
+  % The group PNGs are square with transparent padding, so width = height.
+  % All four use the same side (25.3 mm) so the six robots are the same size
+  % in every card; centres are offset so the robots themselves span y = 44.0
+  % to 64.6 (top row) and 79.0 to 99.6 (bottom row), i.e. the same distance
+  % below each card's top edge. The scripted card keeps 3 mm under its robots
+  % for the fifth Fixed label.
+  \asset{group_self_play}{117.77}{54.67}{25.3}{25.3}
+  \asset{group_prompt_tests}{163.25}{54.67}{25.3}{25.3}
+  \asset{group_scripted_partners}{117.76}{89.69}{25.3}{25.3}
+  \asset{group_mixed_tables}{163.25}{89.67}{25.3}{25.3}
+
+  % Five Fixed labels are vector text, separated from the extracted artwork.
+  % Four sit beside the upper and lower side robots, level with their faces;
+  % the fifth is centred under the bottom robot, so the set is left-right
+  % symmetric about the card's centre line (x = 117.75).
+  \fixedbadge{102.4}{85.6}
+  \fixedbadge{133.1}{85.6}
+  \fixedbadge{102.4}{92.7}
+  \fixedbadge{133.1}{92.7}
+  \fixedbadge{117.75}{101.1}
+\end{tikzpicture}
+\end{document}

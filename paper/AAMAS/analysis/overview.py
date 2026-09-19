@@ -5,7 +5,8 @@ Run from the repository root, AFTER selfplay.py (it reads the game counts that s
 
 Writes (and nothing else):
     paper/AAMAS/figures/fig_overview.pdf (+ .png preview)
-Placed in main.tex (Introduction, fig:overview) as a figure* at text width.
+No longer placed in main.tex: since 19-09-2026 fig:overview is the TikZ figure
+paper/AAMAS/tikz_figure_complete/figure_biolinum.pdf (game and designs only).
 
 Every count on the figure is read from tables/num_selfplay.tex, the same macros the prose
 prints, and the four design counts must add up to \\CntGames or the figure is not drawn.
