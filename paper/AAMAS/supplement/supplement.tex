@@ -39,7 +39,6 @@
 \setlength{\cftsubsecnumwidth}{3.4em}   % room for "S10.6"
 \usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
-\externaldocument[main-]{../main}
 
 \setlist[itemize]{label=\textnormal{$\bullet$},leftmargin=*,itemsep=1pt,topsep=2pt}
 
@@ -69,6 +68,8 @@
 \input{tables/snum_scripted.tex}
 \input{../tables/num_strategy.tex}
 \InputIfFileExists{tables/snum_probes.tex}{}{}
+%% Import the paper's labels only after the number macros exist: main.aux stores captions that contain them (e.g. \GridOptMean in Table 3), and importing them earlier stops the build with an undefined control sequence.
+\externaldocument[main-]{../main}
 \InputIfFileExists{tables/snum_groups.tex}{}{}
 
 %% A two-column "claim | value" table for the numbers behind a main-text section.
@@ -102,16 +103,16 @@ Table~\ref{tab:guide} maps each part of the paper to the sections here. Every re
 \toprule
 Part of the paper & In this supplement \\
 \midrule
-Section 3.1, rules and Propositions 1 and 2 & Section~\ref{sec:game}: full proofs, the ten-round game, the loss decomposition, risk aversion, best responses to scripted partners \\
-Section 3.2, models, prompts, protocol & Sections~\ref{sec:models} and~\ref{sec:prompts}: model identifiers, how replies are read, every prompt word for word \\
-Section 3.2, designs and measures & Section~\ref{sec:design}: games per design, the lottery draws, statistical methods, reproducibility \\
-Section 4, self-play across risk & Section~\ref{sec:selfplay} \\
-Section 4, prompt and decoding changes & Section~\ref{sec:controls} \\
-Section 5.1, asking the agent & Section~\ref{sec:questions}: every question word for word, and all answers \\
-Section 5.2, fixed partners & Section~\ref{sec:scripted} \\
-Section 6, mixed groups & Section~\ref{sec:mixed} \\
-Section 7, selection & Section~\ref{sec:selection}: method, payoff functions, all selection settings \\
-Sections 4 and 6, last round, equilibria, rules, responses to openings & Section~\ref{sec:strategy} \\
+Section~\ref{main-sec:rules}, rules and Propositions 1 and 2 & Section~\ref{sec:game}: full proofs, the ten-round game, the loss decomposition, risk aversion, best responses to scripted partners \\
+Section~\ref{main-sec:setup}, models, prompts, protocol & Sections~\ref{sec:models} and~\ref{sec:prompts}: model identifiers, how replies are read, every prompt word for word \\
+Section~\ref{main-sec:setup}, designs and measures & Section~\ref{sec:design}: games per design, the lottery draws, statistical methods, reproducibility \\
+Section~\ref{main-sec:grid}, self-play across risk & Section~\ref{sec:selfplay} \\
+Section~\ref{main-sec:controls}, prompt and decoding changes & Section~\ref{sec:controls} \\
+Section~\ref{main-sec:knowing}, asking the agent & Section~\ref{sec:questions}: every question word for word, and all answers \\
+Section~\ref{main-sec:scripted}, fixed partners & Section~\ref{sec:scripted} \\
+Section~\ref{main-sec:groups}, mixed tables & Section~\ref{sec:mixed} \\
+Section~\ref{main-sec:selection}, selection & Section~\ref{sec:selection}: method, payoff functions, all selection settings \\
+Sections~\ref{main-sec:grid} and~\ref{main-sec:groups}, last round, equilibria, rules, responses to openings & Section~\ref{sec:strategy} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -341,7 +342,7 @@ The prompts, configurations, seeds and code will be released with the final vers
 \section{Self-play across risk}
 \label{sec:selfplay}
 
-This section supports the first three paragraphs of Section 4 of the paper, its Table 3 and its Figure 2. All six seats hold the same model, with the base prompt, at eleven risk levels from 0 to 1 and ten games per level, so each model plays 110 games and fills 660 seats.
+This section supports Section~\ref{main-sec:grid} of the paper, its Table 3 and its Figure 2. All six seats hold the same model, with the base prompt, at eleven risk levels from 0 to 1 and ten games per level, so each model plays 110 games and fills 660 seats.
 
 \subsection{Numbers behind the main text}
 
@@ -429,7 +430,7 @@ Table~\ref{tab:endgame} describes the last rounds, which is where the models dif
 \section{Prompt and decoding controls}
 \label{sec:controls}
 
-This section supports the last two paragraphs of Section 4 of the paper and its Table 4. Section~\ref{sec:prompts} gives every prompt. All conditions are self-play; the rerun repeats the base prompt, with in-game questions asked in separate calls that never enter the game.
+This section supports Section~\ref{main-sec:controls} of the paper and its Table 4. Section~\ref{sec:prompts} gives every prompt. All conditions are self-play; the rerun repeats the base prompt, with in-game questions asked in separate calls that never enter the game.
 
 \subsection{Numbers behind the main text}
 
@@ -504,7 +505,7 @@ The no-hint prompt was played at $p=0.1$, $0.5$ and $0.9$, the same levels as th
 \section{In-game questions}
 \label{sec:questions}
 
-This section supports Section 5.1 of the paper. In the rerun games, seat 1 was asked ten questions in rounds 1, 5 and 10, about the state it had just decided on. Each question is a separate call that sees the decision prompt of that round with its final instruction replaced by the question, and its answer never enters the game. The answer is read from a final \texttt{ANSWER:} line; an unreadable answer would count as wrong. Each model answers 90 questions of each kind: 30 games, three rounds each.
+This section supports Section~\ref{main-sec:knowing} of the paper. In the rerun games, seat 1 was asked ten questions in rounds 1, 5 and 10, about the state it had just decided on. Each question is a separate call that sees the decision prompt of that round with its final instruction replaced by the question, and its answer never enters the game. The answer is read from a final \texttt{ANSWER:} line; an unreadable answer would count as wrong. Each model answers 90 questions of each kind: 30 games, three rounds each.
 
 \subsection{Numbers behind the main text}
 
@@ -541,7 +542,7 @@ Every rule question was answered correctly by every model in every round (Table~
 Table~\ref{tab:probe-value} counts every answer to the value comparison. Claude Haiku 4.5 is always correct and Gemini 3.5 Flash-Lite is almost always correct; both always answer ``equal'' at $p=0.5$. GPT-5.6 Luna is correct most of the time. Qwen3-235B answers that paying nothing is better in all 90 answers, so it is correct only at $p=0.1$. Grok 4.20 leans the same way.
 
 \begin{table}[h]
-\caption{The value comparison of Section 5.1 of the paper: number of answers of each kind, of 30 per model and risk level, and share correct. A: pay 2 in every round and reach the target; B: pay nothing and miss it.}
+\caption{The value comparison of Section~\ref{main-sec:knowing} of the paper: number of answers of each kind, of 30 per model and risk level, and share correct. A: pay 2 in every round and reach the target; B: pay nothing and miss it.}
 \label{tab:probe-value}
 \centering\small
 \input{tables/s_probe_value.tex}
@@ -565,7 +566,7 @@ Figure~\ref{fig:answers} and Table~\ref{tab:probe-rounds} split the same answers
 
 \subsection{Answers against play}
 
-Table~\ref{tab:knowdo} gives the numbers behind Figure 3 of the paper: for each model and risk level, the share of value answers saying that paying nothing is better and the total that the questioned seat pays in the same games, each with an interval. The \emph{Shift} rows are the changes from $p=0.1$ to $p=0.9$ that the figure plots. For the three models that answer well, the answer moves by close to its full range while the payment does not move.
+Table~\ref{tab:knowdo} gives the numbers behind Figure 3 of the paper: for each model and risk level, the share of value answers saying that paying nothing is better and the total that the questioned seat pays in the same games, each with an interval. The figure plots the $p=0.1$ and $p=0.9$ rows with these intervals and joins them by an arrow; the \emph{Shift} rows give that change, with intervals that resample the answer and the payment from the same game. For the three models that answer well, the answer moves by close to its full range while the payment does not move.
 
 \begin{table}[h]
 \caption{Answers and play of the questioned seat (ten games per risk level). \emph{Shift}: drop in the share saying B from $p=0.1$ to $p=0.9$, and change in the units paid, with intervals that resample the games at the two risk levels independently.}
@@ -589,7 +590,7 @@ The second value question asks how much cash a player ends with, on average, if 
 \section{One model beside scripted partners}
 \label{sec:scripted}
 
-This section supports Section 5.2 of the paper, including its Table 5; Figure~\ref{fig:scr-heat} shows the same games round by round. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
+This section supports Section~\ref{main-sec:scripted} of the paper, including its Table 5; Figure~\ref{fig:scr-heat} shows the same games round by round. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
 
 \subsection{Numbers behind the main text}
 
@@ -710,7 +711,7 @@ Table~\ref{tab:scr-fair} shows the most common sequence of moves beside the two 
 \section{Two models at one table}
 \label{sec:mixed}
 
-This section supports Section 6 of the paper and its Figures~\ref{main-fig:advantage} and~\ref{main-fig:mixed}. Every pair of models shares a table, with one to five seats for the first-named model, at $p=0.1$, $0.5$ and $0.9$, with ten games per cell: 150 games per pair and \MixGames{} in all. ``Alone'' means self-play of the same model at the same three risk levels, pooling the base grid and the rerun, which use the same prompt (20 games per model and risk level).
+This section supports Section~\ref{main-sec:groups} of the paper and its Figures~\ref{main-fig:advantage} and~\ref{main-fig:mixed}. Every pair of models shares a table, with one to five seats for the first-named model, at $p=0.1$, $0.5$ and $0.9$, with ten games per cell: 150 games per pair and \MixGames{} in all. ``Alone'' means self-play of the same model at the same three risk levels, pooling the base grid and the rerun, which use the same prompt (20 games per model and risk level).
 
 \subsection{Numbers behind the main text}
 
@@ -800,7 +801,7 @@ Table~\ref{tab:mix-timing} asks when the payment falls short beside Grok 4.20. T
 \section{Selection among models}
 \label{sec:selection}
 
-This section supports Section 7 of the paper and its Figure~\ref{main-fig:selection}. It gives the method in full, the payoffs that feed it, and every selection setting we computed.
+This section supports Section~\ref{main-sec:selection} of the paper and its Figure~\ref{main-fig:selection}. It gives the method in full, the payoffs that feed it, and every selection setting we computed.
 
 \subsection{Method}
 
@@ -832,18 +833,18 @@ Where $G>0$ selection pushes the share of $A$ up, and where $G<0$ it pushes it d
 
 \begin{center}
 \begin{claims}
-Within a table ($N=6$, $\beta=1$): Qwen3-235B's mass at $p=0.1$; $0.5$; $0.9$ & \SelWithinQwenMassLow{}; \SelWithinQwenMassMid{}; \SelWithinQwenMassHigh{} \\
-Within a table: population target rate at $p=0.5$; $0.9$ (\%) & \SelWithinReachMid{}; \SelWithinReachHigh{} \\
+One table ($N=6$, $\beta=1$): Qwen3-235B's mass at $p=0.1$; $0.5$; $0.9$ & \SelWithinQwenMassLow{}; \SelWithinQwenMassMid{}; \SelWithinQwenMassHigh{} \\
+One table: population target rate at $p=0.5$; $0.9$ (\%) & \SelWithinReachMid{}; \SelWithinReachHigh{} \\
 \quad a model picked at random (\%) & \SelUniformReachMid{}; \SelUniformReachHigh{} \\
 \quad stronger selection, $\beta=\SelBetaExtra$ (\%) & \SelStrongWithinReachMid{}; \SelStrongWithinReachHigh{} \\
-Across tables ($N=30$, $\beta=1$): Gemini 3.5 Flash-Lite's mass at $p=0.5$; $0.9$ & \SelAcrossFlashMassMid{}; \SelAcrossFlashMassHigh{} \\
-Across tables at $p=0.9$: population target rate (\%); payoff per seat & \SelAcrossReachHigh{}; \SelAcrossPayHigh{} \\
-Across tables at $p=0.1$: model with the largest mass & \SelAcrossWinnerLow{} \\
+Larger population ($N=30$, $\beta=1$): Gemini 3.5 Flash-Lite's mass at $p=0.5$; $0.9$ & \SelAcrossFlashMassMid{}; \SelAcrossFlashMassHigh{} \\
+Larger population at $p=0.9$: population target rate (\%); payoff per seat & \SelAcrossReachHigh{}; \SelAcrossPayHigh{} \\
+Larger population at $p=0.1$: model with the largest mass & \SelAcrossWinnerLow{} \\
 Winners unchanged for $\beta=\SelBetaExtra$, for $N$ of \SelNExtra{}, and with grid-only self-play & yes \\
 Smallest share of bootstrap replicates in which the winner stays on top (\%): pooled self-play; grid only & \SelBootMinPct{}; \SupSelBaseBootMinPct{} \\
-Weak selection ($\beta=\SelWeakBeta$), within a table: largest mass of any model & \SelWeakWithinMaxMass{} \\
-Weak selection, across tables: model with the largest mass at $p=0.5$; $0.9$ & \SelWeakAcrossTopMid{}; \SelWeakAcrossTopHigh{} \\
-Across tables: smallest population from which Gemini 3.5 Flash-Lite stays the winner at $p=0.9$; at $p=0.5$ & \SelSwitchN{}; \SupSelSwitchNMid{} \\
+Weak selection ($\beta=\SelWeakBeta$), one table ($N=6$): largest mass of any model & \SelWeakWithinMaxMass{} \\
+Weak selection, larger population ($N=30$): model with the largest mass at $p=0.5$; $0.9$ & \SelWeakAcrossTopMid{}; \SelWeakAcrossTopHigh{} \\
+Larger population: smallest population from which Gemini 3.5 Flash-Lite stays the winner at $p=0.9$; at $p=0.5$ & \SelSwitchN{}; \SupSelSwitchNMid{} \\
 Cells (pair, split, risk) in which a single seat beside five Grok 4.20 seats earns more than they do & \SelGrokLosesCells{} of 12 \\
 Cells with Qwen3-235B seats; Qwen3-235B significantly below its tablemates; significantly above & \SelQwenCells{}; \SelQwenBelowCells{}; \SelQwenAboveCells{} \\
 \end{claims}
@@ -876,7 +877,7 @@ Tables~\ref{tab:sel-payoff-01} to~\ref{tab:sel-payoff-09} give $\pi_X(k)$ for ev
 
 \subsection{Every selection setting}
 
-Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for both kinds of comparison, three selection intensities and three population sizes. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. Within a table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to almost zero. Across tables, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both comparisons as soon as selection is more than very weak.
+Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for both population sizes, three selection intensities and three population sizes. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. In a population of one table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to almost zero. In the larger population, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both population sizes as soon as selection is more than very weak.
 
 \begin{table}[h]
 \caption{Stationary mass of each model under each selection setting, with the population's self-play target rate and expected payoff per seat. \emph{Random model}: every model equally weighted.}
@@ -888,20 +889,20 @@ Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the popula
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{figures/sfig_mass_beta.pdf}
-\caption{Stationary mass of the five models as the selection intensity $\beta$ grows from 0.01 to 100. Top: comparison within a table ($N=6$). Bottom: comparison across tables ($N=30$). The dashed line marks $\beta=1$, the setting of Figure~\ref{main-fig:selection} of the paper.}
+\caption{Stationary mass of the five models as the selection intensity $\beta$ grows from 0.01 to 100. Top: a population of one table ($N=6$). Bottom: a larger population ($N=30$). The dashed line marks $\beta=1$, the setting of Figure~\ref{main-fig:selection} of the paper.}
 \label{fig:mass-beta}
 \end{figure}
 
 Table~\ref{tab:sel-boot} gives the bootstrap check for the two settings of the paper, with self-play from the grid and the rerun together and from the grid alone. The winners are the same in both cases and stay on top in the large majority of replicates. Some intervals for the target rate are wide, because a population's target rate depends on which model wins and the models differ sharply in self-play success.
 
 \begin{table}[h]
-\caption{Bootstrap check of the two settings of Figure~\ref{main-fig:selection} ($\beta=1$; within a table $N=6$, across tables $N=30$), over \SupSelBootReps{} replicates: the winner of the point estimate, the share of replicates in which it stays on top, and the population's target rate and payoff per seat with 95\% intervals.}
+\caption{Bootstrap check of the two settings of Figure~\ref{main-fig:selection} ($\beta=1$; one table, $N=6$; larger population, $N=30$), over \SupSelBootReps{} replicates: the winner of the point estimate, the share of replicates in which it stays on top, and the population's target rate and payoff per seat with 95\% intervals.}
 \label{tab:sel-boot}
 \centering\small
 \input{tables/s_sel_boot.tex}
 \end{table}
 
-Figure~\ref{main-fig:selection} of the paper shows the stationary masses and the table-composition payoffs for one pair. Figure~\ref{fig:invasion} gives the full invasion diagrams behind those masses, for every pair of models at the three risk levels and both kinds of comparison. Each arrow marks a takeover that selection favours.
+Figure~\ref{main-fig:selection} of the paper shows the stationary masses and the table-composition payoffs for one pair. Figure~\ref{fig:invasion} gives the full invasion diagrams behind those masses, for every pair of models at the three risk levels and both population sizes. Each arrow marks a takeover that selection favours.
 
 \begin{figure}[h]
 \centering
@@ -912,10 +913,10 @@ Figure~\ref{main-fig:selection} of the paper shows the stationary masses and the
 
 \subsection{Facts about single tables}
 
-Table~\ref{tab:sel-facts} checks, cell by cell, the two table-level facts that the selection results rest on. A single seat of any model beside five Grok 4.20 seats earns more than they do in every cell. Qwen3-235B is significantly ahead of its tablemates in most cells and significantly behind in one, which is about what chance allows among so many tests. Part (c) shows how large the population must be before comparison across tables favours Gemini 3.5 Flash-Lite: a population only slightly larger than one table is enough.
+Table~\ref{tab:sel-facts} checks, cell by cell, the two table-level facts that the selection results rest on. A single seat of any model beside five Grok 4.20 seats earns more than they do in every cell. Qwen3-235B is significantly ahead of its tablemates in most cells and significantly behind in one, which is about what chance allows among so many tests. Part (c) shows how large the population must be before selection favours Gemini 3.5 Flash-Lite: a population only slightly larger than one table is enough.
 
 \begin{table}[h]
-\caption{(a) Expected payoff of a single seat of each model beside five Grok 4.20 seats (ten games per risk level). (b) Qwen3-235B's expected payoff per seat against its tablemates in each cell of ten games, exact one-sided sign-flip tests in both directions. (c) The across-table winner as the population size $N$ grows from 6 to 120.}
+\caption{(a) Expected payoff of a single seat of each model beside five Grok 4.20 seats (ten games per risk level). (b) Qwen3-235B's expected payoff per seat against its tablemates in each cell of ten games, exact one-sided sign-flip tests in both directions. (c) The winner as the population size $N$ grows from 6 to 120.}
 \label{tab:sel-facts}
 \centering\small
 \input{tables/s_sel_facts.tex}
@@ -934,7 +935,7 @@ At $p=0.5$, reaching the target is not required for optimal welfare: zero contri
 \section{Strategies, the last round and equilibrium benchmarks}
 \label{sec:strategy}
 
-This section supports four statements in Sections 4 and 6 of the paper: how Qwen3-235B and GPT-5.6 Luna play the last round, how the models compare with the equilibria of Proposition 1, how each model's moves can be described by a simple rule, and how partners respond to Grok 4.20's opening move. All tables use the games played with the base prompt.
+This section supports four statements in Sections~\ref{main-sec:grid} and~\ref{main-sec:groups} of the paper: how Qwen3-235B and GPT-5.6 Luna play the last round, how the models compare with the equilibria of Proposition 1, how each model's moves can be described by a simple rule, and how partners respond to Grok 4.20's opening move. All tables use the games played with the base prompt.
 
 \subsection{The last round}
 

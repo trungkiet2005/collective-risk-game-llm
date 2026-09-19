@@ -1,8 +1,8 @@
 """Rebuild the publication figures and both anonymous PDFs from stored evidence.
 
 No network, model inference, dataset filtering, or statistical re-estimation.
-Idempotent source migrations keep captions and documentation consistent with
-Figure 3's percentage-point axis and the expected-payoff analysis.
+Idempotent source migrations keep the captions and documentation consistent with
+the equilibrium check and the expected-payoff analysis.
 """
 from pathlib import Path
 import subprocess
@@ -23,12 +23,8 @@ def replace_once(path, old, new):
 
 
 def migrate_sources():
-    replace_once(HERE / 'main.tex',
-        '(a)~Drop in the share of answers favouring B; dashed: a fully correct switch.',
-        '(a)~Percentage-point drop in answers favouring B; dashed: a fully correct switch.')
-    replace_once(HERE / 'main.tex',
-        'correct-answer benchmark of one; Qwen and Grok move little.',
-        'correct-answer benchmark of 100 percentage points; Qwen and Grok move little.')
+    # Figure 3's caption and description were rewritten for the arrow plot (19-09-2026);
+    # the two migrations to its former percentage-point axis no longer apply.
     replace_once(HERE / 'main.tex',
         'p = 1 is excluded on purpose: at p = 1 every profile that misses the target is a weak equilibrium.',
         'p = 1 is checked separately: a failed pool is an equilibrium only when no player can reach the target while retaining positive cash.')

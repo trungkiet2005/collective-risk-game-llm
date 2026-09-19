@@ -68,7 +68,7 @@ FOCAL = mx_mod.PANEL_B                            # Haiku, Flash-Lite, Luna, Qwe
 MASS_SPECS = [("within", 0.1, 6), ("within", 1.0, 6), ("within", 10.0, 6),
               ("across", 0.1, 30), ("across", 1.0, 30), ("across", 10.0, 30),
               ("across", 1.0, 60), ("across", 10.0, 60), ("across", 1.0, 120), ("across", 10.0, 120)]
-RULE_NAME = {"within": "Within table", "across": "Across tables"}
+RULE_NAME = {"within": "One table", "across": "Many tables"}
 SELF_SOURCE = {"pooled": "Self-play from the grid and the rerun (20 games per model and risk level)",
                "base": "Self-play from the grid only (10 games per model and risk level)"}
 BETA_GRID = np.logspace(-2, 2, 81)

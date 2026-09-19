@@ -254,78 +254,84 @@ FIGURE_HEIGHT_PT = 159.5
 FIGURE_TEXT_PT = cs.SIZE_LABEL * 72.27 / cs.POINTS_PER_INCH + 0.02
 
 
-def interval(ax, x, y, lo, hi, name, *, filled=True, horizontal=False):
-    """Draw an existing estimate and its game-level bootstrap CI, without offsets
-    to the measured value. A zero-width interval remains zero-width."""
+def interval(ax, x, y, lo, hi, name, *, filled=True):
+    """Draw an existing estimate and its game-level bootstrap CI as a translucent bar,
+    without offsets to the measured value. A zero-width interval draws no bar."""
     st = cs.model(name)
-    value = x if horizontal else y
-    err = np.array([[value - lo], [hi - value]])
-    ax.errorbar(
-        x, y, **({"xerr": err} if horizontal else {"yerr": err}),
-        fmt=st.marker, ms=4.4 * st.marker_scale,
-        mfc=st.colour if filled else cs.WHITE, mec=st.colour, mew=0.85,
-        ecolor=st.colour, elinewidth=cs.LW_DATA, capsize=2.0,
-        capthick=0.8, zorder=3,
-    )
+    if not lo - 1e-9 <= x <= hi + 1e-9:
+        raise ValueError(f"{name}: estimate {x} outside [{lo}, {hi}]")
+    if hi > lo:
+        ax.plot([lo, hi], [y, y], color=st.colour, lw=5.0, alpha=0.28,
+                solid_capstyle="round", zorder=2)
+    ax.plot([x], [y], ls="none", marker=st.marker, ms=4.6 * st.marker_scale,
+            mfc=st.colour if filled else cs.WHITE, mec=st.colour, mew=0.9, zorder=4,
+            clip_on=False)
 
 
 def figure(A, B):
     cs.use()
     fig = plt.figure(figsize=cs.figsize("col", height_pt=FIGURE_HEIGHT_PT))
     fig._crsd_width = "col"
-    ax, bx = fig.subplots(1, 2, gridspec_kw={"width_ratios": [1, 1.25], "wspace": 0.35})
+    ax, bx = fig.subplots(1, 2, gridspec_kw={"width_ratios": [1, 1.25], "wspace": 0.06})
 
-    # ---- a: two separate conditions, with intervals for both, even at 100%.
+    # ---- a: one row per model, an arrow from self-play (filled) to one Qwen seat
+    # (open); both conditions keep their own interval, even at 100%.
     rows_a = list(PANEL_A)
+    ax.set_xlim(-6, 106)
     for i, x in enumerate(rows_a):
-        r = A.loc[x]
-        interval(ax, 100 * r.alone, i - 0.17, *(100 * np.array(r.alone_ci)),
-                 x, horizontal=True)
-        interval(ax, 100 * r.q, i + 0.17, *(100 * np.array(r.q_ci)),
-                 x, horizontal=True, filled=False)
-    ax.set_xlim(-9, 109)
+        r, st = A.loc[x], cs.model(x)
+        if abs(r.q - r.alone) > 0.12:
+            ax.annotate("", xy=(100 * r.q, i), xytext=(100 * r.alone, i), zorder=3,
+                        arrowprops=dict(arrowstyle="-|>", color=st.colour, lw=1.1,
+                                        shrinkA=3.2, shrinkB=3.6, mutation_scale=7))
+        elif r.q == r.alone:
+            ax.annotate("no change", (100 * r.q, i), xytext=(-7, 0), textcoords="offset points",
+                        ha="right", va="center", fontsize=FIGURE_TEXT_PT, color=cs.MUTED,
+                        fontstyle="italic")
+        # Open first, so a filled marker stays visible when the two coincide.
+        interval(ax, 100 * r.q, i, *(100 * np.array(r.q_ci)), x, filled=False)
+        interval(ax, 100 * r.alone, i, *(100 * np.array(r.alone_ci)), x)
     ax.set_xticks([0, 50, 100])
     ax.set_xlabel("Target reached (%)", fontsize=FIGURE_TEXT_PT)
     cs.row_labels(ax, rows_a, wrap=True)
     ax.set_ylim(len(rows_a) - 0.5, -0.5)
-    ax.spines["left"].set_visible(False)
+    ax.spines[["left", "right", "top"]].set_visible(False)
     ax.tick_params(axis="y", length=0)
     ax.grid(False)
-    ax.xaxis.grid(True)
     condition_handles = [
         Line2D([], [], marker="o", ls="none", ms=4.4, mec=cs.INK,
-               mfc=cs.INK if filled else cs.WHITE, mew=0.85, label=label)
-        for filled, label in ((True, "Self-play"), (False, "+1 Qwen3-235B"))
+               mfc=cs.INK if filled else cs.WHITE, mew=0.9, label=label)
+        for filled, label in ((True, "Self-play"), (False, "+1 Qwen"))
     ]
-    ax.legend(handles=condition_handles, loc="lower center", bbox_to_anchor=(0.5, 1.01),
-              fontsize=FIGURE_TEXT_PT, handlelength=1, labelspacing=0.35)
+    fig.legend(handles=condition_handles, loc="outside lower left", ncols=2,
+               fontsize=FIGURE_TEXT_PT, handletextpad=0.2)
 
-    # ---- b: every composition has its own x position and uncertainty. Lines only
-    # join measured means; no fit, interpolation of data, or causal arrows.
+    # ---- b: every composition has its own x position; the band is its interval.
+    # Lines only join measured means; no fit, interpolation of data, or causal arrows.
     for m in PANEL_B:
         d = B[B.model == m].sort_values("grok")
         if list(d.grok) != [1, 2, 3, 4, 5]:
             raise RuntimeError(f"{m}: Grok seat counts {list(d.grok)}")
+        if ((d.own < d.lo - 1e-9) | (d.own > d.hi + 1e-9)).any():
+            raise ValueError(f"{m}: an estimate lies outside its interval")
         st = cs.model(m)
-        bx.plot(d.grok, d.own, color=st.colour, lw=cs.LW_DATA, ls=st.dash, zorder=2)
-        for r in d.itertuples():
-            interval(bx, r.grok, r.own, r.lo, r.hi, m)
+        bx.fill_between(d.grok, d.lo, d.hi, color=st.colour, alpha=0.18, lw=0, zorder=1.5)
+        bx.plot(d.grok, d.own, color=st.colour, lw=cs.LW_DATA, marker=st.marker,
+                ms=4.0 * st.marker_scale, mfc=st.colour, mec=cs.WHITE, mew=0.5, zorder=3)
+        bx.annotate(m, (5, d.own.iloc[-1]), xytext=(4, 0), textcoords="offset points",
+                    ha="left", va="center", fontsize=FIGURE_TEXT_PT, color=st.text,
+                    annotation_clip=False)
     bx.axhline(cd.FAIR_TOTAL, **cs.THEORY_SECONDARY)
-    bx.set_xlim(0.65, 5.35)
+    bx.set_xlim(0.7, 5.3)
     bx.set_xticks(range(1, 6))
     bx.set_ylim(min(8.0, float(np.floor(B.lo.min())) - 1),
-                max(26.0, float(np.ceil(B.hi.max())) + 1))
+                max(25.5, float(np.ceil(B.hi.max())) + 1))
     bx.set_yticks([10, 15, 20, 25])
     bx.set_xlabel("Grok 4.20 seats", fontsize=FIGURE_TEXT_PT)
-    handles = [Line2D([], [], color=cs.model(m).colour, marker=cs.model(m).marker,
-                      ls=cs.model(m).dash, lw=cs.LW_DATA,
-                      ms=4.0 * cs.model(m).marker_scale, label=m) for m in PANEL_B]
-    bx.legend(handles=handles, ncols=2, loc="lower center", bbox_to_anchor=(0.5, 1.01),
-              fontsize=FIGURE_TEXT_PT, handlelength=1.1, columnspacing=0.7, labelspacing=0.35)
+    bx.set_ylabel("Units per seat", fontsize=FIGURE_TEXT_PT)
 
-    for axis, letter, title in ((ax, "a", "One Qwen seat"), (bx, "b", "Units per seat")):
-        axis.set_title(f"{letter}   {title}", loc="left", y=1.38,
-                       fontsize=cs.SIZE_TITLE, weight="bold")
+    for axis, letter, title in ((ax, "a", "One replacement"), (bx, "b", "Beside Grok 4.20")):
+        cs.panel_title(axis, letter, title)
         axis.tick_params(labelsize=FIGURE_TEXT_PT)
         axis.set_axisbelow(True)
     cs.check_text(fig, min_pt=FIGURE_TEXT_PT)
@@ -360,7 +366,8 @@ def save_figure(A, B):
     provenance["games_per_risk"] = provenance.n_games // len(RISKS)
     provenance["bootstrap_draws"] = cd.N_BOOT
     provenance["ci_method"] = "percentile_2.5_97.5;pooled_games;not_risk_stratified"
-    provenance.to_csv(cd.FIGURES / "fig_mixed.csv", index=False)
+    # LF on every platform, so the registered digest does not depend on the OS.
+    provenance.to_csv(cd.FIGURES / "fig_mixed.csv", index=False, lineterminator="\n")
     print(f"wrote {pdf.relative_to(cd.REPO)} (+ .png, greyscale/CVD proof, .csv)")
     print(f"figure gates passed: {cs.COL_W_PT:.4f} x {FIGURE_HEIGHT_PT} PDF pt; "
           f"text >= {FIGURE_TEXT_PT:.2f} PDF pt "

@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{34}
+\begin{thebibliography}{51}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -36,6 +36,19 @@
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
 
+\bibitem[Abou~Chakra and Traulsen(2012)]%
+        {abouchakra2012evolutionary}
+\bibfield{author}{\bibinfo{person}{Maria Abou~Chakra} {and}
+  \bibinfo{person}{Arne Traulsen}.} \bibinfo{year}{2012}\natexlab{}.
+\newblock \showarticletitle{Evolutionary dynamics of strategic behavior in a
+  collective-risk dilemma}.
+\newblock \bibinfo{journal}{\emph{PLoS Computational Biology}}
+  \bibinfo{volume}{8}, \bibinfo{number}{8} (\bibinfo{year}{2012}),
+  \bibinfo{pages}{e1002652}.
+\newblock
+\href{https://doi.org/10.1371/journal.pcbi.1002652}{doi:\nolinkurl{10.1371/journal.pcbi.1002652}}
+
+
 \bibitem[Akata et~al\mbox{.}(2025)]%
         {akata2025playing}
 \bibfield{author}{\bibinfo{person}{Elif Akata}, \bibinfo{person}{Lion Schulz},
@@ -62,6 +75,42 @@
 \href{https://doi.org/10.1016/0047-2727(88)90043-6}{doi:\nolinkurl{10.1016/0047-2727(88)90043-6}}
 
 
+\bibitem[Buscemi et~al\mbox{.}(2025a)]%
+        {buscemi2025llms}
+\bibfield{author}{\bibinfo{person}{Alessio Buscemi}, \bibinfo{person}{Daniele
+  Proverbio}, \bibinfo{person}{Paolo Bova}, \bibinfo{person}{Nataliya
+  Balabanova}, \bibinfo{person}{Adeela Bashir}, \bibinfo{person}{Theodor
+  Cimpeanu}, \bibinfo{person}{Henrique Correia~da Fonseca},
+  \bibinfo{person}{Manh~Hong Duong}, \bibinfo{person}{Elias
+  Fern{\'a}ndez~Domingos}, \bibinfo{person}{Antonio~M. Fernandes},
+  \bibinfo{person}{Marcus Krellner}, \bibinfo{person}{Ndidi~Bianca Ogbo},
+  \bibinfo{person}{Simon~T. Powers}, \bibinfo{person}{Fernando~P. Santos},
+  \bibinfo{person}{Zia~Ush Shamszaman}, \bibinfo{person}{Zhao Song},
+  \bibinfo{person}{Alessandro Di~Stefano}, {and} \bibinfo{person}{The~Anh
+  Han}.} \bibinfo{year}{2025}\natexlab{a}.
+\newblock \bibinfo{title}{Do {LLMs} trust {AI} regulation? Emerging behaviour
+  of game-theoretic {LLM} agents}.
+\newblock
+\showeprint[arxiv]{2504.08640}
+\href{https://doi.org/10.48550/arXiv.2504.08640}{doi:\nolinkurl{10.48550/arXiv.2504.08640}}
+
+
+\bibitem[Buscemi et~al\mbox{.}(2025b)]%
+        {buscemi2025fairgame}
+\bibfield{author}{\bibinfo{person}{Alessio Buscemi}, \bibinfo{person}{Daniele
+  Proverbio}, \bibinfo{person}{Alessandro Di~Stefano}, \bibinfo{person}{The~Anh
+  Han}, \bibinfo{person}{German Castignani}, {and} \bibinfo{person}{Pietro
+  Li{\`o}}.} \bibinfo{year}{2025}\natexlab{b}.
+\newblock \showarticletitle{{FAIRGAME}: A Framework for {AI} Agents Bias
+  Recognition Using Game Theory}. In \bibinfo{booktitle}{\emph{{ECAI} 2025 --
+  28th European Conference on Artificial Intelligence}}
+  \emph{(\bibinfo{series}{Frontiers in Artificial Intelligence and
+  Applications}, Vol.~\bibinfo{volume}{413})}. \bibinfo{publisher}{IOS Press},
+  \bibinfo{pages}{4097--4104}.
+\newblock
+\href{https://doi.org/10.3233/FAIA251300}{doi:\nolinkurl{10.3233/FAIA251300}}
+
+
 \bibitem[Celiktemel et~al\mbox{.}(2026)]%
         {celiktemel2026group}
 \bibfield{author}{\bibinfo{person}{Luis Celiktemel}, \bibinfo{person}{Edward
@@ -74,6 +123,23 @@
 \newblock
 \showeprint[arxiv]{2606.23343}
 \href{https://doi.org/10.48550/arXiv.2606.23343}{doi:\nolinkurl{10.48550/arXiv.2606.23343}}
+
+
+\bibitem[Chan et~al\mbox{.}(2024)]%
+        {chan2024visibility}
+\bibfield{author}{\bibinfo{person}{Alan Chan}, \bibinfo{person}{Carson Ezell},
+  \bibinfo{person}{Max Kaufmann}, \bibinfo{person}{Kevin Wei},
+  \bibinfo{person}{Lewis Hammond}, \bibinfo{person}{Herbie Bradley},
+  \bibinfo{person}{Emma Bluemke}, \bibinfo{person}{Nitarshan Rajkumar},
+  \bibinfo{person}{David Krueger}, \bibinfo{person}{Noam Kolt},
+  \bibinfo{person}{Lennart Heim}, {and} \bibinfo{person}{Markus Anderljung}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Visibility into {AI} Agents}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 2024 {ACM} Conference on
+  Fairness, Accountability, and Transparency ({FAccT})}}.
+  \bibinfo{publisher}{ACM}, \bibinfo{pages}{958--973}.
+\newblock
+\href{https://doi.org/10.1145/3630106.3658948}{doi:\nolinkurl{10.1145/3630106.3658948}}
 
 
 \bibitem[Chen et~al\mbox{.}(2023)]%
@@ -114,6 +180,20 @@
 \newblock
 
 
+\bibitem[Duong et~al\mbox{.}(2026)]%
+        {duong2026cost}
+\bibfield{author}{\bibinfo{person}{M.~H. Duong}, \bibinfo{person}{C.~M.
+  Durbac}, {and} \bibinfo{person}{T.~A. Han}.} \bibinfo{year}{2026}\natexlab{}.
+\newblock \showarticletitle{Cost of Institutional Incentives for Promoting
+  Cooperation in $2\times 2$ Games and Collective Risk Games}.
+\newblock \bibinfo{journal}{\emph{Dynamic Games and Applications}}
+  (\bibinfo{year}{2026}).
+\newblock
+\shownote{Online first, 7 February 2026}.
+\newblock
+\href{https://doi.org/10.1007/s13235-025-00696-6}{doi:\nolinkurl{10.1007/s13235-025-00696-6}}
+
+
 \bibitem[Fan et~al\mbox{.}(2024)]%
         {fan2024can}
 \bibfield{author}{\bibinfo{person}{Caoyun Fan}, \bibinfo{person}{Jindou Chen},
@@ -125,6 +205,34 @@
   Intelligence}}, Vol.~\bibinfo{volume}{38}. \bibinfo{pages}{17960--17967}.
 \newblock
 \href{https://doi.org/10.1609/aaai.v38i16.29751}{doi:\nolinkurl{10.1609/aaai.v38i16.29751}}
+
+
+\bibitem[Fern{\'a}ndez~Domingos et~al\mbox{.}(2023)]%
+        {fernandezdomingos2023egttools}
+\bibfield{author}{\bibinfo{person}{Elias Fern{\'a}ndez~Domingos},
+  \bibinfo{person}{Francisco~C. Santos}, {and} \bibinfo{person}{Tom Lenaerts}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{{EGTtools}: Evolutionary game dynamics in
+  {Python}}.
+\newblock \bibinfo{journal}{\emph{iScience}} \bibinfo{volume}{26},
+  \bibinfo{number}{4} (\bibinfo{year}{2023}), \bibinfo{pages}{106419}.
+\newblock
+\href{https://doi.org/10.1016/j.isci.2023.106419}{doi:\nolinkurl{10.1016/j.isci.2023.106419}}
+
+
+\bibitem[Fern{\'a}ndez~Domingos et~al\mbox{.}(2022)]%
+        {fernandezdomingos2022delegation}
+\bibfield{author}{\bibinfo{person}{Elias Fern{\'a}ndez~Domingos},
+  \bibinfo{person}{In{\^e}s Terrucha}, \bibinfo{person}{R{\'e}mi Suchon},
+  \bibinfo{person}{Jelena Gruji{\'c}}, \bibinfo{person}{Juan~C. Burguillo},
+  \bibinfo{person}{Francisco~C. Santos}, {and} \bibinfo{person}{Tom Lenaerts}.}
+  \bibinfo{year}{2022}\natexlab{}.
+\newblock \showarticletitle{Delegation to artificial agents fosters prosocial
+  behaviors in the collective risk dilemma}.
+\newblock \bibinfo{journal}{\emph{Scientific Reports}}  \bibinfo{volume}{12}
+  (\bibinfo{year}{2022}), \bibinfo{pages}{8492}.
+\newblock
+\href{https://doi.org/10.1038/s41598-022-11518-9}{doi:\nolinkurl{10.1038/s41598-022-11518-9}}
 
 
 \bibitem[Filippas et~al\mbox{.}(2024)]%
@@ -155,6 +263,18 @@
 \href{https://doi.org/10.1609/icwsm.v19i1.35829}{doi:\nolinkurl{10.1609/icwsm.v19i1.35829}}
 
 
+\bibitem[Fudenberg and Imhof(2006)]%
+        {fudenberg2006imitation}
+\bibfield{author}{\bibinfo{person}{Drew Fudenberg} {and}
+  \bibinfo{person}{Lorens~A. Imhof}.} \bibinfo{year}{2006}\natexlab{}.
+\newblock \showarticletitle{Imitation processes with small mutations}.
+\newblock \bibinfo{journal}{\emph{Journal of Economic Theory}}
+  \bibinfo{volume}{131}, \bibinfo{number}{1} (\bibinfo{year}{2006}),
+  \bibinfo{pages}{251--262}.
+\newblock
+\href{https://doi.org/10.1016/j.jet.2005.04.006}{doi:\nolinkurl{10.1016/j.jet.2005.04.006}}
+
+
 \bibitem[Guzman~Piedrahita et~al\mbox{.}(2025)]%
         {guzmanpiedrahita2025corrupted}
 \bibfield{author}{\bibinfo{person}{David Guzman~Piedrahita},
@@ -169,6 +289,65 @@
 \url{https://openreview.net/forum?id=kH6LOHGjEl}
 \showURL{%
 \tempurl}
+
+
+\bibitem[Hammond et~al\mbox{.}(2025)]%
+        {hammond2025multi}
+\bibfield{author}{\bibinfo{person}{Lewis Hammond}, \bibinfo{person}{Alan Chan},
+  \bibinfo{person}{Jesse Clifton}, \bibinfo{person}{Jason Hoelscher-Obermaier},
+  \bibinfo{person}{Akbir Khan}, \bibinfo{person}{Euan McLean},
+  \bibinfo{person}{Chandler Smith}, \bibinfo{person}{Wolfram Barfuss},
+  \bibinfo{person}{Jakob Foerster}, \bibinfo{person}{Tom{\'a}{\v{s}}
+  Gaven{\v{c}}iak}, \bibinfo{person}{The~Anh Han}, \bibinfo{person}{Edward
+  Hughes}, \bibinfo{person}{Vojt{\v{e}}ch Kova{\v{r}}{\'\i}k},
+  \bibinfo{person}{Jan Kulveit}, \bibinfo{person}{Joel~Z. Leibo},
+  \bibinfo{person}{Caspar Oesterheld}, \bibinfo{person}{Christian Schroeder~de
+  Witt}, \bibinfo{person}{Nisarg Shah}, \bibinfo{person}{Michael Wellman},
+  \bibinfo{person}{Paolo Bova}, \bibinfo{person}{Theodor Cimpeanu},
+  \bibinfo{person}{Carson Ezell}, \bibinfo{person}{Quentin Feuillade-Montixi},
+  \bibinfo{person}{Matija Franklin}, \bibinfo{person}{Esben Kran},
+  \bibinfo{person}{Igor Krawczuk}, \bibinfo{person}{Max Lamparth},
+  \bibinfo{person}{Niklas Lauffer}, \bibinfo{person}{Alexander Meinke},
+  \bibinfo{person}{Sumeet Motwani}, \bibinfo{person}{Anka Reuel},
+  \bibinfo{person}{Vincent Conitzer}, \bibinfo{person}{Michael Dennis},
+  \bibinfo{person}{Iason Gabriel}, \bibinfo{person}{Adam Gleave},
+  \bibinfo{person}{Gillian Hadfield}, \bibinfo{person}{Nika Haghtalab},
+  \bibinfo{person}{Atoosa Kasirzadeh}, \bibinfo{person}{S{\'e}bastien Krier},
+  \bibinfo{person}{Kate Larson}, \bibinfo{person}{Joel Lehman},
+  \bibinfo{person}{David~C. Parkes}, \bibinfo{person}{Georgios Piliouras},
+  {and} \bibinfo{person}{Iyad Rahwan}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{Multi-Agent Risks from Advanced {AI}}.
+\newblock
+\shownote{Cooperative AI Foundation, Technical Report \#1}.
+\newblock
+\showeprint[arxiv]{2502.14143}
+\href{https://doi.org/10.48550/arXiv.2502.14143}{doi:\nolinkurl{10.48550/arXiv.2502.14143}}
+
+
+\bibitem[Han(2022)]%
+        {han2022emergent}
+\bibfield{author}{\bibinfo{person}{The~Anh Han}.}
+  \bibinfo{year}{2022}\natexlab{}.
+\newblock \showarticletitle{Emergent behaviours in multi-agent systems with
+  Evolutionary Game Theory}.
+\newblock \bibinfo{journal}{\emph{AI Communications}} \bibinfo{volume}{35},
+  \bibinfo{number}{4} (\bibinfo{year}{2022}), \bibinfo{pages}{327--337}.
+\newblock
+\href{https://doi.org/10.3233/AIC-220104}{doi:\nolinkurl{10.3233/AIC-220104}}
+
+
+\bibitem[Han et~al\mbox{.}(2024)]%
+        {han2024evolutionary}
+\bibfield{author}{\bibinfo{person}{The~Anh Han}, \bibinfo{person}{Manh~Hong
+  Duong}, {and} \bibinfo{person}{Matja{\v{z}} Perc}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Evolutionary mechanisms that promote cooperation
+  may not promote social welfare}.
+\newblock \bibinfo{journal}{\emph{Journal of the Royal Society Interface}}
+  \bibinfo{volume}{21}, \bibinfo{number}{220} (\bibinfo{year}{2024}),
+  \bibinfo{pages}{20240547}.
+\newblock
+\href{https://doi.org/10.1098/rsif.2024.0547}{doi:\nolinkurl{10.1098/rsif.2024.0547}}
 
 
 \bibitem[Huang et~al\mbox{.}(2025)]%
@@ -199,6 +378,28 @@
   Neural Information Processing Systems}}, Vol.~\bibinfo{volume}{31}.
   \bibinfo{publisher}{Curran Associates, Inc.}
 \newblock
+
+
+\bibitem[Huynh et~al\mbox{.}(2025)]%
+        {huynh2025understanding}
+\bibfield{author}{\bibinfo{person}{Trung-Kiet Huynh} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{Understanding {LLM} Agent Behaviours via Game Theory:
+  Strategy Recognition, Biases and Multi-Agent Dynamics}.
+\newblock
+\showeprint[arxiv]{2512.07462}
+\href{https://doi.org/10.48550/arXiv.2512.07462}{doi:\nolinkurl{10.48550/arXiv.2512.07462}}
+
+
+\bibitem[Huynh et~al\mbox{.}(2026)]%
+        {huynh2026payoff}
+\bibfield{author}{\bibinfo{person}{Trung-Kiet Huynh} {et~al\mbox{.}}}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{Payoff scaling shapes cooperation in {LLM} agents
+  across languages}.
+\newblock
+\showeprint[arxiv]{2601.19082}
+\href{https://doi.org/10.48550/arXiv.2601.19082}{doi:\nolinkurl{10.48550/arXiv.2601.19082}}
 
 
 \bibitem[Kumar et~al\mbox{.}(2026)]%
@@ -250,6 +451,18 @@
 \tempurl}
 
 
+\bibitem[Lor{\`e} and Heydari(2024)]%
+        {lore2024strategic}
+\bibfield{author}{\bibinfo{person}{Nunzio Lor{\`e}} {and}
+  \bibinfo{person}{Babak Heydari}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Strategic behavior of large language models and the
+  role of game structure versus contextual framing}.
+\newblock \bibinfo{journal}{\emph{Scientific Reports}}  \bibinfo{volume}{14}
+  (\bibinfo{year}{2024}), \bibinfo{pages}{18490}.
+\newblock
+\href{https://doi.org/10.1038/s41598-024-69032-z}{doi:\nolinkurl{10.1038/s41598-024-69032-z}}
+
+
 \bibitem[Mei et~al\mbox{.}(2024)]%
         {mei2024turing}
 \bibfield{author}{\bibinfo{person}{Qiaozhu Mei}, \bibinfo{person}{Yutong Xie},
@@ -295,6 +508,20 @@
 \href{https://doi.org/10.1038/s41598-019-45619-9}{doi:\nolinkurl{10.1038/s41598-019-45619-9}}
 
 
+\bibitem[Pal et~al\mbox{.}(2026)]%
+        {pal2026large}
+\bibfield{author}{\bibinfo{person}{Saptarshi Pal}, \bibinfo{person}{Abhishek
+  Mallela}, \bibinfo{person}{Lenz Pracher}, \bibinfo{person}{Chiyu Wei},
+  \bibinfo{person}{Feng Fu}, \bibinfo{person}{Santiago Schnell}, {and}
+  \bibinfo{person}{Martin~A. Nowak}.} \bibinfo{year}{2026}\natexlab{}.
+\newblock \showarticletitle{Large language models instantiate evolutionarily
+  robust strategies of cooperation}.
+\newblock \bibinfo{journal}{\emph{PNAS Nexus}} \bibinfo{volume}{5},
+  \bibinfo{number}{6} (\bibinfo{year}{2026}), \bibinfo{pages}{pgag210}.
+\newblock
+\href{https://doi.org/10.1093/pnasnexus/pgag210}{doi:\nolinkurl{10.1093/pnasnexus/pgag210}}
+
+
 \bibitem[Palfrey and Rosenthal(1984)]%
         {palfrey1984participation}
 \bibfield{author}{\bibinfo{person}{Thomas~R. Palfrey} {and}
@@ -317,6 +544,17 @@
 \newblock
 \showeprint[arxiv]{2507.02618}
 \href{https://doi.org/10.48550/arXiv.2507.02618}{doi:\nolinkurl{10.48550/arXiv.2507.02618}}
+
+
+\bibitem[Pham et~al\mbox{.}(2026)]%
+        {pham2026humans}
+\bibfield{author}{\bibinfo{person}{Phu~Hoa Pham} {et~al\mbox{.}}}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{Humans Are More Diverse: Frontier {LLMs} Show Extreme
+  Policies in Idealised {AI} Development Races}.
+\newblock
+\showeprint[arxiv]{2608.01193}
+\href{https://doi.org/10.48550/arXiv.2608.01193}{doi:\nolinkurl{10.48550/arXiv.2608.01193}}
 
 
 \bibitem[Piatti et~al\mbox{.}(2024)]%
@@ -457,6 +695,18 @@
   (\bibinfo{year}{2006}), \bibinfo{pages}{10952--10955}.
 \newblock
 \href{https://doi.org/10.1073/pnas.0602530103}{doi:\nolinkurl{10.1073/pnas.0602530103}}
+
+
+\bibitem[Traulsen et~al\mbox{.}(2006)]%
+        {traulsen2006stochastic}
+\bibfield{author}{\bibinfo{person}{Arne Traulsen}, \bibinfo{person}{Martin~A.
+  Nowak}, {and} \bibinfo{person}{Jorge~M. Pacheco}.}
+  \bibinfo{year}{2006}\natexlab{}.
+\newblock \showarticletitle{Stochastic dynamics of invasion and fixation}.
+\newblock \bibinfo{journal}{\emph{Physical Review E}} \bibinfo{volume}{74},
+  \bibinfo{number}{1} (\bibinfo{year}{2006}), \bibinfo{pages}{011909}.
+\newblock
+\href{https://doi.org/10.1103/PhysRevE.74.011909}{doi:\nolinkurl{10.1103/PhysRevE.74.011909}}
 
 
 \bibitem[Tuyls et~al\mbox{.}(2018)]%
