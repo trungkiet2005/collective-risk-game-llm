@@ -1,0 +1,196 @@
+\begin{thebibliography}{26}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Milinski et~al.(2008)Milinski, Sommerfeld, Krambeck, Reed, and
+  Marotzke]{milinski2008collective}
+Manfred Milinski, Ralf~D. Sommerfeld, Hans-J{\"u}rgen Krambeck, Floyd~A. Reed,
+  and Jochem Marotzke.
+\newblock The collective-risk social dilemma and the prevention of simulated
+  dangerous climate change.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 105\penalty0
+  (7):\penalty0 2291--2294, 2008.
+\newblock \doi{10.1073/pnas.0709546105}.
+
+\bibitem[Hardin(1968)]{hardin1968tragedy}
+Garrett Hardin.
+\newblock The tragedy of the commons.
+\newblock \emph{Science}, 162\penalty0 (3859):\penalty0 1243--1248, 1968.
+\newblock \doi{10.1126/science.162.3859.1243}.
+
+\bibitem[Dawes(1980)]{dawes1980social}
+Robyn~M. Dawes.
+\newblock Social dilemmas.
+\newblock \emph{Annual Review of Psychology}, 31:\penalty0 169--193, 1980.
+\newblock \doi{10.1146/annurev.ps.31.020180.001125}.
+
+\bibitem[Fehr and G{\"a}chter(2002)]{fehr2002altruistic}
+Ernst Fehr and Simon G{\"a}chter.
+\newblock Altruistic punishment in humans.
+\newblock \emph{Nature}, 415\penalty0 (6868):\penalty0 137--140, 2002.
+\newblock \doi{10.1038/415137a}.
+
+\bibitem[Horton(2023)]{horton2023large}
+John~J. Horton.
+\newblock Large language models as simulated economic agents: What can we learn
+  from homo silicus?
+\newblock NBER Working Paper 31122, National Bureau of Economic Research, 2023.
+\newblock Also available as arXiv:2301.07543.
+
+\bibitem[Argyle et~al.(2023)Argyle, Busby, Fulda, Gubler, Rytting, and
+  Wingate]{argyle2023out}
+Lisa~P. Argyle, Ethan~C. Busby, Nancy Fulda, Joshua~R. Gubler, Christopher
+  Rytting, and David Wingate.
+\newblock Out of one, many: Using language models to simulate human samples.
+\newblock \emph{Political Analysis}, 31\penalty0 (3):\penalty0 337--351, 2023.
+\newblock \doi{10.1017/pan.2023.2}.
+
+\bibitem[Aher et~al.(2023)Aher, Arriaga, and Kalai]{aher2023using}
+Gati~V. Aher, Rosa~I. Arriaga, and Adam~Tauman Kalai.
+\newblock Using large language models to simulate multiple humans and replicate
+  human subject studies.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine
+  Learning (ICML)}, volume 202 of \emph{Proceedings of Machine Learning
+  Research}, pages 337--371. PMLR, 2023.
+
+\bibitem[Fontana et~al.(2024)Fontana, Pierri, and Aiello]{fontana2024nicer}
+Nicol{\'o} Fontana, Francesco Pierri, and Luca~Maria Aiello.
+\newblock Nicer than humans: How do large language models behave in the
+  prisoner's dilemma?
+\newblock arXiv:2406.13605, 2024.
+
+\bibitem[Phelps and Russell(2023)]{phelps2023investigating}
+Steve Phelps and Yvan~I. Russell.
+\newblock Investigating emergent goal-like behaviour in large language models
+  using experimental economics.
+\newblock arXiv:2305.07970, 2023.
+
+\bibitem[Akata et~al.(2023)Akata, Schulz, Coda-Forno, Oh, Bethge, and
+  Schulz]{akata2023playing}
+Elif Akata, Lion Schulz, Julian Coda-Forno, Seong~Joon Oh, Matthias Bethge, and
+  Eric Schulz.
+\newblock Playing repeated games with large language models.
+\newblock arXiv:2305.16867, 2023.
+
+\bibitem[Piatti et~al.(2024)Piatti, Jin, Kleiman-Weiner, Sch{\"o}lkopf, Sachan,
+  and Mihalcea]{piatti2024cooperate}
+Giorgio Piatti, Zhijing Jin, Max Kleiman-Weiner, Bernhard Sch{\"o}lkopf,
+  Mrinmaya Sachan, and Rada Mihalcea.
+\newblock Cooperate or collapse: Emergence of sustainable cooperation in a
+  society of {LLM} agents.
+\newblock In \emph{Advances in Neural Information Processing Systems 37
+  (NeurIPS 2024)}, 2024.
+\newblock arXiv:2404.16698.
+
+\bibitem[Buscemi et~al.(2025{\natexlab{a}})Buscemi, Proverbio, Di~Stefano, Han,
+  Castignani, and Li{\`o}]{buscemi2025fairgame}
+Alessio Buscemi, Daniele Proverbio, Alessandro Di~Stefano, The-Anh Han, German
+  Castignani, and Pietro Li{\`o}.
+\newblock {FAIRGAME}: A framework for {AI} agents bias recognition using game
+  theory.
+\newblock \emph{arXiv preprint arXiv:2504.14325}, 2025{\natexlab{a}}.
+\newblock \doi{10.48550/arXiv.2504.14325}.
+
+\bibitem[Huynh et~al.(2025)Huynh, Dao-Sy, Cao, Le, Nguyen, Nguyen-Lam,
+  Nguyen-Vo, Pham, Pham, Than, Tran, Tran, Tran-Le, Buscemi, Trang, and
+  Han]{huynh2025understanding}
+Trung-Kiet Huynh, Duy-Minh Dao-Sy, Thanh-Bang Cao, Phong-Hao Le, Hong-Dan
+  Nguyen, Phu-Quy Nguyen-Lam, Minh-Luan Nguyen-Vo, Hong-Phat Pham, Phu-Hoa
+  Pham, Thien-Kim Than, Chi-Nguyen Tran, Huy Tran, Gia-Thoai Tran-Le, Alessio
+  Buscemi, Le~Hong Trang, and The~Anh Han.
+\newblock Understanding {LLM} agent behaviours via game theory: Strategy
+  recognition, biases and multi-agent dynamics.
+\newblock arXiv:2512.07462, 2025.
+
+\bibitem[{Qwen Team}(2024)]{qwen2025qwen25}
+{Qwen Team}.
+\newblock Qwen2.5 technical report.
+\newblock \emph{arXiv preprint arXiv:2412.15115}, 2024.
+
+\bibitem[{Gemma Team}(2024)]{gemma2024gemma2}
+{Gemma Team}.
+\newblock Gemma 2: Improving open language models at a practical size.
+\newblock \emph{arXiv preprint arXiv:2408.00118}, 2024.
+
+\bibitem[Grattafiori et~al.(2024)Grattafiori, Dubey,
+  et~al.]{grattafiori2024llama3}
+Aaron Grattafiori, Abhimanyu Dubey, et~al.
+\newblock The llama 3 herd of models.
+\newblock \emph{arXiv preprint arXiv:2407.21783}, 2024.
+
+\bibitem[Wilson(1927)]{wilson1927}
+Edwin~B. Wilson.
+\newblock Probable inference, the law of succession, and statistical inference.
+\newblock \emph{Journal of the American Statistical Association}, 22\penalty0
+  (158):\penalty0 209--212, 1927.
+\newblock \doi{10.1080/01621459.1927.10502953}.
+
+\bibitem[Wei et~al.(2022)Wei, Tay, Bommasani, Raffel, Zoph, Borgeaud, Yogatama,
+  Bosma, Zhou, Metzler, Chi, Hashimoto, Vinyals, Liang, Dean, and
+  Fedus]{wei2022emergent}
+Jason Wei, Yi~Tay, Rishi Bommasani, Colin Raffel, Barret Zoph, Sebastian
+  Borgeaud, Dani Yogatama, Maarten Bosma, Denny Zhou, Donald Metzler, Ed~H.
+  Chi, Tatsunori Hashimoto, Oriol Vinyals, Percy Liang, Jeff Dean, and William
+  Fedus.
+\newblock Emergent abilities of large language models.
+\newblock \emph{Transactions on Machine Learning Research}, 2022.
+\newblock ISSN 2835-8856.
+
+\bibitem[Feng et~al.(2024)Feng, Dou, Li, Wang, Wang, Guo, Ma, and
+  Kong]{feng2024survey}
+Xiachong Feng, Longxu Dou, Ella Li, Qinghao Wang, Haochuan Wang, Yu~Guo, Chang
+  Ma, and Lingpeng Kong.
+\newblock A survey on large language model-based social agents in
+  game-theoretic scenarios.
+\newblock arXiv:2412.03920, 2024.
+
+\bibitem[Yao et~al.(2026)Yao, Chen, and Zhang]{yao2026competition}
+Jiayi Yao, Cong Chen, and Baosen Zhang.
+\newblock Competition and cooperation of {LLM} agents in games.
+\newblock arXiv:2604.00487, 2026.
+
+\bibitem[Tewolde et~al.(2026)Tewolde, Zhang, Guzman~Piedrahita, Conitzer, and
+  Jin]{tewolde2026coopeval}
+Emanuel Tewolde, Xiao Zhang, David Guzman~Piedrahita, Vincent Conitzer, and
+  Zhijing Jin.
+\newblock {CoopEval}: Benchmarking cooperation-sustaining mechanisms and {LLM}
+  agents in social dilemmas.
+\newblock arXiv:2604.15267, 2026.
+
+\bibitem[Li and Shirado(2025)]{li2025spontaneous}
+Yuxuan Li and Hirokazu Shirado.
+\newblock Spontaneous giving and calculated greed in language models.
+\newblock arXiv:2502.17720, 2025.
+
+\bibitem[Backmann et~al.(2025)Backmann, Guzman~Piedrahita, Zhang, Tewolde,
+  Mihalcea, Sch{\"o}lkopf, and Jin]{backmann2025ethics}
+Steffen Backmann, David Guzman~Piedrahita, Terry~Jingchen Zhang, Emanuel
+  Tewolde, Rada Mihalcea, Bernhard Sch{\"o}lkopf, and Zhijing Jin.
+\newblock When ethics and payoffs diverge: {LLM} agents in morally charged
+  social dilemmas.
+\newblock arXiv:2505.19212, 2025.
+
+\bibitem[Buscemi et~al.(2025{\natexlab{b}})Buscemi, Proverbio, Di~Stefano, Han,
+  Castignani, and Li{\`o}]{buscemi2025strategic}
+Alessio Buscemi, Daniele Proverbio, Alessandro Di~Stefano, The~Anh Han, German
+  Castignani, and Pietro Li{\`o}.
+\newblock Strategic communication and language bias in multi-agent {LLM}
+  coordination.
+\newblock arXiv:2508.00032, 2025{\natexlab{b}}.
+
+\bibitem[Madmoun and Lahlou(2025)]{madmoun2025communication}
+Hachem Madmoun and Salem Lahlou.
+\newblock Communication enables cooperation in {LLM} agents: A comparison with
+  curriculum-based approaches.
+\newblock arXiv:2510.05748, 2025.
+
+\bibitem[Jiang et~al.(2025)Jiang, Yang, Wang, and Hui]{jiang2025trust}
+Guanxuan Jiang, Shirao Yang, Yuyang Wang, and Pan Hui.
+\newblock When trust collides: Decoding human-{LLM} cooperation dynamics
+  through the prisoner's dilemma.
+\newblock arXiv:2503.07320, 2025.
+
+\end{thebibliography}
