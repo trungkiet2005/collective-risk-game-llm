@@ -1,0 +1,27 @@
+% All colour variants of Figure 1 at full size, three per row, each labelled
+% with its file name. Built by build_palettes.sh after the variants exist.
+\documentclass[border=6mm]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage{biolinum}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\newcommand{\variant}[2]{%
+  \begin{minipage}[t]{188mm}
+    \includegraphics[width=188mm]{pdf/#1.pdf}\par\vspace{2.5mm}
+    {\fontsize{15}{18}\selectfont\bfseries #2}\hfill
+    {\fontsize{11}{13}\selectfont\color[HTML]{57606A}\texttt{\detokenize{pdf/#1.pdf}}}
+  \end{minipage}}
+\begin{document}
+\begin{tabular}{@{}c@{\hspace{12mm}}c@{\hspace{12mm}}c@{}}
+  \variant{fig1_01_vivid}{01 Vivid (current)} &
+  \variant{fig1_02_white_minimal}{02 White minimal} &
+  \variant{fig1_03_classic_paper}{03 Classic paper} \\[10mm]
+  \variant{fig1_04_nature}{04 Nature (NPG)} &
+  \variant{fig1_05_science}{05 Science (AAAS)} &
+  \variant{fig1_06_okabe_ito}{06 Okabe--Ito (colour-blind safe)} \\[10mm]
+  \variant{fig1_07_tableau}{07 Tableau 10} &
+  \variant{fig1_08_slate_mono}{08 Slate mono (greyscale safe)} &
+  \variant{fig1_09_modern_soft}{09 Modern soft}
+\end{tabular}
+\end{document}

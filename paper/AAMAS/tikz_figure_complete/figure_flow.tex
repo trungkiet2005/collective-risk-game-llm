@@ -1,0 +1,165 @@
+% Flow-style redraw of Figure 1: same content as figure_biolinum.tex, new layout.
+% Layout follows the "row band + left label + block arrow" template: one flat tinted
+% band per row, a coloured label at the left of each band, and grey block arrows
+% between rows. No cards, no panel frames, no header strips, nothing sits inside a
+% second rectangle: icons and text lie directly on the band.
+% Compile with pdfLaTeX: pdflatex -interaction=nonstopmode -halt-on-error figure_flow.tex
+% (or bash build_flow.sh, which also copies the PDF to ../figures/fig_game_designs_flow.pdf).
+% All headings, labels, numbers and symbols are real PDF text; robots, logos and icons
+% are the PNGs in assets/, unchanged.
+% Coordinates are millimetres, y increases downward. Canvas 188 x 90 mm.
+\documentclass[tikz,border=0pt]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{biolinum}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tikz}
+\input{glyphtounicode}
+\pdfgentounicode=1
+\pdfcompresslevel=9
+\pdfobjcompresslevel=2
+\pdfinfo{/Title (Collective-risk game and four experimental designs, flow layout)
+         /Subject (TikZ redraw with selectable text and extracted transparent icons)
+         /Creator (pdfLaTeX and TikZ)}
+
+% Two families of rows: the game (cool) and the study built on it (warm).
+\definecolor{Ink}{HTML}{1B2733}
+\definecolor{Muted}{HTML}{4E5B69}
+\definecolor{CoolBand}{HTML}{E6EFF6}
+\definecolor{WarmBand}{HTML}{F8EBE1}
+\definecolor{CoolLabel}{HTML}{1F6690}
+\definecolor{WarmLabel}{HTML}{AE4A18}
+\definecolor{ArrowFill}{HTML}{98A0A8}
+\definecolor{ArrowLine}{HTML}{4B525A}
+
+\newcommand{\fsize}[1]{\fontsize{#1}{\dimexpr #1pt*6/5\relax}\selectfont}
+% #1 filename stem, #2 x centre, #3 y centre, #4 max width, #5 max height.
+\newcommand{\asset}[5]{%
+  \node[inner sep=0pt,outer sep=0pt] at (#2,#3)
+    {\includegraphics[width=#4mm,height=#5mm,keepaspectratio]{assets/#1.png}};}
+% Full-width flat band: #1 top, #2 bottom, #3 colour.
+\newcommand{\band}[3]{\fill[#3] (0,#1) rectangle (188,#2);}
+% Row label at the left of its band: #1 y centre, #2 colour, #3 text.
+\newcommand{\rowlabel}[3]{%
+  \node[anchor=west,text=#2,font=\fsize{11.5}\bfseries,inner sep=0pt,align=left]
+    at (3,#1) {#3};}
+% Block arrow pointing down: #1 x centre, #2 y of the tail.
+\newcommand{\blockarrow}[2]{%
+  \path[fill=ArrowFill,draw=ArrowLine,line width=.35pt,line join=round]
+    (#1-1.3,#2) -- (#1+1.3,#2) -- (#1+1.3,#2+2.9) -- (#1+2.9,#2+2.9) --
+    (#1,#2+5.6) -- (#1-2.9,#2+2.9) -- (#1-1.3,#2+2.9) -- cycle;}
+% Number disc for a design: #1 x, #2 y, #3 digit.
+\newcommand{\numdisc}[3]{%
+  \path[fill=WarmLabel] (#1,#2) circle[radius=3.5mm];
+  \node[text=white,font=\fsize{13}\bfseries,inner sep=0pt] at (#1,#2) {#3};}
+% Plain 'Fixed' tag beside a scripted robot: text only, no badge.
+\newcommand{\fixedtag}[2]{%
+  \node[text=Muted,font=\fsize{6.4}\bfseries,inner sep=0pt] at (#1,#2) {Fixed};}
+
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=-1mm,text=Ink,every node/.style={outer sep=0pt}]
+  \path[use as bounding box] (0,0) rectangle (188,90);
+
+  % ------------------------------- bands -------------------------------
+  \band{0}{19.6}{CoolBand}          % The game
+  \band{23.4}{41.0}{CoolBand}       % Outcomes
+  \band{44.6}{55.8}{WarmBand}       % Models we study
+  \band{59.6}{89.8}{WarmBand}       % Four designs
+
+  % Row-to-row flow: playing the game leads to the outcomes; the models are
+  % put into the four designs.
+  \blockarrow{110}{18.7}
+  \blockarrow{110}{54.9}
+
+  % ------------------------------- THE GAME -------------------------------
+  \rowlabel{9.8}{CoolLabel}{The game}
+  \asset{group_game}{44}{9.8}{18.4}{18.4}
+
+  % Six rules, icon above caption, pitch 21.3 mm.
+  \asset{icon_players}{68.65}{6.2}{7.4}{6.7}
+  \asset{icon_rounds}{89.95}{6.2}{6.5}{6.7}
+  \asset{icon_endowment}{111.25}{6.2}{6.5}{6.7}
+  \asset{icon_contribution}{132.55}{6.2}{6.5}{6.7}
+  \asset{icon_target}{153.85}{6.2}{6.5}{6.7}
+  \asset{icon_risk}{175.15}{6.2}{6.5}{6.9}
+  \foreach \x/\label in {68.65/{6 players},89.95/{10 rounds},111.25/{40 each},
+                          132.55/{pay 0 / 2 / 4},153.85/{target 120}} {
+    \node[anchor=base,font=\fsize{8.4},inner sep=0pt] at (\x,14.54) {\label};
+  }
+  \node[anchor=base,font=\fsize{7.6},inner sep=0pt] at (175.15,14.44) {miss $\to$ lose all};
+  \node[anchor=base,text=Muted,font=\fsize{6.8},inner sep=0pt] at (175.15,17.54) {(probability $p$)};
+
+  % ------------------------------- OUTCOMES -------------------------------
+  \rowlabel{32.0}{CoolLabel}{Outcomes}
+
+  % 'Miss' spans the two outcomes that follow a total below the target.
+  \node[anchor=base,text=Muted,font=\fsize{6.8},inner sep=0pt] at (134.5,26.74) {Miss: total $<120$};
+  \draw[Muted,line width=.45pt] (85.5,29.3) -- (85.5,28.3) -- (183.5,28.3) -- (183.5,29.3);
+
+  \foreach \xs/\icon in {34/icon_success,84.7/icon_catastrophe,135.4/icon_no_catastrophe} {
+    \asset{\icon}{\xs+3.6}{35.2}{6.2}{6.2}
+  }
+  \node[anchor=base west,font=\fsize{7.4}\bfseries,inner sep=0pt] at (42.6,33.11) {Target reached};
+  \node[anchor=base west,text=Muted,font=\fsize{6.8},inner sep=0pt] at (42.6,36.24) {total $\geq120$};
+  \node[anchor=base west,font=\fsize{7.4},inner sep=0pt] at (42.6,39.51) {keep remainder};
+
+  \node[anchor=base west,font=\fsize{7.0}\bfseries,inner sep=0pt] at (93.3,33.06) {Miss + catastrophe};
+  \node[anchor=base west,text=Muted,font=\fsize{6.8},inner sep=0pt] at (93.3,36.24) {probability $p$};
+  \node[anchor=base west,font=\fsize{7.4},inner sep=0pt] at (93.3,39.51) {lose all};
+
+  \node[anchor=base west,font=\fsize{7.0}\bfseries,inner sep=0pt] at (144,33.06) {Miss + no catastrophe};
+  \node[anchor=base west,text=Muted,font=\fsize{6.8},inner sep=0pt] at (144,36.24) {probability $1-p$};
+  \node[anchor=base west,font=\fsize{7.4},inner sep=0pt] at (144,39.51) {keep money};
+
+  % ---------------------------- MODELS WE STUDY ----------------------------
+  \rowlabel{50.2}{WarmLabel}{Models we\\ study}
+  % Order follows the paper: Haiku, Flash-Lite, Luna, Qwen, Grok. Names as in figure_biolinum.tex.
+  \asset{logo_claude}{37.6}{50.2}{5.6}{4.8}
+  \asset{logo_gemini}{68.0}{50.2}{5.6}{4.8}
+  \asset{logo_gpt}{98.4}{50.2}{5.6}{4.8}
+  \asset{logo_qwen}{128.8}{50.2}{5.6}{4.8}
+  \asset{logo_grok}{159.2}{50.2}{5.6}{4.8}
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (42.3,49.6) {Claude};
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (42.3,52.6) {Haiku 4.5};
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (72.7,49.6) {Gemini 3.5};
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (72.7,52.6) {Flash-Lite};
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (103.1,49.6) {GPT-5.6};
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (103.1,52.6) {Luna};
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (133.5,51.1) {Qwen3-235B};
+  \node[anchor=base west,font=\fsize{7.3}\bfseries,inner sep=0pt] at (163.9,51.1) {Grok 4.20};
+
+  % ----------------------------- FOUR DESIGNS -----------------------------
+  \rowlabel{74.7}{WarmLabel}{Four designs}
+  % Column x origins 34, 72, 110, 148 (pitch 38 mm); each column is
+  % [number disc] title / subtitle, then the six robots.
+  \numdisc{37.7}{65.2}{1}
+  \numdisc{75.7}{65.2}{2}
+  \numdisc{113.7}{65.2}{3}
+  \numdisc{151.7}{65.2}{4}
+  \foreach \xs/\title/\sub in {34/{Self-play}/{same model $\times 6$},
+                               72/{Prompt tests}/{prompt variants},
+                               110/{Scripted partners}/{fixed partners},
+                               148/{Mixed tables}/{two models}} {
+    \node[anchor=base west,font=\fsize{8.4}\bfseries,inner sep=0pt] at (\xs+8.6,64.94) {\title};
+    \node[anchor=base west,text=Muted,font=\fsize{7.2},inner sep=0pt] at (\xs+8.6,68.19) {\sub};
+  }
+  % Same 19.6 mm width in every column so the robots are the same size; each starts
+  % 9.8 mm below the band top (centre = top + 9.8 + half its height). The mixed-table
+  % PNG has no transparent margin above its top antenna, so it sits 0.5 mm lower.
+  \asset{group_self_play}{52}{77.15}{19.6}{19.6}
+  \asset{group_prompt_tests}{90}{77.35}{19.6}{19.6}
+  \asset{group_scripted_partners}{128}{77.9}{19.6}{19.6}
+  \asset{group_mixed_tables}{166}{77.6}{19.6}{19.6}
+
+  % Five Fixed tags: two on each side of the upper and lower side robots, level with
+  % their faces, and one under the bottom robot; symmetric about x = 128.
+  \fixedtag{114.6}{74.7}
+  \fixedtag{141.4}{74.7}
+  \fixedtag{114.6}{80.3}
+  \fixedtag{141.4}{80.3}
+  \fixedtag{128}{87.3}
+\end{tikzpicture}
+\end{document}

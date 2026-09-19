@@ -4,7 +4,7 @@ Run from the repository root:
     python paper/AAMAS/analysis/supp_selfplay.py
 
 Writes (and nothing else):
-    paper/AAMAS/supplement/tables/s_design_counts.tex    games, decisions, unreadable replies per design
+    paper/AAMAS/supplement/tables/s_design_counts.tex    games, decisions, replies without the CONTRIBUTION: marker per design
     paper/AAMAS/supplement/tables/s_lottery.tex          the ten lottery draws and grid catastrophes
     paper/AAMAS/supplement/tables/s_grid_total.tex       mean seat total, models x risk
     paper/AAMAS/supplement/tables/s_grid_reach.tex       target reached (%), models x risk
@@ -226,8 +226,8 @@ def t_design_counts(games, units, seats, G, S):
     body.append(line(*mixed))
     body += [r"\midrule",
              f"Total & & & {thousands(tot['games'])} & {thousands(tot['dec'])} & {tot['parse']} \\\\"]
-    head = [r" & & Games per & Total & Model & Unreadable \\",
-            r"Design & Risk levels $p$ & model & games & decisions & replies \\"]
+    head = [r" & & Games per & Total & Model & Without the \\",
+            r"Design & Risk levels $p$ & model & games & decisions & marker \\"]
     emit("s_design_counts.tex", "@{}llrrrr@{}", head, body)
 
     G.macro("CntGames", thousands(tot["games"]))
@@ -244,7 +244,7 @@ def t_design_counts(games, units, seats, G, S):
     G.macro("CntGamesMixed", thousands(counts["exp_mixed"]))
     if len(games) != tot["games"]:
         raise RuntimeError("design rows do not cover every game")
-    print(f"  designs: {tot['games']} games, {tot['dec']} decisions, {tot['parse']} unreadable")
+    print(f"  designs: {tot['games']} games, {tot['dec']} decisions, {tot['parse']} without the marker")
 
 
 def t_lottery(games, G, S):
@@ -376,7 +376,7 @@ def t_grid_models(units, seats, G, S):
     if (A < -1e-9).any() or (B < -1e-9).any() or (C < -1e-9).any():
         raise RuntimeError("negative loss component")
     base_u["A"], base_u["B"], base_u["C"] = A, B, C
-    labels = {"A": "overshoot", "B": "below $p^*$", "C": "last round"}
+    labels = {"A": "past 120", "B": "below $p^*$", "C": "missed"}
 
     def row(name, d, s, strata_zero, strata_lost, offset):
         d0 = d[d.p == 0]
@@ -509,7 +509,7 @@ def t_endgame(games, G, S):
         r("\\quad mean round the pool first reached 120", "round"),
         r("\\quad units per seat paid after that round", "waste"),
         r("Games missing 120 at $p>0$ (of 100)", "miss"),
-        r("\\quad of which on fair pace through round 9", "pace"),
+        r("\\quad of which at or ahead of fair pace through round 9", "pace"),
         r"\addlinespace",
         r("Games reaching 120 as played (\\%)", "reach_pct"),
         r("\\quad had every seat repeated its round-9 move in round 10 (\\%)", "cf"),

@@ -1,5 +1,5 @@
 %% =====================================================================================
-%% Supplementary material for "When Low-Cost Language Models Cooperate by Default: Incentives, Partners, and Selection in a Collective-Risk Dilemma". AAMAS 2027 allows supplementary material only as a separate file, and reviewers need not read it, so nothing the paper's argument depends on may live only here. Its job is to hold every value the main text states in words, the full proofs, the instruments word for word and the methods.
+%% Supplementary material for "Paying When It Cannot Help: LLM Agents in a Collective-Risk Dilemma". AAMAS 2027 allows supplementary material only as a separate file, and reviewers need not read it, so nothing the paper's argument depends on may live only here. Its job is to hold every value the main text states in words, the full proofs, the instruments word for word and the methods.
 %% Anonymous: no author names, no repository names, no internal run identifiers, no experiment codes.
 %% One source line per paragraph (no hard wrapping). Never hand-type a measured number: numbers come from ../tables/num_*.tex (the paper's own macros) and tables/*.tex (tabulars and Sup* macros written by the analysis scripts).
 %%
@@ -75,8 +75,8 @@
 %% A two-column "claim | value" table for the numbers behind a main-text section.
 \newenvironment{claims}{\small\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.74\textwidth}>{\raggedleft\arraybackslash}p{0.2\textwidth}@{}}\toprule Statement in the paper, made precise & Value \\\midrule}{\bottomrule\end{tabular}}
 
-\title{Supplementary Material\\[4pt]\large When Low-Cost Language Models Cooperate by Default:\\
-Incentives, Partners, and Selection in a Collective-Risk Dilemma}
+\title{Supplementary Material\\[4pt]\large Paying When It Cannot Help:\\
+LLM Agents in a Collective-Risk Dilemma}
 \author{Anonymous submission}
 \date{}
 
@@ -130,7 +130,7 @@ Six players each start with an endowment $e=40$. In each of $R=10$ rounds, every
 \label{eq:ev}
 u_i(x)=\begin{cases} e-x_i & \text{if } X\ge T,\\ (1-p)\,(e-x_i) & \text{if } X<T.\end{cases}
 \end{equation}
-The fair share is $T/6=20$ per player, or 2 per round, and the pivot is $\popt=T/(6e)=\tfrac12$. All results below assume $p<1$. At $p=1$ a missed target leaves every player with nothing whatever it paid, so many profiles that miss the target become weak equilibria and the characterisation changes.
+The fair share is $T/6=20$ per player, or 2 per round, and the pivot is $\popt=T/(6e)=\tfrac12$. The equilibrium results below assume $p<1$. At $p=1$ a missed target leaves every player with nothing whatever it paid, so many profiles that miss the target become weak equilibria and the characterisation changes.
 
 \subsection{Proposition 1 and its proof}
 
@@ -152,7 +152,9 @@ We check the three cases $X<T$, $X>T$ and $X=T$ in turn.
 \emph{Welfare.} Total welfare is $6e-X$ when $X\ge T$ and $(1-p)(6e-X)$ when $X<T$. Over profiles that reach the target it is largest at $X=T$, with value $6e-T$; over profiles that miss it, it is largest at $X=0$, with value $(1-p)\,6e$. The first is larger if and only if $p>T/(6e)=\popt$, and they are equal at $\popt$. Dividing by six gives $\mathrm{opt}(p)$.
 \end{proof}
 
-The statement is also checked by exhaustive search over every symmetric profile and several thousand random asymmetric profiles at eleven risk levels, as part of the tests that will be released with the final version.
+The welfare statement also holds at $p=1$, as the paper states: a missed target then leaves welfare 0, below the $6e-T$ of a pool that reaches $T$ exactly, so $\mathrm{opt}(1)=e-T/6$, which is what the formula gives.
+
+The equilibrium statement is also checked against every unilateral deviation, from every symmetric profile and from 3,000 random asymmetric profiles at each of the ten risk levels from 0 to 0.9, as part of the tests that will be released with the final version; the case $p=1$ is checked separately.
 
 \subsection{The ten-round game}
 
@@ -279,7 +281,7 @@ Sampling uses temperature 0.7, or 0 in the temperature-zero condition, and an ou
 \subsection{How replies are read}
 \label{sec:parse}
 
-The move is read from the last line of the reply that starts with \texttt{CONTRIBUTION:} and carries one of the allowed amounts. A reply without such a line falls back to the last allowed amount it names. Two situations trigger a new request, with a fresh sampling seed, up to three times: a reply that names no allowed amount at all, and a reply whose length reached the output limit. A reply that reached the limit is asked again with a four times larger limit, up to 8,000 tokens, because asking again with the same limit cuts the reply at the same place; such a reply is never read by the fallback, since any number in it may come from unfinished reasoning. A reply that is still unusable after the retries is counted as unreadable. The data record, for every seat and game, how many replies were unreadable or lacked a \texttt{CONTRIBUTION:} line. Across all \CntDecisions{} model decisions there are \CntParseFail{} such replies, both under the first rewording (Table~\ref{tab:design}), so every other move comes from a \texttt{CONTRIBUTION:} line and the fallback plays no role in the results.
+The move is read from the last line of the reply that starts with \texttt{CONTRIBUTION:} and carries one of the allowed amounts. A reply without such a line falls back to the last allowed amount it names. Two situations trigger a new request, with a fresh sampling seed, up to three times: a reply that names no allowed amount at all, and a reply whose length reached the output limit. A reply that reached the limit is asked again with a four times larger limit, up to 8,000 tokens, because asking again with the same limit cuts the reply at the same place; such a reply is never counted as readable, since any number in it may come from unfinished reasoning. A reply that is still unusable after the retries is counted as unreadable. The data record, for every seat and game, how many replies were unreadable or lacked a \texttt{CONTRIBUTION:} line. No reply was unreadable. Across all \CntDecisions{} model decisions, \CntParseFail{} replies lacked the line, both from Grok 4.20 under the first rewording (Table~\ref{tab:design}), and their moves were read from the rest of the reply. Both games exceeded the target by more than a single move can change, so neither move affects an outcome, and every other move comes from a \texttt{CONTRIBUTION:} line.
 
 In-game questions are read the same way from a final \texttt{ANSWER:} line (Section~\ref{sec:questions}). An unreadable answer counts as wrong.
 
@@ -300,7 +302,7 @@ Each round, every seat receives the prompt below, rendered for its own position,
 Table~\ref{tab:design} counts the games of every design. Every model plays the same number of games in every design, and every cell (one condition, one risk level, one model or pair of models) holds \CntReps{} games, numbered by a repetition index from 1 to 10. The scripted-partner and two-model designs use the base prompt.
 
 \begin{table}[h]
-\caption{Games per design. \emph{Games per model} counts the games in which a model holds at least one seat; in the design with two models at one table each model sits in four of the ten pairs. \emph{Model decisions} counts one decision per model seat per round (the scripted seats are not counted). \emph{Unreadable replies} are replies that gave no readable move after the retries of Section~\ref{sec:parse}.}
+\caption{Games per design. \emph{Games per model} counts the games in which a model holds at least one seat; in the design with two models at one table each model sits in four of the ten pairs. \emph{Model decisions} counts one decision per model seat per round (the scripted seats are not counted). \emph{Without the marker}: replies with no \texttt{CONTRIBUTION:} line, whose move was read from the rest of the reply (Section~\ref{sec:parse}); no reply was unreadable.}
 \label{tab:design}
 \centering\small
 \input{tables/s_design_counts.tex}
@@ -325,7 +327,7 @@ In the game engine, the catastrophe lottery of a game is one uniform draw that d
 
 \begin{itemize}
 \item \textbf{Unit.} The game. Seats of one game share a history and a lottery, so they are not independent. A model's value in a game is the mean over the seats it holds.
-\item \textbf{Intervals.} 95\% percentile bootstrap over games with 5,000 resamples. When a quantity pools several risk levels, games are resampled within each risk level, so each level keeps its weight. For a ratio, such as the share of $\mathrm{opt}(p)$ lost, numerator and denominator are resampled together.
+\item \textbf{Intervals.} 95\% percentile bootstrap over games with 5,000 resamples (2,000 for the tables of Section~\ref{sec:strategy}). For self-play and the prompt controls, a quantity that pools several risk levels resamples games within each risk level, so each level keeps its weight. Intervals for the scripted and two-model designs, including Figure~\ref{main-fig:mixed} of the paper, resample games pooled across risk levels without stratification; every such pool holds the same number of games at each risk level. For a ratio, such as the share of $\mathrm{opt}(p)$ lost, numerator and denominator are resampled together.
 \item \textbf{Tests.} Two-sided permutation tests on the difference in means, with 5,000 permutations, reporting $(h+1)/(n+1)$ for $h$ permuted differences at least as large as the observed one out of $n$. When two conditions are compared over several risk levels, condition labels are permuted within each risk level. The paper marks a prompt change in bold when the shift is at least 2 units and $P<0.01$.
 \item \textbf{Exact sign-flip tests.} For Qwen3-235B against its tablemates in each cell of ten games, the one-sided $P$ is the share of all $2^{10}$ sign patterns of the per-game payoff gaps whose mean is at most the observed mean.
 \item \textbf{Variance shares.} For the scripted design, the variance of a model's total over the three fixed-amount partner kinds, five risk levels and ten games is split with balanced two-way sums of squares into partner kind, risk, their interaction and a residual.
@@ -342,7 +344,7 @@ The prompts, configurations, seeds and code will be released with the final vers
 \section{Self-play across risk}
 \label{sec:selfplay}
 
-This section supports Section~\ref{main-sec:grid} of the paper, its Table 3 and its Figure 2. All six seats hold the same model, with the base prompt, at eleven risk levels from 0 to 1 and ten games per level, so each model plays 110 games and fills 660 seats.
+This section supports Section~\ref{main-sec:grid} of the paper, its Table~\ref{main-tab:models} and its Figure~\ref{main-fig:selfplay}. All six seats hold the same model, with the base prompt, at eleven risk levels from 0 to 1 and ten games per level, so each model plays 110 games and fills 660 seats.
 
 \subsection{Numbers behind the main text}
 
@@ -361,7 +363,7 @@ Qwen3-235B: games reaching the target, of 110 & \GridQwenReach{} \\
 Qwen3-235B: games reaching it had every seat repeated its round-9 move (\%) & \GridQwenFixReachPct{} \\
 Qwen3-235B: games whose pool before round 10 is short of 120 by more than the 4 units one seat can add, of 110; most common pool before round 10 & \SupQwenShortBeyondOne{}; \SupQwenModalPoolNine{} \\
 GPT-5.6 Luna: games missing the target at $p>0$, of \GridLunaGames{} & \GridLunaMiss{} \\
-All models: missed games at $p>0$ that were on the fair pace through round 9 & \GridMissOnPace{} of \GridMissTotal{} \\
+All models: missed games at $p>0$ that were at or ahead of the fair pace through round 9 & \GridMissOnPace{} of \GridMissTotal{} \\
 Claude Haiku 4.5: seats paying 0 in round 10 when the pool already holds 120 (\%, \SupHaikuStopGames{} games); when it does not (\%, \SupHaikuStopOtherGames{} games) & \GridHaikuStopPct{}; \GridHaikuStopOtherPct{} \\
 Share of the attainable payoff the panel loses (\%) & \GridLossPanelPct{} [\SupGridLostPanelLo, \SupGridLostPanelHi] \\
 \quad Gemini 3.5 Flash-Lite; Qwen3-235B; Grok 4.20 (\%) & \GridFlashLossPct{}; \GridQwenLossPct{}; \GridGrokLossPct{} \\
@@ -390,10 +392,10 @@ Means can hide a mixture of very different seats, so Figure~\ref{fig:seat-totals
 
 \subsection{Outcomes at each risk level}
 
-Table~\ref{tab:grid-outcomes} gives three outcomes for every cell. Gemini 3.5 Flash-Lite and Grok 4.20 reach the target at every risk level, and so does Claude Haiku 4.5 at every positive level. Qwen3-235B almost never does. The share of the attainable payoff that is lost shows the cost of the default at low risk: the three fair-share models lose close to half of it at $p=0.1$, where the optimum is to keep everything, and almost nothing above the pivot.
+Table~\ref{tab:grid-outcomes} gives three outcomes for every cell. Gemini 3.5 Flash-Lite and Grok 4.20 reach the target at every risk level, and so does Claude Haiku 4.5 at every positive level. Qwen3-235B almost never does. The share of the attainable payoff that is lost shows the cost of the default at low risk: the three fair-share models lose close to half of it at $p=0.1$, where the optimum is to keep everything. Above the pivot, Claude Haiku 4.5 and Gemini 3.5 Flash-Lite lose little, while GPT-5.6 Luna still loses part of it through the games that miss the target.
 
 \begin{table}[h]
-\caption{Self-play outcomes by risk level, ten games per cell. (a) Games reaching the target. (b) Seats paying 2 in all ten rounds. (c) Share of the attainable expected payoff $\mathrm{opt}(p)$ lost; the Panel row pools the five models. \emph{All} pools the grid and matches Table 3 of the paper.}
+\caption{Self-play outcomes by risk level, ten games per cell. (a) Games reaching the target. (b) Seats paying 2 in all ten rounds. (c) Share of the attainable expected payoff $\mathrm{opt}(p)$ lost; the Panel row pools the five models. \emph{All} pools the grid and matches Table~\ref{main-tab:models} of the paper.}
 \label{tab:grid-outcomes}
 \centering\small
 \textbf{(a)} Target reached (\% of games)\par\smallskip
@@ -406,7 +408,7 @@ Table~\ref{tab:grid-outcomes} gives three outcomes for every cell. Gemini 3.5 Fl
 
 \subsection{Where the payoff goes}
 
-Table~\ref{tab:grid-models} adds intervals to Table 3 of the paper and splits each model's loss into the three parts defined in Section~\ref{sec:loss}. Claude Haiku 4.5 and Gemini 3.5 Flash-Lite lose almost only by paying below the pivot. GPT-5.6 Luna loses mostly there too, and the rest by missing the target above the pivot. Grok 4.20 loses mostly by paying past 120. Qwen3-235B loses in two nearly equal ways, paying below the pivot and missing above it.
+Table~\ref{tab:grid-models} adds intervals to Table~\ref{main-tab:models} of the paper and splits each model's loss into the three parts defined in Section~\ref{sec:loss}. Claude Haiku 4.5 and Gemini 3.5 Flash-Lite lose almost only by paying below the pivot. GPT-5.6 Luna loses mostly there too, and the rest by missing the target above the pivot. Grok 4.20 loses mostly by paying past 120. Qwen3-235B loses in two nearly equal ways, paying below the pivot and missing above it.
 
 \begin{table}[h]
 \caption{Self-play summary with intervals. At $p=0$: mean seat total with its interval and the number of seats paying anything. \emph{Payoff lost}: share of $\mathrm{opt}(p)$ lost over the grid, with a bootstrap interval that resamples games within each risk level. \emph{Share of the loss}: the three parts of Section~\ref{sec:loss} as shares of each model's total loss.}
@@ -417,10 +419,10 @@ Table~\ref{tab:grid-models} adds intervals to Table 3 of the paper and splits ea
 
 \subsection{The end of the game}
 
-Table~\ref{tab:endgame} describes the last rounds, which is where the models differ most. Qwen3-235B pays 2 in almost every decision of rounds 1 to 9 and 0 in almost every round-10 decision, so its tables almost always end just short of 120. Had every seat repeated its round-9 move, all of them would have reached the target. Claude Haiku 4.5 stops in round 10 mostly when the pool already holds 120, which shows that the pool can be worked out from the history in the prompt. Grok 4.20 reaches 120 around round 7 and keeps paying. All of GPT-5.6 Luna's missed games at positive risk were on the fair pace until the last round.
+Table~\ref{tab:endgame} describes the last rounds, which is where the models differ most. Qwen3-235B pays 2 in almost every decision of rounds 1 to 9 and 0 in almost every round-10 decision, so its tables almost always end just short of 120. Had every seat repeated its round-9 move, all of them would have reached the target. Claude Haiku 4.5 stops in round 10 mostly when the pool already holds 120, which shows that the pool can be worked out from the history in the prompt. Grok 4.20 reaches 120 around round 7 and keeps paying. All of GPT-5.6 Luna's missed games at positive risk were at or ahead of the fair pace until the last round.
 
 \begin{table}[h]
-\caption{End-of-game behaviour in self-play (110 games per model; ``n/a'' marks a case with no games). The pool after round 9 is what the seats could have added up before deciding in round 10. \emph{On fair pace}: the pool reached at least $12t$ after every round $t$ up to 9. The last row replays each game with every seat's round-10 move replaced by its round-9 move.}
+\caption{End-of-game behaviour in self-play (110 games per model; ``n/a'' marks a case with no games). The pool after round 9 is what the seats could have added up before deciding in round 10. \emph{At or ahead of fair pace}: the pool reached at least $12t$ after every round $t$ up to 9. The last row replays each game with every seat's round-10 move replaced by its round-9 move.}
 \label{tab:endgame}
 \centering\small
 \input{tables/s_endgame.tex}
@@ -430,7 +432,7 @@ Table~\ref{tab:endgame} describes the last rounds, which is where the models dif
 \section{Prompt and decoding controls}
 \label{sec:controls}
 
-This section supports Section~\ref{main-sec:controls} of the paper and its Table 4. Section~\ref{sec:prompts} gives every prompt. All conditions are self-play; the rerun repeats the base prompt, with in-game questions asked in separate calls that never enter the game.
+This section supports Section~\ref{main-sec:controls} of the paper and its Table~\ref{main-tab:robust}. Section~\ref{sec:prompts} gives every prompt. All conditions are self-play; the rerun repeats the base prompt, with in-game questions asked in separate calls that never enter the game.
 
 \subsection{Numbers behind the main text}
 
@@ -459,10 +461,10 @@ Distinct game records per ten-game cell, temperature zero against 0.7 & \RobTemp
 
 \subsection{Every change against the base grid}
 
-Table~\ref{tab:controls-shift} gives, for every model and condition, the mean seat total at $p=0.1$ and $0.9$ with its shift from the base grid, the interval of the shift and the permutation test. These are the tests behind the bold entries of Table 4 in the paper. The four models other than Grok 4.20 barely move under the rerun, the rewordings and temperature zero. The large shifts come from removing the hint (Qwen3-235B and Grok 4.20 pay more), the second rewording (Grok 4.20 pays about the fair share), neutral wording (Grok 4.20 pays more) and the stated goal (GPT-5.6 Luna and Qwen3-235B pay less).
+Table~\ref{tab:controls-shift} gives, for every model and condition, the mean seat total at $p=0.1$ and $0.9$ with its shift from the base grid, the interval of the shift and the permutation test. These are the tests behind the bold entries of Table~\ref{main-tab:robust} in the paper. The four models other than Grok 4.20 barely move under the rerun, the rewordings and temperature zero. The large shifts come from removing the hint (Qwen3-235B and Grok 4.20 pay more), the second rewording (Grok 4.20 pays about the fair share), neutral wording (Grok 4.20 pays more) and the stated goal (GPT-5.6 Luna and Qwen3-235B pay less).
 
 \begin{table}[h]
-\caption{Mean seat total pooled over $p=0.1$ and $0.9$ (20 games per entry) and its shift from the base grid, with a bootstrap interval that resamples games within each risk level and a permutation $P$ that permutes condition labels within each risk level. Bold: shift of at least 2 units with $P<0.01$, as in Table 4 of the paper. A printed shift can differ by 0.1 from the difference of the printed means, because both are rounded separately.}
+\caption{Mean seat total pooled over $p=0.1$ and $0.9$ (20 games per entry) and its shift from the base grid, with a bootstrap interval that resamples games within each risk level and a permutation $P$ that permutes condition labels within each risk level. Bold: shift of at least 2 units with $P<0.01$, as in Table~\ref{main-tab:robust} of the paper. A printed shift can differ by 0.1 from the difference of the printed means, because both are rounded separately.}
 \label{tab:controls-shift}
 \centering\small
 \input{tables/s_controls_shift.tex}
@@ -566,7 +568,7 @@ Figure~\ref{fig:answers} and Table~\ref{tab:probe-rounds} split the same answers
 
 \subsection{Answers against play}
 
-Table~\ref{tab:knowdo} gives the numbers behind Figure 3 of the paper: for each model and risk level, the share of value answers saying that paying nothing is better and the total that the questioned seat pays in the same games, each with an interval. The figure plots the $p=0.1$ and $p=0.9$ rows with these intervals and joins them by an arrow; the \emph{Shift} rows give that change, with intervals that resample the answer and the payment from the same game. For the three models that answer well, the answer moves by close to its full range while the payment does not move.
+Table~\ref{tab:knowdo} gives the numbers behind Figure~\ref{main-fig:knowdo} of the paper: for each model and risk level, the share of value answers saying that paying nothing is better and the total that the questioned seat pays in the same games, each with an interval. The figure plots the $p=0.1$ and $p=0.9$ rows with these intervals and joins them by an arrow; the \emph{Shift} rows give that change, with intervals that resample the answer and the payment from the same game. For the three models that answer well, the answer moves by close to its full range while the payment does not move.
 
 \begin{table}[h]
 \caption{Answers and play of the questioned seat (ten games per risk level). \emph{Shift}: drop in the share saying B from $p=0.1$ to $p=0.9$, and change in the units paid, with intervals that resample the games at the two risk levels independently.}
@@ -590,7 +592,7 @@ The second value question asks how much cash a player ends with, on average, if 
 \section{One model beside scripted partners}
 \label{sec:scripted}
 
-This section supports Section~\ref{main-sec:scripted} of the paper, including its Table 5; Figure~\ref{fig:scr-heat} shows the same games round by round. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
+This section supports Section~\ref{main-sec:scripted} of the paper, including its Table~\ref{main-tab:settled}; Figure~\ref{fig:scr-heat} shows the same games round by round. Seat 1 holds the model and the five other seats follow one of the four rules of Table~\ref{tab:scripts}, at five risk levels with ten games each, so every model plays 50 games beside each kind of partner. Best responses are derived in Section~\ref{sec:br}.
 
 \subsection{Numbers behind the main text}
 
@@ -627,7 +629,7 @@ Figure~\ref{fig:scr-heat} shows, round by round, what each model pays beside par
 \label{fig:scr-heat}
 \end{figure}
 
-Table~\ref{tab:scr-totals} gives the mean total of the model's seat for every kind of partner and risk level, with the best response below each block. The last column is what a best responder would change: 20 units between low and high risk beside fair-share partners, and nothing beside the other two. No model comes close. Beside partners who always pay 0 or always pay 4, every model pays well above the best response of 0, and Qwen3-235B and Grok 4.20 pay the most, even though these partners make every unit a loss.
+Table~\ref{tab:scr-totals} gives the mean total of the model's seat for every kind of partner and risk level, with the best response below each block. The last column is what a best responder would change: 20 units between low and high risk beside fair-share partners, and nothing beside the other two. No model comes close. Beside partners who always pay 0 or always pay 4, every model pays more than the best response of 0 in every game, and Qwen3-235B and Grok 4.20 pay the most, even though these partners make every unit a loss.
 
 \begin{table}[h]
 \caption{Mean total paid by the model's seat (ten games per entry). \emph{All risks}: the mean over the five risk levels. Last column: the mean at $p=0.7$ and $0.9$ minus the mean at $p=0.1$ and $0.3$. The best-response row gives the best total; ``0 or 20'' marks the tie at $\popt$.}
@@ -647,7 +649,7 @@ Figure~\ref{fig:scr-rounds} shows the same games round by round beside the two k
 
 \subsection{Outcomes and distance from the best response}
 
-Table~\ref{tab:scr-outcomes} turns payments into outcomes. Beside partners who always pay 4, every model reaches the target in every game, so the whole gap to the best response is money paid for nothing; it ranges from small for GPT-5.6 Luna to most of the endowment for Grok 4.20. Beside fair-share partners, the three models that pay the exact split reach the target in almost every game and are exactly optimal in many high-risk games, while Qwen3-235B almost never reaches the target.
+Table~\ref{tab:scr-outcomes} turns payments into outcomes. Beside partners who always pay 4, every model reaches the target in every game, so the whole gap to the best response is money paid for nothing; it ranges from small for GPT-5.6 Luna to most of the endowment for Grok 4.20. Beside fair-share partners, Claude Haiku 4.5, Gemini 3.5 Flash-Lite and GPT-5.6 Luna reach the target in almost every game and are exactly optimal in many games at or above the pivot, while Qwen3-235B almost never reaches the target.
 
 \begin{table}[h]
 \caption{Outcomes by kind of partner, pooled over five risk levels (50 games per model). \emph{Expected payoff} is the model seat's; \emph{Gap to best response} is the best-response payoff minus it; \emph{Exactly optimal} counts games with no gap. For the best-response rows beside fair-share partners, the target count is 20 or 30 depending on how the tie at $\popt$ is broken.}
@@ -811,7 +813,7 @@ This section supports Section~\ref{main-sec:selection} of the paper and its Figu
 \[
 \mathcal{H}(k;\,M,\,m)=\binom{m}{k}\binom{M-m}{5-k}\Big/\binom{M}{5}.
 \]
-The fitness of each type is its payoff averaged over these tables, as in Equation (2) of the paper. With $N=6$ the whole population is a single table, so the $A$ agents earn exactly $\pi_A(i)$ and the $B$ agents $\pi_B(6-i)$.
+The fitness of each type is its payoff averaged over these tables, as in Equation~\eqref{main-eq:fitness} of the paper. With $N=6$ the whole population is a single table, so the $A$ agents earn exactly $\pi_A(i)$ and the $B$ agents $\pi_B(6-i)$.
 
 \paragraph{Fixation.} Under the pairwise comparison rule, an agent copies another with probability $1/(1+e^{-\beta\Delta f})$, where $\Delta f$ is the other agent's fitness minus its own. The probability that one $A$ newcomer takes over a population of $B$ is
 \[
@@ -842,7 +844,8 @@ Larger population at $p=0.9$: population target rate (\%); payoff per seat & \Se
 Larger population at $p=0.1$: model with the largest mass & \SelAcrossWinnerLow{} \\
 Winners unchanged for $\beta=\SelBetaExtra$, for $N$ of \SelNExtra{}, and with grid-only self-play & yes \\
 Smallest share of bootstrap replicates in which the winner stays on top (\%): pooled self-play; grid only & \SelBootMinPct{}; \SupSelBaseBootMinPct{} \\
-Weak selection ($\beta=\SelWeakBeta$), one table ($N=6$): largest mass of any model & \SelWeakWithinMaxMass{} \\
+Weak selection ($\beta=\SelWeakBeta$), one table ($N=6$): largest mass of any model at any risk level & \SelWeakWithinMaxMass{} \\
+\quad model with the largest mass at $p=0.5$; $0.9$ & \SupSelWeakWithinTopMid{}; \SupSelWeakWithinTopHigh{} \\
 Weak selection, larger population ($N=30$): model with the largest mass at $p=0.5$; $0.9$ & \SelWeakAcrossTopMid{}; \SelWeakAcrossTopHigh{} \\
 Larger population: smallest population from which Gemini 3.5 Flash-Lite stays the winner at $p=0.9$; at $p=0.5$ & \SelSwitchN{}; \SupSelSwitchNMid{} \\
 Cells (pair, split, risk) in which a single seat beside five Grok 4.20 seats earns more than they do & \SelGrokLosesCells{} of 12 \\
@@ -877,7 +880,7 @@ Tables~\ref{tab:sel-payoff-01} to~\ref{tab:sel-payoff-09} give $\pi_X(k)$ for ev
 
 \subsection{Every selection setting}
 
-Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for both population sizes, three selection intensities and three population sizes. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. In a population of one table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to almost zero. In the larger population, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both population sizes as soon as selection is more than very weak.
+Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for one table ($N=6$) and for larger populations ($N=30$, \SelNExtra{}), at the selection intensities $\beta=\SelWeakBeta$, 1 and \SelBetaExtra{}; the two largest populations are computed only for $\beta\ge1$. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. In a population of one table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to almost zero. In the larger population, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both population sizes as soon as selection is more than very weak.
 
 \begin{table}[h]
 \caption{Stationary mass of each model under each selection setting, with the population's self-play target rate and expected payoff per seat. \emph{Random model}: every model equally weighted.}

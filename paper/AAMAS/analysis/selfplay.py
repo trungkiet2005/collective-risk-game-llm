@@ -362,12 +362,12 @@ def main():
     if (A < -1e-9).any() or (B < -1e-9).any() or (C < -1e-9).any():
         raise RuntimeError("negative loss component")
     base_u["A"], base_u["B"], base_u["C"] = A, B, C
-    labels = {"A": "overshoot", "B": "below $p^*$", "C": "last round"}
+    labels = {"A": "past 120", "B": "below $p^*$", "C": "missed"}
     expected_main = {"Haiku": "B", "Flash-Lite": "B", "Luna": "B", "Qwen": "C", "Grok": "A"}
 
     print("\nModel table (exp_baseline, 110 games per model)")
     print("  loss decomposition, share of each model's expected loss: "
-          "A overshoot | B paying below p* | C missing at p>=p*")
+          "A paying past 120 | B paying below p* | C missing at p>=p*")
     rows = []
     loss_pct = {}
     for m in MODELS:

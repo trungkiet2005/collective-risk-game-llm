@@ -57,6 +57,39 @@
 \definecolor{SurvivalLine}{HTML}{E2C56B}
 \definecolor{FixedFill}{HTML}{65706F}
 
+% Colour variants: palettes/<name>.tex may redefine any colour above or any
+% role below; build them all with palettes/build_palettes.sh. Without
+% \FigPalette this file compiles to the paper's Figure 1 unchanged.
+\newif\ifheadrule \headrulefalse
+\ifdefined\FigPalette \input{\FigPalette}\fi
+\makeatletter
+\newcommand{\defaultcolorlet}[2]{\@ifundefinedcolor{#1}{\colorlet{#1}{#2}}{}}
+\makeatother
+\defaultcolorlet{PanelFill}{white}
+\defaultcolorlet{HeadA}{Blue}
+\defaultcolorlet{HeadB}{Green}
+\defaultcolorlet{HeadText}{white}
+\defaultcolorlet{HeadTagA}{HeadText}
+\defaultcolorlet{HeadTagB}{HeadText}
+\defaultcolorlet{HeadRuleA}{BlueLine}
+\defaultcolorlet{HeadRuleB}{GreenLine}
+\defaultcolorlet{CardLine}{GeminiLine}
+\defaultcolorlet{RuleCard}{white}
+\defaultcolorlet{SelfLine}{GeminiLine}
+\defaultcolorlet{PromptLine}{ClaudeLine}
+\defaultcolorlet{ScriptLine}{QwenLine}
+\defaultcolorlet{MixedLine}{GrokLine}
+\defaultcolorlet{NumOne}{Blue}
+\defaultcolorlet{NumTwo}{Orange}
+\defaultcolorlet{NumThree}{Purple}
+\defaultcolorlet{NumFour}{Gold}
+\defaultcolorlet{NumText}{white}
+\defaultcolorlet{NumTextOne}{NumText}
+\defaultcolorlet{NumTextTwo}{NumText}
+\defaultcolorlet{NumTextThree}{NumText}
+\defaultcolorlet{NumTextFour}{NumText}
+\defaultcolorlet{FixedText}{white}
+
 \newcommand{\fsize}[1]{\fontsize{#1}{\dimexpr #1pt*6/5\relax}\selectfont}
 \newcommand{\card}[6]{%
   \path[rounded corners=1.25mm,fill=#5,draw=#6,line width=.36pt]
@@ -67,13 +100,13 @@
     {\includegraphics[width=#4mm,height=#5mm,keepaspectratio]{assets/#1.png}};}
 % A small typographic badge; no raster text is used for these five labels.
 \newcommand{\fixedbadge}[2]{%
-  \node[rounded corners=.65mm,fill=FixedFill,text=white,inner xsep=.65mm,
+  \node[rounded corners=.65mm,fill=FixedFill,text=FixedText,inner xsep=.65mm,
         inner ysep=.42mm,outer sep=0pt,font=\fsize{5.8}]
         at (#1,#2) {Fixed};}
-% Header block for an experimental-design card.
-\newcommand{\designhead}[7]{%
+% Header block for an experimental-design card; #8 is the number's colour.
+\newcommand{\designhead}[8]{%
   \path[fill=#4] (#1,#2) circle[radius=3.8mm];
-  \node[text=white,font=\fsize{14}\bfseries,inner sep=0pt] at (#1,#2) {#3};
+  \node[text=#8,font=\fsize{14}\bfseries,inner sep=0pt] at (#1,#2) {#3};
   \node[text=Ink,font=\fsize{8.5}\bfseries,inner sep=0pt,align=center]
     at (#5,{#2-1.50}) {#6};
   \node[text=Muted,font=\fsize{7.4},inner sep=0pt,align=center]
@@ -85,18 +118,19 @@
   \path[use as bounding box] (0,0) rectangle (188,90);
 
   % -------------------- (a) THE GAME --------------------
-  \path[rounded corners=1.8mm,fill=white] (1,1) rectangle (92,89);
+  \path[rounded corners=1.8mm,fill=PanelFill] (1,1) rectangle (92,89);
   \begin{scope}
     \clip[rounded corners=1.8mm] (1,1) rectangle (92,89);
-    \fill[Blue] (1,1) rectangle (92,8.8);
+    \fill[HeadA] (1,1) rectangle (92,8.8);
   \end{scope}
+  \ifheadrule \draw[HeadRuleA,line width=.55pt] (1,8.8) -- (92,8.8); \fi
   \path[rounded corners=1.8mm,draw=BlueLine,line width=.55pt]
     (1,1) rectangle (92,89);
-  \node[anchor=west,text=white,font=\fsize{14}\bfseries,inner sep=0pt]
-    at (3.5,4.9) {(a)\quad The game};
+  \node[anchor=west,text=HeadText,font=\fsize{14}\bfseries,inner sep=0pt]
+    at (3.5,4.9) {\textcolor{HeadTagA}{(a)}\quad The game};
 
-  \card{3}{10.6}{55.5}{60.4}{PanelWash}{GeminiLine}
-  \card{57.5}{10.6}{90}{60.4}{white}{GeminiLine}
+  \card{3}{10.6}{55.5}{60.4}{PanelWash}{CardLine}
+  \card{57.5}{10.6}{90}{60.4}{RuleCard}{CardLine}
   \asset{group_game}{29.25}{35.5}{45}{45}
 
   % Six rule icons and their selectable labels (pitch 7.8 mm).
@@ -118,7 +152,7 @@
 
   % Outcomes: corrected parent heading. The original put 'Target reached'
   % under 'if total < 120'. Here 'miss' has its own explicit condition.
-  \card{3}{62}{90}{87}{PanelWash}{GeminiLine}
+  \card{3}{62}{90}{87}{PanelWash}{CardLine}
   \node[anchor=west,font=\fsize{9.2}\bfseries,inner sep=0pt]
     at (4.4,65.0) {Outcomes};
   \node[anchor=east,font=\fsize{6.8},text=Muted,inner sep=0pt]
@@ -142,20 +176,21 @@
   \node[font=\fsize{7.4},inner sep=0pt] at (75.1665,83.6) {keep money};
 
   % -------------------- (b) FOUR DESIGNS --------------------
-  \path[rounded corners=1.8mm,fill=white] (94,1) rectangle (187,89);
+  \path[rounded corners=1.8mm,fill=PanelFill] (94,1) rectangle (187,89);
   \begin{scope}
     \clip[rounded corners=1.8mm] (94,1) rectangle (187,89);
-    \fill[Green] (94,1) rectangle (187,8.8);
+    \fill[HeadB] (94,1) rectangle (187,8.8);
   \end{scope}
+  \ifheadrule \draw[HeadRuleB,line width=.55pt] (94,8.8) -- (187,8.8); \fi
   \path[rounded corners=1.8mm,draw=GreenLine,line width=.55pt]
     (94,1) rectangle (187,89);
-  \node[anchor=west,text=white,font=\fsize{14}\bfseries,inner sep=0pt]
-    at (96.5,4.9) {(b)\quad Four designs};
+  \node[anchor=west,text=HeadText,font=\fsize{14}\bfseries,inner sep=0pt]
+    at (96.5,4.9) {\textcolor{HeadTagB}{(b)}\quad Four designs};
 
   % Model names are transcribed from the supplied image, not independently
   % verified release names. Logos are extracted symbols without raster labels.
   % Order follows the paper (19-09-2026): Haiku, Flash-Lite, Luna, Qwen, Grok.
-  \card{96}{10.6}{185}{28.6}{ModelWash}{GeminiLine}
+  \card{96}{10.6}{185}{28.6}{ModelWash}{CardLine}
   \node[anchor=west,font=\fsize{9.0}\bfseries,inner sep=0pt]
     at (97.4,13.1) {Models we study};
   \card{97.4}{15.6}{113.7}{27.6}{ClaudeWash}{ClaudeLine}
@@ -178,15 +213,15 @@
   \node[font=\fsize{7.3}\bfseries,inner sep=0pt] at (175.95,23.9) {Grok 4.20};
 
   % Design cards use consistent geometry, title baselines, and artwork height.
-  \card{96}{30.2}{139.5}{57.8}{SelfWash}{GeminiLine}
-  \card{141.5}{30.2}{185}{57.8}{PromptWash}{ClaudeLine}
-  \card{96}{59.4}{139.5}{87}{ScriptWash}{QwenLine}
-  \card{141.5}{59.4}{185}{87}{MixedWash}{GrokLine}
+  \card{96}{30.2}{139.5}{57.8}{SelfWash}{SelfLine}
+  \card{141.5}{30.2}{185}{57.8}{PromptWash}{PromptLine}
+  \card{96}{59.4}{139.5}{87}{ScriptWash}{ScriptLine}
+  \card{141.5}{59.4}{185}{87}{MixedWash}{MixedLine}
 
-  \designhead{101.4}{35.2}{1}{Blue}{121.6}{Self-play}{same model $\times 6$}
-  \designhead{146.9}{35.2}{2}{Orange}{167.1}{Prompt tests}{prompt variants}
-  \designhead{101.4}{64.4}{3}{Purple}{121.6}{Scripted partners}{fixed partners}
-  \designhead{146.9}{64.4}{4}{Gold}{167.1}{Mixed tables}{two models}
+  \designhead{101.4}{35.2}{1}{NumOne}{121.6}{Self-play}{same model $\times 6$}{NumTextOne}
+  \designhead{146.9}{35.2}{2}{NumTwo}{167.1}{Prompt tests}{prompt variants}{NumTextTwo}
+  \designhead{101.4}{64.4}{3}{NumThree}{121.6}{Scripted partners}{fixed partners}{NumTextThree}
+  \designhead{146.9}{64.4}{4}{NumFour}{167.1}{Mixed tables}{two models}{NumTextFour}
   % All four groups have the same width (19.1 mm) so the robots are the same
   % size in every card, and each starts 8.8 mm below its card's top edge
   % (centre = top + 8.8 + half its height). The mixed-table PNG has no
