@@ -14,12 +14,12 @@
     },
     "fig_mixed": {
       "csv_sha256": "203620af5b59dd7927e2286e7195c661992149f925e638246331cf7f3d524ff3",
-      "tex_sha256": "f13c197b81a038f80767f94d018ecc12798fbc8b2ea17e14c0c325d026758e22",
+      "tex_sha256": "fc1b5b591247dfb9171b8aa0815c1394d03af27fe13b9c0a8a056c6b88817f5f",
       "estimates": 28,
       "width_bp": 241.14500427246094,
-      "height_bp": 139.9980010986328,
+      "height_bp": 145.9980010986328,
       "minimum_font_bp": 8.219200134277344,
-      "text_spans": 30,
+      "text_spans": 27,
       "type3_fonts": 0
     }
   }

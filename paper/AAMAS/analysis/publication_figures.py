@@ -17,7 +17,7 @@ import crsd_data as cd
 
 FIG = cd.FIGURES
 TEXT_PT = 8.25
-HEIGHTS = {'fig_knowdo': 158.0, 'fig_mixed': 140.0}
+HEIGHTS = {'fig_knowdo': 158.0, 'fig_mixed': 146.0}
 RISK_LOW, RISK_HIGH = 0.1, 0.9
 ARROW_MIN_BP = 14.0   # a shorter change is drawn as a plain segment: no room for a head
 LABELS = {'Haiku': r'Haiku 4.5', 'Flash-Lite': r'Gemini 3.5\\Flash-Lite',
@@ -177,36 +177,43 @@ def mixed(rows):
     short={cd.show(m):m for m in cs.MODEL_ORDER}
     a=[r for r in rows if r['panel']=='a'];b=[r for r in rows if r['panel']=='b']
     if len(a)!=8 or len(b)!=20: raise ValueError('Figure 5 requires 8 + 20 estimates')
-    xa=lambda v: 54+56*v/100
-    xb=lambda k: 142+14*(k-1)
-    yb=lambda v: 112-4.914*(v-8)
-    d.text(1,8,'a  One replacement',anchor='west',bold=True)
-    d.text(126,8,'b  Units per seat',anchor='west',bold=True)
-    # The legend is neutral: fill encodes condition, not another model.
-    for x,label,filled in ((4,'Self-play',True),(50,'+1 Qwen',False)):
-        d.circle(x,21,'ink',filled=filled); d.text(x+4.5,21,label,anchor='west')
+    k=cs.MODEL_ORDER.index
+    # One shared model legend on top frees both panels from per-row and line-end labels.
+    for m,(x,y) in {'Haiku':(4,7),'Flash-Lite':(70,7),'Luna':(168,7),'Qwen':(4,19),'Grok':(70,19)}.items():
+        d.line(x,y,x+10,y,colour=f'm{k(m)}',width=1.1)
+        d.mark(x+5,y,m,size=1.9)
+        d.text(x+14,y,LABELS[m].replace(r'\\',' '),anchor='west')
+    d.line(0,27.5,cs.COL_W_PT,27.5,width=.4,opacity=.5)
+    top,ax=38,122
+    xa=lambda v: 10+v
+    xb=lambda n: 142+22.5*(n-1)
+    yb=lambda v: ax-4-3.75*(v-8)
+    d.text(1,top,'a  One replacement',anchor='west',bold=True)
+    d.text(126,top,'b  Units per seat',anchor='west',bold=True)
+    # The condition key is neutral: fill encodes condition, not another model.
+    for x,label,filled in ((4,'Self-play',True),(46,'+1 Qwen',False)):
+        d.circle(x,top+12,'ink',filled=filled); d.text(x+4.5,top+12,label,anchor='west')
     # a: an arrow from self-play to one Qwen seat; both keep their own interval.
     for i,m in enumerate(('Haiku','Flash-Lite','Luna','Grok')):
-        y,k=38+22*i,cs.MODEL_ORDER.index(m)
-        d.text(46,y,LABELS[m],anchor='east',colour=f't{k}',align='right')
+        y=top+26+15*i
         s,q=(next(r for r in a if short[r['model']]==m and r['condition']==c) for c in ('self_play','one_Qwen_seat'))
         for r in (s,q):
             d.check(float(r['estimate']),float(r['ci_low']),float(r['ci_high']))
             d.bar(xa(float(r['ci_low'])),xa(float(r['ci_high'])),y,m)
         xs,xq=xa(float(s['estimate'])),xa(float(q['estimate']))
         if abs(xs-xq)<1e-7: d.text(xq-6,y,'no change',anchor='east',colour='muted',italic=True)
-        d.arrow(xs,xq,y,f'm{k}')
+        d.arrow(xs,xq,y,f'm{k(m)}')
         d.mark(xq,y,m,filled=False); d.mark(xs,y,m)
-    d.line(50,116,114,116,colour='ink',width=.7)
-    for v in (0,50,100):
-        x=xa(v); d.line(x,116,x,119,colour='ink'); d.text(x,124,str(v))
-    d.text(xa(50),134,r'Target reached (\%)')
+    d.line(6,ax,114,ax,colour='ink',width=.7)
+    for v in (0,25,50,75,100):
+        x=xa(v); d.line(x,ax,x,ax+3,colour='ink'); d.text(x,ax+8,str(v))
+    d.text(xa(50),ax+18,r'Target reached (\%)')
     # b: every composition is its own measured mean; lines only join them, bands are
     # their intervals. No fit, and no interpolation of data.
     for v in (10,15,20,25):
-        d.line(136,yb(v),200,yb(v),opacity=.28,width=.5)
+        d.line(136,yb(v),238,yb(v),opacity=.28,width=.5)
         d.text(133,yb(v),str(v),anchor='east')
-    d.line(136,yb(20),200,yb(20),colour='muted',dash='densely dotted',width=.8)
+    d.line(136,yb(20),238,yb(20),colour='muted',dash='densely dotted',width=.8)
     groups={}
     for m in ('Haiku','Flash-Lite','Luna','Qwen'):
         group=sorted((r for r in b if short[r['model']]==m),key=lambda r:int(r['grok_seats']))
@@ -215,20 +222,12 @@ def mixed(rows):
         d.ribbon([(xb(int(r['grok_seats'])),yb(float(r['ci_low'])),yb(float(r['ci_high']))) for r in group],m)
         groups[m]=[(xb(int(r['grok_seats'])),yb(float(r['estimate']))) for r in group]
     for m,pts in groups.items():
-        d.polyline(pts,f'm{cs.MODEL_ORDER.index(m)}')
+        d.polyline(pts,f'm{k(m)}')
         for x,y in pts: d.mark(x,y,m,size=1.9)
-    # Direct labels at the line ends, nudged apart only where two would touch.
-    ends=sorted((pts[-1][1],m) for m,pts in groups.items())
-    ys=[y for y,_ in ends]
-    for j in range(1,len(ys)):
-        if ys[j]-ys[j-1]<10:
-            mid=(ys[j]+ys[j-1])/2; ys[j-1],ys[j]=mid-5,mid+5
-    for y,(_,m) in zip(ys,ends):
-        d.text(xb(5)+5,y,m,anchor='west',colour=f't{cs.MODEL_ORDER.index(m)}')
-    d.line(136,116,202,116,colour='ink',width=.7)
-    for k in range(1,6):
-        x=xb(k); d.line(x,116,x,119,colour='ink'); d.text(x,124,str(k))
-    d.text(xb(3),134,'Grok 4.20 seats')
+    d.line(136,ax,238,ax,colour='ink',width=.7)
+    for n in range(1,6):
+        x=xb(n); d.line(x,ax,x,ax+3,colour='ink'); d.text(x,ax+8,str(n))
+    d.text(xb(3),ax+18,'Grok 4.20 seats')
     return d.write()
 
 
