@@ -1,7 +1,3 @@
-%% =====================================================================================
-%% Single-file paper: every section, figure and caption lives in this file. Write each paragraph on one line (no hard wrapping). Only machine-generated content stays in tables/ (num_*.tex macros and tab_*.tex tabulars, written by analysis/*.py), so rerunning an analysis script updates the paper.
-%% Prose rule (17-09-2026, relaxed the same day): paragraphs carry few numbers, but a claim a reviewer would want to check (a quantifier such as "almost always") gets its value from a macro in parentheses. Game rules and design parameters may stay; measured results are stated in words and their values live in the tables, the figures and the supplementary material (supplement/supplement.tex, which inputs the same num_*.tex macros). Never hand-type a measured number.
-%% =====================================================================================
 \documentclass[sigconf,anonymous]{aamas}
 \pdfinfoomitdate=1
 \pdftrailerid{}
@@ -56,7 +52,6 @@
 \author{Anonymous Author(s)}
 \affiliation{\institution{Anonymous Institution}\country{}}
 
-%% Keep in sync, word for word, with OPENREVIEW_ABSTRACT.txt. No result numbers in the abstract.
 \begin{abstract}
 Language-model agents increasingly act on behalf of people in settings where multiple agents share a common outcome. In many such settings, avoiding a collective loss requires each agent to give up some of its own resources. We ask whether such agents adjust their cooperation to the stakes and their partners, or instead follow a largely fixed default behaviour. Five production models play a collective-risk social dilemma in which six players pay into a shared pool over ten rounds; if the pool misses its target, a catastrophe destroys all remaining savings with a given probability. Four models pay about an equal share at every positive risk level, and four of the five also pay at zero risk, where paying cannot help. Explicitly stating that only the agent's own cash matters reduces payment at zero risk for most models; simply making the prompt more neutral does not. Several models correctly identify which choice gives them the higher expected payoff at each risk level, yet barely change what they actually pay. Against fixed partners, no model consistently chooses the payoff-maximising best response, and in groups mixing different models, one agent that underpays in the final round can make an otherwise successful group fail. In payoff-based evolutionary selection, population size changes which model is favoured: with only one six-agent group, selection favours the model that pays least and reduces group success, whereas in larger randomly mixed populations it favours an exact fair-share model at moderate and high risk.
 \end{abstract}
@@ -67,18 +62,9 @@ Language-model agents increasingly act on behalf of people in settings where mul
 
 \maketitle
 
-%% =====================================================================================
-%% 1 Introduction. Spine of the paper, three sentences:
-%%   believed: LLM agents that reach cooperative outcomes are cooperating strategically;
-%%   found: when the prompt leaves the agent's goal unstated, the models pay by default (play that does not follow the stakes, visible where paying cannot help); removing normative words keeps the default, stating the goal switches most of it off without making the models weigh the risk; defaults respond to partners only in simple ways and fail predictably in mixed groups and under selection;
-%%   change: state the agent's goal, evaluate against the optimum, in mixed populations, and choose the selection signal with care.
-%% Structure (20-09-2026): five top-level sections. Section 3 holds the game, the benchmarks and the method of every design (3.3), and Section 4 (Results) follows the intro's three questions: 4.1 = stakes (self-play grid, prompt controls, value question), 4.2 = partners (scripted, mixed tables), 4.3 = selection. Section 5 is discussion and conclusion. Figure 1 shows only the game and the designs (no findings panel since 19-09-2026), so the three numbered sets of findings at the end of the Introduction are the only overview of the findings.
-%% Scope rule: claims are about the five models tested, not about "LLMs".
-%% Model names: always with family and version (Claude Haiku 4.5, Gemini 3.5 Flash-Lite, GPT-5.6 Luna, Qwen3-235B, Grok 4.20); a bare "Luna" does not tell the reader it is a GPT model, and "Claude Haiku" does not say which Haiku.
-%% =====================================================================================
+
 \section{Introduction}
 \label{sec:intro}
-%% Overview figure (figure*, text width); placed right after \label{sec:intro} so it floats to page 2. TikZ with PNG robots and logos (19-09-2026), in the slate-mono palette: the layout is tikz_figure_complete/figure_biolinum.tex, the colours are tikz_figure_complete/palettes/slate_mono.tex, and bash tikz_figure_complete/palettes/build_palettes.sh rebuilds it with the other palette variants and copies it to figures/fig_game_designs.pdf, the file included here; it needs tikz_figure_complete/assets/. Set in Linux Biolinum, the sans companion of the class's Libertine. It shows only the game and the designs, so it holds no measured number; the findings live in the three numbered sets of findings below. The former three-panel figure with a findings panel (TikZ_Figure_Deliverables/figure_rebuilt.pdf) and analysis/overview.py's figures/fig_overview.pdf are no longer used.
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_game_designs.pdf}
@@ -89,7 +75,6 @@ Language-model agents increasingly act on behalf of people in settings where mul
 
 Language-model agents increasingly act on behalf of people in settings where several agents share a common outcome, such as spending budgets, drawing on shared compute or negotiating over common resources~\cite{chan2024visibility,hammond2025multi}. In many such settings, avoiding a collective loss requires each agent to give up some of its own resources. We ask whether such agents adjust their cooperation to the situation or follow a largely fixed default. For a designer of such agents, this question splits into three. Does an agent's cooperation depend on what is at stake? Does it depend on what the other agents do? And which agents prevail when a system keeps or copies those that earn the most?
 
-%% Page-2 fill (20-09-2026, after aligning the first paragraph with the abstract): the paragraph that used to carry \looseness=-1 no longer needs it. With the current Introduction the gap above Section 2 is 11 pt without it and 33 pt with it (other section headings: 7 to 10 pt), and the body ends on page 8. Recheck both if the Introduction's length changes.
 Success in self-play, common in multiagent benchmarks~\cite{piatti2024cooperate,huang2025competing}, cannot answer these questions on its own. When every seat holds a copy of the same model, an agent that weighs the stakes and an agent that repeats a fixed rule can leave the same record of play. A success rate also hides how far a group is from the best it could have done: a group can reach its goal and still waste most of its money. And a prompt that states a group target and a number of rounds already suggests an equal split, so an agent that repeats that split looks cooperative on the usual summary measures.
 
 We study these questions in the collective-risk social dilemma, a game introduced to study climate cooperation~\cite{milinski2008collective}. Players pay into a shared pool over several rounds, and if the pool misses a target, a catastrophe destroys everyone's savings with probability $p$ (Figure~\ref{fig:overview}a). For risk-neutral players, group welfare is highest when nobody pays below $p=\tfrac12$ and when the group reaches the target exactly above it, for example by each paying the \emph{fair share}, the target split equally. The game also contains two situations in which paying cannot raise a player's own cash: when there is no risk, and once the outcome is settled. Neither risk attitude nor concern for the group can explain payment in these situations, so they separate a default from a response to the stakes.
@@ -100,10 +85,6 @@ We report three sets of findings, one per question. (1)~\emph{Stakes.} Most mode
 
 For the five models we test, payment is a default rather than a response to the stakes. A default can work well beside copies of itself; whether it fails elsewhere depends on the partners, on whether the agent's goal is stated, and on how agents are selected.
 
-%% =====================================================================================
-%% 2 Related work. Four paragraphs; the social-dilemma paragraph holds the most similar studies and ends with how this paper differs. Cite them by number like every other work; do not name authors or single one out as "closest" (20-09-2026).
-%% Claims about other papers were checked against their full text on 2026-09-16. Citations added on 2026-09-19 (abouchakra2012evolutionary, duong2026cost, han2024evolutionary, lore2024strategic, pal2026large, buscemi2025fairgame, huynh2025understanding, buscemi2025llms, pham2026humans, han2022emergent, fernandezdomingos2022delegation, chan2024visibility, hammond2025multi, huynh2026payoff, traulsen2006stochastic, fudenberg2006imitation) were checked against their abstracts and publisher records.
-%% Anonymity: pham2026humans, huynh2025understanding and huynh2026payoff come from the authors' group. Cite them in the third person only; their bib entries list the first author and "others" so that make_submission.py's name gate passes.
 %% =====================================================================================
 \section{Related work}
 \label{sec:related}
@@ -119,12 +100,8 @@ Societies of agents over-use a common resource~\cite{piatti2024cooperate}, contr
 
 \paragraph{Multiagent evaluation.}
 Multiagent reinforcement learning studies cooperation in sequential social dilemmas~\cite{leibo2017multi,hughes2018inequity}, and ad hoc teamwork and cooperative AI ask for agents that work with partners unlike themselves~\cite{stone2010ad,dafoe2020open,leibo2021scalable}. Empirical game-theoretic analysis treats trained agents as strategies of a meta-game~\cite{wellman2006methods,tuyls2018generalised}, $\alpha$-Rank ranks them by evolutionary dynamics~\cite{omidshafiei2019alpha}, and evolutionary game theory is used to study emergent behaviour in multiagent systems~\cite{han2022emergent}. Language models show distinct strategic fingerprints in tournaments with classic strategies~\cite{payne2025strategic}, their cooperation evolves differently across base models~\cite{vallinder2025cultural}, and cooperation sustained by repetition weakens when co-players differ~\cite{tewolde2026coopeval}. In the collective-risk game, people who delegate to artificial agents succeed more often~\cite{fernandezdomingos2022delegation}, and in theory adaptive players compensate for the effort of artificial agents~\cite{terrucha2024art}. We add a many-player dilemma with exact best responses to fixed partners, and measure this compensation in real models.
-%% =====================================================================================
-%% 3 Game, benchmarks, designs.
-%% Proposition 1 is checked by exhaustive search in crsd/tests/test_paper_equilibrium.py (all symmetric profiles plus 3,000 sampled profiles at each of ten risks below one; the certainty boundary is checked separately). If you change the statement, change the test. p = 1 is checked separately: a failed pool is an equilibrium only when no player can reach the target while retaining positive cash.
-%% The full proofs (Proposition 1, its extension to the ten-round game, Proposition 2) are in supplement/supplement.tex.
-%% The verbatim prompts (base, no hint, neutral wording, goal stated, two rewordings) live in supplement/supplement.tex, rendered from kaggle/benchmarks/crg_task_server.py. The Prompts paragraph (3.2) and the prompt-controls paragraph (3.3) below must quote exactly the spans each condition changes.
-%% =====================================================================================
+
+
 \section{Game and evaluation design}
 \label{sec:game}
 
@@ -191,7 +168,7 @@ The running pool is not printed, so a seat that wants it must add up the history
 \paragraph{Measures.}
 We report \emph{expected} payoffs, the average a seat would earn if the catastrophe lottery were run many times on the same payments, and the share of $\mathrm{opt}(p)$ that is lost. Proposition~\ref{prop:eq}, $\mathrm{opt}(p)$ and the selection fitness below all use expected payoffs, which remove the lottery noise without bias; agents never see the draw, and the supplementary material lists the realised draws. The unit of analysis is the game, since seats in one game share a history and a lottery. Intervals are 95\% percentile bootstraps over games, tests are permutation tests over games, and the supplementary material gives every value behind the statements below.
 
-%% 3.3 holds every design's method, so each results subsection of Section 4 opens with a finding. The prompt-controls paragraph below must quote exactly the spans each condition changes (the base prompt is described in 3.2).
+
 \subsection{Evaluation designs}
 \label{sec:designs}
 
@@ -245,14 +222,7 @@ f_B(i) &= \textstyle\sum_{k=0}^{5} \mathcal{H}(k;\,N-1,\,i)\;\pi_B(6-k), \nonumb
 \end{align}
 where $\mathcal{H}(k;\,N-1,\,m)$ is the hypergeometric chance that $k$ of five tablemates come from the $m$ other agents of type $A$. Under Fermi imitation~\cite{traulsen2006stochastic}, an agent copies a random other agent with probability $1/(1+e^{-\beta\Delta f})$, where $\Delta f$ is the other's fitness minus its own and $\beta=1$ per payoff unit. We assume rare mutation~\cite{fudenberg2006imitation}: each newcomer fixes or disappears before the next arrives. Pairwise fixation probabilities define a Markov chain over the five one-model populations. Its \emph{stationary mass} gives each model's long-run weight, and EGTtools~\cite{fernandezdomingos2023egttools} reproduces the fixation probabilities and stationary distributions of Figure~\ref{fig:selection}. With $N=6$ the whole population is one table; with $N=30$, fitness averages over random, overlapping tables. Changing $N$ changes both table compositions and fixation dynamics, not only whom an agent is compared with. We evaluate this finite-population process, not a scoring-only intervention.
 
-%% =====================================================================================
-%% 4 Results, one subsection per question of the Introduction: 4.1 stakes, 4.2 partners, 4.3 selection. The methods of every design are in 3.3, so each subsection opens with a finding.
-%% 4.1 Incentives: 4.1.1 self-play across risk, 4.1.2 prompt and decoding controls, 4.1.3 the value question.
-%% Numbers: tables/num_selfplay.tex (analysis/selfplay.py), tables/num_strategy.tex (analysis/strategy.py), tables/num_probes.tex (analysis/probes.py). Figures: fig_selfplay.pdf, fig_knowdo.pdf. Tables: tab_models.tex, tab_robust.tex (tabular only; captions live here).
-%% Every qualitative word below ("almost every", "far less", "most") is backed by a value in tab_models, tab_robust, fig_selfplay or the supplement's self-play and prompt-control tables; check those before changing a word.
-%% Wording rule for 4.1.3: probe answers come from separate calls that never enter the game, so the claim is a dissociation between answers and play, never that an answer "causes" or "fails to cause" an action.
-%% =====================================================================================
-%% Figure 2 is defined here, before the Results heading, so that its source stays on page 4 and the figure floats to the top of page 5; defined after the 4.1 heading it slipped to page 6 and pushed the Conclusion past page 8 (20-09-2026).
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_selfplay.pdf}
@@ -305,9 +275,6 @@ The normative words are not the main source of the default. With neutral wording
 \input{tables/tab_robust.tex}
 \end{table}
 
-%% =====================================================================================
-%% 4.1.3 The value question (numbers: tables/num_probes.tex, analysis/probes.py; figure: fig_knowdo.pdf). The question itself is quoted in Section 3.3.
-%% =====================================================================================
 \subsubsection{Correct answers, unchanged play}
 \label{sec:knowing}
 
@@ -321,11 +288,6 @@ The normative words are not the main source of the default. With neutral wording
 
 Every rule question is answered correctly. Claude Haiku 4.5 and Gemini 3.5 Flash-Lite answer the value question correctly almost every time, and GPT-5.6 Luna most of the time. All three change their answer with the risk (Figure~\ref{fig:knowdo}a): at low risk they almost always say that keeping pays more, and at high risk they mostly say the opposite. Their payments barely change (Figure~\ref{fig:knowdo}b). Qwen3-235B always says that keeping pays more, and Grok 4.20 gives that answer in the first round, whatever the risk. The question supplies two hypothetical outcomes rather than the partners' responses to a deviation, and it makes the comparison explicit, unlike the move request. Correct answers therefore do not establish knowledge of a best response, and the result is a gap between answers and play, not evidence about what an agent computes. A strongly risk-averse agent could give these answers and still pay; payment at $p=0$ and after settlement is the sharper test.
 
-%% =====================================================================================
-%% 4.2 Partners: 4.2.1 scripted partners, 4.2.2 mixed tables. Their designs (scripted kinds, best-response enumeration, seat blocks) are in Section 3.3.
-%% Numbers: tables/num_scripted.tex and tables/tab_settled.tex (analysis/scripted.py), tables/num_mixed.tex (analysis/mixed.py), tables/num_advantage.tex (analysis/advantage.py). Figures: fig_advantage.pdf, fig_mixed.pdf.
-%% Design fact, do not "fix": seat blocks are contiguous and fixed within each (pair, seats) cell; the order of the two blocks alternates across cells, so every model holds every seat equally often only when cells are pooled.
-%% =====================================================================================
 \subsection{Partners: simple responses and fragile tables}
 \label{sec:partners}
 
@@ -375,11 +337,7 @@ One partner that stops paying in the last round can break a table of exact fair-
 \paragraph{Agents free-ride on generous partners.}
 Most agents pay less as the number of Grok 4.20 seats rises from one to five (Figure~\ref{fig:mixed}b). Beside five, GPT-5.6 Luna pays \MixLunaBesideFiveGrok{} units, and Gemini 3.5 Flash-Lite and Claude Haiku 4.5 also fall below the fair share; these two stop once the pool reaches the target, while GPT-5.6 Luna pays less from the start. Qwen3-235B does not show this decline. Within a cell, Grok 4.20's higher opening payments are associated with lower total payments by Gemini 3.5 Flash-Lite and Claude Haiku 4.5, mainly through earlier target completion. GPT-5.6 Luna also pays less while the pool is short, consistent with the compensation predicted beside artificial agents~\cite{terrucha2024art}. Openings are not randomised and partners can react to a deviation, so this association identifies neither a causal response nor an exact best response.
 
-%% =====================================================================================
-%% 4.3 Selection among agents. Numbers: tables/num_selection.tex (analysis/selection.py). Figure: fig_selection.pdf. The process itself (pi_A(k), fitness, Fermi imitation, rare mutation) is defined in Section 3.3.
-%% Selection is a rare-mutation Fermi process with population size varied, not a scoring-rule intervention: never describe N=6 versus N=30 as "tablemate versus across-table scoring".
-%% The within-table ranking follows from Proposition 2; present it as known selection theory made concrete, and put the empirical weight on who pays least in company and on what selection costs the group.
-%% =====================================================================================
+
 \subsection{Selection: population size changes which model is favoured}
 \label{sec:selection}
 
@@ -399,12 +357,7 @@ In the larger population, selection favours Gemini 3.5 Flash-Lite at moderate an
 
 Post-hoc checks show that the winners depend on the candidate set: without Qwen3-235B, GPT-5.6 Luna wins the one-table population at all tested risks, and without Gemini 3.5 Flash-Lite, it wins the larger population at moderate and high risk. The supplement reports every omission and the mass-weighted welfare.
 
-%% =====================================================================================
-%% 5 Discussion: 5.1 possible causes, 5.2 implications, 5.3 threats, limitations and ethics, 5.4 conclusion.
-%% Do not promise reproducibility of model text: replaying the same cell with the same seed gives different play. Promise the design (prompts, configurations, seeds, code).
-%% The "must"/unstated-goal threat is no longer untested: the neutral-wording and goal-stated arms answer it (Section 4.1.2). Keep the remaining threats honest: the group-payoff goal, the printed pool and a zero-risk value question are still untested.
-%% The conclusion says what the reader can only accept after the results; it is not the introduction in the past tense.
-%% =====================================================================================
+
 \section{Discussion and conclusion}
 \label{sec:discussion}
 
