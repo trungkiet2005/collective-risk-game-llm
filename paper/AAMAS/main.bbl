@@ -106,7 +106,7 @@
   28th European Conference on Artificial Intelligence}}
   \emph{(\bibinfo{series}{Frontiers in Artificial Intelligence and
   Applications}, Vol.~\bibinfo{volume}{413})}. \bibinfo{publisher}{IOS Press},
-  \bibinfo{pages}{4097--4104}.
+  \bibinfo{address}{Bologna, Italy}, \bibinfo{pages}{4097--4104}.
 \newblock
 \href{https://doi.org/10.3233/FAIA251300}{doi:\nolinkurl{10.3233/FAIA251300}}
 
@@ -137,7 +137,8 @@
 \newblock \showarticletitle{Visibility into {AI} Agents}. In
   \bibinfo{booktitle}{\emph{Proceedings of the 2024 {ACM} Conference on
   Fairness, Accountability, and Transparency ({FAccT})}}.
-  \bibinfo{publisher}{ACM}, \bibinfo{pages}{958--973}.
+  \bibinfo{publisher}{ACM}, \bibinfo{address}{Rio de Janeiro, Brazil},
+  \bibinfo{pages}{958--973}.
 \newblock
 \href{https://doi.org/10.1145/3630106.3658948}{doi:\nolinkurl{10.1145/3630106.3658948}}
 
@@ -184,10 +185,9 @@
         {duong2026cost}
 \bibfield{author}{\bibinfo{person}{M.~H. Duong}, \bibinfo{person}{C.~M.
   Durbac}, {and} \bibinfo{person}{T.~A. Han}.} \bibinfo{year}{2026}\natexlab{}.
-\newblock \showarticletitle{Cost of Institutional Incentives for Promoting
+\newblock \bibinfo{title}{Cost of Institutional Incentives for Promoting
   Cooperation in $2\times 2$ Games and Collective Risk Games}.
-\newblock \bibinfo{journal}{\emph{Dynamic Games and Applications}}
-  (\bibinfo{year}{2026}).
+\newblock \bibinfo{howpublished}{Dynamic Games and Applications}.
 \newblock
 \shownote{Online first, 7 February 2026}.
 \newblock
@@ -202,7 +202,8 @@
 \newblock \showarticletitle{Can Large Language Models Serve as Rational Players
   in Game Theory? A Systematic Analysis}. In
   \bibinfo{booktitle}{\emph{Proceedings of the AAAI Conference on Artificial
-  Intelligence}}, Vol.~\bibinfo{volume}{38}. \bibinfo{pages}{17960--17967}.
+  Intelligence}}, Vol.~\bibinfo{volume}{38}. \bibinfo{publisher}{AAAI Press},
+  \bibinfo{address}{Vancouver, Canada}, \bibinfo{pages}{17960--17967}.
 \newblock
 \href{https://doi.org/10.1609/aaai.v38i16.29751}{doi:\nolinkurl{10.1609/aaai.v38i16.29751}}
 
@@ -244,7 +245,8 @@
   What Can We Learn from {Homo Silicus}?}. In
   \bibinfo{booktitle}{\emph{Proceedings of the 25th ACM Conference on Economics
   and Computation}} \emph{(\bibinfo{series}{EC '24})}.
-  \bibinfo{publisher}{ACM}, \bibinfo{pages}{614--615}.
+  \bibinfo{publisher}{ACM}, \bibinfo{address}{New Haven, CT, USA},
+  \bibinfo{pages}{614--615}.
 \newblock
 \href{https://doi.org/10.1145/3670865.3673513}{doi:\nolinkurl{10.1145/3670865.3673513}}
 
@@ -284,6 +286,8 @@
 \newblock \showarticletitle{Corrupted by Reasoning: Reasoning Language Models
   Become Free-Riders in Public Goods Games}. In
   \bibinfo{booktitle}{\emph{Conference on Language Modeling (COLM)}}.
+  \bibinfo{publisher}{OpenReview.net}, \bibinfo{address}{Montreal, Canada},
+  \bibinfo{numpages}{37}~pages.
 \newblock
 \urldef\tempurl%
 \url{https://openreview.net/forum?id=kH6LOHGjEl}
@@ -360,7 +364,8 @@
   \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{Competing Large Language Models in Multi-Agent
   Gaming Environments}. In \bibinfo{booktitle}{\emph{International Conference
-  on Learning Representations (ICLR)}}. \bibinfo{pages}{65639--65681}.
+  on Learning Representations (ICLR)}}. \bibinfo{publisher}{OpenReview.net},
+  \bibinfo{address}{Singapore}, \bibinfo{pages}{65639--65681}.
 \newblock
 
 
@@ -376,7 +381,8 @@
 \newblock \showarticletitle{Inequity aversion improves cooperation in
   intertemporal social dilemmas}. In \bibinfo{booktitle}{\emph{Advances in
   Neural Information Processing Systems}}, Vol.~\bibinfo{volume}{31}.
-  \bibinfo{publisher}{Curran Associates, Inc.}
+  \bibinfo{publisher}{Curran Associates, Inc.}, \bibinfo{address}{Montreal,
+  Canada}, \bibinfo{numpages}{11}~pages.
 \newblock
 
 
@@ -427,7 +433,7 @@
   38th International Conference on Machine Learning}}
   \emph{(\bibinfo{series}{Proceedings of Machine Learning Research},
   Vol.~\bibinfo{volume}{139})}. \bibinfo{publisher}{PMLR},
-  \bibinfo{pages}{6187--6199}.
+  \bibinfo{address}{Virtual Event}, \bibinfo{pages}{6187--6199}.
 \newblock
 \urldef\tempurl%
 \url{https://proceedings.mlr.press/v139/leibo21a.html}
@@ -443,7 +449,8 @@
 \newblock \showarticletitle{Multi-agent Reinforcement Learning in Sequential
   Social Dilemmas}. In \bibinfo{booktitle}{\emph{Proceedings of the 16th
   International Conference on Autonomous Agents and Multiagent Systems (AAMAS
-  2017)}}. \bibinfo{publisher}{IFAAMAS}, \bibinfo{pages}{464--473}.
+  2017)}}. \bibinfo{publisher}{IFAAMAS}, \bibinfo{address}{S\~{a}o Paulo,
+  Brazil}, \bibinfo{pages}{464--473}.
 \newblock
 \urldef\tempurl%
 \url{https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p464.pdf}
@@ -567,7 +574,7 @@
   Cooperation in a Society of {LLM} Agents}. In
   \bibinfo{booktitle}{\emph{Advances in Neural Information Processing
   Systems}}, Vol.~\bibinfo{volume}{37}. \bibinfo{publisher}{Curran Associates,
-  Inc.}, \bibinfo{pages}{111715--111759}.
+  Inc.}, \bibinfo{address}{Vancouver, Canada}, \bibinfo{pages}{111715--111759}.
 \newblock
 \href{https://doi.org/10.52202/079017-3548}{doi:\nolinkurl{10.52202/079017-3548}}
 
@@ -607,7 +614,8 @@
 \newblock \showarticletitle{{LLMs} are Greedy Agents: Effects of {RL}
   Fine-tuning on Decision-Making Abilities}. In
   \bibinfo{booktitle}{\emph{International Conference on Learning
-  Representations (ICLR)}}. \bibinfo{pages}{127538--127571}.
+  Representations (ICLR)}}. \bibinfo{publisher}{OpenReview.net},
+  \bibinfo{address}{Rio de Janeiro, Brazil}, \bibinfo{pages}{127538--127571}.
 \newblock
 \urldef\tempurl%
 \url{https://openreview.net/forum?id=weUP6H5Ko9}
@@ -635,6 +643,7 @@
 \newblock \showarticletitle{Ad Hoc Autonomous Agent Teams: Collaboration
   without Pre-Coordination}. In \bibinfo{booktitle}{\emph{Proceedings of the
   AAAI Conference on Artificial Intelligence}}, Vol.~\bibinfo{volume}{24}.
+  \bibinfo{publisher}{AAAI Press}, \bibinfo{address}{Atlanta, Georgia, USA},
   \bibinfo{pages}{1504--1509}.
 \newblock
 \href{https://doi.org/10.1609/aaai.v24i1.7529}{doi:\nolinkurl{10.1609/aaai.v24i1.7529}}
@@ -677,7 +686,8 @@
 \newblock \showarticletitle{{CoopEval}: Benchmarking Cooperation-Sustaining
   Mechanisms and {LLM} Agents in Social Dilemmas}. In
   \bibinfo{booktitle}{\emph{Proceedings of the 43rd International Conference on
-  Machine Learning (ICML)}}.
+  Machine Learning (ICML)}}. \bibinfo{publisher}{PMLR},
+  \bibinfo{address}{Seoul, South Korea}, \bibinfo{numpages}{65}~pages.
 \newblock
 \urldef\tempurl%
 \url{https://arxiv.org/abs/2604.15267}
@@ -717,7 +727,8 @@
 \newblock \showarticletitle{A Generalised Method for Empirical Game Theoretic
   Analysis}. In \bibinfo{booktitle}{\emph{Proceedings of the 17th International
   Conference on Autonomous Agents and Multiagent Systems (AAMAS 2018)}}.
-  \bibinfo{publisher}{IFAAMAS}, \bibinfo{pages}{77--85}.
+  \bibinfo{publisher}{IFAAMAS}, \bibinfo{address}{Stockholm, Sweden},
+  \bibinfo{pages}{77--85}.
 \newblock
 \urldef\tempurl%
 \url{https://ifaamas.org/Proceedings/aamas2018/pdfs/p77.pdf}
@@ -732,7 +743,8 @@
 \newblock \showarticletitle{Cultural Evolution of Cooperation among {LLM}
   Agents: Extended Abstract}. In \bibinfo{booktitle}{\emph{Proceedings of the
   24th International Conference on Autonomous Agents and Multiagent Systems
-  (AAMAS 2025)}}. \bibinfo{publisher}{IFAAMAS}, \bibinfo{pages}{2771--2773}.
+  (AAMAS 2025)}}. \bibinfo{publisher}{IFAAMAS}, \bibinfo{address}{Detroit, MI,
+  USA}, \bibinfo{pages}{2771--2773}.
 \newblock
 \urldef\tempurl%
 \url{https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p2771.pdf}
@@ -747,7 +759,8 @@
 \newblock \showarticletitle{Methods for Empirical Game-Theoretic Analysis
   (Extended Abstract)}. In \bibinfo{booktitle}{\emph{Proceedings of the
   Twenty-First National Conference on Artificial Intelligence (AAAI-06)}}.
-  \bibinfo{publisher}{AAAI Press}, \bibinfo{pages}{1552--1555}.
+  \bibinfo{publisher}{AAAI Press}, \bibinfo{address}{Boston, Massachusetts,
+  USA}, \bibinfo{pages}{1552--1555}.
 \newblock
 
 
