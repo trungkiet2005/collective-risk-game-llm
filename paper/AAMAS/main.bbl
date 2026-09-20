@@ -388,7 +388,14 @@
 
 \bibitem[Huynh et~al\mbox{.}(2025)]%
         {huynh2025understanding}
-\bibfield{author}{\bibinfo{person}{Trung-Kiet Huynh} {et~al\mbox{.}}}
+\bibfield{author}{\bibinfo{person}{Trung-Kiet Huynh}, \bibinfo{person}{Duy-Minh
+  Dao-Sy}, \bibinfo{person}{Thanh-Bang Cao}, \bibinfo{person}{Phong-Hao Le},
+  \bibinfo{person}{Hong-Dan Nguyen}, \bibinfo{person}{Phu-Quy Nguyen-Lam},
+  \bibinfo{person}{Minh-Luan Nguyen-Vo}, \bibinfo{person}{Hong-Phat Pham},
+  \bibinfo{person}{Phu-Hoa Pham}, \bibinfo{person}{Thien-Kim Than},
+  \bibinfo{person}{Chi-Nguyen Tran}, \bibinfo{person}{Huy Tran},
+  \bibinfo{person}{Gia-Thoai Tran-Le}, \bibinfo{person}{Alessio Buscemi},
+  \bibinfo{person}{Hong~Trang Le}, {and} \bibinfo{person}{The~Anh Han}.}
   \bibinfo{year}{2025}\natexlab{}.
 \newblock \bibinfo{title}{Understanding {LLM} Agent Behaviours via Game Theory:
   Strategy Recognition, Biases and Multi-Agent Dynamics}.
@@ -399,7 +406,14 @@
 
 \bibitem[Huynh et~al\mbox{.}(2026)]%
         {huynh2026payoff}
-\bibfield{author}{\bibinfo{person}{Trung-Kiet Huynh} {et~al\mbox{.}}}
+\bibfield{author}{\bibinfo{person}{Trung-Kiet Huynh}, \bibinfo{person}{Duy-Minh
+  Dao-Sy}, \bibinfo{person}{Thanh-Bang Cao}, \bibinfo{person}{Phong-Hao Le},
+  \bibinfo{person}{Hong-Dan Nguyen}, \bibinfo{person}{Phu-Quy Nguyen-Lam},
+  \bibinfo{person}{Minh-Luan Nguyen-Vo}, \bibinfo{person}{Hong-Phat Pham},
+  \bibinfo{person}{Phu-Hoa Pham}, \bibinfo{person}{Thien-Kim Than},
+  \bibinfo{person}{Chi-Nguyen Tran}, \bibinfo{person}{Huy Tran},
+  \bibinfo{person}{Gia-Thoai Tran-Le}, \bibinfo{person}{Alessio Buscemi},
+  \bibinfo{person}{Hong~Trang Le}, {and} \bibinfo{person}{The~Anh Han}.}
   \bibinfo{year}{2026}\natexlab{}.
 \newblock \bibinfo{title}{Payoff scaling shapes cooperation in {LLM} agents
   across languages}.
@@ -555,8 +569,13 @@
 
 \bibitem[Pham et~al\mbox{.}(2026)]%
         {pham2026humans}
-\bibfield{author}{\bibinfo{person}{Phu~Hoa Pham} {et~al\mbox{.}}}
-  \bibinfo{year}{2026}\natexlab{}.
+\bibfield{author}{\bibinfo{person}{Phu~Hoa Pham}, \bibinfo{person}{Duy~Minh
+  {Dao Sy}}, \bibinfo{person}{Trung~Kiet Huynh}, \bibinfo{person}{Phu~Quy
+  {Nguyen Lam}}, \bibinfo{person}{Chi~Nguyen Tran}, \bibinfo{person}{Minh~Trung
+  Le}, \bibinfo{person}{Phong~Hao Le}, \bibinfo{person}{Dinh~Nam Nguyen},
+  \bibinfo{person}{Thien~Ky {Nguyen Dong}}, \bibinfo{person}{Elias {Fernandez
+  Domingos}}, \bibinfo{person}{Hong~Trang Le}, {and} \bibinfo{person}{The~Anh
+  Han}.} \bibinfo{year}{2026}\natexlab{}.
 \newblock \bibinfo{title}{Humans Are More Diverse: Frontier {LLMs} Show Extreme
   Policies in Idealised {AI} Development Races}.
 \newblock

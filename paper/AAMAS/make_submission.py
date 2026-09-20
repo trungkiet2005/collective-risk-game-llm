@@ -24,6 +24,9 @@ SUPP = HERE / "supplement" / "supplement.pdf"
 ZIP_LIMIT = 25 * 1024 * 1024
 BODY_PAGES = 8
 
+# Names are checked outside the reference list only: the group's own papers are cited in the third
+# person with their full author lists, which include these names (user agreed 2026-09-20).
+NAME_LEAKS = {r"\bDao\b", r"\bMinh\b"}
 LEAKS = [r"\bDao\b", r"\bMinh\b", r"\bchis", r"trungkiet", r"kaggle", r"github", r"proxy",
          r"D:[/\\]", r"PhD_", r"\bTODO\b", r"\bexp_[a-z]", r"\bE[0-9]{1,2}[ab]?\b",
          r"Interface Focus", r"University of Science", r"VNU", r"@gmail"]
@@ -52,8 +55,11 @@ def check_common(doc, name):
     if re.search(rb"/PTEX\.FileName", raw):
         fail(f"{name}: included file paths recorded (PTEX.FileName)")
     pages = text_of(doc)
+    ref_page = next((i for i, t in enumerate(pages) if "\nReferences\n" in "\n" + t), len(pages))
     for pat in LEAKS:
         for i, t in enumerate(pages):
+            if pat in NAME_LEAKS and i >= ref_page:
+                continue
             m = re.search(pat, t, flags=re.I if pat.islower() else 0)
             if m:
                 fail(f"{name}: '{m.group(0)}' on page {i + 1} matches {pat}")
