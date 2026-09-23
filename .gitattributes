@@ -9,6 +9,8 @@
 *.md    text eol=lf
 *.cfg   text eol=lf
 *.toml  text eol=lf
+*.csv   text eol=lf
+*.tex   text eol=lf
 
 # Nhị phân: KHÔNG đụng vào xuống dòng.
 *.pdf   binary
