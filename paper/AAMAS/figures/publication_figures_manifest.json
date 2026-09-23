@@ -3,23 +3,23 @@
   "estimates_changed": false,
   "figures": {
     "fig_knowdo": {
-      "csv_sha256": "810dad1ae1de729f40ee4aed321de86fd95222331068e1c3647afb423f688b6e",
-      "tex_sha256": "9d078bcd233976864a8c303c278f45e60aa847c266cf706e8542b2b2b3095e6f",
-      "estimates": 5,
+      "csv_sha256": "c31c113f549a2e677e3dfb00b0e2e49cb56d94bd5559cc0c36b4e0e412cbf841",
+      "tex_sha256": "6fab6962c9a2bce0b10ba04fe82ab130290128649bcaf739ab430cee76cd950a",
+      "estimates": 10,
       "width_bp": 241.14500427246094,
-      "height_bp": 149.9980010986328,
+      "height_bp": 157.9980010986328,
       "minimum_font_bp": 8.219200134277344,
-      "text_spans": 18,
+      "text_spans": 23,
       "type3_fonts": 0
     },
     "fig_mixed": {
       "csv_sha256": "203620af5b59dd7927e2286e7195c661992149f925e638246331cf7f3d524ff3",
-      "tex_sha256": "61fe44cf49a426813ab96c125ad89cbe3833387afb438d7494f98106a3041ae5",
+      "tex_sha256": "f13c197b81a038f80767f94d018ecc12798fbc8b2ea17e14c0c325d026758e22",
       "estimates": 28,
       "width_bp": 241.14500427246094,
-      "height_bp": 159.4980010986328,
+      "height_bp": 139.9980010986328,
       "minimum_font_bp": 8.219200134277344,
-      "text_spans": 28,
+      "text_spans": 30,
       "type3_fonts": 0
     }
   }

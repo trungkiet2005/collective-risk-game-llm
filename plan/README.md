@@ -88,10 +88,12 @@ Toàn bộ bài nằm trong **một file** `paper/AAMAS/main.tex` (gộp 17-09-2
 | 1 Introduction | `sec:intro` | — |
 | 2 Related work (có đoạn khai overlap với bản IF) | `sec:related` | — |
 | 3 Game, Mệnh đề 1–2, thiết kế, prompt nguyên văn | `sec:game` | — |
-| 4 Risk does not change the default | `sec:risk` | baseline, nohint, evprobe, para1/2, temp0, wording, neutral |
-| 5 Answers track the risk; play does not | `sec:knowing` | evprobe probes, bestresponse ×4 |
-| 6 Defaults in mixed groups + 7 Selection (α-Rank) | `sec:groups`, `sec:selection` | mixed |
-| 8 Discussion, threats, limitations, ethics | `sec:discussion` | — |
+| 4 Incentives: 4.1 self-play grid · 4.2 prompt controls · 4.3 value question | `sec:risk`, `sec:grid`, `sec:controls`, `sec:knowing` | baseline, nohint, evprobe, para1/2, temp0, wording, neutral |
+| 5 Partners: 5.1 fixed partners · 5.2 mixed tables | `sec:partners`, `sec:scripted`, `sec:groups` | bestresponse ×4, mixed |
+| 6 Selection (Fermi, rare mutation, N = 6 vs 30) | `sec:selection` | mixed |
+| 7 Discussion and conclusion (threats, limitations, ethics gộp một đoạn) | `sec:discussion` | — |
+
+Cấu trúc 7 mục ở trên có từ 19-09-2026 (trước đó 8 mục); supplement tham chiếu các mục này bằng `\ref{main-sec:…}` nên đánh số lại không làm lệch.
 
 **Câu chuyện:** 5 model giá rẻ trả tiền theo **thói quen** (habit = hành vi vẫn tiếp tục khi
 trả tiền đã vô ích: p = 0 hoặc sau khi kết quả đã định), không theo risk; câu trả lời khi được

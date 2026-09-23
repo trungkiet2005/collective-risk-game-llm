@@ -17,7 +17,9 @@ import crsd_data as cd
 
 FIG = cd.FIGURES
 TEXT_PT = 8.25
-HEIGHTS = {'fig_knowdo': 150.0, 'fig_mixed': 159.5}
+HEIGHTS = {'fig_knowdo': 158.0, 'fig_mixed': 140.0}
+RISK_LOW, RISK_HIGH = 0.1, 0.9
+ARROW_MIN_BP = 14.0   # a shorter change is drawn as a plain segment: no room for a head
 LABELS = {'Haiku': r'Haiku 4.5', 'Flash-Lite': r'Gemini 3.5\\Flash-Lite',
           'Luna': r'GPT-5.6\\Luna', 'Qwen': r'Qwen3-235B', 'Grok': r'Grok 4.20'}
 
@@ -32,7 +34,7 @@ class Drawing:
         self.lines = [r'\documentclass[border=0pt]{standalone}',
                       r'\usepackage[T1]{fontenc}',
                       r'\usepackage[tt=false,type1=true]{libertine}',
-                      r'\usepackage{tikz}',
+                      r'\usepackage{tikz}', r'\usetikzlibrary{arrows.meta}',
                       r'\pdfinfoomitdate=1', r'\pdftrailerid{}', r'\pdfsuppressptexinfo=15']
         palette = dict(ink=cs.INK, muted=cs.MUTED, grid=cs.LINE, band=cs.GREY_LIGHT, white=cs.WHITE)
         for i, m in enumerate(cs.MODEL_ORDER):
@@ -43,9 +45,11 @@ class Drawing:
                        rf'\begin{{tikzpicture}}[x=1bp,y=-1bp,text=ink,every node/.style={{inner sep=0pt,outer sep=0pt,font=\fontsize{{{TEXT_PT}}}{{9.5}}\selectfont}}]',
                        rf'\path[use as bounding box] (0,0) rectangle ({cs.COL_W_PT},{self.height});']
 
-    def text(self, x, y, text, *, anchor='center', colour='ink', bold=False):
+    def text(self, x, y, text, *, anchor='center', colour='ink', bold=False, italic=False,
+             align='center'):
         font = r',font=\fontsize{9.2}{10}\selectfont\bfseries' if bold else ''
-        self.lines.append(rf'\node[anchor={anchor},align=center,text={colour}{font}] at {coord(x,y)} {{{text}}};')
+        font += r',font=\fontsize{8.25}{9.2}\selectfont\itshape' if italic else ''
+        self.lines.append(rf'\node[anchor={anchor},align={align},text={colour}{font}] at {coord(x,y)} {{{text}}};')
 
     def line(self, x1, y1, x2, y2, *, colour='grid', width=0.6, dash='', opacity=1):
         self.lines.append(rf'\draw[draw={colour},line width={width}bp,opacity={opacity}{","+dash if dash else ""}] {coord(x1,y1)} -- {coord(x2,y2)};')
@@ -74,18 +78,48 @@ class Drawing:
             path = ' -- '.join(coord(a,b) for a,b in [(x,y-sign*r),(x+r,y+sign*r*.75),(x-r,y+sign*r*.75)])+' -- cycle'
         self.lines.append(rf'\path[{style}] {path};')
 
-    def ci(self, x, y, lo, hi, m, *, horizontal=True, filled=True):
+    def circle(self, x, y, colour, filled=True, size=2.1):
+        fill = colour if filled else 'white'
+        self.lines.append(rf'\path[draw={colour},fill={fill},line width=.8bp] {coord(x,y)} circle[radius={size}bp];')
+
+    @staticmethod
+    def check(value, lo, hi):
         if lo > hi:
             raise ValueError('reversed confidence interval')
-        colour=f'm{cs.MODEL_ORDER.index(m)}'
+        if not lo-1e-7 <= value <= hi+1e-7:
+            raise ValueError('estimate outside interval')
+
+    def bar(self, lo, hi, y, m):
+        """A 95% interval as a translucent round-ended bar; zero width draws nothing."""
+        if hi-lo > 1e-7:
+            colour = f'm{cs.MODEL_ORDER.index(m)}'
+            self.lines.append(rf'\draw[draw={colour},line width=4.6bp,line cap=round,opacity=.28] {coord(lo,y)} -- {coord(hi,y)};')
+
+    def arrow(self, x0, x1, y, colour, *, dashed=False):
+        """The change between two measured values; too short for a head, a segment."""
+        if abs(x1-x0) < 1e-7:
+            return
+        if abs(x1-x0) < ARROW_MIN_BP:
+            self.line(x0, y, x1, y, colour=colour, width=1.1)
+            return
+        dash = ',dash pattern=on 2.6bp off 1.6bp' if dashed else ''
+        self.lines.append(rf'\draw[draw={colour},line width=1.1bp,-{{Stealth[length=3.6bp,width=3.4bp]}},shorten <=3.2bp,shorten >=3.4bp{dash}] {coord(x0,y)} -- {coord(x1,y)};')
+
+    def ribbon(self, points, m):
+        """Interval band through (x, lo, hi) points, in the model colour."""
+        colour = f'm{cs.MODEL_ORDER.index(m)}'
+        path = [coord(x, lo) for x, lo, _ in points] + [coord(x, hi) for x, _, hi in reversed(points)]
+        self.lines.append(rf'\fill[fill={colour},opacity=.18] ' + ' -- '.join(path) + ' -- cycle;')
+
+    def polyline(self, points, colour, width=1.1):
+        self.lines.append(rf'\draw[draw={colour},line width={width}bp,line join=round] ' + ' -- '.join(coord(x, y) for x, y in points) + ';')
+
+    def ci(self, x, y, lo, hi, m, *, horizontal=True, filled=True):
+        self.check(x if horizontal else y, lo, hi)
         if horizontal:
-            if not lo-1e-7 <= x <= hi+1e-7: raise ValueError('estimate outside interval')
-            self.line(lo,y,hi,y,colour=colour,width=1.0)
-            for v in (lo,hi): self.line(v,y-1.7,v,y+1.7,colour=colour,width=.8)
+            self.bar(lo, hi, y, m)
         else:
-            if not lo-1e-7 <= y <= hi+1e-7: raise ValueError('estimate outside interval')
-            self.line(x,lo,x,hi,colour=colour,width=1.0)
-            for v in (lo,hi): self.line(x-1.6,v,x+1.6,v,colour=colour,width=.8)
+            self.lines.append(rf'\draw[draw=m{cs.MODEL_ORDER.index(m)},line width=4.6bp,line cap=round,opacity=.28] {coord(x,lo)} -- {coord(x,hi)};' if hi-lo > 1e-7 else '')
         self.mark(x,y,m,filled=filled)
 
     def write(self):
@@ -95,30 +129,46 @@ class Drawing:
 
 
 def knowdo(rows):
+    """One arrow per model from p = 0.1 (open) to p = 0.9 (filled). Bars are the level
+    intervals of the supplement's knowdo table, which also gives the shift intervals."""
     d=Drawing('fig_knowdo')
-    data={r['model']:r for r in rows}
-    if set(data)!=set(cs.MODEL_ORDER) or len(rows)!=5: raise ValueError('Figure 3 requires five unique models')
-    xa=lambda v: 68+70*(v+0.15)/1.3
-    xb=lambda v: 162+71*(v+10)/20
-    for i in (1,3): d.band(1,36+17.7*i,239,52+17.7*i)
-    d.text(68,9,'a  Answers',anchor='west',bold=True)
-    d.text(161,9,'b  Contributions',anchor='west',bold=True)
-    d.text(103,25,r'Drop in Pr(B) (pp)')
-    d.text(197.5,25,'Change (units)')
-    for x in (xa(0),xb(0)): d.line(x,35,x,123,dash='densely dotted',width=.7)
-    d.line(xa(1),35,xa(1),123,colour='ink',dash='dashed',width=.8)
+    data={(r['model'],float(r['p'])):r for r in rows}
+    want={(m,p) for m in cs.MODEL_ORDER for p in (RISK_LOW,RISK_HIGH)}
+    if set(data)!=want or len(rows)!=len(want): raise ValueError('Figure 3 requires every model once at p = 0.1 and p = 0.9')
+    xa=lambda v: 60+68*v            # share of answers saying B, 0..1
+    xb=lambda v: 150+84*(v-10)/30   # units the questioned seat pays, 10..40
+    ys=[25+19.5*i for i in range(6)]
+    d.text(56,8,'a  Answers',anchor='west',bold=True)
+    d.text(146,8,'b  Play',anchor='west',bold=True)
+    # Reference row: a fully correct answerer says B at p = 0.1 and A at p = 0.9.
+    # It applies only to the stated question, not to best responses in self-play.
+    d.text(50,ys[0],'Correct',anchor='east',colour='muted',italic=True)
+    d.arrow(xa(1),xa(0),ys[0],'muted',dashed=True)
+    d.circle(xa(1),ys[0],'muted',filled=False); d.circle(xa(0),ys[0],'muted')
+    # The risk legend sits in panel b's reference row; fill encodes risk, not a model.
+    for x,p,filled in ((160,RISK_LOW,False),(197,RISK_HIGH,True)):
+        d.circle(x,ys[0],'ink',filled=filled); d.text(x+4.5,ys[0],rf'\textit{{p}}\,=\,{p:g}',anchor='west')
+    d.line(xb(20),ys[0]+9,xb(20),131,colour='muted',dash='densely dotted',width=.8)
     for i,m in enumerate(cs.MODEL_ORDER):
-        y=44+17.7*i
-        r=data[m]
-        d.text(1,y,LABELS[m],anchor='west',colour=f't{i}')
-        d.ci(xa(float(r['dx'])),y,xa(float(r['x_lo'])),xa(float(r['x_hi'])),m)
-        d.ci(xb(float(r['dy'])),y,xb(float(r['y_lo'])),xb(float(r['y_hi'])),m)
-    for x0,x1 in ((68,138),(162,233)): d.line(x0,125,x1,125,colour='ink',width=.7)
-    for value in (0,.5,1):
-        x=xa(value); d.line(x,125,x,128,colour='ink');d.text(x,134,str(round(100*value)))
-    for value in (-10,0,10):
-        x=xb(value); d.line(x,125,x,128,colour='ink');d.text(x,134,str(value) if value>=0 else r'\textminus10')
-    d.text(120,145,'Risk 0.1 to 0.9; 10 games per model and risk',colour='muted')
+        y=ys[i+1]
+        d.text(50,y,LABELS[m],anchor='east',colour=f't{i}',align='right')
+        lo,hi=data[(m,RISK_LOW)],data[(m,RISK_HIGH)]
+        for x,col,low,high in ((xa,'keep',0,1),(xb,'paid',10,40)):
+            for r in (lo,hi):
+                v,v_lo,v_hi=(float(r[c]) for c in (col,col+'_lo',col+'_hi'))
+                d.check(v,v_lo,v_hi)
+                if not low<=v_lo and v_hi<=high: raise ValueError(f'{m} {col} outside the axis')
+                d.bar(x(v_lo),x(v_hi),y,m)
+            x0,x1=x(float(lo[col])),x(float(hi[col]))
+            d.arrow(x0,x1,y,f'm{i}')
+            d.mark(x0,y,m,filled=False); d.mark(x1,y,m)
+    for x0,x1 in ((56,132),(146,238)): d.line(x0,134,x1,134,colour='ink',width=.7)
+    for v in (0,.5,1):
+        x=xa(v); d.line(x,134,x,137,colour='ink'); d.text(x,142.5,str(round(100*v)))
+    for v in (10,20,30,40):
+        x=xb(v); d.line(x,134,x,137,colour='ink'); d.text(x,142.5,str(v))
+    d.text(xa(.5),152.5,r'Answers favouring B (\%)')
+    d.text(xb(25),152.5,'Units paid (of 40)')
     return d.write()
 
 
@@ -127,44 +177,58 @@ def mixed(rows):
     short={cd.show(m):m for m in cs.MODEL_ORDER}
     a=[r for r in rows if r['panel']=='a'];b=[r for r in rows if r['panel']=='b']
     if len(a)!=8 or len(b)!=20: raise ValueError('Figure 5 requires 8 + 20 estimates')
-    xa=lambda v: 55+64*v/100
-    xb=lambda v: 155+18.7*(v-1)
-    yb=lambda v: 139-5.05*(v-8)
-    d.text(1,9,'a  One replacement',anchor='west',bold=True)
-    d.text(145,9,'b  Units per seat',anchor='west',bold=True)
+    xa=lambda v: 54+56*v/100
+    xb=lambda k: 142+14*(k-1)
+    yb=lambda v: 112-4.914*(v-8)
+    d.text(1,8,'a  One replacement',anchor='west',bold=True)
+    d.text(126,8,'b  Units per seat',anchor='west',bold=True)
     # The legend is neutral: fill encodes condition, not another model.
-    for x,label,filled in ((4,'Self-play',True),(57,'+1 Qwen',False)):
-        d.lines.append(rf'\path[draw=ink,fill={"ink" if filled else "white"},line width=.8bp] {coord(x,27)} circle[radius=2.1bp];')
-        d.text(x+5,27,label,anchor='west')
-    for x,y,m,label in ((147,25,'Haiku','Haiku'),(199,25,'Luna','Luna'),(147,38,'Flash-Lite','Flash-Lite'),(207,38,'Qwen','Qwen')):
-        d.mark(x,y,m,size=1.9); d.text(x+5,y,label,anchor='west')
-    models=('Haiku','Flash-Lite','Luna','Grok')
-    for i,m in enumerate(models):
-        y=57+23*i
-        if i%2: d.band(1,y-10.5,124,y+10.5)
-        d.text(1,y,LABELS[m],anchor='west',colour=f't{cs.MODEL_ORDER.index(m)}')
-    for v in (0,50,100): d.line(xa(v),45,xa(v),138,opacity=.25,width=.5)
-    for i,m in enumerate(models):
-        for condition,offset in (('self_play',-3.6),('one_Qwen_seat',3.6)):
-            r=next(r for r in a if short[r['model']]==m and r['condition']==condition)
-            d.ci(xa(float(r['estimate'])),57+23*i+offset,xa(float(r['ci_low'])),xa(float(r['ci_high'])),m,filled=condition=='self_play')
+    for x,label,filled in ((4,'Self-play',True),(50,'+1 Qwen',False)):
+        d.circle(x,21,'ink',filled=filled); d.text(x+4.5,21,label,anchor='west')
+    # a: an arrow from self-play to one Qwen seat; both keep their own interval.
+    for i,m in enumerate(('Haiku','Flash-Lite','Luna','Grok')):
+        y,k=38+22*i,cs.MODEL_ORDER.index(m)
+        d.text(46,y,LABELS[m],anchor='east',colour=f't{k}',align='right')
+        s,q=(next(r for r in a if short[r['model']]==m and r['condition']==c) for c in ('self_play','one_Qwen_seat'))
+        for r in (s,q):
+            d.check(float(r['estimate']),float(r['ci_low']),float(r['ci_high']))
+            d.bar(xa(float(r['ci_low'])),xa(float(r['ci_high'])),y,m)
+        xs,xq=xa(float(s['estimate'])),xa(float(q['estimate']))
+        if abs(xs-xq)<1e-7: d.text(xq-6,y,'no change',anchor='east',colour='muted',italic=True)
+        d.arrow(xs,xq,y,f'm{k}')
+        d.mark(xq,y,m,filled=False); d.mark(xs,y,m)
+    d.line(50,116,114,116,colour='ink',width=.7)
+    for v in (0,50,100):
+        x=xa(v); d.line(x,116,x,119,colour='ink'); d.text(x,124,str(v))
+    d.text(xa(50),134,r'Target reached (\%)')
+    # b: every composition is its own measured mean; lines only join them, bands are
+    # their intervals. No fit, and no interpolation of data.
     for v in (10,15,20,25):
-        d.line(149,yb(v),235,yb(v),opacity=.28,width=.5)
-        d.text(144,yb(v),str(v),anchor='east')
-    d.line(149,yb(20),235,yb(20),dash='densely dotted',width=.8)
+        d.line(136,yb(v),200,yb(v),opacity=.28,width=.5)
+        d.text(133,yb(v),str(v),anchor='east')
+    d.line(136,yb(20),200,yb(20),colour='muted',dash='densely dotted',width=.8)
+    groups={}
     for m in ('Haiku','Flash-Lite','Luna','Qwen'):
         group=sorted((r for r in b if short[r['model']]==m),key=lambda r:int(r['grok_seats']))
         if [int(r['grok_seats']) for r in group]!=[1,2,3,4,5]: raise ValueError(f'incomplete composition: {m}')
-        pts=[(xb(int(r['grok_seats'])),yb(float(r['estimate']))) for r in group]
-        for (x1,y1),(x2,y2) in zip(pts,pts[1:]): d.line(x1,y1,x2,y2,colour=f'm{cs.MODEL_ORDER.index(m)}',width=1.1)
-        for (x,y),r in zip(pts,group): d.ci(x,y,yb(float(r['ci_high'])),yb(float(r['ci_low'])),m,horizontal=False)
-    for x0,x1 in ((52,123),(149,235)): d.line(x0,141,x1,141,colour='ink',width=.7)
-    for v in (0,50,100):
-        x=xa(v);d.line(x,141,x,144,colour='ink');d.text(x,146.5,str(v))
-    for v in range(1,6):
-        x=xb(v);d.line(x,141,x,144,colour='ink');d.text(x,146.5,str(v))
-    d.text(86,154.5,r'Target reached (\%)')
-    d.text(192,154.5,'Grok 4.20 seats')
+        for r in group: d.check(float(r['estimate']),float(r['ci_low']),float(r['ci_high']))
+        d.ribbon([(xb(int(r['grok_seats'])),yb(float(r['ci_low'])),yb(float(r['ci_high']))) for r in group],m)
+        groups[m]=[(xb(int(r['grok_seats'])),yb(float(r['estimate']))) for r in group]
+    for m,pts in groups.items():
+        d.polyline(pts,f'm{cs.MODEL_ORDER.index(m)}')
+        for x,y in pts: d.mark(x,y,m,size=1.9)
+    # Direct labels at the line ends, nudged apart only where two would touch.
+    ends=sorted((pts[-1][1],m) for m,pts in groups.items())
+    ys=[y for y,_ in ends]
+    for j in range(1,len(ys)):
+        if ys[j]-ys[j-1]<10:
+            mid=(ys[j]+ys[j-1])/2; ys[j-1],ys[j]=mid-5,mid+5
+    for y,(_,m) in zip(ys,ends):
+        d.text(xb(5)+5,y,m,anchor='west',colour=f't{cs.MODEL_ORDER.index(m)}')
+    d.line(136,116,202,116,colour='ink',width=.7)
+    for k in range(1,6):
+        x=xb(k); d.line(x,116,x,119,colour='ink'); d.text(x,124,str(k))
+    d.text(xb(3),134,'Grok 4.20 seats')
     return d.write()
 
 

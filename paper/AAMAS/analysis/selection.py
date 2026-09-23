@@ -416,8 +416,8 @@ def invasion_figure(P, point, REACH):
     cs.use()
     fig = plt.figure(figsize=cs.figsize("col", height_pt=268))
     fig._crsd_width = "col"
-    rules = (("within", N_WITHIN, f"Tablemates, $N={N_WITHIN}$"),
-             ("across", N_ACROSS, f"Across tables, $N={N_ACROSS}$"))
+    rules = (("within", N_WITHIN, f"One table, $N={N_WITHIN}$"),
+             ("across", N_ACROSS, f"Many tables, $N={N_ACROSS}$"))
     grid = fig.add_gridspec(len(RISKS), len(rules) + 1, hspace=0.0, wspace=0.0,
                             width_ratios=(0.08, *[1] * len(rules)))
     off = ~np.eye(K, dtype=bool)
@@ -477,8 +477,8 @@ def selection_figure(P, point):
     self-play target rate at the right of each bar. c, d: expected payoff of a Qwen or
     Flash-Lite seat by the number of Qwen seats at the same table. Returns the figure and
     every number drawn."""
-    rules = ((N_WITHIN, "within", f"Tablemates, $N={N_WITHIN}$"),
-             (N_ACROSS, "across", f"Across tables, $N={N_ACROSS}$"))
+    rules = ((N_WITHIN, "within", f"One table, $N={N_WITHIN}$"),
+             (N_ACROSS, "across", f"Many tables, $N={N_ACROSS}$"))
     drawn = dict(mass={}, target={}, composition={})
     shown = [m for m in cs.MODEL_ORDER
              if any(point[(r, BETA, n, pi)]["pi"][MI[m]] >= VISIBLE_MASS

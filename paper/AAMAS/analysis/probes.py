@@ -26,6 +26,8 @@ import sys
 
 import numpy as np
 import pandas as pd
+from matplotlib.lines import Line2D
+from matplotlib.transforms import blended_transform_factory
 
 import crsd_data as cd
 import crsd_style as cs
@@ -268,6 +270,27 @@ def knowdo_data(vc: pd.DataFrame, S: pd.DataFrame) -> pd.DataFrame:
     return D
 
 
+def levels(vc: pd.DataFrame, g: pd.DataFrame) -> pd.DataFrame:
+    """Per model at p = 0.1 and p = 0.9: the share of value answers saying B (keeping)
+    pays more and the units Player_1 pays, each with a game-bootstrap 95% CI. These are
+    the same inputs and draws as the supplement's knowdo table (supp_probes.table_knowdo,
+    offsets 6000+ and 6100+), so the figure and that table print identical intervals."""
+    rows = []
+    for k, m in enumerate(cd.MODELS):
+        for j, p in enumerate(RISKS):
+            if p not in (RISKS[0], RISKS[-1]):
+                continue
+            share = vc[(vc["model"] == m) & (vc["p"] == p)].groupby("gid")["keep"].mean()
+            paid = g[(g["model"] == m) & (g["p"] == p)]["p1_total"].astype(float)
+            if len(share) != 10 or len(paid) != 10 or set(share.index) != set(paid.index):
+                raise RuntimeError(f"{m} p={p}: answers and contributions must match by game")
+            s_lo, s_hi = cd.boot_ci(share.to_numpy(), offset=6000 + 10 * j + k)
+            t_lo, t_hi = cd.boot_ci(paid.to_numpy(), offset=6100 + 10 * j + k)
+            rows.append(dict(model=m, p=p, keep=share.mean(), keep_lo=s_lo, keep_hi=s_hi,
+                             paid=paid.mean(), paid_lo=t_lo, paid_hi=t_hi))
+    return pd.DataFrame(rows)
+
+
 def figure(vc: pd.DataFrame, g: pd.DataFrame, S: pd.DataFrame) -> None:
     D = shifts(vc, g)
     print("\nfigure data (shift from p=0.1 to p=0.9 with 95% CI):")
@@ -288,45 +311,79 @@ def figure(vc: pd.DataFrame, g: pd.DataFrame, S: pd.DataFrame) -> None:
     if (hi["tot"] - lo["tot"]).abs().max() > 2.0:
         raise RuntimeError("the three answering models no longer pay the same at both risks")
 
-    # Two aligned forest plots show the contrast directly. The answer benchmark
-    # applies ONLY to the stated A/B question, not to best responses in self-play.
+    # One arrow per model from p = 0.1 (open) to p = 0.9 (filled); the arrow is the
+    # shift, the translucent bars are the level intervals (the shift intervals are in
+    # the supplement). The answer benchmark applies ONLY to the stated A/B question,
+    # not to best responses in self-play.
+    L = levels(vc, g)
+    print("\nfigure data (share saying B, Player_1 total; 95% CI, supplement draws):")
+    print(L.round(3).to_string(index=False))
+    lv = L.set_index(["model", "p"])
     cs.use()
-    fig, axes = cs.subplots("col", height_pt=150, ncols=2, sharey=True)
-    fig.get_layout_engine().set(wspace=0.35)
-    labels = ("Haiku 4.5", "Flash-Lite", "GPT Luna", "Qwen3-235B", "Grok 4.20")
-    for ax, col, low, high, letter, title, xlabel in (
-        (axes[0], "dx", "x_lo", "x_hi", "a", "Answers switch", "Drop in Pr(B)"),
-        (axes[1], "dy", "y_lo", "y_hi", "b", "Play stays flat", "Change in units"),
-    ):
-        ax.grid(False)
-        ax.spines[["left", "right", "top"]].set_visible(False)
-        ax.tick_params(axis="both", labelsize=FIGURE_TEXT_PT, length=0)
-        ax.set_yticks(range(len(labels)), labels)
-        # A light, alternating row band carries the model identity across the two
-        # panels. It makes paired reading possible without inventing a comparison
-        # line between the independently estimated contrasts.
-        for row in range(1, len(labels), 2):
-            ax.axhspan(row - 0.46, row + 0.46, color=cs.GREY_LIGHT, zorder=0)
-        ax.set_ylim(len(labels) - 0.45, -0.68)
-        ax.axvline(0, **cs.THEORY_SECONDARY)
-        for row, m in enumerate(cs.MODEL_ORDER):
-            d = D.set_index("model").loc[m]
-            style = cs.model(m)
-            ax.errorbar(d[col], row, xerr=[[d[col] - d[low]], [d[high] - d[col]]],
-                        fmt=style.marker, color=style.colour, ms=cs.MARKER_SIZE * style.marker_scale,
-                        mec=cs.WHITE, mew=cs.MARKER_EDGE, elinewidth=cs.LW_DATA,
-                        capsize=2, zorder=3)
-        cs.panel_title(ax, letter, title)
-        ax.set_xlabel(xlabel, fontsize=FIGURE_TEXT_PT, labelpad=4)
-    axes[0].set_xlim(-0.13, 1.15)
-    axes[0].set_xticks([0, 0.5, 1], ["0", "0.5", "1"])
-    axes[0].axvline(1, **cs.THEORY)
-    extent = max(abs(D["y_lo"].min()), abs(D["y_hi"].max()), 2)
-    limit = 2 * np.ceil(1.15 * extent / 2)
-    axes[1].set_xlim(-limit, limit)
-    axes[1].set_xticks([-limit, 0, limit])
+    fig, (ax, bx) = cs.subplots("col", height_pt=162, ncols=2, sharey=True)
+    fig.get_layout_engine().set(wspace=0.06)
+
+    def point(axis, x, y, m, filled):
+        st = cs.model(m) if m in cs.MODELS else None
+        colour = st.colour if st else cs.MUTED
+        axis.plot([x], [y], ls="none", marker=st.marker if st else "o",
+                  ms=4.6 * (st.marker_scale if st else 0.92), mfc=colour if filled else cs.WHITE,
+                  mec=colour, mew=0.9, zorder=4, clip_on=False)
+
+    def shift(axis, x0, x1, y, colour, dashed=False):
+        if abs(x1 - x0) < 0.12 * np.diff(axis.get_xlim())[0]:   # too short for a head
+            axis.plot([x0, x1], [y, y], color=colour, lw=1.1, zorder=3)
+            return
+        axis.annotate("", xy=(x1, y), xytext=(x0, y), zorder=3, arrowprops=dict(
+            arrowstyle="-|>", color=colour, lw=1.1, shrinkA=3.2, shrinkB=3.6, mutation_scale=7,
+            ls=(0, (3, 1.6)) if dashed else "solid"))
+
+    ax.set_xlim(-7, 107)
+    bx.set_xlim(10, 42)
+    shift(ax, 100, 0, 0, cs.MUTED, dashed=True)
+    point(ax, 100, 0, "Correct", False)
+    point(ax, 0, 0, "Correct", True)
+    for row, m in enumerate(cs.MODEL_ORDER, start=1):
+        st = cs.model(m)
+        lo, hi = lv.loc[(m, RISKS[0])], lv.loc[(m, RISKS[-1])]
+        for axis, col, scale in ((ax, "keep", 100), (bx, "paid", 1)):
+            for r in (lo, hi):
+                if r[f"{col}_hi"] > r[f"{col}_lo"]:
+                    axis.plot([scale * r[f"{col}_lo"], scale * r[f"{col}_hi"]], [row, row],
+                              color=st.colour, lw=5.0, alpha=0.28, solid_capstyle="round",
+                              zorder=2)
+            shift(axis, scale * lo[col], scale * hi[col], row, st.colour)
+            point(axis, scale * lo[col], row, m, False)
+            point(axis, scale * hi[col], row, m, True)
+    bx.axvline(cd.FAIR_TOTAL, ymin=0, ymax=0.83, **cs.THEORY_SECONDARY)
+    for axis in (ax, bx):
+        axis.grid(False)
+        axis.spines[["left", "right", "top"]].set_visible(False)
+        axis.tick_params(axis="both", labelsize=FIGURE_TEXT_PT)
+        axis.set_ylim(len(cs.MODEL_ORDER) + 0.45, -0.6)
+    bx.tick_params(axis="y", left=False)
+    ax.set_xticks([0, 50, 100])
+    bx.set_xticks([10, 20, 30, 40])
+    ax.set_xlabel("Answers favouring B (%)", fontsize=FIGURE_TEXT_PT)
+    bx.set_xlabel("Units paid (of 40)", fontsize=FIGURE_TEXT_PT)
+    cs.panel_title(ax, "a", "Answers")
+    cs.panel_title(bx, "b", "Play")
+    ax.set_yticks(range(len(cs.MODEL_ORDER) + 1),
+                  ["Correct"] + [cd.show(m, wrap=True) for m in cs.MODEL_ORDER])
+    ax.tick_params(axis="y", length=0, pad=3)
+    for t, m in zip(ax.get_yticklabels(), ["Correct", *cs.MODEL_ORDER]):
+        t.set_color(cs.MUTED if m == "Correct" else cs.model(m).text)
+        t.set_fontstyle("italic" if m == "Correct" else "normal")
+    handles = [Line2D([], [], ls="none", marker="o", ms=4.2, mec=cs.INK, mew=0.9,
+                      mfc=cs.INK if filled else cs.WHITE, label=f"$p={p:g}$")
+               for filled, p in ((False, RISKS[0]), (True, RISKS[-1]))]
+    bx.legend(handles=handles, loc="center", bbox_to_anchor=(0.5, 0.0), ncols=2,
+              bbox_transform=blended_transform_factory(bx.transAxes, bx.transData),
+              fontsize=FIGURE_TEXT_PT, handletextpad=0.2, columnspacing=0.8)
     # Machine-readable source for the plotted estimates, distinct from rounded tables.
-    D.to_csv(cd.FIGURES / "fig_knowdo.csv", index=False, float_format="%.10g")
+    # LF on every platform, so the registered digest does not depend on the OS.
+    L.to_csv(cd.FIGURES / "fig_knowdo.csv", index=False, float_format="%.10g",
+             lineterminator="\n")
     cs.check_text(fig, min_pt=FIGURE_TEXT_PT)
     pdf = cs.save(fig, cd.FIGURES / "fig_knowdo", title="fig_knowdo", proofs=True)
     print(f"wrote {pdf} (+ .png)")
