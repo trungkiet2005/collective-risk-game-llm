@@ -109,11 +109,11 @@ Section~\ref{main-sec:setup}, models, prompts, protocol & Sections~\ref{sec:mode
 Sections~\ref{main-sec:setup} and~\ref{main-sec:designs}, designs and measures & Section~\ref{sec:design}: games per design, the lottery draws, statistical methods, reproducibility \\
 Section~\ref{main-sec:grid}, self-play across risk & Section~\ref{sec:selfplay} \\
 Section~\ref{main-sec:controls}, prompt and decoding changes & Section~\ref{sec:controls} \\
-Section~\ref{main-sec:knowing}, asking the agent & Section~\ref{sec:questions}: every question word for word, and all answers \\
+Section~\ref{main-sec:designs}, asking the agent & Section~\ref{sec:questions}: every question word for word, all answers, and answers against play \\
 Section~\ref{main-sec:scripted}, fixed partners & Section~\ref{sec:scripted} \\
 Section~\ref{main-sec:groups}, mixed tables & Section~\ref{sec:mixed} \\
 Sections~\ref{main-sec:designs} and~\ref{main-sec:selection}, selection & Section~\ref{sec:selection}: method, payoff functions, all selection settings \\
-Sections~\ref{main-sec:grid} and~\ref{main-sec:groups}, last round, equilibria, rules, responses to openings & Section~\ref{sec:strategy} \\
+Sections~\ref{main-sec:grid} and~\ref{main-sec:groups}, last round, equilibria, rules, responses to openings & Section~\ref{sec:strategy}: including how each model plays the last round \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -508,7 +508,7 @@ The no-hint prompt was played at $p=0.1$, $0.5$ and $0.9$, the same levels as th
 \section{In-game questions}
 \label{sec:questions}
 
-This section supports Section~\ref{main-sec:knowing} of the paper. In the rerun games, seat 1 was asked ten questions in rounds 1, 5 and 10, about the state it had just decided on. Each question is a separate call that sees the decision prompt of that round with its final instruction replaced by the question, and its answer never enters the game. The answer is read from a final \texttt{ANSWER:} line; an unreadable answer would count as wrong. Each model answers 90 questions of each kind: 30 games, three rounds each.
+This section supports the value questions of Section~\ref{main-sec:designs} and the answers-against-play paragraph of Section~\ref{main-sec:controls} of the paper, and gives the full comparison of answers and play (Section~\ref{sec:answers-play}). In the rerun games, seat 1 was asked ten questions in rounds 1, 5 and 10, about the state it had just decided on. Each question is a separate call that sees the decision prompt of that round with its final instruction replaced by the question, and its answer never enters the game. The answer is read from a final \texttt{ANSWER:} line; an unreadable answer would count as wrong. Each model answers 90 questions of each kind: 30 games, three rounds each.
 
 \subsection{Numbers behind the main text}
 
@@ -542,10 +542,12 @@ Every rule question was answered correctly by every model in every round (Table~
 
 \subsection{The value comparison}
 
+Rule questions only ask for numbers shown in the prompt, so the paper relies on one value question, which compares two strategies for the whole game: (A) contribute 2 in every round and reach the target, finishing with 20 for certain; (B) contribute nothing and miss the target, keeping 40 unless the disaster strikes. The correct answer is B below $\popt$, A above it, and equal at $\popt$. A second value question could be read in two ways, so it is reported only here (Section~\ref{sec:second-value}).
+
 Table~\ref{tab:probe-value} counts every answer to the value comparison. Claude Haiku 4.5 is always correct and Gemini 3.5 Flash-Lite is almost always correct; both always answer ``equal'' at $p=0.5$. GPT-5.6 Luna is correct most of the time. Qwen3-235B answers that paying nothing is better in all 90 answers, so it is correct only at $p=0.1$. Grok 4.20 leans the same way.
 
 \begin{table}[h]
-\caption{The value comparison of Section~\ref{main-sec:knowing} of the paper: number of answers of each kind, of 30 per model and risk level, and share correct. A: pay 2 in every round and reach the target; B: pay nothing and miss it.}
+\caption{The value comparison of Section~\ref{main-sec:designs} of the paper: number of answers of each kind, of 30 per model and risk level, and share correct. A: pay 2 in every round and reach the target; B: pay nothing and miss it.}
 \label{tab:probe-value}
 \centering\small
 \input{tables/s_probe_value.tex}
@@ -568,8 +570,18 @@ Figure~\ref{fig:answers} and Table~\ref{tab:probe-rounds} split the same answers
 \end{table}
 
 \subsection{Answers against play}
+\label{sec:answers-play}
 
-Table~\ref{tab:knowdo} gives the numbers behind Figure~\ref{main-fig:knowdo} of the paper: for each model and risk level, the share of value answers saying that paying nothing is better and the total that the questioned seat pays in the same games, each with an interval. The figure plots the $p=0.1$ and $p=0.9$ rows with these intervals and joins them by an arrow; the \emph{Shift} rows give that change, with intervals that resample the answer and the payment from the same game. For the three models that answer well, the answer moves by close to its full range while the payment does not move.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.62\textwidth]{../figures/fig_knowdo.pdf}
+\caption{Answers and play at risk $0.1$ (open) and $0.9$ (filled), ten games per model and risk; arrows run from low to high risk, and shaded bars are 95\% game-bootstrap intervals. (a)~Share of answers favouring B; dashed: a fully correct switch. (b)~Units contributed by the questioned seat out of 40; dotted: fair share. This compares answers and actions, not best responses; Table~\ref{tab:knowdo} gives the shifts with their intervals and all three risks.}
+\label{fig:knowdo}
+\end{figure}
+
+Every rule question is answered correctly. Claude Haiku 4.5 and Gemini 3.5 Flash-Lite answer the value question correctly almost every time, and GPT-5.6 Luna most of the time. All three change their answer with the risk (Figure~\ref{fig:knowdo}a): at low risk they almost always say that keeping contributes  more, and at high risk they mostly say the opposite. Their contributions barely change (Figure~\ref{fig:knowdo}b). Qwen3-235B always says that keeping contributes  more, and Grok 4.20 gives that answer in the first round, regardless of  the risk. The question supplies two hypothetical outcomes rather than the partners' responses to a deviation, and it makes the comparison explicit, unlike the move request. Correct answers therefore do not establish knowledge of a best response, and the result is a gap between answers and play, not evidence about what an agent computes. A strongly risk-averse agent could give these answers and still contribute;  contribution at $p=0$ and after settlement provides the sharper test.
+
+Table~\ref{tab:knowdo} gives the numbers behind Figure~\ref{fig:knowdo}: for each model and risk level, the share of value answers saying that paying nothing is better and the total that the questioned seat pays in the same games, each with an interval. The figure plots the $p=0.1$ and $p=0.9$ rows with these intervals and joins them by an arrow; the \emph{Shift} rows give that change, with intervals that resample the answer and the payment from the same game. For the three models that answer well, the answer moves by close to its full range while the payment does not move.
 
 \begin{table}[h]
 \caption{Answers and play of the questioned seat (ten games per risk level). \emph{Shift}: drop in the share saying B from $p=0.1$ to $p=0.9$, and change in the units paid, with intervals that resample the games at the two risk levels independently.}
@@ -579,6 +591,7 @@ Table~\ref{tab:knowdo} gives the numbers behind Figure~\ref{main-fig:knowdo} of 
 \end{table}
 
 \subsection{The second value question}
+\label{sec:second-value}
 
 The second value question asks how much cash a player ends with, on average, if it pays nothing and the group misses the target. The intended answer is $(1-p)\,40$ for the whole game. The question can also be read as starting from the moment it is asked, with the money the seat still holds, which gives $(1-p)$ times that money. Table~\ref{tab:probe-defect} shows that this second reading is the most common error: Claude Haiku 4.5 gives it in most of its round-5 answers, when it has already paid part of its endowment. Answers of 40, the cash kept if no disaster strikes, come only from Qwen3-235B at $p=0.1$, where they are almost all of its answers. Answers of 0, the cash left if the disaster strikes, come mostly from GPT-5.6 Luna at $p=0.5$ and $0.9$ and from Grok 4.20 at $p=0.9$, and Grok 4.20 gives other wrong answers to about a quarter of the questions at $p=0.1$. Because a wrong answer can come from a reasonable reading rather than from a wrong computation, the paper does not use this question.
 
@@ -881,6 +894,8 @@ Tables~\ref{tab:sel-payoff-01} to~\ref{tab:sel-payoff-09} give $\pi_X(k)$ for ev
 
 \subsection{Every selection setting}
 
+The winners of Figure~\ref{main-fig:selection} of the paper are robust across several checks: each winner remains on top in at least \SelBootMinPct\% of bootstrap samples, and the same winners emerge at $\beta=\SelBetaExtra$, at $N$ of \SelNExtra{} and when using grid-only self-play payoffs. Under weak selection ($\beta=\SelWeakBeta$), the largest one-table mass is only \SelWeakWithinMaxMass{}; GPT-5.6 Luna narrowly leads at moderate and high risk. Which model wins therefore depends on the base-prompt payoffs, whose signatures vary with wording.
+
 Table~\ref{tab:sel-mass} lists the stationary mass of each model, and the population's target rate and payoff, for one table ($N=6$) and for larger populations ($N=30$, \SelNExtra{}), at the selection intensities $\beta=\SelWeakBeta$, 1 and \SelBetaExtra{}; the two largest populations are computed only for $\beta\ge1$. Figure~\ref{fig:mass-beta} shows how the masses move with the selection intensity over a wider range. In a population of one table, stronger selection concentrates the weight on Qwen3-235B at every risk level and group success falls to almost zero. In the larger population, Gemini 3.5 Flash-Lite already leads at moderate and high risk under weak selection and takes all the weight from $\beta=1$ on, while Qwen3-235B takes it at low risk. Grok 4.20 loses its weight under both population sizes as soon as selection is more than very weak.
 
 \begin{table}[h]
@@ -930,6 +945,8 @@ Table~\ref{tab:sel-facts} checks, cell by cell, the two table-level facts that t
 \subsection{Single entrants, candidate sets and welfare}
 \label{sec:selection-sensitivity}
 
+The winners depend on the candidate set: without Qwen3-235B, GPT-5.6 Luna wins the one-table population at all tested risks, and without Gemini 3.5 Flash-Lite, it wins the larger population at moderate and high risk.
+
 The following post-hoc checks reuse the observed payoffs without new model calls. We compare each single entrant's payoff with both resident self-play and its actual tablemates, then compute fixation along the full composition path. These are different comparisons: a favourable initial payoff gap alone does not determine fixation or stationary mass. We also remove each model in turn and rebuild the mutation chain over the retained strategies. This checks dependence on the candidate set, not on the prompt. Every risk and both population sizes are reported, with no new uncertainty intervals.
 
 At $p=0.5$, reaching the target is not required for optimal welfare: zero contribution also earns 20 per seat in expectation. We therefore report stationary-mass-weighted expected payoff and its share of the welfare optimum as well as target rate. The outcomes describe one-model populations in the rare-mutation limit, not the success of mixed groups during invasion.
@@ -939,11 +956,14 @@ At $p=0.5$, reaching the target is not required for optimal welfare: zero contri
 \section{Strategies, the last round and equilibrium benchmarks}
 \label{sec:strategy}
 
-This section supports four statements in Sections~\ref{main-sec:grid} and~\ref{main-sec:groups} of the paper: how Qwen3-235B and GPT-5.6 Luna play the last round, how the models compare with the equilibria of Proposition 1, how each model's moves can be described by a simple rule, and how partners respond to Grok 4.20's opening move. All tables use the games played with the base prompt.
+This section reports how the models play the last round, and supports three statements in Sections~\ref{main-sec:grid} and~\ref{main-sec:groups} of the paper: how the models compare with the equilibria of Proposition 1, how each model's moves can be described by a simple rule, and how partners respond to Grok 4.20's opening move. All tables use the games played with the base prompt.
 
 \subsection{The last round}
+\label{sec:last-round}
 
-Table~\ref{tab:strat-endgame} splits the last move of every seat by the state of the pool before round 10. Qwen3-235B pays nothing about as often when its payment is needed as when the others' fair shares already reach the target, and it almost never stops in rounds 7 to 9 once the target is met, so its skip follows the round number rather than the pool. GPT-5.6 Luna almost never skips when its payment is needed and skips about half the time when it is not. In self-play, GPT-5.6 Luna tables that reach round 10 ahead of the fair pace reach the target in \StratLunaAheadReach{}\% of \StratLunaAheadN{} games, against \StratLunaOnPaceReach{}\% of \StratLunaOnPaceN{} games exactly on pace: when every seat reasons that another will pay, too many skip.
+The last move reveals three rules. Qwen3-235B’s final-round skipping appears to be driven by the timing of the move rather than by the state of the collective pool. Across all base-prompt games, it skips the last  contribution as often when its  contribution is needed as when the others' fair shares already suffice (\StratQwenZeroPivotal\% of seats in both cases), and it almost never stops earlier once the target is met. Human contributions similarly decline over the rounds of repeated public goods games (Andreoni, 1988). GPT-5.6 Luna skips in \StratLunaZeroPivotal\% of cases when the target needs its  contribution but in \StratLunaZeroSlack\% when the others' fair shares would suffice. When six copies each count on another seat to contribute, tables ahead of the fair pace of 12 per round often miss the target, while tables exactly on pace reach it. Claude Haiku 4.5 stops contributing in the final round mostly when the target has already been reached, showing that models can infer the current pool size from the prompt.
+
+Table~\ref{tab:strat-endgame} splits the last move of every seat by the state of the pool before round 10. In self-play, GPT-5.6 Luna tables that reach round 10 ahead of the fair pace reach the target in \StratLunaAheadReach{}\% of \StratLunaAheadN{} games, against \StratLunaOnPaceReach{}\% of \StratLunaOnPaceN{} games exactly on pace: when every seat reasons that another will pay, too many skip.
 
 \begin{table}[h]
 \caption{Share of seats paying nothing in round 10, by the state of the pool after round 9, and in rounds 7 to 9 once the pool has reached 120, with 95\% bootstrap intervals over games in the table file.}

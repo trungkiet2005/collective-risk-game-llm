@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{51}
+\begin{thebibliography}{60}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -169,16 +169,20 @@
 \href{https://doi.org/10.48550/arXiv.2012.08630}{doi:\nolinkurl{10.48550/arXiv.2012.08630}}
 
 
-\bibitem[Dodivers and Rafa{\"\i}(2025)]%
+\bibitem[Dodivers and Rafai(2025)]%
         {dodivers2025uncovering}
-\bibfield{author}{\bibinfo{person}{{\'E}l{\'e}onore Dodivers} {and}
-  \bibinfo{person}{Isma{\"e}l Rafa{\"\i}}.} \bibinfo{year}{2025}\natexlab{}.
+\bibfield{author}{\bibinfo{person}{Eleonore Dodivers} {and}
+  \bibinfo{person}{Ismael Rafai}.} \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{Uncovering the fairness of {AI}: exploring focal
   point, inequality aversion, and altruism in {ChatGPT}'s dictator game
   decisions}.
 \newblock \bibinfo{journal}{\emph{Economics Bulletin}} \bibinfo{volume}{45},
   \bibinfo{number}{4} (\bibinfo{year}{2025}), \bibinfo{pages}{1818--1825}.
 \newblock
+\urldef\tempurl%
+\url{https://www.accessecon.com/pubs/EB/default.aspx?PaperID=EB-25-00292&topic=Abstract}
+\showURL{%
+\tempurl}
 
 
 \bibitem[Duong et~al\mbox{.}(2026)]%
@@ -199,11 +203,11 @@
 \bibfield{author}{\bibinfo{person}{Caoyun Fan}, \bibinfo{person}{Jindou Chen},
   \bibinfo{person}{Yaohui Jin}, {and} \bibinfo{person}{Hao He}.}
   \bibinfo{year}{2024}\natexlab{}.
-\newblock \showarticletitle{Can Large Language Models Serve as Rational Players
-  in Game Theory? A Systematic Analysis}. In
+\newblock \showarticletitle{Can {Large Language Models} Serve as Rational
+  Players in {Game Theory}? A Systematic Analysis}. In
   \bibinfo{booktitle}{\emph{Proceedings of the AAAI Conference on Artificial
   Intelligence}}, Vol.~\bibinfo{volume}{38}. \bibinfo{publisher}{AAAI Press},
-  \bibinfo{address}{Vancouver, Canada}, \bibinfo{pages}{17960--17967}.
+  \bibinfo{address}{Washington, DC, USA}, \bibinfo{pages}{17960--17967}.
 \newblock
 \href{https://doi.org/10.1609/aaai.v38i16.29751}{doi:\nolinkurl{10.1609/aaai.v38i16.29751}}
 
@@ -354,6 +358,33 @@
 \href{https://doi.org/10.1098/rsif.2024.0547}{doi:\nolinkurl{10.1098/rsif.2024.0547}}
 
 
+\bibitem[Han et~al\mbox{.}(2017)]%
+        {han2017evolution}
+\bibfield{author}{\bibinfo{person}{The~Anh Han}, \bibinfo{person}{Luis~Moniz
+  Pereira}, {and} \bibinfo{person}{Tom Lenaerts}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Evolution of commitment and level of participation
+  in public goods games}.
+\newblock \bibinfo{journal}{\emph{Autonomous Agents and Multi-Agent Systems}}
+  \bibinfo{volume}{31}, \bibinfo{number}{3} (\bibinfo{year}{2017}),
+  \bibinfo{pages}{561--583}.
+\newblock
+
+
+\bibitem[Han et~al\mbox{.}(2012)]%
+        {han2012emergence}
+\bibfield{author}{\bibinfo{person}{The~Anh Han},
+  \bibinfo{person}{Lu{\'i}s~Moniz Pereira}, {and} \bibinfo{person}{Francisco~C.
+  Santos}.} \bibinfo{year}{2012}\natexlab{}.
+\newblock \showarticletitle{The emergence of commitments and cooperation}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 11th International Conference on
+  Autonomous Agents and Multiagent Systems (AAMAS 2012)}}.
+  \bibinfo{publisher}{International Foundation for Autonomous Agents and
+  Multiagent Systems}, \bibinfo{address}{Richland, SC},
+  \bibinfo{pages}{559--566}.
+\newblock
+
+
 \bibitem[Huang et~al\mbox{.}(2025)]%
         {huang2025competing}
 \bibfield{author}{\bibinfo{person}{Jen-tse Huang}, \bibinfo{person}{Eric~John
@@ -367,6 +398,10 @@
   on Learning Representations (ICLR)}}. \bibinfo{publisher}{OpenReview.net},
   \bibinfo{address}{Singapore}, \bibinfo{pages}{65639--65681}.
 \newblock
+\urldef\tempurl%
+\url{https://proceedings.iclr.cc/paper_files/paper/2025/hash/a46adbe2f0ca0e16ef8857e188991ad7-Abstract-Conference.html}
+\showURL{%
+\tempurl}
 
 
 \bibitem[Hughes et~al\mbox{.}(2018)]%
@@ -378,12 +413,16 @@
   \bibinfo{person}{Tina Zhu}, \bibinfo{person}{Kevin McKee},
   \bibinfo{person}{Raphael Koster}, \bibinfo{person}{Heather Roff}, {and}
   \bibinfo{person}{Thore Graepel}.} \bibinfo{year}{2018}\natexlab{}.
-\newblock \showarticletitle{Inequity aversion improves cooperation in
-  intertemporal social dilemmas}. In \bibinfo{booktitle}{\emph{Advances in
+\newblock \showarticletitle{Inequity Aversion Improves Cooperation in
+  Intertemporal Social Dilemmas}. In \bibinfo{booktitle}{\emph{Advances in
   Neural Information Processing Systems}}, Vol.~\bibinfo{volume}{31}.
-  \bibinfo{publisher}{Curran Associates, Inc.}, \bibinfo{address}{Montreal,
-  Canada}, \bibinfo{numpages}{11}~pages.
+  \bibinfo{publisher}{Curran Associates, Inc.}, \bibinfo{address}{Red Hook, NY,
+  USA}, \bibinfo{pages}{3330--3340}.
 \newblock
+\urldef\tempurl%
+\url{https://proceedings.neurips.cc/paper_files/paper/2018/hash/7fea637fd6d02b8f0adf6f7dc36aed93-Abstract.html}
+\showURL{%
+\tempurl}
 
 
 \bibitem[Huynh et~al\mbox{.}(2025)]%
@@ -498,6 +537,26 @@
 \href{https://doi.org/10.1073/pnas.2313925121}{doi:\nolinkurl{10.1073/pnas.2313925121}}
 
 
+\bibitem[Merhej et~al\mbox{.}(2021)]%
+        {merhej2021cooperation}
+\bibfield{author}{\bibinfo{person}{Ramona Merhej}, \bibinfo{person}{Fernando~P.
+  Santos}, \bibinfo{person}{Francisco~S. Melo}, {and}
+  \bibinfo{person}{Francisco~C. Santos}.} \bibinfo{year}{2021}\natexlab{}.
+\newblock \showarticletitle{Cooperation between Independent Reinforcement
+  Learners under Wealth Inequality and Collective Risks}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 20th International Conference on
+  Autonomous Agents and MultiAgent Systems}} (Virtual Event, United Kingdom)
+  \emph{(\bibinfo{series}{AAMAS '21})}. \bibinfo{publisher}{International
+  Foundation for Autonomous Agents and Multiagent Systems},
+  \bibinfo{address}{Richland, SC}, \bibinfo{pages}{898--906}.
+\newblock
+\showISBNx{9781450383073}
+\urldef\tempurl%
+\url{https://www.ifaamas.org/Proceedings/aamas2021/pdfs/p898.pdf}
+\showURL{%
+\tempurl}
+
+
 \bibitem[Milinski et~al\mbox{.}(2008)]%
         {milinski2008collective}
 \bibfield{author}{\bibinfo{person}{Manfred Milinski}, \bibinfo{person}{Ralf~D.
@@ -598,6 +657,33 @@
 \href{https://doi.org/10.52202/079017-3548}{doi:\nolinkurl{10.52202/079017-3548}}
 
 
+\bibitem[Rahwan et~al\mbox{.}(2019)]%
+        {rahwan2019machine}
+\bibfield{author}{\bibinfo{person}{Iyad Rahwan}, \bibinfo{person}{Manuel
+  Cebrian}, \bibinfo{person}{Nick Obradovich}, \bibinfo{person}{Josh Bongard},
+  \bibinfo{person}{Jean-Fran{\c{c}}ois Bonnefon}, \bibinfo{person}{Cynthia
+  Breazeal}, \bibinfo{person}{Jacob~W Crandall}, \bibinfo{person}{Nicholas~A
+  Christakis}, \bibinfo{person}{Iain~D Couzin}, \bibinfo{person}{Matthew~O
+  Jackson}, {et~al\mbox{.}}} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Machine behaviour}.
+\newblock \bibinfo{journal}{\emph{Nature}} \bibinfo{volume}{568},
+  \bibinfo{number}{7753} (\bibinfo{year}{2019}), \bibinfo{pages}{477--486}.
+\newblock
+
+
+\bibitem[Rand et~al\mbox{.}(2013)]%
+        {rand2013evolution}
+\bibfield{author}{\bibinfo{person}{David~G Rand}, \bibinfo{person}{Corina~E
+  Tarnita}, \bibinfo{person}{Hisashi Ohtsuki}, {and} \bibinfo{person}{Martin~A
+  Nowak}.} \bibinfo{year}{2013}\natexlab{}.
+\newblock \showarticletitle{Evolution of fairness in the one-shot anonymous
+  ultimatum game}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
+  Sciences}} \bibinfo{volume}{110}, \bibinfo{number}{7} (\bibinfo{year}{2013}),
+  \bibinfo{pages}{2581--2586}.
+\newblock
+
+
 \bibitem[Santos and Pacheco(2011)]%
         {santos2011risk}
 \bibfield{author}{\bibinfo{person}{Francisco~C. Santos} {and}
@@ -609,6 +695,41 @@
   (\bibinfo{year}{2011}), \bibinfo{pages}{10421--10425}.
 \newblock
 \href{https://doi.org/10.1073/pnas.1015648108}{doi:\nolinkurl{10.1073/pnas.1015648108}}
+
+
+\bibitem[Santos et~al\mbox{.}(2020)]%
+        {santos2020picky}
+\bibfield{author}{\bibinfo{person}{Fernando~P Santos}, \bibinfo{person}{Samuel
+  Mascarenhas}, \bibinfo{person}{Francisco~C Santos}, \bibinfo{person}{Filipa
+  Correia}, \bibinfo{person}{Samuel Gomes}, {and} \bibinfo{person}{Ana Paiva}.}
+  \bibinfo{year}{2020}\natexlab{}.
+\newblock \showarticletitle{Picky losers and carefree winners prevail in
+  collective risk dilemmas with partner selection}.
+\newblock \bibinfo{journal}{\emph{Autonomous Agents and Multi-Agent Systems}}
+  \bibinfo{volume}{34}, \bibinfo{number}{2} (\bibinfo{year}{2020}),
+  \bibinfo{pages}{40}.
+\newblock
+
+
+\bibitem[Santos et~al\mbox{.}(2019)]%
+        {santos2019outcome}
+\bibfield{author}{\bibinfo{person}{Fernando~P. Santos},
+  \bibinfo{person}{Samuel~F. Mascarenhas}, \bibinfo{person}{Francisco~C.
+  Santos}, \bibinfo{person}{Filipa Correia}, \bibinfo{person}{Samuel Gomes},
+  {and} \bibinfo{person}{Ana Paiva}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Outcome-based Partner Selection in Collective Risk
+  Dilemmas}. In \bibinfo{booktitle}{\emph{Proceedings of the 18th International
+  Conference on Autonomous Agents and MultiAgent Systems}} (Montreal, QC,
+  Canada) \emph{(\bibinfo{series}{AAMAS '19})}.
+  \bibinfo{publisher}{International Foundation for Autonomous Agents and
+  Multiagent Systems}, \bibinfo{address}{Richland, SC},
+  \bibinfo{pages}{1556--1564}.
+\newblock
+\showISBNx{9781450363099}
+\urldef\tempurl%
+\url{https://www.ifaamas.org/Proceedings/aamas2019/pdfs/p1556.pdf}
+\showURL{%
+\tempurl}
 
 
 \bibitem[Schaffer(1988)]%
@@ -637,9 +758,21 @@
   \bibinfo{address}{Rio de Janeiro, Brazil}, \bibinfo{pages}{127538--127571}.
 \newblock
 \urldef\tempurl%
-\url{https://openreview.net/forum?id=weUP6H5Ko9}
+\url{https://proceedings.iclr.cc/paper_files/paper/2026/hash/cf2fcda40de8520027af2eadcafdecd6-Abstract-Conference.html}
 \showURL{%
 \tempurl}
+
+
+\bibitem[Sigmund et~al\mbox{.}(2010)]%
+        {sigmund2010social}
+\bibfield{author}{\bibinfo{person}{Karl Sigmund}, \bibinfo{person}{Hannelore
+  De~Silva}, \bibinfo{person}{Arne Traulsen}, {and} \bibinfo{person}{Christoph
+  Hauert}.} \bibinfo{year}{2010}\natexlab{}.
+\newblock \showarticletitle{Social learning promotes institutions for governing
+  the commons}.
+\newblock \bibinfo{journal}{\emph{Nature}} \bibinfo{volume}{466},
+  \bibinfo{number}{7308} (\bibinfo{year}{2010}), \bibinfo{pages}{861--863}.
+\newblock
 
 
 \bibitem[Slumbers et~al\mbox{.}(2025)]%
@@ -709,7 +842,7 @@
   \bibinfo{address}{Seoul, South Korea}, \bibinfo{numpages}{65}~pages.
 \newblock
 \urldef\tempurl%
-\url{https://arxiv.org/abs/2604.15267}
+\url{https://icml.cc/virtual/2026/poster/66503}
 \showURL{%
 \tempurl}
 
@@ -760,10 +893,10 @@
 \bibfield{author}{\bibinfo{person}{Aron Vallinder} {and}
   \bibinfo{person}{Edward Hughes}.} \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{Cultural Evolution of Cooperation among {LLM}
-  Agents: Extended Abstract}. In \bibinfo{booktitle}{\emph{Proceedings of the
-  24th International Conference on Autonomous Agents and Multiagent Systems
-  (AAMAS 2025)}}. \bibinfo{publisher}{IFAAMAS}, \bibinfo{address}{Detroit, MI,
-  USA}, \bibinfo{pages}{2771--2773}.
+  Agents}. In \bibinfo{booktitle}{\emph{Proceedings of the 24th International
+  Conference on Autonomous Agents and Multiagent Systems (AAMAS 2025)}}.
+  \bibinfo{publisher}{IFAAMAS}, \bibinfo{address}{Detroit, MI, USA},
+  \bibinfo{pages}{2771--2773}.
 \newblock
 \urldef\tempurl%
 \url{https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p2771.pdf}
@@ -781,6 +914,10 @@
   \bibinfo{publisher}{AAAI Press}, \bibinfo{address}{Boston, Massachusetts,
   USA}, \bibinfo{pages}{1552--1555}.
 \newblock
+\urldef\tempurl%
+\url{https://aaai.org/Papers/AAAI/2006/AAAI06-248.pdf}
+\showURL{%
+\tempurl}
 
 
 \bibitem[Willis et~al\mbox{.}(2026)]%
@@ -796,6 +933,19 @@
 \newblock
 \showeprint[arxiv]{2602.16662}
 \href{https://doi.org/10.48550/arXiv.2602.16662}{doi:\nolinkurl{10.48550/arXiv.2602.16662}}
+
+
+\bibitem[Zisis et~al\mbox{.}(2015)]%
+        {zisis2015generosity}
+\bibfield{author}{\bibinfo{person}{Ioannis Zisis}, \bibinfo{person}{Sibilla
+  Di~Guida}, \bibinfo{person}{The~Anh Han}, \bibinfo{person}{Georg
+  Kirchsteiger}, {and} \bibinfo{person}{Tom Lenaerts}.}
+  \bibinfo{year}{2015}\natexlab{}.
+\newblock \showarticletitle{Generosity motivated by acceptance-evolutionary
+  analysis of an anticipation game}.
+\newblock \bibinfo{journal}{\emph{Scientific reports}} \bibinfo{volume}{5},
+  \bibinfo{number}{1} (\bibinfo{year}{2015}), \bibinfo{pages}{18076}.
+\newblock
 
 
 \end{thebibliography}
