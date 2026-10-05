@@ -61,6 +61,12 @@
 % role below; build them all with palettes/build_palettes.sh. Without
 % \FigPalette this file compiles to the paper's Figure 1 unchanged.
 \newif\ifheadrule \headrulefalse
+\newif\ifgroupframe \groupframetrue   % outline on the Outcomes and Models-we-study boxes
+\newif\ifgroupfill  \groupfilltrue    % wash behind the Outcomes and Models-we-study boxes
+\newif\ifpanelframe \panelframetrue   % outline round panels (a) and (b)
+\newif\ifheadband   \headbandtrue     % filled header band behind the panel titles
+\newif\ifpaneldivider \paneldividerfalse % dashed vertical rule between the panels
+\newif\ifoutcomerows \outcomerowsfalse % outcomes as three icon-and-text lines, no cards
 \ifdefined\FigPalette \input{\FigPalette}\fi
 \makeatletter
 \newcommand{\defaultcolorlet}[2]{\@ifundefinedcolor{#1}{\colorlet{#1}{#2}}{}}
@@ -89,11 +95,20 @@
 \defaultcolorlet{NumTextThree}{NumText}
 \defaultcolorlet{NumTextFour}{NumText}
 \defaultcolorlet{FixedText}{white}
+\defaultcolorlet{DividerLine}{CardLine}
+% Without the header band the titles sit on the panel, so they take the ink colour.
+\ifheadband\else \colorlet{HeadText}{Ink}\colorlet{HeadTagA}{Ink}\colorlet{HeadTagB}{Ink}\fi
 
 \newcommand{\fsize}[1]{\fontsize{#1}{\dimexpr #1pt*6/5\relax}\selectfont}
 \newcommand{\card}[6]{%
   \path[rounded corners=1.25mm,fill=#5,draw=#6,line width=.36pt]
     (#1,#2) rectangle (#3,#4);}
+% A card that groups other cards (Outcomes, Models we study); its outline can be
+% switched off with \groupframefalse in a palette, keeping only the wash.
+\newcommand{\groupcard}[6]{%
+  \ifgroupfill \def\gcfill{#5}\else \def\gcfill{none}\fi
+  \ifgroupframe \card{#1}{#2}{#3}{#4}{\gcfill}{#6}%
+  \else \path[rounded corners=1.25mm,fill=\gcfill] (#1,#2) rectangle (#3,#4);\fi}
 % #1 filename stem, #2 x centre, #3 y centre, #4 max width, #5 max height.
 \newcommand{\asset}[5]{%
   \node[inner sep=0pt,outer sep=0pt] at (#2,#3)
@@ -103,6 +118,11 @@
   \node[rounded corners=.65mm,fill=FixedFill,text=FixedText,inner xsep=.65mm,
         inner ysep=.42mm,outer sep=0pt,font=\fsize{5.8}]
         at (#1,#2) {Fixed};}
+% One outcome line: #1 y centre, #2 icon, #3 title, #4 condition, #5 result.
+\newcommand{\outcomerow}[5]{%
+  \asset{#2}{7.6}{#1}{5.0}{5.0}
+  \node[anchor=west,inner sep=0pt,font=\fsize{8.4}] at (12.2,#1)
+    {\textbf{#3:}\ \textcolor{Muted}{#4},\ #5};}
 % Header block for an experimental-design card; #8 is the number's colour.
 \newcommand{\designhead}[8]{%
   \path[fill=#4] (#1,#2) circle[radius=3.8mm];
@@ -119,13 +139,17 @@
 
   % -------------------- (a) THE GAME --------------------
   \path[rounded corners=1.8mm,fill=PanelFill] (1,1) rectangle (92,89);
+  \ifheadband
   \begin{scope}
     \clip[rounded corners=1.8mm] (1,1) rectangle (92,89);
     \fill[HeadA] (1,1) rectangle (92,8.8);
   \end{scope}
+  \fi
   \ifheadrule \draw[HeadRuleA,line width=.55pt] (1,8.8) -- (92,8.8); \fi
+  \ifpanelframe
   \path[rounded corners=1.8mm,draw=BlueLine,line width=.55pt]
     (1,1) rectangle (92,89);
+  \fi
   \node[anchor=west,text=HeadText,font=\fsize{14}\bfseries,inner sep=0pt]
     at (3.5,4.9) {\textcolor{HeadTagA}{(a)}\quad The game};
 
@@ -152,12 +176,18 @@
 
   % Outcomes: corrected parent heading. The original put 'Target reached'
   % under 'if total < 120'. Here 'miss' has its own explicit condition.
-  \card{3}{62}{90}{87}{PanelWash}{CardLine}
+  \groupcard{3}{62}{90}{87}{PanelWash}{CardLine}
   \node[anchor=west,font=\fsize{9.2}\bfseries,inner sep=0pt]
     at (4.4,65.0) {Outcomes};
   \node[anchor=east,font=\fsize{6.8},text=Muted,inner sep=0pt]
     at (88.7,65.0) {Miss: total $<120$};
 
+  \ifoutcomerows
+  % Three lines, icon then 'Title: condition, result', no cards (pitch 6.2 mm).
+  \outcomerow{71.0}{icon_success}{Target reached}{total $\geq120$}{keep remainder}
+  \outcomerow{77.2}{icon_catastrophe}{Miss + catastrophe}{probability $p$}{lose all}
+  \outcomerow{83.4}{icon_no_catastrophe}{Miss + no catastrophe}{probability $1-p$}{keep money}
+  \else
   \card{4}{67.3}{31.667}{86}{SuccessWash}{SuccessLine}
   \card{32.667}{67.3}{60.333}{86}{FailureWash}{FailureLine}
   \card{61.333}{67.3}{89}{86}{SurvivalWash}{SurvivalLine}
@@ -174,23 +204,31 @@
   \node[font=\fsize{7.4},inner sep=0pt] at (17.8335,83.6) {keep remainder};
   \node[font=\fsize{7.4},inner sep=0pt] at (46.5,83.6) {lose all};
   \node[font=\fsize{7.4},inner sep=0pt] at (75.1665,83.6) {keep money};
+  \fi
 
+  \ifpaneldivider
+    \draw[DividerLine,line width=.5pt,dash pattern=on 2pt off 1.6pt] (93,2) -- (93,88);
+  \fi
   % -------------------- (b) FOUR DESIGNS --------------------
   \path[rounded corners=1.8mm,fill=PanelFill] (94,1) rectangle (187,89);
+  \ifheadband
   \begin{scope}
     \clip[rounded corners=1.8mm] (94,1) rectangle (187,89);
     \fill[HeadB] (94,1) rectangle (187,8.8);
   \end{scope}
+  \fi
   \ifheadrule \draw[HeadRuleB,line width=.55pt] (94,8.8) -- (187,8.8); \fi
+  \ifpanelframe
   \path[rounded corners=1.8mm,draw=GreenLine,line width=.55pt]
     (94,1) rectangle (187,89);
+  \fi
   \node[anchor=west,text=HeadText,font=\fsize{14}\bfseries,inner sep=0pt]
     at (96.5,4.9) {\textcolor{HeadTagB}{(b)}\quad Four designs};
 
   % Model names are transcribed from the supplied image, not independently
   % verified release names. Logos are extracted symbols without raster labels.
   % Order follows the paper (19-09-2026): Haiku, Flash-Lite, Luna, Qwen, Grok.
-  \card{96}{10.6}{185}{28.6}{ModelWash}{CardLine}
+  \groupcard{96}{10.6}{185}{28.6}{ModelWash}{CardLine}
   \node[anchor=west,font=\fsize{9.0}\bfseries,inner sep=0pt]
     at (97.4,13.1) {Models we study};
   \card{97.4}{15.6}{113.7}{27.6}{ClaudeWash}{ClaudeLine}
