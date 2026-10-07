@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{60}
+\begin{thebibliography}{61}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -360,15 +360,16 @@
 
 \bibitem[Han et~al\mbox{.}(2017)]%
         {han2017evolution}
-\bibfield{author}{\bibinfo{person}{The~Anh Han}, \bibinfo{person}{Luis~Moniz
-  Pereira}, {and} \bibinfo{person}{Tom Lenaerts}.}
-  \bibinfo{year}{2017}\natexlab{}.
+\bibfield{author}{\bibinfo{person}{The~Anh Han},
+  \bibinfo{person}{Lu{\'\i}s~Moniz Pereira}, {and} \bibinfo{person}{Tom
+  Lenaerts}.} \bibinfo{year}{2017}\natexlab{}.
 \newblock \showarticletitle{Evolution of commitment and level of participation
   in public goods games}.
 \newblock \bibinfo{journal}{\emph{Autonomous Agents and Multi-Agent Systems}}
   \bibinfo{volume}{31}, \bibinfo{number}{3} (\bibinfo{year}{2017}),
   \bibinfo{pages}{561--583}.
 \newblock
+\href{https://doi.org/10.1007/s10458-016-9338-4}{doi:\nolinkurl{10.1007/s10458-016-9338-4}}
 
 
 \bibitem[Han et~al\mbox{.}(2012)]%
@@ -459,6 +460,22 @@
 \newblock
 \showeprint[arxiv]{2601.19082}
 \href{https://doi.org/10.48550/arXiv.2601.19082}{doi:\nolinkurl{10.48550/arXiv.2601.19082}}
+
+
+\bibitem[Kempinski et~al\mbox{.}(2025)]%
+        {kempinski2025game}
+\bibfield{author}{\bibinfo{person}{Benjamin Kempinski}, \bibinfo{person}{Ian
+  Gemp}, \bibinfo{person}{Kate Larson}, \bibinfo{person}{Marc Lanctot},
+  \bibinfo{person}{Yoram Bachrach}, {and} \bibinfo{person}{Tal Kachman}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Game of Thoughts: Iterative Reasoning in
+  Game-Theoretic Domains with Large Language Models}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 24th International Conference on
+  Autonomous Agents and Multiagent Systems (AAMAS 2025)}}.
+  \bibinfo{publisher}{IFAAMAS}, \bibinfo{address}{Detroit, MI, USA},
+  \bibinfo{pages}{1088--1097}.
+\newblock
+\href{https://doi.org/10.65109/gzfu8152}{doi:\nolinkurl{10.65109/gzfu8152}}
 
 
 \bibitem[Kumar et~al\mbox{.}(2026)]%
@@ -662,26 +679,35 @@
 \bibfield{author}{\bibinfo{person}{Iyad Rahwan}, \bibinfo{person}{Manuel
   Cebrian}, \bibinfo{person}{Nick Obradovich}, \bibinfo{person}{Josh Bongard},
   \bibinfo{person}{Jean-Fran{\c{c}}ois Bonnefon}, \bibinfo{person}{Cynthia
-  Breazeal}, \bibinfo{person}{Jacob~W Crandall}, \bibinfo{person}{Nicholas~A
-  Christakis}, \bibinfo{person}{Iain~D Couzin}, \bibinfo{person}{Matthew~O
-  Jackson}, {et~al\mbox{.}}} \bibinfo{year}{2019}\natexlab{}.
+  Breazeal}, \bibinfo{person}{Jacob~W. Crandall}, \bibinfo{person}{Nicholas~A.
+  Christakis}, \bibinfo{person}{Iain~D. Couzin}, \bibinfo{person}{Matthew~O.
+  Jackson}, \bibinfo{person}{Nicholas~R. Jennings}, \bibinfo{person}{Ece
+  Kamar}, \bibinfo{person}{Isabel~M. Kloumann}, \bibinfo{person}{Hugo
+  Larochelle}, \bibinfo{person}{David Lazer}, \bibinfo{person}{Richard
+  McElreath}, \bibinfo{person}{Alan Mislove}, \bibinfo{person}{David~C.
+  Parkes}, \bibinfo{person}{Alex~`Sandy' Pentland},
+  \bibinfo{person}{Margaret~E. Roberts}, \bibinfo{person}{Azim Shariff},
+  \bibinfo{person}{Joshua~B. Tenenbaum}, {and} \bibinfo{person}{Michael
+  Wellman}.} \bibinfo{year}{2019}\natexlab{}.
 \newblock \showarticletitle{Machine behaviour}.
 \newblock \bibinfo{journal}{\emph{Nature}} \bibinfo{volume}{568},
   \bibinfo{number}{7753} (\bibinfo{year}{2019}), \bibinfo{pages}{477--486}.
 \newblock
+\href{https://doi.org/10.1038/s41586-019-1138-y}{doi:\nolinkurl{10.1038/s41586-019-1138-y}}
 
 
 \bibitem[Rand et~al\mbox{.}(2013)]%
         {rand2013evolution}
-\bibfield{author}{\bibinfo{person}{David~G Rand}, \bibinfo{person}{Corina~E
-  Tarnita}, \bibinfo{person}{Hisashi Ohtsuki}, {and} \bibinfo{person}{Martin~A
+\bibfield{author}{\bibinfo{person}{David~G. Rand}, \bibinfo{person}{Corina~E.
+  Tarnita}, \bibinfo{person}{Hisashi Ohtsuki}, {and} \bibinfo{person}{Martin~A.
   Nowak}.} \bibinfo{year}{2013}\natexlab{}.
 \newblock \showarticletitle{Evolution of fairness in the one-shot anonymous
-  ultimatum game}.
+  {Ultimatum Game}}.
 \newblock \bibinfo{journal}{\emph{Proceedings of the National Academy of
   Sciences}} \bibinfo{volume}{110}, \bibinfo{number}{7} (\bibinfo{year}{2013}),
   \bibinfo{pages}{2581--2586}.
 \newblock
+\href{https://doi.org/10.1073/pnas.1214167110}{doi:\nolinkurl{10.1073/pnas.1214167110}}
 
 
 \bibitem[Santos and Pacheco(2011)]%
@@ -699,8 +725,8 @@
 
 \bibitem[Santos et~al\mbox{.}(2020)]%
         {santos2020picky}
-\bibfield{author}{\bibinfo{person}{Fernando~P Santos}, \bibinfo{person}{Samuel
-  Mascarenhas}, \bibinfo{person}{Francisco~C Santos}, \bibinfo{person}{Filipa
+\bibfield{author}{\bibinfo{person}{Fernando~P. Santos}, \bibinfo{person}{Samuel
+  Mascarenhas}, \bibinfo{person}{Francisco~C. Santos}, \bibinfo{person}{Filipa
   Correia}, \bibinfo{person}{Samuel Gomes}, {and} \bibinfo{person}{Ana Paiva}.}
   \bibinfo{year}{2020}\natexlab{}.
 \newblock \showarticletitle{Picky losers and carefree winners prevail in
@@ -709,6 +735,7 @@
   \bibinfo{volume}{34}, \bibinfo{number}{2} (\bibinfo{year}{2020}),
   \bibinfo{pages}{40}.
 \newblock
+\href{https://doi.org/10.1007/s10458-020-09463-w}{doi:\nolinkurl{10.1007/s10458-020-09463-w}}
 
 
 \bibitem[Santos et~al\mbox{.}(2019)]%
@@ -773,6 +800,7 @@
 \newblock \bibinfo{journal}{\emph{Nature}} \bibinfo{volume}{466},
   \bibinfo{number}{7308} (\bibinfo{year}{2010}), \bibinfo{pages}{861--863}.
 \newblock
+\href{https://doi.org/10.1038/nature09203}{doi:\nolinkurl{10.1038/nature09203}}
 
 
 \bibitem[Slumbers et~al\mbox{.}(2025)]%
@@ -898,10 +926,7 @@
   \bibinfo{publisher}{IFAAMAS}, \bibinfo{address}{Detroit, MI, USA},
   \bibinfo{pages}{2771--2773}.
 \newblock
-\urldef\tempurl%
-\url{https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p2771.pdf}
-\showURL{%
-\tempurl}
+\href{https://doi.org/10.65109/jnmb7739}{doi:\nolinkurl{10.65109/jnmb7739}}
 
 
 \bibitem[Wellman(2006)]%
@@ -941,11 +966,12 @@
   Di~Guida}, \bibinfo{person}{The~Anh Han}, \bibinfo{person}{Georg
   Kirchsteiger}, {and} \bibinfo{person}{Tom Lenaerts}.}
   \bibinfo{year}{2015}\natexlab{}.
-\newblock \showarticletitle{Generosity motivated by acceptance-evolutionary
+\newblock \showarticletitle{Generosity motivated by acceptance - evolutionary
   analysis of an anticipation game}.
-\newblock \bibinfo{journal}{\emph{Scientific reports}} \bibinfo{volume}{5},
+\newblock \bibinfo{journal}{\emph{Scientific Reports}} \bibinfo{volume}{5},
   \bibinfo{number}{1} (\bibinfo{year}{2015}), \bibinfo{pages}{18076}.
 \newblock
+\href{https://doi.org/10.1038/srep18076}{doi:\nolinkurl{10.1038/srep18076}}
 
 
 \end{thebibliography}

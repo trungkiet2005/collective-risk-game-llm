@@ -408,7 +408,9 @@ def gates():
 
 
 def main():
-    r = subprocess.run([sys.executable, str(HERE / "make_submission.py")], capture_output=True, text=True)
+    # The authors keep their en and em dashes (decided 7 October 2026).
+    r = subprocess.run([sys.executable, str(HERE / "make_submission.py"), "--allow-dashes"],
+                       capture_output=True, text=True)
     print(r.stdout.strip())
     if r.returncode:
         fail("make_submission.py gates failed")

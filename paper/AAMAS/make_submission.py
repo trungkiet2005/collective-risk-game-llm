@@ -77,9 +77,10 @@ def main():
     if first_ref != BODY_PAGES or not pages[first_ref].startswith(header) or body_before != len(header):
         fail(f"body is not exactly {BODY_PAGES} pages (references on page {first_ref + 1}, "
              f"{body_before - len(header)} characters of body before the heading)")
+    # House style, not a venue rule; the authors may waive it with --allow-dashes.
     for i, t in enumerate(pages[:BODY_PAGES]):
         body = t.replace(header, "").replace("3–7 May 2027", "")
-        if "–" in body or "—" in body:
+        if ("–" in body or "—" in body) and "--allow-dashes" not in sys.argv:
             fail(f"main.pdf: en or em dash in the body on page {i + 1}")
     supp_doc = pymupdf.open(SUPP)
     check_common(supp_doc, "supplement.pdf")
