@@ -49,3 +49,5 @@ python paper/AAMAS/make_submission.py
 ```
 
 This creates local upload files and checks the eight-page body, reference placement, anonymity strings, font types and archive size. It does not submit anything and does not certify scientific completeness, venue eligibility or the absence of overlap with another manuscript.
+
+For the full-paper upload (7 October 2026 onward), run `python paper/AAMAS/make_full_submission.py` instead. It runs the gates above, then adds two folders to `supplementary_material.zip`: `code/` (the game with the evaluation harness swapped for an OpenAI-compatible router call; every other definition is checked to be unchanged, and one game is played against a local stand-in router) and `data/` (every recorded game). It checks both for identifying strings and writes `paper/AAMAS/AAMAS2027_full_submission/`. Its `HUONG_DAN_NOP.md` lists the OpenReview steps.
