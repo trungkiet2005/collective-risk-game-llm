@@ -276,9 +276,6 @@ The normative words are not the main source of the default. With neutral wording
 
 For most models, behaviour at zero risk changes depending on whether the prompt clearly states the goal. When risk above zero, models tend to contribute  similar amounts across risk levels, and this pattern remains under different wordings. The partner and selection results below use the base prompt.
 
-\paragraph{Correct answers, unchanged play.}
-Asked the value question in separate calls, Claude Haiku 4.5, Gemini 3.5 Flash-Lite and GPT-5.6 Luna mostly answer correctly and change their answer with the risk, yet the questioned seats contribute almost the same at low and high risk; Qwen3-235B and Grok 4.20 mostly answer that keeping pays more. This is a gap between answers and play, not evidence about what an agent computes; the Supplementary Material gives every answer and the answers against play (Section~S8.6). A strongly risk-averse agent could give these answers and still contribute; contribution at $p=0$ and after settlement provides the sharper test.
-
 \begin{table}[t]
 \caption{Mean seat total under prompt and decoding changes. Top: pooled over $p=0.1$ and $0.9$ (20 games each). \emph{Rerun} repeats the base prompt with in-game questions; \emph{Para.\,1, 2} are the rewordings; \emph{Wording} is the neutral wording and \emph{Goal} adds the stated goal. Bold: a shift from \emph{Base} of at least 2 units with permutation $P<0.01$; every bold shift also has $P<0.001$, below the Bonferroni threshold for the 35 comparisons. Bottom: single risk levels (10 games each).}
 \label{tab:robust}
@@ -286,6 +283,9 @@ Asked the value question in separate calls, Claude Haiku 4.5, Gemini 3.5 Flash-L
 \setlength{\tabcolsep}{4pt}
 \input{tables/tab_robust.tex}
 \end{table}
+
+\paragraph{Correct answers, unchanged play.}
+Asked the value question in separate calls, Claude Haiku 4.5, Gemini 3.5 Flash-Lite and GPT-5.6 Luna mostly answer correctly and change their answer with the risk, yet the questioned seats contribute almost the same at low and high risk; Qwen3-235B and Grok 4.20 mostly answer that keeping pays more. This is a gap between answers and play, not evidence about what an agent computes; the Supplementary Material gives every answer and the answers against play (Section~S8.6). A strongly risk-averse agent could give these answers and still contribute; contribution at $p=0$ and after settlement provides the sharper test.
 
 \subsection{Partners: simple responses and fragile tables}
 \label{sec:partners}
@@ -355,6 +355,7 @@ In a one-table population, selection favours the model that contributes least. P
 %\paragraph{A larger population favours the fair-share player.}
 In  larger populations, selection favours Gemini 3.5 Flash-Lite at moderate and high risk (Figure~\ref{fig:selection}b). Its self-play attains the welfare optimum there, but neither optimality nor Nash equilibrium implies that imitation will select it. The ranking comes from the estimated payoffs at every composition along the fixation path, where a lower  contributor  can earn more than its tablemates even while lowering its own payoff (Figure~\ref{fig:selection}c,\,d). At low risk both population sizes favour Qwen3-235B, whose outcome remains far below the optimum. The switch to Gemini 3.5 Flash-Lite occurs already at seven or eight agents, consistent with finite-population theory~\cite{schaffer1988evolutionarily}. 
 %Each winner stays on top in at least \SelBootMinPct\% of bootstrap samples, and the same winners appear at $\beta=\SelBetaExtra$, at $N$ of \SelNExtra{} and with grid-only self-play payoffs. Under weak selection ($\beta=\SelWeakBeta$), the largest one-table mass is only \SelWeakWithinMaxMass{} and GPT-5.6 Luna narrowly leads at moderate and high risk. Which model wins remains conditional on the base-prompt payoffs, whose signatures change with wording.
+
 Each winner is stable under bootstrap resampling, stronger selection, larger $N$ and grid-only payoffs, but not under weak selection or when a candidate is removed (Supplementary Material, Sections~S11.4 and~S11.6).
 
 \section{Conclusion and discussion}
