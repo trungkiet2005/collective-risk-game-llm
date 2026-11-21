@@ -95,8 +95,9 @@ play the model `kaggle b t run -m <slug>` selected, exactly as before):
                        built on the same MODEL_PROXY_URL/MODEL_PROXY_API_KEY.
     scripted:<policy>  a deterministic seat that NEVER calls the proxy. Policies:
                        always_0, always_2, always_4, ev_maximiser,
-                       conditional_cooperator -- the same five, with the same
-                       decision rules, as crsd/models/scripted.py.
+                       conditional_cooperator, switch_to_0, switch_to_4 -- the
+                       same seven, with the same decision rules, as
+                       crsd/models/scripted.py.
     self  (or empty)   the run-selected model.
 
   E3a, best response (one llm seat against five KNOWN opponents). Only P1 calls the
@@ -250,7 +251,7 @@ if TEMPLATE_VARIANT not in KNOWN_TEMPLATE_VARIANTS:
 #                      client is built by _client_for() on the same
 #                      MODEL_PROXY_URL/MODEL_PROXY_API_KEY as the selected one.
 #   scripted:<policy>  a deterministic seat that never calls the proxy (free, and
-#                      immune to a 503). Five policies, reimplemented from
+#                      immune to a 503). Seven policies, reimplemented from
 #                      crsd/models/scripted.py further down this file.
 #   self / <empty>     the run-selected model.
 # Same textual shape as every other knob so plan/scripts/launch_shard.py's regex
@@ -260,12 +261,13 @@ if TEMPLATE_VARIANT not in KNOWN_TEMPLATE_VARIANTS:
 SCRIPTED_PREFIX = "scripted:"
 SELF_MODEL = "self"
 SCRIPTED_POLICIES = ("always_0", "always_2", "always_4", "ev_maximiser",
-                     "conditional_cooperator")
+                     "conditional_cooperator", "switch_to_0", "switch_to_4")
 # One character per policy for the seat tag, copied from SEAT_CODE in
 # crsd/analysis/scripted_reference.py so a group reads the same in both arms:
 # "L44444" is one llm seat against five always_4 opponents.
 SEAT_CODE = {"always_0": "0", "always_2": "2", "always_4": "4",
-             "ev_maximiser": "E", "conditional_cooperator": "C"}
+             "ev_maximiser": "E", "conditional_cooperator": "C",
+             "switch_to_0": "Z", "switch_to_4": "F"}
 _SEAT_MODELS_SPEC = os.environ.get("CRG_SEAT_MODELS", "")
 
 
@@ -1738,6 +1740,13 @@ def scripted_decide(policy, risk, history, player_index):
     conditional_cooperator
         round 1 pays a fair share; from round 2 it matches the MEAN of the OTHER
         seats' previous round, snapped to the legal set.
+    switch_to_0 / switch_to_4
+        a DYNAMIC partner (AAMAS 2027 rebuttal, 21-11-2026): pays a fair share in the
+        first half of the game, then from round N_ROUNDS // 2 + 1 (round 6 of 10)
+        switches for good to 0 or to 4. With five such partners and one llm seat the
+        target becomes unreachable (switch_to_0: at most 70 + 20) or certain
+        (switch_to_4: at least 50 + 100), so the best response from round 6 is 0 in
+        both. The round comes from len(history), as in crsd/models/scripted.py.
     """
     name = scripted_policy_name(policy)
     if name not in SCRIPTED_POLICIES:
@@ -1754,6 +1763,10 @@ def scripted_decide(policy, risk, history, player_index):
         if (1.0 - float(risk)) * ENDOWMENT > share_cost:
             return _nearest_option(0)
         return _nearest_option(_scripted_fair_share())
+    if name in ("switch_to_0", "switch_to_4"):
+        if len(history) + 1 < N_ROUNDS // 2 + 1:
+            return _nearest_option(_scripted_fair_share())
+        return _nearest_option(0 if name == "switch_to_0" else 4)
     # conditional_cooperator
     if not history:
         return _nearest_option(_scripted_fair_share())
