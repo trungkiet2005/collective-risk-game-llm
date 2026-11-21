@@ -69,12 +69,16 @@ interpretation and scope sentences, References). Post the set that fits the form
 
 ## Next steps
 
-1. Done 2026-11-21: showpool shards converted to `results/exp_showpool/` (3 models x 20 games),
-   `verify_wide.py --panel any` clean except the two Grok para1 parse failures already disclosed in
-   `results/DATA_CARD.md`; the panel gate flags Qwen and Grok as missing by design (no longer served).
-2. Done: audit round on the three responses (numbers traced to `paper/AAMAS/analysis/followups/*.csv`
-   and to the submitted text); four wording fixes; lengths LF/CRLF: JJ3F 2387/2414, mTF6 2464/2485,
-   6GLf 1958/1979. Responses are final pending the user's read.
+1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
+   commit 4f3b0ac, Kiet merged PR 1 on 2026-11-21). `docs/rebuttal_aamas2027/` is now a clone of it
+   (git pull there, never edit the old copies). Lengths with CRLF: JJ3F 2489, mTF6 2495, 6GLf 2432.
+2. Audit 2026-11-21 18:00: target-240, generalisation and pool numbers match `followups/*.csv`; the
+   6,000 cap correction matches the code (`_REASONING_HINTS` in `crg_task_server.py`, only Haiku forced to
+   3,000 in `run_dense_grid.py`). NOT traceable in either repo yet (Kiet's runs): dynamic-partner arm
+   (`rb_switch.csv`, `results/exp_bestresponse_switch0/4`), the 20-call replication of the same-history probe
+   (173/180, 1 of 90, 178 of 180, P < 0.001), the 40-call explained decisions, the full-grid Haiku reasons
+   (`rb_grid_reasons.csv`, 60/60, 49/60), and the per-folder cap list in `README_code.md`. Kiet to push them
+   to this repo before posting.
 3. User posts on OpenReview.
 
 ## Decisions ledger
