@@ -77,6 +77,11 @@ Risk dose-response probe (Minh, started 2026-11-21 18:26, pre-registered in
 `python paper/AAMAS/analysis/rebuttal_risk.py plan/runs/_dl`. Reviewer simulation of the final
 responses: `SIM_ALL_20261121.md` in the private rebuttal repo.
 
+Update 2026-11-21 20:15: risk sweep done for Luna, Haiku 5.5, gpt-oss (all flat by the pre-registered
+gate, largest step 0.70); Haiku 4.5 and Flash-Lite shards stuck on 503 (acc5, kit567), not used.
+Final responses in the private repo got a slop/accuracy pass and the sweep line (JJ3F 2488, mTF6 2496,
+6GLf 2432 characters with CRLF).
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
