@@ -42,6 +42,12 @@ September run. Do not relaunch those two slugs. Submitted-grid transcripts recov
 550 games (moves verified), only Haiku writes reasoning: `plan/runs/_recover/`.
 Three responses final 2026-11-21 14:50 after audit (mechanical gates clean, every number checked against followups/*.csv, two P-value ranges corrected); kept outside git in docs/rebuttal_aamas2027/FINAL_TO_POST.md.
 
+Generalisation wave (started 2026-11-21 15:14, `plan/scripts/launch_gen.py`, log
+`plan/runs/gen_wave.log`): six served models (Claude Haiku 5.5, GPT-6 Luna, Grok 4.7,
+Gemini 3.8 Flash, Gemma 4 31B, gpt-oss-120b), day 1 = probe + base self-play p = 0 on
+acc1, acc2, acc3, acc4, acc11, chisboiz; day 2 (after 2026-11-22 16:00) = self-play
+p = 0.1 and 0.9, fill DAY2 in the script from probe_accounts.py. Data stays in plan/runs.
+
 ## Next steps
 
 1. Done 2026-11-21: showpool shards converted to `results/exp_showpool/` (3 models x 20 games),
@@ -59,6 +65,8 @@ Three responses final 2026-11-21 14:50 after audit (mechanical gates clean, ever
 - 2026-11-21: write each response to 2,500 characters until the form shows its limit. (user)
 
 - 2026-11-21: share the rebuttal drafts with Trung Kiet through a private repo (technoob05/crg-aamas2027-rebuttal), never the public code repo. (user)
+
+- 2026-11-21: use the remaining benchmark quota on six newer/open models to answer the generalisation question. (user)
 
 ## Manual steps for the user
 
