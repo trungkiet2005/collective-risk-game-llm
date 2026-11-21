@@ -89,6 +89,13 @@ Haiku 4.5 (acc11) and Flash-Lite (hunhtrungkit) at concurrency 1: `plan/runs/rb_
 for everything else is scheduled in-session for 2026-11-22 09:17 (same list; run by hand if the session
 is gone). Reviewer and AC simulation of the final responses: SIM_FINAL_20261121.md in the private repo.
 
+Update 2026-11-21 20:40: five pool users never used for Benchmarks were added to launch_shard.py
+(nvviet05, nguyendinhhaduong, tntduong, vkhoinguyen, hnhhctiliu; tokens in runtime_profiles). They run
+the generalisation redo at concurrency 1 (`plan/runs/gen_redo2.sh`, log gen_redo2.log): gpt-6-luna probe
++ p = 0, grok-4.7 probe + p = 0, gemini-3.8-flash probe (push-only, validation is the run), Haiku 5.5
+p = 0 fill, gpt-oss p = 0.1. Gemma 4 31B: an agent lane runs it locally on a 4x L4 kernel
+(transformers, same prompts and parser), notes in `plan/runs/GEMMA_NOTE.md`, source in kaggle/gemma_local/.
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,

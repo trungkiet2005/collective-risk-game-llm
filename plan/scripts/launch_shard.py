@@ -80,6 +80,9 @@ ACCOUNTS = {
     "kit567":       ("json", CRED_ROOT / "kaggle (2).json"),
     "hunhtrungkit": ("json", CRED_ROOT / "kaggle (3).json"),
     "tnkiet":       ("json", CRED_ROOT / "kaggle (4).json"),
+    # Added 2026-11-21: pool accounts never used for Benchmarks before (token in runtime_profiles).
+    **{n: ("token_txt", CRED_ROOT / "runtime_profiles" / n / "access_token") for n in (
+        "nvviet05", "nguyendinhhaduong", "tntduong", "vkhoinguyen", "hnhhctiliu")},
 }
 
 
