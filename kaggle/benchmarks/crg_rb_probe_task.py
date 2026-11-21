@@ -2759,16 +2759,35 @@ def _rb_target_items():
     return items
 
 
+RB_RISKS_SWEEP = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+
+
+def _rb_risk_items():
+    """Risk dose-response probe (fixed 2026-11-21 before any call; plan/rb-risk-probe-20261121.md).
+    One decision prompt, only the risk changes: 11 levels 0..1, round 1 (no history) and round 6
+    after five fair rounds, base and no-hint wording, RB_SAMPLES_CF calls per cell. The welfare
+    benchmark and the fair-history best response step from 0 to 2 at p* = T/(N*e) = 0.5."""
+    items, k = [], 0
+    for tmpl in ("baseline", "nohint"):
+        for hid in ("r1", "fair"):
+            for risk in RB_RISKS_SWEEP:
+                for s in range(RB_SAMPLES_CF):
+                    items.append(dict(kind="cf", hid=hid, risk=risk, sample=s, tmpl=tmpl, k=k))
+                    k += 1
+    return items
+
+
 def _rb_items():
     """Every call of this run, fixed before the first request."""
-    if RB_SET == "target":
-        items = _rb_target_items()
+    if RB_SET in ("target", "risk"):
+        items = _rb_target_items() if RB_SET == "target" else _rb_risk_items()
         if IS_PUSH_VALIDATION:
             items = items[:2]
         for it in items:
             rng = _rb_random.Random(1000003 * it["k"] + 29)
             it["focal"] = rng.randrange(N_PLAYERS)
-            it["seed"] = (RB_SEED_OFFSET + 50_000_000 + 7919 * it["k"]) % SAMPLING_SEED_MOD
+            off = 50_000_000 if RB_SET == "target" else 120_000_000
+            it["seed"] = (RB_SEED_OFFSET + off + 7919 * it["k"]) % SAMPLING_SEED_MOD
         return items
     items = []
     k = 0
