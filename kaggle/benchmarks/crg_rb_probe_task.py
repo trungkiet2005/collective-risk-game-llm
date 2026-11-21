@@ -2734,8 +2734,42 @@ def _rb_history(hid, focal):
     raise ValueError(hid)
 
 
+RB_SET = os.environ.get("CRG_RB_SET", "main").strip().lower()
+import threading as _rb_threading
+_RB_LOCK = _rb_threading.Lock()
+
+
+def _rb_target_items():
+    """Target probe (fixed 2026-11-21 before any call): round 1, no history.
+    T = 240 makes the fair share 4 per round (the whole endowment) and the pivot p* = 240/240 = 1,
+    so for every p < 1 paying is never worth it; a split rebuilt from the target predicts 4,
+    an incentive-driven agent predicts 0 at both risks. Base and no-hint wording; T = 120 no-hint
+    is the control (fair share 2)."""
+    items, k = [], 0
+    for tmpl, target in (("baseline", 240), ("nohint", 240), ("nohint", 120)):
+        for risk in (0.1, 0.9):
+            for s in range(RB_SAMPLES_CF):
+                items.append(dict(kind="cf", hid="r1", risk=risk, sample=s, tmpl=tmpl,
+                                  target=target, k=k))
+                k += 1
+    for s in range(RB_SAMPLES_EX):
+        items.append(dict(kind="explain", hid="r1", risk=0.9, sample=s, tmpl="baseline",
+                          target=240, k=k))
+        k += 1
+    return items
+
+
 def _rb_items():
     """Every call of this run, fixed before the first request."""
+    if RB_SET == "target":
+        items = _rb_target_items()
+        if IS_PUSH_VALIDATION:
+            items = items[:2]
+        for it in items:
+            rng = _rb_random.Random(1000003 * it["k"] + 29)
+            it["focal"] = rng.randrange(N_PLAYERS)
+            it["seed"] = (RB_SEED_OFFSET + 50_000_000 + 7919 * it["k"]) % SAMPLING_SEED_MOD
+        return items
     items = []
     k = 0
     for hid in ("r1", "fair", "generous", "settled", "defect", "drop"):
@@ -2777,7 +2811,15 @@ def _rb_prompt(it):
     else:
         tmpl = _to_probe_template(base)
         q = _RB_RECOG_Q
-    return _assemble(tmpl, "en", it["focal"], rnd, hist, it["risk"], question_text=q), rnd, hist
+    global TARGET
+    with _RB_LOCK:
+        saved = TARGET
+        TARGET = it.get("target", saved)
+        try:
+            text = _assemble(tmpl, "en", it["focal"], rnd, hist, it["risk"], question_text=q)
+        finally:
+            TARGET = saved
+    return text, rnd, hist
 
 
 def _rb_one(it):
@@ -2786,6 +2828,7 @@ def _rb_one(it):
     row = dict(item=it["k"], kind=it["kind"], history=it["hid"], risk=it["risk"],
                sample=it["sample"], template=it["tmpl"], focal_seat=it["focal"] + 1,
                round=rnd, pool_before=sum(sum(r) for r in hist), model=MODEL,
+               target=it.get("target", TARGET),
                prompt_sha=_rb_hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16])
     if it["kind"] in ("cf", "explain"):
         text, value, failed, ti, to, cost = decide(None, prompt, it["seed"], ctx=ctx)
