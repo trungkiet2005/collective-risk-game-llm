@@ -44,9 +44,12 @@ Three responses drafted and under audit (kept outside git).
 
 ## Next steps
 
-1. When shards finish: convert showpool shards with `plan/scripts/to_wide_csv.py`, gate
-   with `verify_wide.py`, analyse probes, fill the result card.
-2. Finish the three responses under 2,500 characters each, run the rebuttal audit gates.
+1. Done 2026-11-21: showpool shards converted to `results/exp_showpool/` (3 models x 20 games),
+   `verify_wide.py --panel any` clean except the two Grok para1 parse failures already disclosed in
+   `results/DATA_CARD.md`; the panel gate flags Qwen and Grok as missing by design (no longer served).
+2. Done: audit round on the three responses (numbers traced to `paper/AAMAS/analysis/followups/*.csv`
+   and to the submitted text); four wording fixes; lengths LF/CRLF: JJ3F 2387/2414, mTF6 2464/2485,
+   6GLf 1958/1979. Responses are final pending the user's read.
 3. User posts on OpenReview.
 
 ## Decisions ledger
