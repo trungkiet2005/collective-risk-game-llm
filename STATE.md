@@ -40,7 +40,7 @@ Update 2026-11-21 11:30: the endpoint now refuses `qwen3-235b-a22b-instruct-2507
 covers Haiku, Flash and Luna only; Qwen and Grok evidence for the pool control comes from the
 September run. Do not relaunch those two slugs. Submitted-grid transcripts recovered for 308 of
 550 games (moves verified), only Haiku writes reasoning: `plan/runs/_recover/`.
-Three responses drafted and under audit (kept outside git).
+Three responses final 2026-11-21 14:50 after audit (mechanical gates clean, every number checked against followups/*.csv, two P-value ranges corrected); kept outside git in docs/rebuttal_aamas2027/FINAL_TO_POST.md.
 
 ## Next steps
 
