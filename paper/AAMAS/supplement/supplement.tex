@@ -33,6 +33,9 @@
 \usepackage{needspace}
 \let\plainsubsection\subsection
 \renewcommand{\subsection}{\FloatBarrier\needspace{8\baselineskip}\plainsubsection}
+\let\plainsection\section
+\renewcommand{\section}{\FloatBarrier\needspace{12\baselineskip}\plainsection}  % no section heading alone at a page foot
+\makeatletter\setlength{\@fptop}{0pt}\makeatother  % float-only pages start at the top, not centred
 \usepackage[font=small,labelfont=bf,skip=4pt]{caption}
 \usepackage{tocloft}
 \setlength{\cftsecnumwidth}{2.6em}      % room for "S10"
@@ -947,9 +950,9 @@ Table~\ref{tab:sel-facts} checks, cell by cell, the two table-level facts that t
 
 The winners depend on the candidate set: without Qwen3-235B, GPT-5.6 Luna wins the one-table population at all tested risks, and without Gemini 3.5 Flash-Lite, it wins the larger population at moderate and high risk.
 
-The following post-hoc checks reuse the observed payoffs without new model calls. We compare each single entrant's payoff with both resident self-play and its actual tablemates, then compute fixation along the full composition path. These are different comparisons: a favourable initial payoff gap alone does not determine fixation or stationary mass. We also remove each model in turn and rebuild the mutation chain over the retained strategies. This checks dependence on the candidate set, not on the prompt. Every risk and both population sizes are reported, with no new uncertainty intervals.
+The following post-hoc checks reuse the observed payoffs without new model calls. We compare each single entrant's payoff with both resident self-play and its actual tablemates, then compute fixation along the full composition path. These are different comparisons: a favourable initial payoff gap alone does not determine fixation or stationary mass. We also remove each model in turn and rebuild the mutation chain over the retained strategies. This checks dependence on the candidate set, not on the prompt. Every risk and both population sizes are reported, with no new uncertainty intervals: Tables~\ref{tab:review-entrant-1} to~\ref{tab:review-entrant-3} give the single entrants and Table~\ref{tab:review-candidates} the winner for every candidate set.
 
-At $p=0.5$, reaching the target is not required for optimal welfare: zero contribution also earns 20 per seat in expectation. We therefore report stationary-mass-weighted expected payoff and its share of the welfare optimum as well as target rate. The outcomes describe one-model populations in the rare-mutation limit, not the success of mixed groups during invasion.
+At $p=0.5$, reaching the target is not required for optimal welfare: zero contribution also earns 20 per seat in expectation. We therefore report stationary-mass-weighted expected payoff and its share of the welfare optimum as well as target rate (Table~\ref{tab:review-welfare}). The outcomes describe one-model populations in the rare-mutation limit, not the success of mixed groups during invasion.
 
 \input{tables/s_review_selection.tex}
 

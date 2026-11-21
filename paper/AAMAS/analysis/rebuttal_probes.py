@@ -23,6 +23,10 @@ public goods / public goods / social dilemma / commons / volunteer's dilemma).
 
     python paper/AAMAS/analysis/rebuttal_probes.py <download_root> [task] [prefix]
     (generalisation wave: task crg-gen-probe, prefix gen)
+    python paper/AAMAS/analysis/rebuttal_probes.py <download_root> --task crg-rb-probe2 --tag _w2
+
+Wave 2 (crg-rb-probe2, plan/scripts/launch_rb2.py) is an independent replication at
+n = 20 per cell, same prompts and coding rules; --tag keeps its tables separate.
 """
 import csv
 import glob
@@ -88,7 +92,7 @@ def perm_between(groups, rng, n=5000):
     return (hit + 1) / (n + 1)
 
 
-def main(root, task="crg-rb-probe", prefix="rb"):
+def main(root, task="crg-rb-probe", prefix="rb", tag=""):
     rng = random.Random(20261121)
     rows = load(root, task)
     if not rows:
@@ -136,6 +140,9 @@ def main(root, task="crg-rb-probe", prefix="rb"):
     OUT.mkdir(parents=True, exist_ok=True)
     for name, data in ((prefix + "_counterfactual.csv", cf_out), (prefix + "_explain.csv", ex_out),
                        (prefix + "_recognition.csv", rc_out)):
+        if not data:
+            continue
+        name = name.replace(".csv", tag + ".csv")
         with open(OUT / name, "w", newline="", encoding="utf-8") as fh:
             w = csv.DictWriter(fh, fieldnames=list(data[0]))
             w.writeheader()
@@ -146,4 +153,13 @@ def main(root, task="crg-rb-probe", prefix="rb"):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:4])
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("root")
+    ap.add_argument("task_pos", nargs="?", default=None, metavar="task")
+    ap.add_argument("prefix_pos", nargs="?", default=None, metavar="prefix")
+    ap.add_argument("--task", default=None)
+    ap.add_argument("--prefix", default=None)
+    ap.add_argument("--tag", default="")
+    a = ap.parse_args()
+    main(a.root, a.task or a.task_pos or "crg-rb-probe", a.prefix or a.prefix_pos or "rb", a.tag)

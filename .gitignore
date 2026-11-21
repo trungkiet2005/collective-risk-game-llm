@@ -108,3 +108,6 @@ Thumbs.db
 
 # codex-chatgpt-web = rac cua launcher Codex (chi co node_modules/electron), khong thuoc project
 /codex-chatgpt-web/
+
+# Rebuttal drafts and review text: never commit (repo is public; double-blind review)
+rebuttal/

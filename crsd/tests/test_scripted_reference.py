@@ -34,7 +34,9 @@ def _run(condition_name, risk, reps=1, seed=0):
 
 def test_policy_names_match_the_canonical_module():
     """E7 phải phủ ĐÚNG năm chính sách của crsd.models.scripted, không thiếu không thừa."""
-    assert set(sr.POLICY_NAMES) == set(scripted_mod.POLICY_NAMES)
+    assert (set(sr.POLICY_NAMES) | set(scripted_mod.PARTNER_ONLY_POLICIES)
+            == set(scripted_mod.POLICY_NAMES))
+    assert not set(sr.POLICY_NAMES) & set(scripted_mod.PARTNER_ONLY_POLICIES)
     assert len(sr.POLICY_NAMES) == 5
 
 

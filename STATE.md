@@ -20,7 +20,10 @@ merged into main.
 | running pool shown, self-play p=0.1, 0.9 | R3 | running (`crg-rb-showpool`) |
 | same-history counterfactual, explained decisions, game recognition | R1, R2 | running (`crg-rb-probe`, task source `kaggle/benchmarks/crg_rb_probe_task.py`) |
 | E8 follow-up (pool shown at p=0 and with scripted partners, p=0 value probe, group goal) | R3, R2 | ran 2026-09-18, numbers in `paper/AAMAS/analysis/followups/e8_*.csv`; raw data was on the retired GreenNode pod |
-| responses | all | drafts kept outside git (`.git/info/exclude`: `docs/rebuttal_aamas2027/`) |
+| dynamic partners: 5 x `switch_to_0` / `switch_to_4` (pay 2 in rounds 1-5, then 0 / 4), Haiku, Flash, Luna, p=0.1, 0.9 | R1 | done 2026-11-21 from the Windows copy: 6 shards clean (`crg-rb-switch`, `plan/scripts/launch_rb_switch.py`), `results/exp_bestresponse_switch{0,4}` (3 models x 20 games, verify_wide balanced; panel gate flags Qwen/Grok as missing on purpose), `followups/rb_switch.csv` from `paper/AAMAS/analysis/rebuttal_switch.py`. acc2, acc3, acc4 had no quota left. On Windows set `CRSD_CRED_ROOT=D:/AI_PhD/GameTheory/kaggle_for_research` |
+| probe wave 2, independent replication at n = 20 per cell (cf + explain, no recognition), Haiku, Flash, Luna | R1, R2 | done 2026-11-21 from Windows: 3 shards x 420 calls clean, every reply carries the CONTRIBUTION line (`crg-rb-probe2`, `plan/scripts/launch_rb2.py`, accounts foundnotkiet / trungkiet / kakagotto), `followups/rb_{counterfactual,explain}_w2.csv` via `rebuttal_probes.py --task crg-rb-probe2 --tag _w2`. Haiku pays in 7 of 40 settled cf calls (wave 1: 0 of 20); Luna pays 0 once against fair partners at p = 0.1 |
+| output cap of the exp_baseline grid | R1 | Flash-Lite, Luna, Grok grid ran at 6000 (code default), not 3000 as Supp. S3.2 says; README_code.md fixed, S3.2 to fix at camera-ready |
+| responses | all | drafts kept outside git (`.git/info/exclude`: `docs/rebuttal_aamas2027/`); a second set drafted on Windows in `rebuttal/` (also untracked), to merge |
 
 ## Running jobs
 

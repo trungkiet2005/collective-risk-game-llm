@@ -28,6 +28,7 @@ from typing import List, Optional, Sequence, Tuple
 from ..engine import scoring
 from ..models.routing import make_seat_router
 from ..models.scripted import (
+    PARTNER_ONLY_POLICIES,
     POLICY_NAMES as SCRIPTED_POLICY_NAMES,
     SCRIPTED_PREFIX,
     make_scripted_send_batch,
@@ -44,7 +45,7 @@ POLICY_NAMES: Tuple[str, ...] = (
     "ev_maximiser",
     "conditional_cooperator",
 )
-assert set(POLICY_NAMES) == set(SCRIPTED_POLICY_NAMES), (
+assert set(POLICY_NAMES) | set(PARTNER_ONLY_POLICIES) == set(SCRIPTED_POLICY_NAMES), (
     f"lệch tên chính sách: E7 {sorted(POLICY_NAMES)} vs "
     f"crsd.models.scripted {sorted(SCRIPTED_POLICY_NAMES)}"
 )
@@ -56,6 +57,9 @@ SEAT_CODE = {
     "always_4": "4",
     "ev_maximiser": "E",
     "conditional_cooperator": "C",
+    # partner-only (rebuttal 21-11-2026): nửa sau đổi sang 0 / sang 4
+    "switch_to_0": "Z",
+    "switch_to_4": "F",
 }
 
 POLICY_MODULE = "crsd.models.scripted"   # ghi vào kết quả để truy nguyên

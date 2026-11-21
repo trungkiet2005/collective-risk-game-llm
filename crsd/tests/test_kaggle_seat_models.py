@@ -184,6 +184,10 @@ HISTORIES = [
     [[0, 2, 4, 0, 2, 4]],
     [[0, 0, 0, 0, 0, 4], [4, 4, 4, 4, 4, 0]],
     [[2, 2, 2, 2, 2, 2], [0, 4, 0, 4, 0, 4], [2, 0, 2, 0, 2, 0]],
+    # Long enough to cross the switch of switch_to_0 / switch_to_4 (round 6 of 10).
+    [[2, 2, 2, 2, 2, 2]] * 4,
+    [[2, 2, 2, 2, 2, 2]] * 5,
+    [[2, 0, 0, 0, 0, 0]] * 5 + [[0, 4, 4, 4, 4, 4]] * 4,
 ]
 
 
@@ -213,6 +217,37 @@ def test_scripted_policy_behaviour_is_the_documented_one(monkeypatch):
     assert task.scripted_decide("ev_maximiser", 0.9, HISTORIES[1], 0) == 2
     # conditional_cooperator: fair share first, then the mean of the OTHERS.
     assert task.scripted_decide("conditional_cooperator", 0.9, [], 3) == 2
+
+
+def test_switch_partners_pay_fair_share_then_switch_at_round_6(monkeypatch):
+    """switch_to_x (rebuttal R1): 2 in rounds 1-5 whatever happens, x from round 6 on,
+    ignoring both the risk and what the other seats did."""
+    task = _load_task(monkeypatch)
+    for policy, after in (("switch_to_0", 0), ("switch_to_4", 4)):
+        for risk in (0.1, 0.9):
+            for done in range(task.N_ROUNDS):
+                history = [[0, 4, 0, 4, 0, 4]] * done     # history must not matter
+                want = 2 if done + 1 <= 5 else after
+                got = task.scripted_decide(policy, risk, history, 1)
+                assert got == want, (policy, risk, done + 1, got)
+    assert task.SEAT_CODE["switch_to_0"] == "Z" and task.SEAT_CODE["switch_to_4"] == "F"
+
+
+def test_switch_partners_make_round_6_best_response_zero(monkeypatch):
+    """The design claim the rebuttal leans on: against five switch_to_0 partners the
+    target is out of reach from round 6, against five switch_to_4 it is certain."""
+    task = _load_task(monkeypatch)
+    for policy in ("switch_to_0", "switch_to_4"):
+        partners_total = sum(task.scripted_decide(policy, 0.5, [[0] * 6] * r, 1) * 5
+                             for r in range(task.N_ROUNDS))
+        if policy == "switch_to_0":
+            # 50 from partners + the llm seat paying 4 in all ten rounds = 90 < 120
+            assert partners_total + 4 * task.N_ROUNDS < task.TARGET
+        else:
+            assert partners_total >= task.TARGET               # 50 + 100 = 150
+    seats = "self," + ",".join(["scripted:switch_to_0"] * 5)
+    assert _load_task(monkeypatch, CRG_SEAT_MODELS=seats).SEAT_TAG.startswith(
+        "seats-LZZZZZ-")
     assert task.scripted_decide("conditional_cooperator", 0.9, [[0, 4, 4, 4, 4, 4]],
                                 0) == 4
     assert task.scripted_decide("conditional_cooperator", 0.9, [[4, 0, 0, 0, 0, 0]],

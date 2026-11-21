@@ -286,3 +286,42 @@ def test_panel_du_va_dung_thi_xanh(verify_wide, tmp_path):
         for m in sorted(PANEL_TAGS):
             write_cell(tmp_path, "exp_b", risk, m, [m] * 6)
     assert run(verify_wide, tmp_path, "--panel", PANEL_ARG, "--expect-reps", "10") == 0
+
+
+def _run_default_panel(verify_wide, tree) -> int:
+    """main() with NO --panel, i.e. the default 5-model panel plus PARTIAL_PANELS."""
+    argv = ["verify_wide.py", "--wide", str(tree)]
+    old, sys.argv = sys.argv, argv
+    try:
+        return verify_wide.main()
+    finally:
+        sys.argv = old
+
+
+def test_partial_panel_rebuttal_arm_passes_with_its_three_models(verify_wide, tmp_path):
+    """exp_bestresponse_switch0/4 ran on three models on purpose (the endpoint refuses Qwen
+    and Grok since 21-11-2026): the declared partial panel lets it pass."""
+    for exp in ("exp_bestresponse_switch0", "exp_bestresponse_switch4"):
+        for risk in RISKS:
+            for m in verify_wide.PARTIAL_PANELS[exp]:
+                write_cell(tmp_path, exp, risk, m, [m] * 6)
+    assert _run_default_panel(verify_wide, tmp_path) == 0
+
+
+def test_partial_panel_still_catches_a_missing_model(verify_wide, tmp_path, capsys):
+    """The narrower panel is still a gate: dropping one of ITS models must fail."""
+    exp = "exp_bestresponse_switch0"
+    for risk in RISKS:
+        for m in verify_wide.PARTIAL_PANELS[exp][:-1]:
+            write_cell(tmp_path, exp, risk, m, [m] * 6)
+    assert _run_default_panel(verify_wide, tmp_path) == 1
+    assert "CONG DU PANEL" in capsys.readouterr().err
+
+
+def test_partial_panel_does_not_leak_to_other_experiments(verify_wide, tmp_path, capsys):
+    """Any experiment NOT in PARTIAL_PANELS still needs all five models."""
+    for risk in RISKS:
+        for m in verify_wide.PARTIAL_PANELS["exp_bestresponse_switch0"]:
+            write_cell(tmp_path, "exp_bestresponse_coop", risk, m, [m] * 6)
+    assert _run_default_panel(verify_wide, tmp_path) == 1
+    assert "CONG DU PANEL [exp_bestresponse_coop]" in capsys.readouterr().err

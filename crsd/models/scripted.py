@@ -126,6 +126,36 @@ def _conditional_cooperator(ctx: dict) -> float:
     return nearest_option(mean, opts)
 
 
+def _switch_round(ctx: dict) -> int:
+    """Vòng đầu tiên của nửa sau: 10 vòng -> vòng 6. Partner đổi nước từ vòng này."""
+    return int(ctx.get("n_rounds", 10)) // 2 + 1
+
+
+def _make_switch(after: float) -> Callable[[dict], float]:
+    """Partner ĐỘNG cho rebuttal AAMAS 2027 (R1 JJ3F, 21-11-2026).
+
+    Nửa đầu ván đóng đúng phần mình (``fairShare``, = 2 với tham số Milinski), rồi
+    từ vòng ``n_rounds // 2 + 1`` đổi HẲN sang ``after``. Vòng hiện tại lấy từ độ dài
+    lịch sử chứ không từ ``ctx["round"]``, để khớp bản server (chỉ có lịch sử).
+
+    Với E=40, target=120, n=6, 10 vòng và 5 partner thế này + 1 ghế LLM:
+      - ``switch_to_0``: tới đầu vòng 6 quỹ <= 50 + 20 = 70, năm vòng còn lại ghế LLM
+        góp tối đa 20 -> target KHÔNG còn đạt được -> best response từ vòng 6 là 0.
+      - ``switch_to_4``: partner tự góp 5 x 4 x 5 = 100 -> quỹ >= 150 -> target CHẮC
+        đạt -> best response từ vòng 6 cũng là 0.
+    Hai nhánh cùng best response nhưng ngược hướng, nên tách được người giữ mặc định
+    (giữ 2 ở cả hai), người hợp tác có điều kiện (giảm ở switch_to_0) và kẻ ăn theo
+    (giảm ở switch_to_4).
+    """
+    def policy(ctx: dict) -> float:
+        opts = ctx.get("options")
+        current = len(ctx.get("history") or []) + 1
+        if current < _switch_round(ctx):
+            return nearest_option(_fair_share(ctx), opts)
+        return nearest_option(after, opts)
+    return policy
+
+
 # name -> (hàm quyết định, có BẮT BUỘC ngữ cảnh không)
 _POLICIES = {
     "always_0": (_make_always(0), False),
@@ -133,9 +163,16 @@ _POLICIES = {
     "always_4": (_make_always(4), False),
     "ev_maximiser": (_ev_maximiser, True),
     "conditional_cooperator": (_conditional_cooperator, True),
+    "switch_to_0": (_make_switch(0), True),
+    "switch_to_4": (_make_switch(4), True),
 }
 
 POLICY_NAMES = tuple(sorted(_POLICIES))
+
+# Chính sách CHỈ dùng làm partner trong thí nghiệm rebuttal, KHÔNG thuộc bộ năm chính
+# sách tham chiếu của E7 (crsd.analysis.scripted_reference): E7 so các nhóm THUẦN, mà
+# một bàn toàn switch_to_x chỉ là always_2 nửa đầu rồi hằng số -- không thêm mốc nào.
+PARTNER_ONLY_POLICIES = ("switch_to_0", "switch_to_4")
 
 
 def decide(policy: str, ctx: Optional[dict] = None) -> float:

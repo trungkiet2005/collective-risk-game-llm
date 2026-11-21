@@ -78,6 +78,18 @@ MIX_PREFIX = "mix__"
 # chút: tắt cổng là quyết định phải gõ ra chứ không phải một cờ trống dễ lỡ tay.
 PANEL_OFF = {"any", "none", "off"}
 
+# Experiment CO Y chi chay mot phan panel -> panel ky vong RIENG cua no. Cong du panel van
+# chay day du cho no (thieu mot model TRONG danh sach nay van bi bat), va moi experiment
+# khac van phai du 5 model. Tot hon `--panel any`, vi co do tat cong cho TAT CA.
+# Rebuttal 21-11-2026: tu ngay do endpoint tu choi qwen3-235b va grok-4.20 ("Unsupported
+# model version"), nen partner dong chi chay duoc 3 model (STATE.md).
+_REBUTTAL_PANEL = ("anthropic-claude-haiku-4-5-20251001", "google-gemini-3.5-flash-lite",
+                   "openai-gpt-5.6-luna")
+PARTIAL_PANELS = {
+    "exp_bestresponse_switch0": _REBUTTAL_PANEL,
+    "exp_bestresponse_switch4": _REBUTTAL_PANEL,
+}
+
 
 def tag_components(model_tag: str) -> list:
     """`<model_tag>` -> danh sách model mà nó nói là có mặt.
@@ -302,9 +314,12 @@ def main() -> int:
             identities = set(present[exp])
             if exp not in mixed_exps:
                 identities |= set(per_model[exp])
-            missing = panel - identities
+            # Chi thu hep panel khi nguoi dung de MAC DINH; --panel tu khai thi giu nguyen.
+            want = (set(PARTIAL_PANELS[exp]) if args.panel is None and exp in PARTIAL_PANELS
+                    else panel)
+            missing = want - identities
             if missing:
-                errs.append(f"CONG DU PANEL [{exp}]: thieu han {len(missing)}/{len(panel)} "
+                errs.append(f"CONG DU PANEL [{exp}]: thieu han {len(missing)}/{len(want)} "
                             f"model -> {sorted(missing)}. Nhieu kha nang shard cua chung "
                             f"chet ma chua chay lai. Dat --panel any neu experiment nay CO Y "
                             f"chi chay mot phan panel.")

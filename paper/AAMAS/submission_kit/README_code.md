@@ -38,6 +38,18 @@ stopped.
 | `CRG_SEAT_MODELS` | six comma-separated seats: `self`, another model, or `scripted:<policy>` | all `self` |
 | `CRG_MAX_OUT` | output cap per reply | 512, or 6000 for reasoning models |
 
+The defaults above are for a fresh run. The recorded games in `../data/` used
+`CRG_TEMPERATURE=0.7` (0 only in `exp_baseline_temp0`), English prompts and the retry rule
+(a reply that reached the cap was asked again at four times the cap, up to 8,000 tokens),
+with this output cap:
+
+| Data folder | `CRG_MAX_OUT` |
+|---|---|
+| `exp_baseline` | 3000 for Claude Haiku 4.5 and Qwen3-235B; 6000 (the default above) for Gemini 3.5 Flash-Lite, GPT-5.6 Luna and Grok 4.20 |
+| every other folder | 3000 |
+
+To reproduce a folder, set its cap together with its settings below.
+
 Settings of each data folder in `../data/`:
 
 | Data folder | Settings |
@@ -57,7 +69,8 @@ Qwen3-235B-A22B-Instruct-2507 and Grok 4.20 (0309, non-reasoning); routers name 
 differently, so look up each name in the router's model list.
 
 The recorded games were played through a hosted evaluation service that called these
-models; this release replaces only that service's client with the router call above. The
+models, with the same settings for all five; this release replaces only that service's
+client with the router call above. The
 prompts, parser, retry rule, seeds, lottery and scripted partners are the code that played
 the games. The lottery draws and seat layouts depend only on the repetition index, so every
 cell has the same design as in `../data/`. Model text is not reproducible: services accept a

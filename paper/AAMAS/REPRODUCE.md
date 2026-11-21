@@ -51,3 +51,7 @@ python paper/AAMAS/make_submission.py
 This creates local upload files and checks the eight-page body, reference placement, anonymity strings, font types and archive size. It does not submit anything and does not certify scientific completeness, venue eligibility or the absence of overlap with another manuscript.
 
 For the full-paper upload (7 October 2026 onward), run `python paper/AAMAS/make_full_submission.py` instead. It runs the gates above, then adds two folders to `supplementary_material.zip`: `code/` (the game with the evaluation harness swapped for an OpenAI-compatible router call; every other definition is checked to be unchanged, and one game is played against a local stand-in router) and `data/` (every recorded game). It checks both for identifying strings and writes `paper/AAMAS/AAMAS2027_full_submission/`. Its `HUONG_DAN_NOP.md` lists the OpenReview steps.
+
+## arXiv preprint
+
+Run `python paper/AAMAS/make_arxiv.py` from the repository root after the AAMAS build. It leaves `main.tex` and the supplement as submitted and derives a separate preprint in `paper/AAMAS/arxiv/`: `nonacm` mode, the seven authors (first three equal contribution, Le Hong Trang and The Anh Han corresponding), no AAMAS running head, copyright box or ACM Reference Format, comments stripped, and the Supplementary Material appended after the references. It writes `arxiv_submission.zip` (with `main.bbl`, no `.bib`), recompiles the zip in a clean folder with pdflatex only, as arXiv does, and saves that result as `arxiv_preview.pdf`.
