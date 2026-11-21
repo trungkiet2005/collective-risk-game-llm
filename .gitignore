@@ -111,3 +111,12 @@ Thumbs.db
 
 # Rebuttal drafts and review text: never commit (repo is public; double-blind review)
 rebuttal/
+
+# Local preprint build (not tracked)
+paper/AAMAS/ARXIV_METADATA.txt
+paper/AAMAS/arxiv/
+paper/AAMAS/arxiv_preview.pdf
+paper/AAMAS/arxiv_submission.zip
+paper/AAMAS/make_arxiv.py
+paper/AAMAS/supplement/supplement_arxiv.pdf
+paper/AAMAS/supplement/supplement_arxiv.tex
