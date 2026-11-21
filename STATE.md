@@ -12,6 +12,12 @@ Repo moved to the Mac on 2026-11-21: cloned from GitHub into `active/`; the Wind
 origin/main. Branch `submission/overview-figure-20260919` (the submitted paper, 13 commits)
 merged into main.
 
+## Lanes and owners (live board: issue #3 body, https://github.com/trungkiet2005/collective-risk-game-llm/issues/3)
+
+Minh owns experiments, FINAL_TO_POST.md and posting until 25 Nov. Open for Kiet: camera-ready paragraphs for the new
+evidence on branch `camera-ready-rebuttal`, the verified citations, title/abstract rewording (needs Minh's OK).
+Before any Kaggle launch: add a row to the account-lock table in the issue body.
+
 ## Rebuttal lanes
 
 | lane | asked by | status |
