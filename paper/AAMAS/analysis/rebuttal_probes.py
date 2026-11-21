@@ -50,8 +50,11 @@ RECOG = r"collective.?risk|milinski|climate (game|dilemma|change game)|threshold
 
 def load(root):
     rows = []
-    for f in glob.glob(str(Path(root) / "*" / "crg-rb-probe" / "**" / "games.csv"), recursive=True):
-        for r in csv.DictReader(open(f, encoding="utf-8")):
+    files = glob.glob(str(Path(root) / "*" / "crg-rb-probe" / "**" / "games.csv"), recursive=True)
+    per = [list(csv.DictReader(open(f, encoding="utf-8"))) for f in files]
+    # complete runs first, so a partial run of the same model never displaces them
+    for part in sorted(per, key=len, reverse=True):
+        for r in part:
             r["risk"] = float(r["risk"])
             rows.append(r)
     seen, out = set(), []
