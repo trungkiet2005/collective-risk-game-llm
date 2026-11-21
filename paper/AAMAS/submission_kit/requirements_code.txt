@@ -1,0 +1,3 @@
+# crg_game.py needs only the Python standard library (tested with Python 3.12).
+# Optional: reads OPENROUTER_API_KEY and the CRG_* settings from a .env file.
+python-dotenv

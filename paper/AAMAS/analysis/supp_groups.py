@@ -518,7 +518,7 @@ def t_payoff(P, pi):
 
 def t_mass(P, REACH, WEL, point, gate, snum):
     lines = [r" & & & " + " & ".join(cd.LINES[m][0] for m in M) + r" & Target & Payoff \\",
-             r"Comparison & $N$ & $\beta$ & " + " & ".join(cd.LINES[m][1] for m in M) + r" & (\%) & per seat \\",
+             r"Population & $N$ & $\beta$ & " + " & ".join(cd.LINES[m][1] for m in M) + r" & (\%) & per seat \\",
              r"\midrule"]
     reducible, results = 0, {}
     for pi, p in enumerate(RISKS):
@@ -571,7 +571,7 @@ def t_mass(P, REACH, WEL, point, gate, snum):
 
 
 def t_boot(runs, gate, snum):
-    lines = [r"Comparison & $p$ & Top model & Top in (\%) & Target (\%) & 95\% CI & Payoff per seat & 95\% CI \\",
+    lines = [r"Population & $p$ & Top model & Top in (\%) & Target (\%) & 95\% CI & Payoff per seat & 95\% CI \\",
              r"\midrule"]
     winners = {}
     for si, (source, (P, REACH, WEL, point, boots)) in enumerate(runs.items()):
@@ -649,7 +649,7 @@ def t_facts(mx, P, gate, snum):
     gate.number("SelQwenAboveCells", above)
 
     lines += [r"\midrule",
-              group(r"(c) Across-table winner by population size, $\beta=1$, $N$ from 6 to 120", 5),
+              group(r"(c) Winner by population size, $\beta=1$, $N$ from 6 to 120", 5),
               r"$p$ & \multicolumn{2}{l}{Winner at smaller $N$} & From $N$ & Winner up to $N=120$ \\",
               r"\midrule"]
     for pi, p in enumerate(RISKS):

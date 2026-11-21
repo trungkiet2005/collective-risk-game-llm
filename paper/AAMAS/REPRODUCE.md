@@ -40,7 +40,7 @@ The two excluded files target an older manuscript's moved `paper/revision` modul
 
 For the typeset Figures 3 and 5 and both PDFs, run `python paper/AAMAS/build_publication.py` from the repository root. This uses stored estimates and performs the existing packaging gates; it does not claim that pending experiments are complete. The September 18 Linux figure check used Python 3.11, NumPy 2.3.5, pandas 2.3.3, Matplotlib 3.10.8, PyMuPDF 1.28.2 and TeX Live 2026 with Type 1 Libertine fonts.
 
-From `paper/AAMAS/TikZ_Figure_Deliverables`, run `pdflatex -interaction=nonstopmode -halt-on-error figure_rebuilt.tex`. From `paper/AAMAS`, run the same command on `main.tex` twice. Then, from `paper/AAMAS/supplement`, run it on `supplement.tex` twice. Use `bibtex main` followed by two more LaTeX passes if citations change. Direct `pdflatex` also works when `latexmk` cannot find Perl.
+For Figure 1, from `paper/AAMAS/tikz_figure_complete`, run `bash palettes/build_palettes.sh`; it builds the `figure_biolinum.tex` layout in each palette and copies the slate-mono one (`palettes/slate_mono.tex`) to `figures/fig_game_designs.pdf`, the file `main.tex` includes. It needs the `biolinum` package and the PNGs in `assets/`, and it holds no measured number. From `paper/AAMAS`, run the same command on `main.tex` twice. Then, from `paper/AAMAS/supplement`, run it on `supplement.tex` twice. Use `bibtex main` followed by two more LaTeX passes if citations change. Direct `pdflatex` also works when `latexmk` cannot find Perl.
 
 Finally run from the repository root:
 
@@ -49,3 +49,5 @@ python paper/AAMAS/make_submission.py
 ```
 
 This creates local upload files and checks the eight-page body, reference placement, anonymity strings, font types and archive size. It does not submit anything and does not certify scientific completeness, venue eligibility or the absence of overlap with another manuscript.
+
+For the full-paper upload (7 October 2026 onward), run `python paper/AAMAS/make_full_submission.py` instead. It runs the gates above, then adds two folders to `supplementary_material.zip`: `code/` (the game with the evaluation harness swapped for an OpenAI-compatible router call; every other definition is checked to be unchanged, and one game is played against a local stand-in router) and `data/` (every recorded game). It checks both for identifying strings and writes `paper/AAMAS/AAMAS2027_full_submission/`. Its `HUONG_DAN_NOP.md` lists the OpenReview steps.

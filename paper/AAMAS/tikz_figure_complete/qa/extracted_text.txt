@@ -1,0 +1,31 @@
+(a)      The game                                                  (b)      Four designs
+                                                                   Models we study
+                                             6 players
+
+                                                                     Claude          GPT-5.6         Gemini 3.5
+                                             10 rounds                                                            Qwen3-235B    Grok 4.20
+                                                                    Haiku 4.5         Luna           Flash-Lite
+
+
+                                             40 each                              Self-play                           Prompt tests
+                                                                    1           same model ×6                2        prompt variants
+                                             pay 0 / 2 / 4
+
+
+                                             target 120
+
+                                             miss → lose all
+                                             (probability p)
+
+                                                                            Scripted partners                         Mixed tables
+Outcomes                                       Miss: total < 120    3            fixed partners              4          two models
+
+                                                                    Fixed                         Fixed
+
+
+  Target reached    Miss + catastrophe   Miss + no catastrophe
+      total ≥ 120      probability p        probability 1 − p       Fixed                         Fixed
+
+  keep remainder         lose all            keep money
+                                                                                  Fixed
+

@@ -1,0 +1,6 @@
+# Only for optional extraction and QA. Not required for LaTeX compilation.
+Pillow
+numpy
+scipy
+opencv-python-headless
+PyMuPDF
