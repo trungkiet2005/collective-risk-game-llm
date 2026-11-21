@@ -47,6 +47,14 @@ Generalisation wave (started 2026-11-21 15:14, `plan/scripts/launch_gen.py`, log
 Gemini 3.8 Flash, Gemma 4 31B, gpt-oss-120b), day 1 = probe + base self-play p = 0 on
 acc1, acc2, acc3, acc4, acc11, chisboiz; day 2 (after 2026-11-22 16:00) = self-play
 p = 0.1 and 0.9, fill DAY2 in the script from probe_accounts.py. Data stays in plan/runs.
+Traps met on day 1 (2026-11-21): (a) the push-validation guard cut Gemma to 3 of 185 items
+because the server runs `gemma-4-31b-it` as `google/gemma-4-31b`; guard fixed and tested
+(commit "Fix push-validation guard..."), Gemma redone via `plan/runs/gemma_redo.sh`;
+(b) the server's validation model is now `gemini-3.8-flash`, so a Flash 3.8 shard validates
+over its whole sweep: use --push-only then --download-only for that model, never `run`;
+(c) acc1 ran out of quota after 2 of 10 Haiku 5.5 p = 0 games: fill reps 2-9 on day 2.
+Day-1 follow-up chains: `plan/runs/gen_follow.sh` (log gen_follow.log). Day 2 is scheduled
+in-session for 2026-11-22 16:23; if the session is gone, run it by hand from this note.
 
 ## Next steps
 
