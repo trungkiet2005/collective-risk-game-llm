@@ -56,6 +56,13 @@ over its whole sweep: use --push-only then --download-only for that model, never
 Day-1 follow-up chains: `plan/runs/gen_follow.sh` (log gen_follow.log). Day 2 is scheduled
 in-session for 2026-11-22 16:23; if the session is gone, run it by hand from this note.
 
+Update 2026-11-21 16:30: target probe (target 240 makes paying never worth it) run on five models:
+Haiku 4.5 and Flash pay the split from the target (4) in 78 of 80 calls; Luna and gpt-oss in part;
+Haiku 5.5 refuses (0 in 39 of 40). Results `paper/AAMAS/analysis/followups/rb_target.csv`. The mTF6
+response was rewritten with it (v3, predicted move 4 -> 5 by a simulated reviewer before the target
+probe); JJ3F response now adds the two newer models. Private drafts updated in
+technoob05/crg-aamas2027-rebuttal.
+
 ## Next steps
 
 1. Done 2026-11-21: showpool shards converted to `results/exp_showpool/` (3 models x 20 games),
