@@ -1,5 +1,6 @@
 source,model,risk,games,seat_total,share_seats_paying,games_reaching_120,units_after_120
-new,anthropic-claude-haiku-5-5,0.0,2,0.0,0.0,0,0.0
+new,anthropic-claude-haiku-5-5,0.0,10,0.0,0.0,0,0.0
+new,openai-gpt-6-luna,0.0,10,0.0,0.0,0,0.0
 new,openai-gpt-oss-120b,0.0,10,0.87,0.32,0,0.0
 panel,anthropic-claude-haiku-4-5-20251001,0.0,10,20.9,1.0,8,0.8
 panel,anthropic-claude-haiku-4-5-20251001,0.1,10,20.63,1.0,10,1.0
