@@ -1,8 +1,8 @@
-# STATE: collective-risk-game-llm (AAMAS 2027, submission 933)
+# STATE: collective-risk-game-llm (AAMAS 2027)
 
 ## Now (2026-11-21)
 
-Reviews are in: JJ3F 6/7 (proceedings/findings), mTF6 4/6, 6GLf 7/9. Rebuttal window
+Reviews are in (three reviewers; details stay off this public repo). Rebuttal window
 20 to 24 Nov 2026 AoE (about 19:00 on 25 Nov, Vietnam time); reviewers acknowledge by
 3 Dec; notification 21 Dec. The AAMAS 2027 pages give no rebuttal length; AAMAS 2025
 capped it at 2,500 characters, so every response is written to fit 2,500 (user, 11-21).
@@ -14,13 +14,13 @@ merged into main.
 
 ## Rebuttal lanes
 
-| lane | reviewer | status |
+| lane | asked by | status |
 |---|---|---|
-| within-model risk trend, offline | JJ3F | done: `paper/AAMAS/analysis/rebuttal_trend.py`, `followups/rebuttal_trend.csv` |
-| running pool shown, self-play p=0.1, 0.9 | 6GLf | running (`crg-rb-showpool`) |
-| same-history counterfactual, explained decisions, game recognition | JJ3F, mTF6 | running (`crg-rb-probe`, task source `kaggle/benchmarks/crg_rb_probe_task.py`) |
-| E8 follow-up (pool shown at p=0 and with scripted partners, p=0 value probe, group goal) | 6GLf, mTF6 | ran 2026-09-18, numbers in `paper/AAMAS/analysis/followups/e8_*.csv`; raw data was on the retired GreenNode pod |
-| responses | all | drafts in `docs/rebuttal_aamas2027/` |
+| within-model risk trend, offline | R1 | done: `paper/AAMAS/analysis/rebuttal_trend.py`, `followups/rebuttal_trend.csv` |
+| running pool shown, self-play p=0.1, 0.9 | R3 | running (`crg-rb-showpool`) |
+| same-history counterfactual, explained decisions, game recognition | R1, R2 | running (`crg-rb-probe`, task source `kaggle/benchmarks/crg_rb_probe_task.py`) |
+| E8 follow-up (pool shown at p=0 and with scripted partners, p=0 value probe, group goal) | R3, R2 | ran 2026-09-18, numbers in `paper/AAMAS/analysis/followups/e8_*.csv`; raw data was on the retired GreenNode pod |
+| responses | all | drafts kept outside git (`.git/info/exclude`: `docs/rebuttal_aamas2027/`) |
 
 ## Running jobs
 
@@ -43,5 +43,5 @@ Downloads land in `plan/runs/_dl/<account>/<task>/`.
 
 ## Manual steps for the user
 
-- Post the three responses at https://openreview.net/forum?id= (submission 933 page),
+- Post the three responses at https://openreview.net/forum?id= (the submission page),
   one under each review, after the drafts are marked final.
