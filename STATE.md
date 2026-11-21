@@ -63,6 +63,10 @@ response was rewritten with it (v3, predicted move 4 -> 5 by a simulated reviewe
 probe); JJ3F response now adds the two newer models. Private drafts updated in
 technoob05/crg-aamas2027-rebuttal.
 
+Two response sets exist (outside git): FINAL_TO_POST.md (each under 2,500 characters, core
+SkyPart moves) and FINAL_TO_POST_FULL.md (each under 5,000, full SkyPart layout with tables,
+interpretation and scope sentences, References). Post the set that fits the form's real limit.
+
 ## Next steps
 
 1. Done 2026-11-21: showpool shards converted to `results/exp_showpool/` (3 models x 20 games),
