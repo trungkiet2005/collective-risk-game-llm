@@ -108,6 +108,12 @@ checkout, log `plan/runs/rb_goal_wave.log`, task `crg-rb-goalrisk`, 220 calls pe
 vinhdinhthien, trunkdabest, chunaiu (locked in issue 3). Analyse:
 `python paper/AAMAS/analysis/rebuttal_risk.py plan/runs/_dl --task crg-rb-goalrisk --tag _goal`.
 
+Update 2026-11-22 00:20 (Minh): Gemma 4 31B local run 1 (tonngohan/crg-gemma-local-p0) gave 0 rows (GPU OOM with
+2 workers, then illegal memory access); run 2 `tntduong/crg-gemma-local-p0b` (1 worker, batch 8, kernel source
+`kaggle/gemma_local/`, pushed with kaggle_pool.py) running, fetch with `kaggle_pool.py output`. Generalisation day 2
+`plan/scripts/launch_gen_day2.sh` (log `plan/runs/gen_day2.log`) running on foundnotkiet, trungkiet, tonngohan,
+kit567, hunhtrungkit. Lane board and locks: issue 3.
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
