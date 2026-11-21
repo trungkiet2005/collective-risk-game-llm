@@ -58,6 +58,8 @@ Three responses final 2026-11-21 14:50 after audit (mechanical gates clean, ever
   about 12k model calls on the Kaggle Benchmarks pool. (user)
 - 2026-11-21: write each response to 2,500 characters until the form shows its limit. (user)
 
+- 2026-11-21: share the rebuttal drafts with Trung Kiet through a private repo (technoob05/crg-aamas2027-rebuttal), never the public code repo. (user)
+
 ## Manual steps for the user
 
 - Post the three responses at https://openreview.net/forum?id= (the submission page),
