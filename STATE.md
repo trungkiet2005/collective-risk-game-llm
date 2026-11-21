@@ -70,6 +70,13 @@ Two response sets exist (outside git): FINAL_TO_POST.md (each under 2,500 charac
 SkyPart moves) and FINAL_TO_POST_FULL.md (each under 5,000, full SkyPart layout with tables,
 interpretation and scope sentences, References). Post the set that fits the form's real limit.
 
+Risk dose-response probe (Minh, started 2026-11-21 18:26, pre-registered in
+`plan/rb-risk-probe-20261121.md`): `plan/scripts/launch_rb_risk.sh` from the main checkout, log
+`plan/runs/rb_risk_wave.log`, task `crg-rb-risk`, 440 calls per model on acc5 (Haiku 4.5), kit567
+(Flash-Lite), vinhdinhthien (Luna), trunkdabest (Haiku 5.5), chunaiu (gpt-oss-120b). Analyse with
+`python paper/AAMAS/analysis/rebuttal_risk.py plan/runs/_dl`. Reviewer simulation of the final
+responses: `SIM_ALL_20261121.md` in the private rebuttal repo.
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
