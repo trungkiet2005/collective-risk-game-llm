@@ -82,6 +82,13 @@ gate, largest step 0.70); Haiku 4.5 and Flash-Lite shards stuck on 503 (acc5, ki
 Final responses in the private repo got a slop/accuracy pass and the sweep line (JJ3F 2488, mTF6 2496,
 6GLf 2432 characters with CRLF).
 
+Update 2026-11-21 20:25: generalisation day 1 ended with only Haiku 5.5 and gpt-oss complete. Failures:
+503 under concurrency (probes for gpt-6-luna, grok-4.7, gemini-3.8-flash), quota 403 (self-play p = 0 for
+gpt-6-luna on acc2, grok-4.7 on acc3), Gemma returns empty content (dropped). Risk sweep rerun for
+Haiku 4.5 (acc11) and Flash-Lite (hunhtrungkit) at concurrency 1: `plan/runs/rb_risk_redo.sh`. Catch-up
+for everything else is scheduled in-session for 2026-11-22 09:17 (same list; run by hand if the session
+is gone). Reviewer and AC simulation of the final responses: SIM_FINAL_20261121.md in the private repo.
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
