@@ -1,0 +1,6 @@
+model,n_games,slope_per_0p1,slope_lo,slope_hi,perm_p,spearman,mean_low,mean_high,high_minus_low,benchmark_slope_per_0p1
+anthropic-claude-haiku-4-5-20251001,100,0.047,-0.0,0.093,0.0674,0.189,20.96,21.21,0.25,2.97
+google-gemini-3.5-flash-lite,100,-0.001,-0.005,0.003,0.7171,-0.05,20.01,20.01,-0.0,2.97
+openai-gpt-5.6-luna,100,-0.024,-0.052,0.003,0.112,-0.177,19.97,19.87,-0.1,2.97
+qwen-qwen3-235b-a22b-instruct-2507,100,-0.047,-0.073,-0.023,0.0008,-0.364,18.5,18.23,-0.27,2.97
+xai-grok-4.20-0309-non-reasoning,100,1.002,0.701,1.303,0.0002,0.573,32.15,37.13,4.98,2.97

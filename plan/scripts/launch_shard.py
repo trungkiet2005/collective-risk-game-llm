@@ -43,7 +43,7 @@ CRED_ROOT = Path(os.environ.get(
 WORK = REPO / "plan" / "runs"          # log + file shard
 # Kết quả tải về PHẢI nằm ở đường dẫn ngắn: cây thư mục Kaggle sinh ra đã 174 ký tự,
 # đặt trong plan/runs/<label>/ là vượt giới hạn 260 của Windows và download chết.
-DL_ROOT = Path("D:/tmp/crgdl")
+DL_ROOT = Path(os.environ.get("CRG_DL_ROOT", "D:/tmp/crgdl"))
 
 # account -> (kiểu, đường dẫn credential).
 #
