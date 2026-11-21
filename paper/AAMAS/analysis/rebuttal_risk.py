@@ -22,8 +22,8 @@ ABOVE = {"r1": (0.6, 0.7, 0.8, 0.9, 1.0), "fair": (0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
 B = 5000
 
 
-def load(root):
-    files = glob.glob(str(Path(root) / "*" / "crg-rb-risk" / "**" / "games.csv"), recursive=True)
+def load(root, task="crg-rb-risk"):
+    files = glob.glob(str(Path(root) / "*" / task / "**" / "games.csv"), recursive=True)
     parts = sorted((list(csv.DictReader(open(f, encoding="utf-8"))) for f in files), key=len, reverse=True)
     seen, rows = set(), []
     for part in parts:
@@ -44,8 +44,8 @@ def boot_diff(a, b, rng):
     return round(d[int(0.025 * B)], 2), round(d[int(0.975 * B)], 2)
 
 
-def main(root):
-    rows = load(root)
+def main(root, task="crg-rb-risk", tag=""):
+    rows = load(root, task)
     cells = defaultdict(list)
     fails = defaultdict(int)
     for r in rows:
@@ -61,7 +61,7 @@ def main(root):
                           mean=round(sum(v) / len(v), 2), share0=round(sum(x == 0 for x in v) / len(v), 2),
                           share2=round(sum(x == 2 for x in v) / len(v), 2),
                           share4=round(sum(x == 4 for x in v) / len(v), 2), best_response=br))
-    with open(HERE / "rb_risk.csv", "w", newline="", encoding="utf-8") as fh:
+    with open(HERE / ("rb_risk%s.csv" % tag), "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(curve[0]))
         w.writeheader()
         w.writerows(curve)
@@ -81,7 +81,7 @@ def main(root):
                           verdict="risk-responsive" if step >= 1.0 and ci[0] > 0 else "flat",
                           best_response_below=round(sum(x == 0 for x in lo) / len(lo), 2),
                           mean_p0=round(sum(z) / len(z), 2) if z else "", benchmark_step=2))
-    with open(HERE / "rb_risk_step.csv", "w", newline="", encoding="utf-8") as fh:
+    with open(HERE / ("rb_risk%s_step.csv" % tag), "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(steps[0]))
         w.writeheader()
         w.writerows(steps)
@@ -90,4 +90,10 @@ def main(root):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("root")
+    ap.add_argument("--task", default="crg-rb-risk")
+    ap.add_argument("--tag", default="")
+    a = ap.parse_args()
+    main(a.root, a.task, a.tag)
