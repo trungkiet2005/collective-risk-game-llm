@@ -541,8 +541,16 @@ def _model_key(name):
 
 _EXPECTED_MODELS = [m.strip() for m in os.environ.get("CRG_EXPECT_MODEL", "").split(",")
                     if m.strip()]
+# The server can also drop a slug suffix ("gemma-4-31b-it" runs as "google/gemma-4-31b";
+# measured 2026-11-21, that probe silently played 3 items instead of 185), so the provider
+# prefix is removed and either name may contain the other.
+def _same_model(slug, server_name):
+    a, b = _model_key(slug), _model_key(server_name.split("/")[-1])
+    return a in b or b in a
+
+
 IS_PUSH_VALIDATION = bool(_EXPECTED_MODELS) and not any(
-    _model_key(m) in _model_key(MODEL) for m in _EXPECTED_MODELS)
+    _same_model(m, MODEL) for m in _EXPECTED_MODELS)
 if IS_PUSH_VALIDATION:
     RISKS, LANGS, REPS, REP_START = [0.9], ["en"], 1, 0
 

@@ -21,7 +21,8 @@ Explain: keyword coding of the free-text reasons, coded categories fixed here:
 Recognition: names a known game (collective-risk / Milinski / climate game / threshold
 public goods / public goods / social dilemma / commons / volunteer's dilemma).
 
-    python paper/AAMAS/analysis/rebuttal_probes.py <download_root>
+    python paper/AAMAS/analysis/rebuttal_probes.py <download_root> [task] [prefix]
+    (generalisation wave: task crg-gen-probe, prefix gen)
 """
 import csv
 import glob
@@ -48,9 +49,9 @@ CODES = {
 RECOG = r"collective.?risk|milinski|climate (game|dilemma|change game)|threshold public goods|public goods|social dilemma|tragedy of the commons|commons|volunteer"
 
 
-def load(root):
+def load(root, task="crg-rb-probe"):
     rows = []
-    files = glob.glob(str(Path(root) / "*" / "crg-rb-probe" / "**" / "games.csv"), recursive=True)
+    files = glob.glob(str(Path(root) / "*" / task / "**" / "games.csv"), recursive=True)
     per = [list(csv.DictReader(open(f, encoding="utf-8"))) for f in files]
     # complete runs first, so a partial run of the same model never displaces them
     for part in sorted(per, key=len, reverse=True):
@@ -87,9 +88,9 @@ def perm_between(groups, rng, n=5000):
     return (hit + 1) / (n + 1)
 
 
-def main(root):
+def main(root, task="crg-rb-probe", prefix="rb"):
     rng = random.Random(20261121)
-    rows = load(root)
+    rows = load(root, task)
     if not rows:
         raise SystemExit("no probe rows under %s" % root)
     cf_out, ex_out, rc_out = [], [], []
@@ -133,8 +134,8 @@ def main(root):
                 rc_out.append(dict(model=m, template=t, n=len(sub), names_known_game=sum(hits),
                                    examples=" || ".join((r["value"] or "")[:120] for r in sub[:2])))
     OUT.mkdir(parents=True, exist_ok=True)
-    for name, data in (("rb_counterfactual.csv", cf_out), ("rb_explain.csv", ex_out),
-                       ("rb_recognition.csv", rc_out)):
+    for name, data in ((prefix + "_counterfactual.csv", cf_out), (prefix + "_explain.csv", ex_out),
+                       (prefix + "_recognition.csv", rc_out)):
         with open(OUT / name, "w", newline="", encoding="utf-8") as fh:
             w = csv.DictWriter(fh, fieldnames=list(data[0]))
             w.writeheader()
@@ -145,4 +146,4 @@ def main(root):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:4])

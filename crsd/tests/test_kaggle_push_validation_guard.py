@@ -23,6 +23,8 @@ SERVER_NAMES = [
     ("qwen3-235b-a22b-instruct-2507", "qwen/qwen3-235b-a22b-instruct-2507"),
     ("grok-4.20-0309-non-reasoning", "xai/grok-4.20-0309-non-reasoning"),
     ("claude-opus-5-default", "anthropic/claude-opus-5@default"),
+    ("gemma-4-31b-it", "google/gemma-4-31b"),
+    ("claude-haiku-5-5", "anthropic/claude-haiku-5-5"),
 ]
 SWEEP = {"CRG_RISKS": "0,0.1,0.9", "CRG_LANGS": "en", "CRG_REPS": "5", "CRG_REP_START": "5"}
 
