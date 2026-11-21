@@ -24,6 +24,13 @@ merged into main.
 
 ## Running jobs
 
+Status 2026-11-21 11:10: 8/15 shards clean. Agent lane "rescue" reruns probe Flash
+(503 under concurrency), probe Grok and Qwen (run never finished), showpool Luna p=0.9 reps
+1-9 (tnkiet out of quota); notes in `plan/runs/RESCUE_NOTE.md`. Agent lane "recover"
+re-downloads the submitted grid's transcripts (reasoning text) from the benchmark server,
+no quota; notes in `plan/runs/_recover/RECOVER_NOTE.md`. Analyses:
+`paper/AAMAS/analysis/rebuttal_{trend,probes,showpool}.py`.
+
 `plan/scripts/launch_rb.py` (driver log `plan/runs/rb_wave.log`, per-shard logs
 `plan/runs/rb_*/shard.log`): 15 shards, one Kaggle user each, plan fixed in the script.
 Downloads land in `plan/runs/_dl/<account>/<task>/`.
