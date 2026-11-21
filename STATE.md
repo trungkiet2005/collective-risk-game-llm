@@ -35,6 +35,13 @@ no quota; notes in `plan/runs/_recover/RECOVER_NOTE.md`. Analyses:
 `plan/runs/rb_*/shard.log`): 15 shards, one Kaggle user each, plan fixed in the script.
 Downloads land in `plan/runs/_dl/<account>/<task>/`.
 
+Update 2026-11-21 11:30: the endpoint now refuses `qwen3-235b-a22b-instruct-2507` and
+`grok-4.20-0309-non-reasoning` ("Skipped (Unsupported model version)"), so every new run
+covers Haiku, Flash and Luna only; Qwen and Grok evidence for the pool control comes from the
+September run. Do not relaunch those two slugs. Submitted-grid transcripts recovered for 308 of
+550 games (moves verified), only Haiku writes reasoning: `plan/runs/_recover/`.
+Three responses drafted and under audit (kept outside git).
+
 ## Next steps
 
 1. When shards finish: convert showpool shards with `plan/scripts/to_wide_csv.py`, gate
