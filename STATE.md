@@ -102,6 +102,12 @@ the generalisation redo at concurrency 1 (`plan/runs/gen_redo2.sh`, log gen_redo
 p = 0 fill, gpt-oss p = 0.1. Gemma 4 31B: an agent lane runs it locally on a 4x L4 kernel
 (transformers, same prompts and parser), notes in `plan/runs/GEMMA_NOTE.md`, source in kaggle/gemma_local/.
 
+Goal-prompt risk sweep (Minh, started 2026-11-22 00:25; positive control for the flat base sweep;
+pre-registered `plan/rb-goalrisk-probe-20261122.md`): `plan/scripts/launch_rb_goalrisk.sh` from the main
+checkout, log `plan/runs/rb_goal_wave.log`, task `crg-rb-goalrisk`, 220 calls per model on acc5, hunhtrungkit,
+vinhdinhthien, trunkdabest, chunaiu (locked in issue 3). Analyse:
+`python paper/AAMAS/analysis/rebuttal_risk.py plan/runs/_dl --task crg-rb-goalrisk --tag _goal`.
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
