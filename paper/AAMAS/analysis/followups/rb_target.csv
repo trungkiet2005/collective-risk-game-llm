@@ -1,0 +1,7 @@
+model,wording,target,risk,n,mean,share_pay4,share_pay0
+google/gemini-3.5-flash-lite,baseline,240,0.1,10,4.0,1.0,0.0
+google/gemini-3.5-flash-lite,baseline,240,0.9,10,4.0,1.0,0.0
+google/gemini-3.5-flash-lite,nohint,120,0.1,10,2.0,0.0,0.0
+google/gemini-3.5-flash-lite,nohint,120,0.9,10,2.0,0.0,0.0
+google/gemini-3.5-flash-lite,nohint,240,0.1,10,4.0,1.0,0.0
+google/gemini-3.5-flash-lite,nohint,240,0.9,10,4.0,1.0,0.0

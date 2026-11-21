@@ -1,0 +1,6 @@
+model,template,n,names_known_game,examples
+anthropic/claude-haiku-5-5,wording,10,10,"Yes. This is the Collective Risk Social Dilemma (collective risk dilemma), usually used to study how groups cooperate to || Yes, this is the Collective Risk Dilemma (as in Milinski et al., 2008), which studies how people cooperate, or free-ride"
+anthropic/claude-haiku-5-5,baseline,10,10,"Yes, this is the collective risk dilemma (CRD) threshold public goods game (e.g., Milinski et al., 2008; Tavoni et al.,  || Yes, this is the collective-risk social dilemma (Milinski et al., 2008), a threshold public goods game with a probabilis"
+google/gemma-4-31b,wording,1,1,Threshold Public Goods Game; it is usually used to study cooperation and coordination behavior when a collective goal mu
+openai/gpt-oss-120b,wording,10,9,"Yes, it is a threshold (or provision‑point) public goods game, which is commonly used to study collective action and coo || Yes – it is the collective‑risk social dilemma (a threshold public‑goods game), commonly used to study cooperation under"
+openai/gpt-oss-120b,baseline,10,10,"Yes, it is the collective‑risk dilemma (climate game) commonly used to study cooperation and collective action in climat || Yes, it is the collective‑risk social dilemma (the “climate‑change” game) commonly used to study cooperation and climate"
