@@ -121,6 +121,11 @@ Update 2026-11-22 09:15: every rebuttal experiment is finished. Gemma 4 31B loca
 Grok 4.7 probe never finished (dropped). Final responses updated (private repo 1226dc7): JJ3F 2498, mTF6 2498, 6GLf 2427
 characters with CRLF. Nothing left running for the rebuttal; the 09:17 catch-up was cancelled.
 
+Update 2026-11-22 (pre-posting): Kiet's PR 4 (switch-to-4 split by pool, `rebuttal_switch_settled.py`) verified and merged;
+his private PR 2 closed after porting its three edits by hand onto the final. Final responses ready to post: private repo
+commit c4eaa02, one file per review in `docs/rebuttal_aamas2027/post/` (JJ3F 2497, mTF6 2496, 6GLf 2452 characters with CRLF);
+every number traced (SOURCES.md), anonymity scan clean, markdown tables render.
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
