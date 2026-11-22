@@ -114,6 +114,13 @@ Update 2026-11-22 00:20 (Minh): Gemma 4 31B local run 1 (tonngohan/crg-gemma-loc
 `plan/scripts/launch_gen_day2.sh` (log `plan/runs/gen_day2.log`) running on foundnotkiet, trungkiet, tonngohan,
 kit567, hunhtrungkit. Lane board and locks: issue 3.
 
+Update 2026-11-22 09:15: every rebuttal experiment is finished. Gemma 4 31B local run 2 complete (185 probe items,
+10 games, 0 parse failures; copied to plan/runs/_dl/tntduong/). Goal-prompt sweep: gpt-oss risk-responsive (step 1.58
+[1.33, 1.80]), the positive control; Luna prediction not met; Haiku 4.5 goal shard failed. Day-2 self-play: Haiku 5.5
+9.47 at p = 0.1 vs 20.03 at p = 0.9 (newer model responds in full games); GPT-6 Luna flat 20.03; gpt-oss 14.4 vs 20.47.
+Grok 4.7 probe never finished (dropped). Final responses updated (private repo 1226dc7): JJ3F 2498, mTF6 2498, 6GLf 2427
+characters with CRLF. Nothing left running for the rebuttal; the 09:17 catch-up was cancelled.
+
 ## Next steps
 
 1. Final responses live in the private repo `technoob05/crg-aamas2027-rebuttal` (`FINAL_TO_POST.md`,
